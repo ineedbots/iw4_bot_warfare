@@ -1,0 +1,1 @@
+start iw4x.exe -dedicated +set fs_game "mods/bots" +set developer "1" +set developer_script "1" +set scr_game_spectatetype "2" scr_war_scorelimit "0" +set sv_cheats "1" +set logfile "2" +set bots_manage_add "7" +devmap mp_rust

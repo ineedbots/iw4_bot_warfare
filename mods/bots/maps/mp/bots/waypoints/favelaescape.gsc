@@ -1,0 +1,4 @@
+FavelaEscape()
+{
+	return [];
+}
