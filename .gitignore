@@ -6,11 +6,15 @@
 !/z_devserver.bat
 !/z_dev.bat
 !/z_serverdev.bat
+!/z_server.bat
 
 # Folder to not ignore
 !/mods/
 /mods/*
 !/mods/bots/
+!/main/
+/main/*
+!/main/server.cfg
 
 *.log
 logs/
