@@ -87,11 +87,10 @@ resetBotVars()
 	self.bot.second_next_wp = -1;
 	self.bot.towards_goal = undefined;
 	self.bot.astar = [];
+	self.bot.speed = 0;
 	
 	self.bot.isfrozen = false;
-	self.bot.sprintendtime = -1;
 	self.bot.isreloading = false;
-	self.bot.issprinting = false;
 	self.bot.isfragging = false;
 	self.bot.issmoking = false;
 	self.bot.isfraggingafter = false;
@@ -142,6 +141,7 @@ onPlayerSpawned()
 		self thread stanceHack();
 
 		self thread UseRunThink();
+		self thread watchUsingRemote();
 		
 		self thread spawned();
 	}
@@ -235,7 +235,8 @@ UseRunThink()
 			self.bot.isfrozen ||
 			self.bot.isreloading ||
 			self.bot.ads_pressed || self.bot.fire_pressed ||
-			self.bot.isfragging || self.bot.issmoking)
+			self.bot.isfragging || self.bot.issmoking ||
+			self.bot.speed <= 0)
 			{
 				self.bot.running = false;
 				self thread doRunDelay();
@@ -268,23 +269,25 @@ bot_lookat(pos, time, vel)
 	self endon("bots_aim_overlap");
 	self endon("disconnect");
 	self endon("death");
+	self endon("spawned_player");
 	level endon ( "game_ended" );
 
 	if (!isDefined(pos))
 		return;
 
+	steps = time / 0.05;
+	if (!isDefined(steps) || steps <= 0)
+		steps = 1;
+
 	if (isDefined(vel))
 	{
-		vel /= 4;
-		pos -= vel;
+		vel *= time;
+		vel /= steps;
+		pos += vel;
 	}
 
 	myAngle=self getPlayerAngles();
 	angles = VectorToAngles( (pos - self GetEye()) - anglesToForward(myAngle) );
-
-	steps = time / 0.05;
-	if (!isDefined(steps) || steps <= 0)
-		steps = 1;
 	
 	X=(angles[0]-myAngle[0]);
 	while(X > 170.0)
@@ -335,19 +338,22 @@ stanceHack()
 fireHack()
 {
 	self endon("disconnect");
-	self endon("death");
+	self endon("spawned_player");
 
 	self FreezeControls(true);
 	for (;;)
 	{
 		wait 0.05;
 
+		if (!isAlive(self))
+			return;
+
 		shouldFire = self.bot.fire_pressed;
 
 		if (self.bot.isswitching || self.bot.run_in_delay || self.bot.running)
 			shouldFire = false;
 
-		if (self.bot.isfragging || self.bot.issmoking || !self GetCurrentWeaponClipAmmo())
+		if (self.bot.isfragging || self.bot.issmoking || (!self GetCurrentWeaponClipAmmo() && !self IsUsingRemote()))
 			shouldFire = true;
 
 		if (level.gameEnded || !gameFlag( "prematch_done" ))
@@ -363,11 +369,20 @@ fireHack()
 adsHack()
 {
 	self endon("disconnect");
-	self endon("death");
+	self endon("spawned_player");
 
 	for (;;)
 	{
 		wait 0.05;
+
+		if (!isAlive(self))
+			return;
+
+		if (self isUsingRemote())
+		{
+			self ResetSpreadOverride();
+			continue;
+		}
 
 		shouldAds = self.bot.ads_pressed;
 
@@ -412,6 +427,7 @@ onWeaponChange()
 
 	self.bot.isswitching = false;
 	
+	self.bot.is_cur_full_auto = WeaponIsFullAuto(self GetCurrentWeapon());
 	for(;;)
 	{
 		self waittill( "weapon_change", newWeapon );
@@ -423,8 +439,11 @@ onWeaponChange()
 			case "none":
 				if(isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != "none")
 					self setSpawnWeapon(self.lastDroppableWeapon);
-			break;//ac130, grenades
-			case "":
+			break;//grenades
+			case "ac130_105mm_mp":
+			case "ac130_40mm_mp":
+			case "ac130_25mm_mp":
+			case "heli_remote_mp":
 			break;
 			default:
 				self thread doSwitch();
@@ -492,6 +511,86 @@ onLastStand()
 	}
 }
 
+watchUsingRemote()
+{
+	self endon("disconnect");
+	self endon("spawned_player");
+
+	for (;;)
+	{
+		if (isDefined(level.chopper) && isDefined(level.chopper.gunner) && level.chopper.gunner == self)
+		{
+			self watchUsingMinigun();
+
+			if (isReallyAlive(self))
+			{
+				self setSpawnWeapon(self getLastWeapon());
+				self.bot.targets = [];
+			}
+		}
+
+		if (isDefined(level.ac130Player) && level.ac130player == self)
+		{
+			self thread watchAc130Weapon();
+			self watchUsingAc130();
+
+			if (isReallyAlive(self))
+			{
+				self setSpawnWeapon(self getLastWeapon());
+				self.bot.targets = [];
+			}
+		}
+
+		wait 1;
+	}
+}
+
+watchUsingMinigun()
+{
+	self endon("heliPlayer_removed");
+
+	while (isDefined(level.chopper) && isDefined(level.chopper.gunner) && level.chopper.gunner == self)
+	{
+		if (self getCurrentWeapon() != "heli_remote_mp")
+		{
+			self setspawnweapon("heli_remote_mp");
+		}
+
+		wait 0.05;
+	}
+}
+
+watchAc130Weapon()
+{
+	self endon("ac130player_removed");
+	self endon("disconnect");
+
+	while (isDefined(level.ac130Player) && level.ac130player == self)
+	{
+		curWeap = self GetCurrentWeapon();
+
+		if (curWeap != "ac130_105mm_mp" && curWeap != "ac130_40mm_mp" && curWeap != "ac130_25mm_mp")
+			self setSpawnWeapon("ac130_105mm_mp");
+
+		wait 0.05;
+	}
+}
+
+watchUsingAc130()
+{
+	self endon("ac130player_removed");
+
+	while (isDefined(level.ac130Player) && level.ac130player == self)
+	{
+		self setspawnweapon("ac130_105mm_mp");
+		wait 3+randomInt(3);
+		self setspawnweapon("ac130_40mm_mp");
+		wait 4+randomInt(3);
+		self setspawnweapon("ac130_25mm_mp");
+		wait 4+randomInt(3);
+	}
+}
+
 /*
 	We wait for a time defined by the bot's difficulty and start all threads that control the bot.
 */
@@ -502,12 +601,12 @@ spawned()
 
 	wait self.pers["bots"]["skill"]["spawn_time"];
 	
-	/*self thread check_reload();
-	self thread stance();
-	self thread walk();
 	self thread target();
 	self thread aim();
-	self thread onNewEnemy();*/
+	self thread check_reload();
+	self thread stance();
+	self thread onNewEnemy();
+	self thread walk();
 	
 	self notify("bot_spawned");
 }
@@ -584,12 +683,12 @@ reload_thread()
 	
 	wait 2.5;
 	
-	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfragging || self.bot.issmoking || self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
+	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.issmokingafter || self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
 		return;
 		
 	cur = self getCurrentWEapon();
 	
-	if(IsWeaponClipOnly(cur) || !self GetWeaponAmmoStock(cur))
+	if(IsWeaponClipOnly(cur) || !self GetWeaponAmmoStock(cur) || self IsUsingRemote())
 		return;
 	
 	maxsize = WeaponClipSize(cur);
@@ -605,13 +704,14 @@ reload_thread()
 target()
 {
 	self endon("disconnect");
-	self endon("death");
-
-	targets = [];
+	self endon("spawned_player");
 	
 	for(;;)
 	{
 		wait 0.05;
+
+		if (!isAlive(self))
+			return;
 		
 		if(self maps\mp\_flashgrenades::isFlashbanged())
 			continue;
@@ -628,6 +728,15 @@ target()
 		initReactTime = self.pers["bots"]["skill"]["init_react_time"];
 		hasTarget = isDefined(self.bot.target);
 		usingRemote = self isUsingRemote();
+		vehEnt = undefined;
+
+		if (usingRemote)
+		{
+			if ( level.ac130player == self )
+				vehEnt = level.ac130.planeModel;
+			if ( isDefined(level.chopper) && isDefined(level.chopper.gunner) && level.chopper.gunner == self )
+				vehEnt = level.chopper;
+		}
 		
 		if(hasTarget && !isDefined(self.bot.target.entity))
 		{
@@ -642,7 +751,9 @@ target()
 			daDist = distanceSquared(self.origin, ent.origin);
 			obj = self.bot.targets[key];
 			isObjDef = isDefined(obj);
-			entOrigin = ent.origin + (0, 0, 5);
+			entOrigin = ent.origin;
+			if (isDefined(self.bot.script_target_offset))
+				entOrigin += self.bot.script_target_offset;
 			
 			for(;;)
 			{
@@ -668,6 +779,8 @@ target()
 						obj.trace_time_time = 0;
 						obj.rand = randomInt(100);
 						obj.didlook = false;
+						obj.isplay = isPlayer(ent);
+						obj.offset = self.bot.script_target_offset;
 						
 						self.bot.targets[key] = obj;
 					}
@@ -730,6 +843,8 @@ target()
 				obj.trace_time_time = 0;
 				obj.rand = randomInt(100);
 				obj.didlook = false;
+				obj.isplay = isPlayer(player);
+				obj.offset = undefined;
 				
 				self.bot.targets[key] = obj;
 			}
@@ -767,7 +882,8 @@ target()
 
 			if (usingRemote)
 			{
-				canTargetPlayer = true;
+				canTargetPlayer = (bulletTracePassed(myEye, player getTagOrigin( "j_head" ), false, vehEnt)
+													&& !player _hasPerk("specialty_coldblooded"));
 			}
 			else
 			{
@@ -795,6 +911,8 @@ target()
 					obj.trace_time_time = 0;
 					obj.rand = randomInt(100);
 					obj.didlook = false;
+					obj.isplay = isPlayer(player);
+					obj.offset = undefined;
 					
 					self.bot.targets[key] = obj;
 				}
@@ -964,11 +1082,14 @@ watchToLook()
 aim()
 {
 	self endon("disconnect");
-	self endon("death");
+	self endon("spawned_player"); // for remote killstreaks.
 	
 	for(;;)
 	{
 		wait 0.05;
+
+		if (!isAlive(self))
+			return;
 		
 		if(!gameFlag( "prematch_done" ) || level.gameEnded || self.bot.isfrozen || self maps\mp\_flashgrenades::isFlashbanged())
 			continue;
@@ -976,6 +1097,8 @@ aim()
 		aimspeed = self.pers["bots"]["skill"]["aim_time"];
 		if(self IsStunned() || self isArtShocked())
 			aimspeed = 1;
+
+		usingRemote = self IsUsingRemote();
 		
 		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity))
 		{
@@ -984,7 +1107,8 @@ aim()
 			last_pos = self.bot.target.last_seen_pos;
 			target = self.bot.target.entity;
 			conedot = 0;
-			isplay = isPlayer(target);
+			isplay = self.bot.target.isplay;
+			offset = self.bot.target.offset;
 			dist = self.bot.target.dist;
 			curweap = self getCurrentWeapon();
 			eyePos = self getEye();
@@ -995,14 +1119,14 @@ aim()
 			nadeAimOffset = 0;
 			myeye = self getEye();
 			
-			if(self.bot.isfragging || self.bot.issmoking)
+			if(self.bot.isfraggingafter || self.bot.issmokingafter)
 				nadeAimOffset = dist/3000;
 			else if(weaponClass(curweap) == "grenade")
 				nadeAimOffset = dist/16000;
 			
 			if(no_trace_time)
 			{
-				if(no_trace_time > remember_time/2)
+				if(no_trace_time > remember_time/2 && !usingRemote)
 				{
 					self ads(false);
 					
@@ -1029,7 +1153,10 @@ aim()
 					}
 				}
 				
-				//self botLookAt(last_pos + (0, 0, self getEyeHeight() + nadeAimOffset), aimspeed);
+				if (!usingRemote)
+					self thread bot_lookat(last_pos + (0, 0, self getEyeHeight() + nadeAimOffset), aimspeed);
+				else
+					self thread bot_lookat(last_pos, aimspeed);
 				continue;
 			}
 			
@@ -1039,22 +1166,16 @@ aim()
 			{
 				aimpos = target getTagOrigin( "j_spineupper" ) + (0, 0, nadeAimOffset);
 				conedot = getConeDot(aimpos, eyePos, angles);
-				
-				if(!nadeAimOffset && conedot > 0.999)
-				{
-					//self botLookAtPlayer(target, "j_spineupper");//cod4x is crashing when this is called
-					self thread bot_lookat(aimpos, aimspeed, target GetVelocity());
-				}
-				else
-				{
-					self thread bot_lookat(aimpos, aimspeed, target GetVelocity());
-				}
+				self thread bot_lookat(aimpos, aimspeed, target GetVelocity());
 			}
 			else
 			{
-				aimpos = target.origin + (0, 0, 5 + nadeAimOffset);
+				aimpos = target.origin;
+				if (isDefined(offset))
+					aimpos += offset;
+				aimpos += (0, 0, nadeAimOffset);
 				conedot = getConeDot(aimpos, eyePos, angles);
-				self bot_lookat(aimpos, aimspeed);
+				self thread bot_lookat(aimpos, aimspeed);
 			}
 			
 			if(false && isplay && conedot > 0.9 && dist < level.bots_maxKnifeDistance && trace_time > reaction_time)
@@ -1070,12 +1191,10 @@ aim()
 				continue;
 			}
 			
-			//c4 logic here, but doesnt work anyway
-			
 			canADS = self canAds(dist, curweap);
 			self ads(canADS);
 
-			if((!canADS || self botAdsAmount() == 1.0) && conedot > 0.95 && trace_time > reaction_time)
+			if((!canADS || self botAdsAmount() == 1.0) && (conedot > 0.95 || dist < level.bots_maxKnifeDistance) && trace_time > reaction_time)
 			{
 				self botFire();
 			}
@@ -1086,14 +1205,24 @@ aim()
 		self ads(false);
 		self stopNading();
 		
-		lookat = self.bot.script_aimpos;
-		if(self.bot.second_next_wp != -1 && !self.bot.run.running)
-			lookat = level.waypoints[self.bot.second_next_wp].origin;
-		else if(isDefined(self.bot.towards_goal))
-			lookat = self.bot.towards_goal;
-		
-		if(isDefined(lookat))
-			self thread bot_lookat(lookat + (0, 0, self getEyeHeight()), aimspeed);
+		if (!isDefined(self.bot.script_aimpos))
+		{
+			if (!usingRemote)
+			{
+				lookat = undefined;
+				if(self.bot.second_next_wp != -1 && !self.bot.running)
+					lookat = level.waypoints[self.bot.second_next_wp].origin;
+				else if(isDefined(self.bot.towards_goal))
+					lookat = self.bot.towards_goal;
+				
+				if(isDefined(lookat))
+					self thread bot_lookat(lookat + (0, 0, self getEyeHeight()), aimspeed);
+			}
+		}
+		else
+		{
+			self thread bot_lookat(self.bot.script_aimpos, aimspeed);
+		}
 	}
 }
 
@@ -1175,6 +1304,9 @@ canFire(curweap)
 {
 	if(curweap == "none")
 		return false;
+
+	if (self IsUsingRemote())
+		return true;
 		
 	return self GetWeaponammoclip(curweap);
 }
@@ -1184,6 +1316,9 @@ canFire(curweap)
 */
 canAds(dist, curweap)
 {
+	if (self IsUsingRemote())
+		return false;
+
 	far = level.bots_noADSDistance;
 	if(self hasPerk("specialty_bulletaccuracy"))
 		far *= 1.4;
@@ -1204,6 +1339,9 @@ canAds(dist, curweap)
 isInRange(dist, curweap)
 {
 	weapclass = weaponClass(curweap);
+
+	if (self IsUsingRemote())
+		return true;
 	
 	if(weapclass == "spread" && dist > level.bots_maxShotgunDistance)
 		return false;

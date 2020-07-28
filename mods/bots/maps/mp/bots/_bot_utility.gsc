@@ -10,7 +10,7 @@ is_bot()
 	assert(isDefined(self));
 	assert(isPlayer(self));
 
-	return ((isDefined(self.pers["isBot"]) && self.pers["isBot"]) || (isDefined(self.pers["isBotWarfare"]) && self.pers["isBotWarfare"]));
+	return ((isDefined(self.pers["isBot"]) && self.pers["isBot"]) || (isDefined(self.pers["isBotWarfare"]) && self.pers["isBotWarfare"]) || isSubStr( self.guid, "bot" ));
 }
 
 /*
@@ -92,9 +92,10 @@ ClearScriptGoal()
 /*
 	Sets the script enemy for a bot.
 */
-SetScriptEnemy(enemy)
+SetScriptEnemy(enemy, offset)
 {
 	self.bot.script_target = enemy;
+	self.bot.script_target_offset = offset;
 }
 
 /*
@@ -102,7 +103,7 @@ SetScriptEnemy(enemy)
 */
 ClearScriptEnemy()
 {
-	self SetScriptEnemy(undefined);
+	self SetScriptEnemy(undefined, undefined);
 }
 
 /*
@@ -190,7 +191,7 @@ RaySphereIntersect(start, end, spherePos, radius)
 */
 SmokeTrace(start, end, rad)
 {
-	for(i = 0; i < level.bots_smokeList.count; i++)
+	for(i = level.bots_smokeList.count - 1; i >= 0; i--)
 	{
 		nade = level.bots_smokeList.data[i];
 		
