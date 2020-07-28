@@ -142,6 +142,8 @@ onPlayerSpawned()
 
 		self thread UseRunThink();
 		self thread watchUsingRemote();
+
+		// grenades (pick up too), knife (players and ents), walk, stinger, reload
 		
 		self thread spawned();
 	}
@@ -254,13 +256,14 @@ doRunDelay()
 {
 	self endon("disconnect");
 	self endon("death");
+	self notify("bot_run_delay");
+	self endon("bot_run_delay");
 
 	self.bot.run_in_delay = true;
 
-	wait 1;
+	wait 1; // perk?
 
-	if (!self.bot.running)
-		self.bot.run_in_delay = false;
+	self.bot.run_in_delay = false;
 }
 
 bot_lookat(pos, time, vel)
@@ -460,7 +463,7 @@ doSwitch()
 
 	self.bot.isswitching = true;
 
-	wait 1.5;
+	wait 1;
 
 	self.bot.isswitching = false;
 }
