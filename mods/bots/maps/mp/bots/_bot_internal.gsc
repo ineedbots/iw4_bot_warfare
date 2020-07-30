@@ -26,7 +26,7 @@ added()
 	self.pers["bots"]["skill"]["semi_time"] = 0.05;
 	
 	self.pers["bots"]["behavior"] = [];
-	self.pers["bots"]["behavior"]["strafe"] = 50;
+	self.pers["bots"]["behavior"]["strafe"] = 50; // should?
 	self.pers["bots"]["behavior"]["nade"] = 50;
 	self.pers["bots"]["behavior"]["sprint"] = 50;
 	self.pers["bots"]["behavior"]["camp"] = 50;
@@ -34,7 +34,7 @@ added()
 	self.pers["bots"]["behavior"]["crouch"] = 10;
 	self.pers["bots"]["behavior"]["switch"] = 1;
 	self.pers["bots"]["behavior"]["class"] = 1;
-	self.pers["bots"]["behavior"]["jump"] = 100;
+	self.pers["bots"]["behavior"]["jump"] = 100; // how
 
 	self.pers["bots"]["unlocks"] = [];
 }
@@ -87,11 +87,16 @@ resetBotVars()
 	self.bot.second_next_wp = -1;
 	self.bot.towards_goal = undefined;
 	self.bot.astar = [];
-	self.bot.speed = 0;
+	self.bot.velocity = (0,0,0);
+	self.bot.script_move_speed = 0;
+	self.bot.last_pos = self.origin;
+	self.bot.moveTo = self.origin;
+	self.bot.climbing = false;
 	
 	self.bot.isfrozen = false;
 	self.bot.isreloading = false;
-	self.bot.isfragging = false;
+
+	self.bot.isfragging = false; // gotta think about grenades
 	self.bot.issmoking = false;
 	self.bot.isfraggingafter = false;
 	self.bot.issmokingafter = false;
@@ -139,11 +144,12 @@ onPlayerSpawned()
 		self thread adsHack();
 		self thread fireHack();
 		self thread stanceHack();
+		self thread moveHack();
 
 		self thread UseRunThink();
 		self thread watchUsingRemote();
 
-		// grenades (pick up too), knife (players and ents), walk, stinger, reload
+		// grenades (pick up too), knife (players and ents), walk, stinger, reload, footsounds, claymore hack
 		
 		self thread spawned();
 	}
@@ -209,6 +215,11 @@ prone()
 	self botSetStance("prone");
 }
 
+botMoveTo(to)
+{
+	self.bot.moveTo = to;
+}
+
 sprint()
 {
 	if (self.bot.run_time < 2.0)
@@ -234,11 +245,12 @@ UseRunThink()
 			if (self.bot.run_time <= 0 ||
 			isDefined(self.lastStand) || self getStance() != "stand" ||
 			level.gameEnded || !gameFlag( "prematch_done" ) ||
-			self.bot.isfrozen ||
+			self.bot.isfrozen || self.bot.climbing ||
 			self.bot.isreloading ||
 			self.bot.ads_pressed || self.bot.fire_pressed ||
 			self.bot.isfragging || self.bot.issmoking ||
-			self.bot.speed <= 0)
+			lengthsquared(self.bot.velocity) <= 25 ||
+			self IsStunned() || self isArtShocked() || self maps\mp\_flashgrenades::isFlashbanged())
 			{
 				self.bot.running = false;
 				self thread doRunDelay();
@@ -261,7 +273,10 @@ doRunDelay()
 
 	self.bot.run_in_delay = true;
 
-	wait 1; // perk?
+	if (self _hasPerk("specialty_fastsprintrecovery"))
+		wait 0.5;
+	else
+		wait 1;
 
 	self.bot.run_in_delay = false;
 }
@@ -338,6 +353,121 @@ stanceHack()
 	}
 }
 
+moveHack()
+{
+	self endon("disconnect");
+	self endon("death");
+
+	self.bot.last_pos = self.origin;
+	self.bot.moveTo = self.origin;
+
+	for (;;)
+	{
+		wait 0.05;
+
+		self.bot.velocity = self.origin-self.bot.last_pos;
+		self.bot.last_pos = self.origin;
+
+		if (level.gameEnded || !gameFlag( "prematch_done" ))
+			continue;
+
+		if (self.bot.isfrozen)
+			continue;
+
+		stance = self getStance();
+		curWeap = self GetCurrentWeapon();
+		weapClass = weaponClass(curWeap);
+		inLastStand = isDefined(self.lastStand);
+
+		// a number between 0 and 1, 1 being totally flat, same level.    0 being totally above or below.      about 0.7 is a 45 degree angle
+		verticleDegree = getConeDot(self.bot.moveTo + (1, 1, 0), self.origin  + (-1, -1, 0), VectorToAngles((self.bot.moveTo[0], self.bot.moveTo[1], self.origin[2]) - self.origin));
+		self.bot.climbing = (self.bot.next_wp != -1 && level.waypoints[self.bot.next_wp].type == "climb") ||
+												(abs(self.bot.moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64);
+
+		if (isLastStand)
+			self.bot.climbing = false;
+
+		moveSpeed = 10;
+		if (self.bot.running)
+			moveSpeed *= 1.5;
+		if (self IsStunned() || self isArtShocked())
+			moveSpeed *= 0.15;
+		if (self.bot.ads_pressed)
+			moveSpeed *= 0.35;
+
+		if (inLastStand)
+			moveSpeed *= 0.2;
+		else
+		{
+			if (stance == "crouch")
+				moveSpeed *= 0.5;
+			if (stance == "prone")
+				moveSpeed *= 0.2;
+		}
+
+		if (self.bot.climbing)
+		{
+			if (self _hasPerk("specialty_fastmantle"))
+				moveSpeed = 6;
+			else
+				moveSpeed = 4;
+		}
+
+		switch ( weapClass )
+		{
+			case "rifle":
+				if(self.hasRiotShieldEquipped)
+					moveSpeed *= 0.8;
+				else
+					moveSpeed *= 0.95;
+				break;
+			case "mg":
+				moveSpeed *= 0.875;
+				break;
+			case "spread":
+				moveSpeed *= 0.95;
+				break;
+			case "rocketlauncher":
+				moveSpeed *= 0.8;
+				break;
+		}
+
+		if (self _hasPerk("specialty_lightweight"))
+			moveSpeed *= 1.15;
+
+		moveSpeed *= (getdvarfloat("g_speed")/190.0);
+		moveSpeed *= self.moveSpeedScaler;
+
+		self.bot.script_move_speed = moveSpeed;
+
+		completedMove = false;
+		if (DistanceSquared(self.origin, self.bot.moveTo) < (moveSpeed * moveSpeed))
+		{
+			completedMove = true;
+			self SetOrigin(self.bot.moveTo);
+		}
+
+		if (completedMove)
+			continue;
+
+		if (!self.bot.climbing)
+		{
+			// step towards the goal
+			self SetOrigin(self.origin + (VectorNormalize((self.bot.moveTo[0], self.bot.moveTo[1], self.origin[2])-self.origin) * moveSpeed));
+
+			// clamp to ground
+			trace = physicsTrace(self.origin + (0.0,0.0,50.0), self.origin + (0.0,0.0,-40.0));
+			if((trace[2] - (self.origin[2]-40.0)) > 0.0 && ((self.origin[2]+50.0) - trace[2]) > 0.0)
+			{
+				self SetOrigin(trace);
+			}
+			continue;
+		}
+		
+		self SetOrigin(self.origin + (VectorNormalize(self.bot.moveTo-self.origin) * moveSpeed));
+	}
+}
+
 fireHack()
 {
 	self endon("disconnect");
@@ -353,7 +483,7 @@ fireHack()
 
 		shouldFire = self.bot.fire_pressed;
 
-		if (self.bot.isswitching || self.bot.run_in_delay || self.bot.running)
+		if (self.bot.isswitching || self.bot.run_in_delay || self.bot.running || self.bot.climbing)
 			shouldFire = false;
 
 		if (self.bot.isfragging || self.bot.issmoking || (!self GetCurrentWeaponClipAmmo() && !self IsUsingRemote()))
@@ -396,6 +526,9 @@ adsHack()
 			shouldAds = false;
 
 		if (self.bot.isfrozen)
+			shouldAds = false;
+
+		if (self.bot.climbing)
 			shouldAds = false;
 
 		if (shouldAds)
@@ -459,11 +592,12 @@ doSwitch()
 {
 	self endon("disconnect");
 	self endon("death");
-	self endon("weapon_change");
+	self notify("bot_weapon_change");
+	self endon("bot_weapon_change");
 
 	self.bot.isswitching = true;
 
-	wait 1;
+	wait 1;  // fast pullout?
 
 	self.bot.isswitching = false;
 }
@@ -610,7 +744,7 @@ spawned()
 	self thread stance();
 	self thread onNewEnemy();
 	self thread walk();
-	
+
 	self notify("bot_spawned");
 }
 
@@ -629,6 +763,9 @@ stance()
 		toStance = "stand";
 		if(self.bot.next_wp != -1)
 			toStance = level.waypoints[self.bot.next_wp].type;
+		if(toStance == "climb")
+			toStance = "stand";
+			
 		if(toStance != "stand" && toStance != "crouch" && toStance != "prone")
 			toStance = "crouch";
 			
@@ -644,7 +781,7 @@ stance()
 			
 		curweap = self getCurrentWeapon();
 			
-		if(toStance != "stand" || self.bot.run.running)
+		if(toStance != "stand" || self.bot.running)
 			continue;
 			
 		if(randomInt(100) > self.pers["bots"]["behavior"]["sprint"])
@@ -1103,7 +1240,7 @@ aim()
 
 		usingRemote = self IsUsingRemote();
 		
-		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity))
+		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity) && !self.bot.climbing)
 		{
 			trace_time = self.bot.target.trace_time;
 			no_trace_time = self.bot.target.no_trace_time;
@@ -1364,14 +1501,14 @@ walk()
 	{
 		wait 0.05;
 		
-		//self botMoveTo(self.origin);
+		self botMoveTo(self.origin);
 		
 		if(self.bot.isfrozen)
 			continue;
 			
 		if(self maps\mp\_flashgrenades::isFlashbanged())
 		{
-			//self botMoveTo(self.origin + self GetVelocity()*500);
+			self botMoveTo(self.origin + self GetBotVelocity()*self.bot.script_move_speed);
 			continue;
 		}
 		
@@ -1443,7 +1580,7 @@ strafe(target)
 	if(traceRight["fraction"] > traceLeft["fraction"])
 		strafe = traceRight["position"];
 	
-	//self botMoveTo(strafe);
+	self botMoveTo(strafe);
 	wait 2;
 }
 
@@ -1576,7 +1713,7 @@ movetowards(goal)
 	time = 0;
 	while(distanceSquared(self.origin, self.bot.towards_goal) > level.bots_goalDistance)
 	{
-		//self botMoveTo(self.bot.towards_goal);
+		self botMoveTo(self.bot.towards_goal);
 		
 		if(time > 2.5)
 		{
@@ -1587,7 +1724,7 @@ movetowards(goal)
 				
 				randomDir = self getRandomLargestStafe(stucks);
 			
-				//self botMoveTo(randomDir);
+				self botMoveTo(randomDir);
 				wait stucks;
 			}
 			
@@ -1604,7 +1741,7 @@ movetowards(goal)
 		
 		wait 0.05;
 		time += 0.05;
-		if(lengthsquared(self getVelocity()) < 1000)
+		if(lengthsquared(self getBotVelocity()) < 1000)
 			timeslow += 0.05;
 		else
 			timeslow = 0;

@@ -154,6 +154,11 @@ IsStunned()
 	return (isdefined(self.concussionEndTime) && self.concussionEndTime > gettime());
 }
 
+getBotVelocity()
+{
+	return self.bot.velocity;
+}
+
 /*
 	Returns if we are beingArtilleryShellshocked 
 */
@@ -215,6 +220,14 @@ getConeDot(to, from, dir)
     dirToTarget = VectorNormalize(to-from);
     forward = AnglesToForward(dir);
     return vectordot(dirToTarget, forward);
+}
+
+DistanceSquared2D(to, from)
+{
+	to = (to[0], to[1], 0);
+	from = (from[0], from[1], 0);
+	
+	return DistanceSquared(to, from);
 }
 
 /*
