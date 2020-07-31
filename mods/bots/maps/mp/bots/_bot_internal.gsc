@@ -380,6 +380,8 @@ moveHack()
 	self endon("disconnect");
 	self endon("death");
 
+	self SetOrigin((0,0,-500));
+
 	self.bot.last_pos = self.origin;
 	self.bot.moveTo = self.origin;
 
@@ -405,10 +407,12 @@ moveHack()
 		inLastStand = isDefined(self.lastStand);
 		usingRemote = self isUsingRemote();
 
-		// a number between 0 and 1, 1 being totally flat, same level.    0 being totally above or below.      about 0.7 is a 45 degree angle
-		verticleDegree = getConeDot(self.bot.moveTo + (1, 1, 0), self.origin  + (-1, -1, 0), VectorToAngles((self.bot.moveTo[0], self.bot.moveTo[1], self.origin[2]) - self.origin));
-		self.bot.climbing = (self.bot.next_wp != -1 && level.waypoints[self.bot.next_wp].type == "climb") ||
-												(abs(self.bot.moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64);
+		if (!self.bot.climbing)
+		{
+			// a number between 0 and 1, 1 being totally flat, same level.    0 being totally above or below.      about 0.7 is a 45 degree angle
+			verticleDegree = getConeDot(self.bot.moveTo + (1, 1, 0), self.origin  + (-1, -1, 0), VectorToAngles((self.bot.moveTo[0], self.bot.moveTo[1], self.origin[2]) - self.origin));
+			self.bot.climbing = (abs(self.bot.moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64);
+		}
 
 		if (inLastStand || usingRemote)
 			self.bot.climbing = false;
@@ -546,12 +550,6 @@ adsHack()
 		if (!isAlive(self))
 			return;
 
-		if (self isUsingRemote())
-		{
-			self ResetSpreadOverride();
-			continue;
-		}
-
 		shouldAds = self.bot.ads_pressed;
 
 		if (level.gameEnded)
@@ -584,7 +582,10 @@ adsHack()
 		if (self.bot.ads_tightness > self.bot.ads_lowest)
 			self.bot.ads_tightness = self.bot.ads_lowest;
 
-		self setSpreadOverride(self.bot.ads_tightness);
+		if (self.bot.ads_tightness >= self.bot.ads_lowest)
+			self ResetSpreadOverride();
+		else
+			self setSpreadOverride(self.bot.ads_tightness);
 	}
 }
 
@@ -798,6 +799,7 @@ stance()
 		toStance = "stand";
 		if(self.bot.next_wp != -1)
 			toStance = level.waypoints[self.bot.next_wp].type;
+		self.bot.climbing = (toStance == "climb");
 		if(toStance == "climb")
 			toStance = "stand";
 			
@@ -1559,7 +1561,7 @@ walk()
 			continue;
 		}
 		
-		hasTarget = isDefined(self.bot.target) && isDefined(self.bot.target.entity);
+		hasTarget = (isDefined(self.bot.target) && isDefined(self.bot.target.entity) && !self.bot.climbing);
 		if(hasTarget)
 		{
 			curweap = self getCurrentWeapon();

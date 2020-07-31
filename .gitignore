@@ -17,6 +17,7 @@
 !/main/server.cfg
 
 *.log
+*.stat
 logs/
 demos/
 missingasset.csv
