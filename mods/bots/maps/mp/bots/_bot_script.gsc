@@ -628,6 +628,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_time"] = 0.6;
 				self.pers["bots"]["skill"]["init_react_time"] = 1500;
 				self.pers["bots"]["skill"]["reaction_time"] = 1000;
+				self.pers["bots"]["skill"]["no_trace_ads_time"] = 500;
+				self.pers["bots"]["skill"]["no_trace_look_time"] = 600;
 				self.pers["bots"]["skill"]["remember_time"] = 750;
 				self.pers["bots"]["skill"]["fov"] = 0.7;
 				self.pers["bots"]["skill"]["dist"] = 1000;
@@ -648,6 +650,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_time"] = 0.55;
 				self.pers["bots"]["skill"]["init_react_time"] = 1000;
 				self.pers["bots"]["skill"]["reaction_time"] = 800;
+				self.pers["bots"]["skill"]["no_trace_ads_time"] = 1000;
+				self.pers["bots"]["skill"]["no_trace_look_time"] = 1250;
 				self.pers["bots"]["skill"]["remember_time"] = 1500;
 				self.pers["bots"]["skill"]["fov"] = 0.65;
 				self.pers["bots"]["skill"]["dist"] = 1500;
@@ -668,6 +672,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_time"] = 0.4;
 				self.pers["bots"]["skill"]["init_react_time"] = 750;
 				self.pers["bots"]["skill"]["reaction_time"] = 500;
+				self.pers["bots"]["skill"]["no_trace_ads_time"] = 1000;
+				self.pers["bots"]["skill"]["no_trace_look_time"] = 1500;
 				self.pers["bots"]["skill"]["remember_time"] = 2000;
 				self.pers["bots"]["skill"]["fov"] = 0.6;
 				self.pers["bots"]["skill"]["dist"] = 2250;
@@ -688,6 +694,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_time"] = 0.3;
 				self.pers["bots"]["skill"]["init_react_time"] = 600;
 				self.pers["bots"]["skill"]["reaction_time"] = 400;
+				self.pers["bots"]["skill"]["no_trace_ads_time"] = 1500;
+				self.pers["bots"]["skill"]["no_trace_look_time"] = 2000;
 				self.pers["bots"]["skill"]["remember_time"] = 3000;
 				self.pers["bots"]["skill"]["fov"] = 0.55;
 				self.pers["bots"]["skill"]["dist"] = 3350;
@@ -708,6 +716,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_time"] = 0.25;
 				self.pers["bots"]["skill"]["init_react_time"] = 500;
 				self.pers["bots"]["skill"]["reaction_time"] = 300;
+				self.pers["bots"]["skill"]["no_trace_ads_time"] = 2500;
+				self.pers["bots"]["skill"]["no_trace_look_time"] = 3000;
 				self.pers["bots"]["skill"]["remember_time"] = 4000;
 				self.pers["bots"]["skill"]["fov"] = 0.5;
 				self.pers["bots"]["skill"]["dist"] = 5000;
@@ -728,6 +738,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_time"] = 0.2;
 				self.pers["bots"]["skill"]["init_react_time"] = 250;
 				self.pers["bots"]["skill"]["reaction_time"] = 150;
+				self.pers["bots"]["skill"]["no_trace_ads_time"] = 2500;
+				self.pers["bots"]["skill"]["no_trace_look_time"] = 4000;
 				self.pers["bots"]["skill"]["remember_time"] = 5000;
 				self.pers["bots"]["skill"]["fov"] = 0.45;
 				self.pers["bots"]["skill"]["dist"] = 7500;
@@ -748,6 +760,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_time"] = 0.1;
 				self.pers["bots"]["skill"]["init_react_time"] = 100;
 				self.pers["bots"]["skill"]["reaction_time"] = 50;
+				self.pers["bots"]["skill"]["no_trace_ads_time"] = 2500;
+				self.pers["bots"]["skill"]["no_trace_look_time"] = 4000;
 				self.pers["bots"]["skill"]["remember_time"] = 7500;
 				self.pers["bots"]["skill"]["fov"] = 0.4;
 				self.pers["bots"]["skill"]["dist"] = 10000;
@@ -788,6 +802,8 @@ set_diff()
 			self.pers["bots"]["skill"]["init_react_time"] = 50 * randomInt(100);
 			self.pers["bots"]["skill"]["reaction_time"] = 50 * randomInt(100);
 			self.pers["bots"]["skill"]["remember_time"] = 50 * randomInt(100);
+			self.pers["bots"]["skill"]["no_trace_ads_time"] = 50 * randomInt(100);
+			self.pers["bots"]["skill"]["no_trace_look_time"] = 50 * randomInt(100);
 			self.pers["bots"]["skill"]["fov"] = randomFloatRange(-1, 1);
 			self.pers["bots"]["skill"]["dist"] = randomIntRange(500, 25000);
 			self.pers["bots"]["skill"]["spawn_time"] = 0.05 * randomInt(20);
