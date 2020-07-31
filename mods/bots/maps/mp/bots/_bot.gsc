@@ -268,30 +268,30 @@ diffBots()
 					if(axis_hard < var_axis_hard)
 					{
 						axis_hard++;
-						player.pers["bots"]["skill"]["base"] = 6;
+						player.pers["bots"]["skill"]["base"] = 7;
 					}
 					else if(axis_med < var_axis_med)
 					{
 						axis_med++;
-						player.pers["bots"]["skill"]["base"] = 3;
+						player.pers["bots"]["skill"]["base"] = 4;
 					}
 					else
-						player.pers["bots"]["skill"]["base"] = 0;
+						player.pers["bots"]["skill"]["base"] = 1;
 				}
 				else if(player.pers["team"] == "allies")
 				{
 					if(allies_hard < var_allies_hard)
 					{
 						allies_hard++;
-						player.pers["bots"]["skill"]["base"] = 6;
+						player.pers["bots"]["skill"]["base"] = 7;
 					}
 					else if(allies_med < var_allies_med)
 					{
 						allies_med++;
-						player.pers["bots"]["skill"]["base"] = 3;
+						player.pers["bots"]["skill"]["base"] = 4;
 					}
 					else
-						player.pers["bots"]["skill"]["base"] = 0;
+						player.pers["bots"]["skill"]["base"] = 1;
 				}
 			}
 		}
