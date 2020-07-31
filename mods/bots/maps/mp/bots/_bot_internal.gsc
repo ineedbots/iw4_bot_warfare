@@ -378,14 +378,18 @@ moveHack()
 		curWeap = self GetCurrentWeapon();
 		weapClass = weaponClass(curWeap);
 		inLastStand = isDefined(self.lastStand);
+		usingRemote = self isUsingRemote();
 
 		// a number between 0 and 1, 1 being totally flat, same level.    0 being totally above or below.      about 0.7 is a 45 degree angle
 		verticleDegree = getConeDot(self.bot.moveTo + (1, 1, 0), self.origin  + (-1, -1, 0), VectorToAngles((self.bot.moveTo[0], self.bot.moveTo[1], self.origin[2]) - self.origin));
 		self.bot.climbing = (self.bot.next_wp != -1 && level.waypoints[self.bot.next_wp].type == "climb") ||
 												(abs(self.bot.moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64);
 
-		if (isLastStand)
+		if (inLastStand || usingRemote)
 			self.bot.climbing = false;
+
+		if (usingRemote)
+			continue;
 
 		moveSpeed = 10;
 		if (self.bot.running)
@@ -447,12 +451,13 @@ moveHack()
 			self SetOrigin(self.bot.moveTo);
 		}
 
+		// push out of players
+
 		if (completedMove)
 			continue;
 
-		if (!self.bot.climbing)
+		if (!self.bot.climbing || inLastStand)
 		{
-			// step towards the goal
 			self SetOrigin(self.origin + (VectorNormalize((self.bot.moveTo[0], self.bot.moveTo[1], self.origin[2])-self.origin) * moveSpeed));
 
 			// clamp to ground
@@ -461,6 +466,11 @@ moveHack()
 			{
 				self SetOrigin(trace);
 			}
+			else
+			{
+				self SetOrigin(self.origin - (0,0,5));
+			}
+
 			continue;
 		}
 		
@@ -483,16 +493,16 @@ fireHack()
 
 		shouldFire = self.bot.fire_pressed;
 
-		if (self.bot.isswitching || self.bot.run_in_delay || self.bot.running || self.bot.climbing)
+		if (self.bot.isswitching || self.bot.run_in_delay || self.bot.running)
 			shouldFire = false;
 
-		if (self.bot.isfragging || self.bot.issmoking || (!self GetCurrentWeaponClipAmmo() && !self IsUsingRemote()))
+		if (self.bot.isfragging || self.bot.issmoking || (self.bot.isreloading && !self IsUsingRemote()))
 			shouldFire = true;
 
 		if (level.gameEnded || !gameFlag( "prematch_done" ))
 			shouldFire = false;
 
-		if (self.bot.isfrozen)
+		if (self.bot.isfrozen || self.bot.climbing)
 			shouldFire = false;
 
 		self FreezeControls(!shouldFire);
@@ -823,7 +833,7 @@ reload_thread()
 	
 	wait 2.5;
 	
-	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.issmokingafter || self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
+	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.issmokingafter || self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.climbing)
 		return;
 		
 	cur = self getCurrentWEapon();
@@ -853,7 +863,7 @@ target()
 		if (!isAlive(self))
 			return;
 		
-		if(self maps\mp\_flashgrenades::isFlashbanged())
+		if(self maps\mp\_flashgrenades::isFlashbanged() || self.bot.climbing)
 			continue;
 	
 		myEye = self GetEye();
@@ -1561,9 +1571,8 @@ walk()
 */
 strafe(target)
 {
-	self endon("new_enemy");
-	self endon("flash_rumble_loop");
 	self endon("kill_goal");
+	self thread killWalkOnEvents();
 	
 	angles = VectorToAngles(vectorNormalize(target.origin - self.origin));
 	anglesLeft = (0, angles[1]+90, 0);
@@ -1582,6 +1591,7 @@ strafe(target)
 	
 	self botMoveTo(strafe);
 	wait 2;
+	self notify("kill_goal");
 }
 
 /*
