@@ -1,1 +1,1 @@
-start iw4x.exe -dedicated +set party_maxplayers 18 +set net_port 28960 +party_enable 0 +set fs_game "mods/bots" +exec server.cfg +map_rotate
+start iw4x.exe -dedicated +set sv_lanonly "1" +set net_port "28960" +set fs_game "mods/bots" +exec server.cfg +map_rotate

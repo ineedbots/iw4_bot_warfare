@@ -124,6 +124,9 @@ resetBotVars()
 	self.bot.ads_lowest = 9;
 	self.bot.ads_tightness = self.bot.ads_lowest;
 	self.bot.ads_highest = 1;
+
+	self.bot.jumping = false;
+	self.bot.jumpingafter = false;
 }
 
 /*
@@ -197,6 +200,32 @@ smoke(time)
 */
 jump()
 {
+	self endon("death");
+	self endon("disconnect");
+
+	if (isDefined(self.lastStand) || self getStance() != "stand" ||
+			level.gameEnded || !gameFlag( "prematch_done" ) ||
+			self.bot.isfrozen || self.bot.climbing || self.bot.jumping || self.bot.jumpingafter)
+			return;
+
+	self.bot.jumping = true;
+	self.bot.jumpingafter = true;
+
+	for (i = 0; i < 6; i++)
+	{
+		self SetOrigin(self.origin + (0, 0, 13));
+		wait 0.05;
+	}
+
+	self.bot.jumping = false;
+
+	for (i = 0; i < 6; i++)
+	{
+		self SetOrigin(self.origin + (0, 0, -5));
+		wait 0.05;
+	}
+
+	self.bot.jumpingafter = false;
 }
 
 /*
@@ -380,8 +409,6 @@ moveHack()
 	self endon("disconnect");
 	self endon("death");
 
-	self SetOrigin((0,0,-500));
-
 	self.bot.last_pos = self.origin;
 	self.bot.moveTo = self.origin;
 
@@ -411,7 +438,7 @@ moveHack()
 		{
 			// a number between 0 and 1, 1 being totally flat, same level.    0 being totally above or below.      about 0.7 is a 45 degree angle
 			verticleDegree = getConeDot(self.bot.moveTo + (1, 1, 0), self.origin  + (-1, -1, 0), VectorToAngles((self.bot.moveTo[0], self.bot.moveTo[1], self.origin[2]) - self.origin));
-			self.bot.climbing = (abs(self.bot.moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64);
+			self.bot.climbing = (abs(self.bot.moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64 && !self.bot.jumpingafter);
 		}
 
 		if (inLastStand || usingRemote)
@@ -485,13 +512,13 @@ moveHack()
 		if (completedMove)
 			continue;
 
-		if (!self.bot.climbing || inLastStand)
+		if (!self.bot.climbing)
 		{
 			self SetOrigin(self.origin + (VectorNormalize((self.bot.moveTo[0], self.bot.moveTo[1], self.origin[2])-self.origin) * moveSpeed));
 
 			// clamp to ground
 			trace = physicsTrace(self.origin + (0.0,0.0,50.0), self.origin + (0.0,0.0,-40.0));
-			if((trace[2] - (self.origin[2]-40.0)) > 0.0 && ((self.origin[2]+50.0) - trace[2]) > 0.0)
+			if(!self.bot.jumping && (trace[2] - (self.origin[2]-40.0)) > 0.0 && ((self.origin[2]+50.0) - trace[2]) > 0.0)
 			{
 				self SetOrigin(trace);
 			}

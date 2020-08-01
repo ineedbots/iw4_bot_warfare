@@ -102,6 +102,8 @@ handleBots()
 	level thread teamBots();
 	level thread diffBots();
 	level addBots();
+
+	setDvar("bots_manage_add", getBotArray().size);
 }
 
 /*
