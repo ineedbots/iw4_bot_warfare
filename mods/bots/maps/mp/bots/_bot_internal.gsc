@@ -1347,7 +1347,7 @@ aim()
 							if(!self.bot.isfraggingafter && !self.bot.issmokingafter)
 							{
 								nade = self getValidGrenade();
-								if(isDefined(nade) && rand <= self.pers["bots"]["behavior"]["nade"] && bulletTracePassed(myEye, myEye + (0, 0, 75), false, self) && bulletTracePassed(last_pos, last_pos + (0, 0, 100), false, target))
+								if(isDefined(nade) && rand <= self.pers["bots"]["behavior"]["nade"] && bulletTracePassed(myEye, myEye + (0, 0, 75), false, self) && bulletTracePassed(last_pos, last_pos + (0, 0, 100), false, target)) //bots_minGrenadeDistance
 								{
 									if(nade == "frag_grenade_mp")
 										self thread frag(2.5);

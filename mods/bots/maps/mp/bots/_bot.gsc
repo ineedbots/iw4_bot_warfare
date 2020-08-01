@@ -55,7 +55,6 @@ init()
 
 	level.defuseObject = undefined;
 	level.bots_smokeList = List();
-	level.bots_fragList = List();
 	
 	level.bots_minSprintDistance = 315;
 	level.bots_minSprintDistance *= level.bots_minSprintDistance;
@@ -555,31 +554,7 @@ onGrenadeFire()
 		grenade.name = weaponName;
 		if(weaponName == "smoke_grenade_mp")
 			grenade thread AddToSmokeList();
-		else if(isSubStr(weaponName, "frag_"))
-			grenade thread AddToFragList(self);
 	}
-}
-
-AddToFragList(owner)
-{
-	grenade = spawnStruct();
-
-	grenade.grenade = self;
-	grenade.owner = owner;
-	grenade.team = owner.team;
-	grenade.throwback = undefined;
-
-	level.bots_fragList ListAdd(grenade);
-
-	grenade thread FragThink();
-}
-
-FragThink()
-{
-	while (isDefined(self.grenade))
-		wait 0.05;
-
-	level.bots_fragList ListRemove(self);
 }
 
 /*
