@@ -150,12 +150,11 @@ onPlayerSpawned()
 		self thread fireHack();
 		self thread stanceHack();
 		self thread moveHack();
-		self thread emptyClipShoot();
 
 		self thread UseRunThink();
 		self thread watchUsingRemote();
 
-		// grenades (pick up too), knife (players and ents), stinger, footsounds, claymore hack
+		// grenades (pick up too), knife (players and ents), stinger, footsounds
 		
 		self thread spawned();
 	}
@@ -801,6 +800,8 @@ spawned()
 
 	wait self.pers["bots"]["skill"]["spawn_time"];
 	
+	self thread emptyClipShoot();
+
 	self thread target();
 	self thread aim();
 	self thread check_reload();

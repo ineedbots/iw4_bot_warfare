@@ -554,6 +554,11 @@ onGrenadeFire()
 		grenade.name = weaponName;
 		if(weaponName == "smoke_grenade_mp")
 			grenade thread AddToSmokeList();
+
+		if ( weaponName == "claymore" || weaponName == "claymore_mp" )
+		{
+			grenade thread claymoreDetonationBotFix();
+		}
 	}
 }
 

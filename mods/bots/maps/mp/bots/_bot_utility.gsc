@@ -1714,3 +1714,47 @@ botPlayerModelForWeapon( weapon, secondary )
 			break;
 	}
 }
+
+claymoreDetonationBotFix()
+{
+	self endon( "death" );
+
+	self waittill( "missile_stuck" );
+
+	damagearea = spawn( "trigger_radius", self.origin + ( 0, 0, 0 - level.claymoreDetonateRadius ), 0, level.claymoreDetonateRadius, level.claymoreDetonateRadius * 2 );
+	self thread maps\mp\gametypes\_weapons::deleteOnDeath( damagearea );
+
+	while ( 1 )
+	{
+		damagearea waittill( "trigger", player );
+
+		if (!player is_bot())
+			continue;
+
+		if ( getdvarint( "scr_claymoredebug" ) != 1 )
+		{
+			if ( isdefined( self.owner ) && player == self.owner )
+				continue;
+			if ( !maps\mp\gametypes\_weapons::friendlyFireCheck( self.owner, player, 0 ) )
+				continue;
+		}
+		if ( lengthsquared( player getBotVelocity() ) < 10 )
+			continue;
+
+		if ( !player maps\mp\gametypes\_weapons::shouldAffectClaymore( self ) )
+			continue;
+
+		if ( player damageConeTrace( self.origin, self ) > 0 )
+			break;
+	}
+	
+	self playsound ("claymore_activated");
+	
+	
+	if ( player _hasPerk( "specialty_delaymine" ) )
+		wait 3.0;
+	else 
+		wait level.claymoreDetectionGracePeriod;
+		
+	self detonate();
+}
