@@ -7,6 +7,7 @@
 !/z_dev.bat
 !/z_serverdev.bat
 !/z_server.bat
+!/z_bots.bat
 
 # Folder to not ignore
 !/mods/
