@@ -55,6 +55,7 @@ init()
 
 	level.defuseObject = undefined;
 	level.bots_smokeList = List();
+	level.bots_fragList = List();
 	
 	level.bots_minSprintDistance = 315;
 	level.bots_minSprintDistance *= level.bots_minSprintDistance;
@@ -552,14 +553,40 @@ onGrenadeFire()
 	{
 		self waittill ( "grenade_fire", grenade, weaponName );
 		grenade.name = weaponName;
+
 		if(weaponName == "smoke_grenade_mp")
 			grenade thread AddToSmokeList();
-
-		if ( weaponName == "claymore" || weaponName == "claymore_mp" )
-		{
+		else if (isSubStr(weaponName, "frag_"))
+			grenade thread AddToFragList();
+		else if ( weaponName == "claymore" || weaponName == "claymore_mp" )
 			grenade thread claymoreDetonationBotFix();
-		}
 	}
+}
+
+AddToFragList()
+{
+	grenade = spawnstruct();
+	grenade.origin = self getOrigin();
+	grenade.velocity = (0, 0, 0);
+	grenade.grenade = self;
+
+	grenade thread thinkFrag();
+	
+	level.bots_fragList ListAdd(grenade);
+}
+
+thinkFrag()
+{
+	while(isDefined(self.grenade))
+	{
+		nowOrigin = self.grenade getOrigin();
+		self.velocity = (nowOrigin - self.origin)*20; //lensq < 10000
+		self.origin = nowOrigin;
+
+		wait 0.05;
+	}
+	
+	level.bots_fragList ListRemove(self);
 }
 
 /*

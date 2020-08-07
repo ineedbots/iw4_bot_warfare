@@ -98,10 +98,9 @@ resetBotVars()
 	self.bot.isfrozen = false;
 	self.bot.isreloading = false;
 
-	self.bot.isfragging = false; // gotta think about grenades
-	self.bot.issmoking = false;
+	self.bot.isfragging = false;
 	self.bot.isfraggingafter = false;
-	self.bot.issmokingafter = false;
+	self.bot.tryingtofrag = false;
 	
 	self.bot.semi_time = false;
 	self.bot.greedy_path = false;
@@ -116,7 +115,7 @@ resetBotVars()
 	self.bot.running = false;
 	self.bot.max_run_time = getdvarfloat("scr_player_sprinttime");
 	self.bot.run_time = self.bot.max_run_time;
-	self.bot.run_in_delay = false;
+	self.bot.runningafter = false;
 
 	self.bot.fire_pressed = false;
 
@@ -145,6 +144,7 @@ onPlayerSpawned()
 		self thread onLastStand();
 		
 		self thread reload_watch();
+		self thread grenade_watch();
 
 		self thread adsHack();
 		self thread fireHack();
@@ -160,14 +160,6 @@ onPlayerSpawned()
 	}
 }
 
-
-/*
-	Bot will knife.
-*/
-knife()
-{
-}
-
 /*
 	Bot will reload.
 */
@@ -178,6 +170,13 @@ reload()
 	self SetWeaponAmmoStock(cur, self GetWeaponAmmoClip(cur) + self GetWeaponAmmoStock(cur));
 	self setWeaponAmmoClip(cur, 0);
 	// the script should reload for us.
+}
+
+/*
+	Bot will knife.
+*/
+knife()
+{
 }
 
 /*
@@ -248,6 +247,11 @@ crouch()
 */
 prone()
 {
+	curWeap = self GetCurrentWeapon();
+
+	if (curWeap == "riotshield_mp")
+		return;
+
 	self botSetStance("prone");
 }
 
@@ -262,6 +266,7 @@ sprint()
 		return;
 
 	self.bot.running = true;
+	self.bot.runningafter = true;
 }
 
 UseRunThink()
@@ -284,7 +289,7 @@ UseRunThink()
 			self.bot.isfrozen || self.bot.climbing ||
 			self.bot.isreloading ||
 			self.bot.ads_pressed || self.bot.fire_pressed ||
-			self.bot.isfragging || self.bot.issmoking ||
+			self.bot.isfragging ||
 			lengthsquared(self.bot.velocity) <= 25 ||
 			self IsStunned() || self isArtShocked() || self maps\mp\_flashgrenades::isFlashbanged())
 			{
@@ -307,14 +312,12 @@ doRunDelay()
 	self notify("bot_run_delay");
 	self endon("bot_run_delay");
 
-	self.bot.run_in_delay = true;
-
 	if (self _hasPerk("specialty_fastsprintrecovery"))
 		wait 0.5;
 	else
 		wait 1;
 
-	self.bot.run_in_delay = false;
+	self.bot.runningafter = false;
 }
 
 bot_lookat(pos, time)
@@ -380,6 +383,34 @@ stanceHack()
 			
 		self SetStance(self.bot.stance);
 	}
+}
+
+grenade_watch()
+{
+	self endon("disconnect");
+	self endon("death");
+
+	for (;;)
+	{
+		self waittill("grenade_pullback", weaponName);
+		self.bot.isfragging = true;
+		self.bot.isfraggingafter = true;
+
+		self waittill_notify_or_timeout( "grenade_fire", 5 );
+
+		self.bot.isfragging = false;
+		self thread doFragAfterThread();
+	}
+}
+
+doFragAfterThread()
+{
+	self endon("disconnect");
+	self endon("death");
+	self endon("grenade_pullback");
+
+	wait 1;
+	self.bot.isfraggingafter = false;
 }
 
 emptyClipShoot()
@@ -548,16 +579,19 @@ fireHack()
 
 		shouldFire = self.bot.fire_pressed;
 
-		if (self.bot.isswitching || self.bot.run_in_delay || self.bot.running)
+		if (self.bot.isswitching || self.bot.runningafter)
 			shouldFire = false;
 
-		if (self.bot.isfragging || self.bot.issmoking)
+		if (self.bot.climbing)
+			shouldFire = false;
+
+		if (self.bot.tryingtofrag)
 			shouldFire = true;
 
 		if (level.gameEnded || !gameFlag( "prematch_done" ))
 			shouldFire = false;
 
-		if (self.bot.isfrozen || self.bot.climbing)
+		if (self.bot.isfrozen)
 			shouldFire = false;
 
 		self FreezeControls(!shouldFire);
@@ -569,6 +603,7 @@ adsHack()
 	self endon("disconnect");
 	self endon("spawned_player");
 
+	self setSpreadOverride(self.bot.ads_tightness);
 	for (;;)
 	{
 		wait 0.05;
@@ -891,7 +926,7 @@ reload_thread()
 	if (self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
 		return;
 	
-	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.issmokingafter || self.bot.climbing)
+	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.climbing)
 		return;
 		
 	cur = self getCurrentWEapon();
@@ -1330,11 +1365,14 @@ aim()
 				reaction_time = self.pers["bots"]["skill"]["reaction_time"];
 				nadeAimOffset = 0;
 				myeye = self getEye();
-				
-				if(self.bot.isfraggingafter || self.bot.issmokingafter)
-					nadeAimOffset = dist/3000;
-				else if(weaponClass(curweap) == "grenade")
-					nadeAimOffset = dist/16000;
+
+				if(weaponClass(curweap) == "grenade")
+				{
+					if (getWeaponClass(curweap) == "weapon_projectile")
+						nadeAimOffset = dist/16000;
+					else
+						nadeAimOffset = dist/3000;
+				}
 				
 				if(no_trace_time)
 				{
@@ -1345,7 +1383,7 @@ aim()
 						if(isplay)
 						{
 							//better room to nade? cook time function with dist?
-							if(!self.bot.isfraggingafter && !self.bot.issmokingafter)
+							if(!self.bot.isfraggingafter)
 							{
 								nade = self getValidGrenade();
 								if(isDefined(nade) && rand <= self.pers["bots"]["behavior"]["nade"] && bulletTracePassed(myEye, myEye + (0, 0, 75), false, self) && bulletTracePassed(last_pos, last_pos + (0, 0, 100), false, target)) //bots_minGrenadeDistance
@@ -1483,8 +1521,6 @@ stopNading()
 {
 	if(self.bot.isfragging)
 		self thread frag(0);
-	if(self.bot.issmoking)
-		self thread smoke(0);
 }
 
 /*
@@ -1522,6 +1558,9 @@ canFire(curweap)
 	if(curweap == "none")
 		return false;
 
+	if (curweap == "riotshield_mp")
+		return false;
+
 	if (self IsUsingRemote())
 		return true;
 		
@@ -1546,6 +1585,12 @@ canAds(dist, curweap)
 	weapclass = (weaponClass(curweap));
 	if(weapclass == "spread" || weapclass == "grenade")
 		return false;
+
+	if (curweap == "riotshield_mp")
+		return false;
+
+	if (isSubStr(curweap, "_akimbo_"))
+		return false;
 	
 	return true;
 }
@@ -1560,7 +1605,10 @@ isInRange(dist, curweap)
 	if (self IsUsingRemote())
 		return true;
 	
-	if(weapclass == "spread" && dist > level.bots_maxShotgunDistance)
+	if((weapclass == "spread" || isSubStr(curweap, "_akimbo_")) && dist > level.bots_maxShotgunDistance)
+		return false;
+
+	if (curweap == "riotshield_mp" && dist > level.bots_maxKnifeDistance)
 		return false;
 		
 	return true;
@@ -1594,7 +1642,7 @@ walk()
 		{
 			curweap = self getCurrentWeapon();
 			
-			if(self.bot.target.entity.classname == "script_vehicle" || self.bot.isfraggingafter || self.bot.issmokingafter)
+			if(self.bot.target.entity.classname == "script_vehicle" || self.bot.isfraggingafter)
 			{
 				continue;
 			}
