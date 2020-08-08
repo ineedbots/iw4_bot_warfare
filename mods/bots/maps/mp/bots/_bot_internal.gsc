@@ -160,180 +160,6 @@ onPlayerSpawned()
 	}
 }
 
-/*
-	Bot will reload.
-*/
-reload()
-{
-	cur = self GetCurrentWeapon();
-
-	self SetWeaponAmmoStock(cur, self GetWeaponAmmoClip(cur) + self GetWeaponAmmoStock(cur));
-	self setWeaponAmmoClip(cur, 0);
-	// the script should reload for us.
-}
-
-/*
-	Bot will knife.
-*/
-knife()
-{
-}
-
-botThrowGrenade(grenName)
-{
-	self endon("death");
-	self endon("disconnect");
-
-	if (self.bot.tryingtofrag)
-		return "already nading";
-
-	if (!self getAmmoCount(grenName))
-		return "no ammo";
-
-	curWeap = self GetCurrentWeapon();
-
-	self setSpawnWeapon(grenName);
-	self.bot.tryingtofrag = true;
-
-	ret = "grenade_pullback";
-	if (grenName != "throwingknife_mp")
-		ret = self waittill_any_timeout( 5, "grenade_pullback" );
-
-	if (ret != "timeout")
-	{
-		ret = self waittill_any_timeout( 5, "grenade_fire", "weapon_change", "offhand_end" );
-		wait 0.95;
-	}
-
-	self.bot.tryingtofrag = false;
-
-	self setSpawnWeapon(curWeap);
-
-	return ret;
-}
-
-pressAds(time)
-{
-	self endon("death");
-	self endon("disconnect");
-	self notify("bot_ads");
-	self endon("bot_ads");
-
-	if(!isDefined(time))
-		time = 0.1;
-	
-	self ads(true);
-	
-	if(time)
-		wait time;
-		
-	self ads(false);
-}
-
-ads(what)
-{
-	self.bot.ads_pressed = what;
-}
-
-pressFire(time)
-{
-	self endon("death");
-	self endon("disconnect");
-	self notify("bot_fire");
-	self endon("bot_fire");
-
-	if(!isDefined(time))
-		time = 0.1;
-	
-	self fire(true);
-	
-	if(time)
-		wait time;
-		
-	self fire(false);
-}
-
-fire(what)
-{
-	self.bot.fire_pressed = what;
-}
-
-/*
-	Bot will jump.
-*/
-jump()
-{
-	self endon("death");
-	self endon("disconnect");
-
-	if (isDefined(self.lastStand) || self getStance() != "stand" ||
-			level.gameEnded || !gameFlag( "prematch_done" ) ||
-			self.bot.isfrozen || self.bot.climbing || self.bot.jumping || self.bot.jumpingafter)
-			return;
-
-	self.bot.jumping = true;
-	self.bot.jumpingafter = true;
-
-	for (i = 0; i < 6; i++)
-	{
-		self SetOrigin(self.origin + (0, 0, 13));
-		wait 0.05;
-	}
-
-	self.bot.jumping = false;
-
-	for (i = 0; i < 6; i++)
-	{
-		self SetOrigin(self.origin + (0, 0, -5));
-		wait 0.05;
-	}
-
-	self.bot.jumpingafter = false;
-}
-
-/*
-	Bot will stand.
-*/
-stand()
-{
-	self.bot.stance = "stand";
-}
-
-/*
-	Bot will crouch.
-*/
-crouch()
-{
-	self.bot.stance = "crouch";
-}
-
-/*
-	Bot will prone.
-*/
-prone()
-{
-	curWeap = self GetCurrentWeapon();
-
-	if (curWeap == "riotshield_mp")
-		return;
-
-	self.bot.stance = "prone";
-}
-
-botMoveTo(to)
-{
-	self.bot.moveTo = to;
-}
-
-sprint()
-{
-	if (self.bot.run_time < 2.0)
-		return;
-
-	self.bot.running = true;
-	self.bot.runningafter = true;
-}
-
 UseRunThink()
 {
 	self endon("death");
@@ -1960,4 +1786,178 @@ getRandomLargestStafe(dist)
 	}
 	
 	return toptraces[randomInt(toptraces.size)]["position"];
+}
+
+/*
+	Bot will reload.
+*/
+reload()
+{
+	cur = self GetCurrentWeapon();
+
+	self SetWeaponAmmoStock(cur, self GetWeaponAmmoClip(cur) + self GetWeaponAmmoStock(cur));
+	self setWeaponAmmoClip(cur, 0);
+	// the script should reload for us.
+}
+
+/*
+	Bot will knife.
+*/
+knife()
+{
+}
+
+botThrowGrenade(grenName)
+{
+	self endon("death");
+	self endon("disconnect");
+
+	if (self.bot.tryingtofrag)
+		return "already nading";
+
+	if (!self getAmmoCount(grenName))
+		return "no ammo";
+
+	curWeap = self GetCurrentWeapon();
+
+	self setSpawnWeapon(grenName);
+	self.bot.tryingtofrag = true;
+
+	ret = "grenade_pullback";
+	if (grenName != "throwingknife_mp")
+		ret = self waittill_any_timeout( 5, "grenade_pullback" );
+
+	if (ret != "timeout")
+	{
+		ret = self waittill_any_timeout( 5, "grenade_fire", "weapon_change", "offhand_end" );
+		wait 0.95;
+	}
+
+	self.bot.tryingtofrag = false;
+
+	self setSpawnWeapon(curWeap);
+
+	return ret;
+}
+
+pressAds(time)
+{
+	self endon("death");
+	self endon("disconnect");
+	self notify("bot_ads");
+	self endon("bot_ads");
+
+	if(!isDefined(time))
+		time = 0.1;
+	
+	self ads(true);
+	
+	if(time)
+		wait time;
+		
+	self ads(false);
+}
+
+ads(what)
+{
+	self.bot.ads_pressed = what;
+}
+
+pressFire(time)
+{
+	self endon("death");
+	self endon("disconnect");
+	self notify("bot_fire");
+	self endon("bot_fire");
+
+	if(!isDefined(time))
+		time = 0.1;
+	
+	self fire(true);
+	
+	if(time)
+		wait time;
+		
+	self fire(false);
+}
+
+fire(what)
+{
+	self.bot.fire_pressed = what;
+}
+
+/*
+	Bot will jump.
+*/
+jump()
+{
+	self endon("death");
+	self endon("disconnect");
+
+	if (isDefined(self.lastStand) || self getStance() != "stand" ||
+			level.gameEnded || !gameFlag( "prematch_done" ) ||
+			self.bot.isfrozen || self.bot.climbing || self.bot.jumping || self.bot.jumpingafter)
+			return;
+
+	self.bot.jumping = true;
+	self.bot.jumpingafter = true;
+
+	for (i = 0; i < 6; i++)
+	{
+		self SetOrigin(self.origin + (0, 0, 13));
+		wait 0.05;
+	}
+
+	self.bot.jumping = false;
+
+	for (i = 0; i < 6; i++)
+	{
+		self SetOrigin(self.origin + (0, 0, -5));
+		wait 0.05;
+	}
+
+	self.bot.jumpingafter = false;
+}
+
+/*
+	Bot will stand.
+*/
+stand()
+{
+	self.bot.stance = "stand";
+}
+
+/*
+	Bot will crouch.
+*/
+crouch()
+{
+	self.bot.stance = "crouch";
+}
+
+/*
+	Bot will prone.
+*/
+prone()
+{
+	curWeap = self GetCurrentWeapon();
+
+	if (curWeap == "riotshield_mp")
+		return;
+
+	self.bot.stance = "prone";
+}
+
+botMoveTo(to)
+{
+	self.bot.moveTo = to;
+}
+
+sprint()
+{
+	if (self.bot.run_time < 2.0)
+		return;
+
+	self.bot.running = true;
+	self.bot.runningafter = true;
 }
