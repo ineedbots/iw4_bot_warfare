@@ -179,18 +179,37 @@ knife()
 {
 }
 
-/*
-	Bot will hold the frag button for a time
-*/
-frag(time)
+botThrowGrenade(grenName)
 {
-}
+	self endon("death");
+	self endon("disconnect");
 
-/*
-	Bot will hold the 'smoke' button for a time.
-*/
-smoke(time)
-{
+	if (self.bot.tryingtofrag)
+		return "already nading";
+
+	if (!self getAmmoCount(grenName))
+		return "no ammo";
+
+	curWeap = self GetCurrentWeapon();
+
+	self setSpawnWeapon(grenName);
+	self.bot.tryingtofrag = true;
+
+	ret = "grenade_pullback";
+	if (grenName != "throwingknife_mp")
+		ret = self waittill_any_timeout( 5, "grenade_pullback" );
+
+	if (ret != "timeout")
+	{
+		ret = self waittill_any_timeout( 5, "grenade_fire", "weapon_change", "offhand_end" );
+		wait 0.95;
+	}
+
+	self.bot.tryingtofrag = false;
+
+	self setSpawnWeapon(curWeap);
+
+	return ret;
 }
 
 /*
@@ -396,7 +415,7 @@ grenade_watch()
 		self.bot.isfragging = true;
 		self.bot.isfraggingafter = true;
 
-		self waittill_notify_or_timeout( "grenade_fire", 5 );
+		self waittill_any_timeout( 5, "grenade_fire", "weapon_change", "offhand_end" );
 
 		self.bot.isfragging = false;
 		self thread doFragAfterThread();
@@ -672,7 +691,7 @@ onWeaponChange()
 			case "none":
 				if(isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != "none")
 					self setSpawnWeapon(self.lastDroppableWeapon);
-			break;//grenades
+			break;
 			case "ac130_105mm_mp":
 			case "ac130_40mm_mp":
 			case "ac130_25mm_mp":
@@ -1388,18 +1407,10 @@ aim()
 								nade = self getValidGrenade();
 								if(isDefined(nade) && rand <= self.pers["bots"]["behavior"]["nade"] && bulletTracePassed(myEye, myEye + (0, 0, 75), false, self) && bulletTracePassed(last_pos, last_pos + (0, 0, 100), false, target)) //bots_minGrenadeDistance
 								{
-									if(nade == "frag_grenade_mp")
-										self thread frag(2.5);
-									else
-										self thread smoke(0.5);
-										
+									self thread botThrowGrenade(nade);
 									self notify("kill_goal");
 								}
 							}
-						}
-						else
-						{
-							self stopNading();
 						}
 					}
 					
@@ -1409,8 +1420,6 @@ aim()
 						self thread bot_lookat(last_pos, aimspeed);
 					continue;
 				}
-				
-				self stopNading();
 				
 				if(isplay)
 				{
@@ -1458,7 +1467,6 @@ aim()
 		}
 		
 		self ads(false);
-		self stopNading();
 		
 		if (!isDefined(self.bot.script_aimpos))
 		{
@@ -1515,15 +1523,6 @@ doSemiTime()
 }
 
 /*
-	Stop the bot from nading.
-*/
-stopNading()
-{
-	if(self.bot.isfragging)
-		self thread frag(0);
-}
-
-/*
 	Returns a random grenade in the bot's inventory.
 */
 getValidGrenade()
@@ -1533,6 +1532,8 @@ getValidGrenade()
 	grenadeTypes[grenadeTypes.size] = "smoke_grenade_mp";
 	grenadeTypes[grenadeTypes.size] = "flash_grenade_mp";
 	grenadeTypes[grenadeTypes.size] = "concussion_grenade_mp";
+	grenadeTypes[grenadeTypes.size] = "semtex_mp";
+	grenadeTypes[grenadeTypes.size] = "throwingknife_mp";
 	
 	possibles = [];
 	
@@ -1556,6 +1557,9 @@ getValidGrenade()
 canFire(curweap)
 {
 	if(curweap == "none")
+		return false;
+
+	if (self.bot.isreloading)
 		return false;
 
 	if (curweap == "riotshield_mp")

@@ -44,6 +44,11 @@ pressFire(time)
 	self fire(false);
 }
 
+botThrowGrenade(gname)
+{
+	return maps\mp\bots\_bot_internal::botThrowGrenade(gname);
+}
+
 fire(what)
 {
 	self.bot.fire_pressed = what;
