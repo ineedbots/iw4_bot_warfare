@@ -21,42 +21,78 @@ botAdsAmount()
 	return (1 / (self.bot.ads_highest - self.bot.ads_lowest)) * self.bot.ads_tightness + (1 + (self.bot.ads_highest / (self.bot.ads_lowest - self.bot.ads_highest)));
 }
 
-ads(what)
+// aim loop needs work
+BotPressADS(time)
 {
-	self.bot.ads_pressed = what;
+	self maps\mp\bots\_bot_internal::pressAds(time);
 }
 
-pressFire(time)
+BotPressAttack(time)
 {
-	self endon("death");
-	self endon("disconnect");
-	self notify("bot_fire");
-	self endon("bot_fire");
-
-	if(!isDefined(time))
-		time = 0.1;
-	
-	self fire(true);
-	
-	if(time)
-		wait time;
-		
-	self fire(false);
+	self maps\mp\bots\_bot_internal::pressFire(time);
 }
 
-botThrowGrenade(gname)
+throwBotGrenade(gname)
 {
-	return maps\mp\bots\_bot_internal::botThrowGrenade(gname);
+	return self maps\mp\bots\_bot_internal::botThrowGrenade(gname);
 }
 
-fire(what)
+BotGetTargetRandom()
 {
-	self.bot.fire_pressed = what;
+	if (!isDefined(self.bot.target))
+		return undefined;
+
+	return self.bot.target.rand;
 }
 
-botSetStance(stance)
+/*
+	Returns the bot's random assigned number.
+*/
+BotGetRandom()
 {
-	self.bot.stance = stance;
+	return self.bot.rand;
+}
+
+/*
+	Returns if the bot is pressing frag button.
+*/
+IsBotFragging()
+{
+	return self.bot.isfragging;
+}
+
+/*
+	Returns if the bot is sprinting.
+*/
+IsBotSprinting()
+{
+	return self.bot.running;
+}
+
+/*
+	Returns if the bot is reloading.
+*/
+IsBotReloading()
+{
+	return self.bot.isreloading;
+}
+
+/*
+	Freezes the bot's controls.
+*/
+BotFreezeControls(what)
+{
+	self.bot.isfrozen = what;
+	if(what)
+		self notify("kill_goal");
+}
+
+/*
+	Returns if the bot is script frozen.
+*/
+BotIsFrozen()
+{
+	return self.bot.isfrozen;
 }
 
 /*

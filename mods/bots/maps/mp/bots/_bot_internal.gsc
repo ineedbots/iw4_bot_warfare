@@ -212,6 +212,52 @@ botThrowGrenade(grenName)
 	return ret;
 }
 
+pressAds(time)
+{
+	self endon("death");
+	self endon("disconnect");
+	self notify("bot_ads");
+	self endon("bot_ads");
+
+	if(!isDefined(time))
+		time = 0.1;
+	
+	self ads(true);
+	
+	if(time)
+		wait time;
+		
+	self ads(false);
+}
+
+ads(what)
+{
+	self.bot.ads_pressed = what;
+}
+
+pressFire(time)
+{
+	self endon("death");
+	self endon("disconnect");
+	self notify("bot_fire");
+	self endon("bot_fire");
+
+	if(!isDefined(time))
+		time = 0.1;
+	
+	self fire(true);
+	
+	if(time)
+		wait time;
+		
+	self fire(false);
+}
+
+fire(what)
+{
+	self.bot.fire_pressed = what;
+}
+
 /*
 	Bot will jump.
 */
@@ -250,7 +296,7 @@ jump()
 */
 stand()
 {
-	self botSetStance("stand");
+	self.bot.stance = "stand";
 }
 
 /*
@@ -258,7 +304,7 @@ stand()
 */
 crouch()
 {
-	self botSetStance("crouch");
+	self.bot.stance = "crouch";
 }
 
 /*
@@ -271,7 +317,7 @@ prone()
 	if (curWeap == "riotshield_mp")
 		return;
 
-	self botSetStance("prone");
+	self.bot.stance = "prone";
 }
 
 botMoveTo(to)
