@@ -1269,8 +1269,6 @@ aim()
 				{
 					if(no_trace_time > no_trace_ads_time && !usingRemote)
 					{
-						self ads(false);
-						
 						if(isplay)
 						{
 							//better room to nade? cook time function with dist?
@@ -1315,19 +1313,18 @@ aim()
 				
 				if(false && isplay && conedot > 0.9 && dist < level.bots_maxKnifeDistance && trace_time > reaction_time)
 				{
-					self ads(false);
-					self knife();
+					self knife(target);
 					continue;
 				}
 				
 				if(!self canFire(curweap) || !self isInRange(dist, curweap))
 				{
-					self ads(false);
 					continue;
 				}
 				
 				canADS = self canAds(dist, curweap);
-				self ads(canADS);
+				if (canADS)
+					self thread pressAds();
 
 				if((!canADS || self botAdsAmount() == 1.0) && (conedot > 0.95 || dist < level.bots_maxKnifeDistance) && trace_time > reaction_time)
 				{
@@ -1337,8 +1334,6 @@ aim()
 				continue;
 			}
 		}
-		
-		self ads(false);
 		
 		if (!isDefined(self.bot.script_aimpos))
 		{
@@ -1789,6 +1784,13 @@ getRandomLargestStafe(dist)
 }
 
 /*
+	Bot will knife.
+*/
+knife(ent)
+{
+}
+
+/*
 	Bot will reload.
 */
 reload()
@@ -1798,13 +1800,6 @@ reload()
 	self SetWeaponAmmoStock(cur, self GetWeaponAmmoClip(cur) + self GetWeaponAmmoStock(cur));
 	self setWeaponAmmoClip(cur, 0);
 	// the script should reload for us.
-}
-
-/*
-	Bot will knife.
-*/
-knife()
-{
 }
 
 botThrowGrenade(grenName)
