@@ -154,7 +154,7 @@ onPlayerSpawned()
 		self thread UseRunThink();
 		self thread watchUsingRemote();
 
-		// grenades (pick up too), knife (players and ents), stinger, footsounds
+		// knife (players and ents), stinger, footsounds
 		
 		self thread spawned();
 	}
@@ -429,6 +429,30 @@ moveHack()
 		}
 
 		// push out of players
+		for (i = level.players.size - 1; i >= 0; i--)
+		{
+			player = level.players[i];
+
+			if (player == self)
+				continue;
+
+			if (!isReallyAlive(player))
+				continue;
+
+			dist = distance(self.origin, player.origin);
+
+			if (dist > level.botPushOutDist)
+				continue;
+
+			pushOutDir = VectorNormalize((self.origin[0], self.origin[1], 0)-(player.origin[0], player.origin[1], 0));
+			trace = bulletTrace(self.origin + (0,0,20), (self.origin + (0,0,20)) + (pushOutDir * ((level.botPushOutDist-dist)+10)), false, self);
+			//no collision, so push out
+			if(trace["fraction"] == 1)
+			{
+				pushoutPos = self.origin + (pushOutDir * (level.botPushOutDist-dist));
+				self SetOrigin((pushoutPos[0], pushoutPos[1], self.origin[2])); 
+			}
+		}
 
 		if (completedMove)
 			continue;
@@ -728,6 +752,8 @@ spawned()
 	
 	self thread emptyClipShoot();
 
+	self thread grenade_danager();
+
 	self thread target();
 	self thread aim();
 	self thread check_reload();
@@ -736,6 +762,85 @@ spawned()
 	self thread walk();
 
 	self notify("bot_spawned");
+}
+
+grenade_danager()
+{
+	self endon("disconnect");
+	self endon("death");
+	
+	for(;;)
+	{
+		wait 1;
+
+		if (self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
+			continue;
+
+		if(self.bot.isfraggingafter || self.bot.climbing)
+			continue;
+
+		myEye = self getEye();
+		for (i = level.bots_fragList.count-1; i >= 0; i--)
+		{
+			frag = level.bots_fragList.data[i];
+
+			if (isDefined(frag.throwback))
+				continue;
+
+			if (isDefined(frag.owner) && frag.owner == self)
+				continue;
+
+			if (level.teamBased && frag.team == self.team)
+				continue;
+
+			if (lengthSquared(frag.velocity) > 10000)
+				continue;
+
+			if(DistanceSquared(self.origin, frag.origin) > 20000)
+				continue;
+
+			if (!bulletTracePassed( myEye, frag.origin, false, frag.grenade ))
+				continue;
+
+			frag.throwback = true;
+
+			hasFrag = self HasWeapon("frag_grenade_mp");
+			fragCount = self GetAmmoCount("frag_grenade_mp");
+
+			if (!hasFrag)
+				self _GiveWeapon("frag_grenade_mp", 0);
+			self SetWeaponAmmoClip("frag_grenade_mp", 1);
+
+			self thread watchThrowback(frag);
+			self botThrowGrenade("frag_grenade_mp");
+			
+			frag.throwback = undefined;
+			self SetWeaponAmmoClip("frag_grenade_mp", fragCount);
+			if (!hasFrag)
+				self TakeWeapon("frag_grenade_mp");
+			break;
+		}
+	}
+}
+
+watchThrowback(frag)
+{
+	self endon("bot_kill_throwback");
+	self thread notifyAfterDelay(5, "bot_kill_throwback");
+	self waittill( "grenade_fire", grenade );
+
+	// blew up already
+	if (!isDefined(frag.grenade))
+	{
+		grenade delete();
+		return;
+	}
+
+	grenade.threwBack = true;
+	self thread incPlayerStat( "throwbacks", 1 );
+	grenade thread maps\mp\gametypes\_shellshock::grenade_earthQuake();
+	grenade.originalOwner = frag.owner;
+	frag.grenade delete();
 }
 
 /*
@@ -1807,7 +1912,7 @@ botThrowGrenade(grenName)
 	self endon("death");
 	self endon("disconnect");
 
-	if (self.bot.tryingtofrag)
+	if (self.bot.tryingtofrag || self.bot.isfraggingafter)
 		return "already nading";
 
 	if (!self getAmmoCount(grenName))
@@ -1825,7 +1930,6 @@ botThrowGrenade(grenName)
 	if (ret != "timeout")
 	{
 		ret = self waittill_any_timeout( 5, "grenade_fire", "weapon_change", "offhand_end" );
-		wait 0.95;
 	}
 
 	self.bot.tryingtofrag = false;

@@ -71,6 +71,7 @@ init()
 	level.bots_maxShotgunDistance *= level.bots_maxShotgunDistance;
 	level.bots_listenDist = 100;
 	level.bots_listenDist *= level.bots_listenDist;
+	level.botPushOutDist = 30;
 	
 	level.smokeRadius = 255;
 	
@@ -557,18 +558,21 @@ onGrenadeFire()
 		if(weaponName == "smoke_grenade_mp")
 			grenade thread AddToSmokeList();
 		else if (isSubStr(weaponName, "frag_"))
-			grenade thread AddToFragList();
+			grenade thread AddToFragList(self);
 		else if ( weaponName == "claymore" || weaponName == "claymore_mp" )
 			grenade thread claymoreDetonationBotFix();
 	}
 }
 
-AddToFragList()
+AddToFragList(who)
 {
 	grenade = spawnstruct();
 	grenade.origin = self getOrigin();
 	grenade.velocity = (0, 0, 0);
 	grenade.grenade = self;
+	grenade.owner = who;
+	grenade.team = who.team;
+	grenade.throwback = undefined;
 
 	grenade thread thinkFrag();
 	
@@ -580,7 +584,7 @@ thinkFrag()
 	while(isDefined(self.grenade))
 	{
 		nowOrigin = self.grenade getOrigin();
-		self.velocity = (nowOrigin - self.origin)*20; //lensq < 10000
+		self.velocity = (nowOrigin - self.origin)*20;
 		self.origin = nowOrigin;
 
 		wait 0.05;

@@ -21,7 +21,6 @@ botAdsAmount()
 	return (1 / (self.bot.ads_highest - self.bot.ads_lowest)) * self.bot.ads_tightness + (1 + (self.bot.ads_highest / (self.bot.ads_lowest - self.bot.ads_highest)));
 }
 
-// aim loop needs work
 BotPressADS(time)
 {
 	self maps\mp\bots\_bot_internal::pressAds(time);
@@ -213,6 +212,12 @@ getEyeHeight()
 	myEye = self getEye();
 
 	return myEye[2] - self.origin[2];
+}
+
+notifyAfterDelay(delay, not)
+{
+	wait delay;
+	self notify(not);
 }
 
 /*
