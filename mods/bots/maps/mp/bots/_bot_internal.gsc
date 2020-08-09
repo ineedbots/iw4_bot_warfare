@@ -126,6 +126,8 @@ resetBotVars()
 
 	self.bot.jumping = false;
 	self.bot.jumpingafter = false;
+
+	self.bot.lockingon = false;
 }
 
 /*
@@ -145,6 +147,7 @@ onPlayerSpawned()
 		
 		self thread reload_watch();
 		self thread grenade_watch();
+		self thread lockon_watch();
 
 		self thread adsHack();
 		self thread fireHack();
@@ -154,9 +157,142 @@ onPlayerSpawned()
 		self thread UseRunThink();
 		self thread watchUsingRemote();
 
-		// knife (players and ents), stinger, footsounds
+		// knife (players and ents), footsounds, anims
 		
 		self thread spawned();
+	}
+}
+
+lockon_watch()
+{
+	self endon("disconnect");
+	self endon("death");
+
+	for (;;)
+	{
+		wait 0.05;
+
+		if(!gameFlag( "prematch_done" ) || level.gameEnded || self.bot.isfrozen || self maps\mp\_flashgrenades::isFlashbanged())
+			continue;
+
+		if (!isDefined(self.bot.target) || !isDefined(self.bot.target.entity))
+			continue;
+
+		if (self.bot.target.entity.classname != "script_vehicle" && self.bot.target.entity.model != "vehicle_uav_static_mp")
+			continue;
+
+		weap = self getCurrentWeapon();
+		if (weap != "stinger_mp" && weap != "at4_mp")
+			continue;
+
+		if (!self GetCurrentWeaponClipAmmo())
+			continue;
+
+		self.bot.lockingon = true;
+		self doLockon();
+		self.bot.lockingon = false;
+	}
+}
+
+doLockon()
+{
+	self endon("bot_kill_lockon");
+	self thread watchBotLockonEvents();
+	self thread watchBotLockonTrace();
+
+	self thread doRocketLockingSound();
+	wait 3;
+	self notify("bot_kill_lockon_sound");
+
+	self thread doRocketLockedSound();
+	wait 1;
+	self notify("bot_kill_lockon_sound");
+
+	// fire!
+	if (isDefined(self.bot.target) && isDefined(self.bot.target.entity))
+	{
+		weap = self getCurrentWeapon();
+		self SetWeaponAmmoClip(weap, self GetCurrentWeaponClipAmmo()-1);
+
+		rocket = MagicBullet(weap, self getEye(), self.bot.target.entity.origin, self );
+		rocket Missile_SetTargetEnt( self.bot.target.entity );
+		
+		self.stingerTarget = self.bot.target.entity;
+		self notify( "missile_fire", rocket, weap );
+	}
+
+	self notify("bot_kill_lockon");
+}
+
+watchBotLockonTrace()
+{
+	self endon("death");
+	self endon("disconnect");
+	self endon("bot_kill_lockon");
+
+	while (isDefined(self.bot.target) && isDefined(self.bot.target.entity) && self.bot.target.no_trace_time < 500)
+		wait 0.05;
+
+	self notify("bot_kill_lockon");
+}
+
+watchBotLockonEvents()
+{
+	self endon("death");
+	self endon("disconnect");
+	self endon("bot_kill_lockon");
+
+	self waittill_any("flash_rumble_loop", "new_enemy", "weapon_change", "weapon_fired");
+
+	self notify("bot_kill_lockon");
+}
+
+doRocketLockingSound()
+{
+	self endon("disconnect");
+	self endon("death");
+	self endon("bot_kill_lockon_sound");
+	self endon("bot_kill_lockon");
+	
+	for(;;)
+	{
+		wait 0.6;
+
+		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity))
+		{
+			if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && self.bot.target.entity == level.chopper )
+				level.chopper.gunner playLocalSound( "missile_locking" );
+
+			if ( isDefined( level.ac130player ) && self.bot.target.entity == level.ac130.planeModel )
+				level.ac130player playLocalSound( "missile_locking" );
+			
+			self playLocalSound( "stinger_locking" );
+			self PlayRumbleOnEntity( "ac130_25mm_fire" );
+		}
+	}
+}
+
+doRocketLockedSound()
+{
+	self endon("disconnect");
+	self endon("death");
+	self endon("bot_kill_lockon_sound");
+	self endon("bot_kill_lockon");
+	
+	for(;;)
+	{
+		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity))
+		{
+			if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && self.bot.target.entity == level.chopper )
+				level.chopper.gunner playLocalSound( "missile_locking" );
+
+			if ( isDefined( level.ac130player ) && self.bot.target.entity == level.ac130.planeModel )
+				level.ac130player playLocalSound( "missile_locking" );
+			
+			self playLocalSound( "stinger_locked" );
+			self PlayRumbleOnEntity( "ac130_25mm_fire" );
+		}
+		wait 0.25;
 	}
 }
 
@@ -209,48 +345,6 @@ doRunDelay()
 		wait 1;
 
 	self.bot.runningafter = false;
-}
-
-bot_lookat(pos, time)
-{
-	self notify("bots_aim_overlap");
-	self endon("bots_aim_overlap");
-	self endon("disconnect");
-	self endon("death");
-	self endon("spawned_player");
-	level endon ( "game_ended" );
-
-	if (!isDefined(pos))
-		return;
-
-	steps = time / 0.05;
-	if (!isDefined(steps) || steps <= 0)
-		steps = 1;
-
-	myAngle=self getPlayerAngles();
-	angles = VectorToAngles( (pos - self GetEye()) - anglesToForward(myAngle) );
-	
-	X=(angles[0]-myAngle[0]);
-	while(X > 170.0)
-		X=X-360.0;
-	while(X < -170.0)
-		X=X+360.0;
-	X=X/steps;
-	
-	Y=(angles[1]-myAngle[1]);
-	while(Y > 180.0)
-		Y=Y-360.0;
-	while(Y < -180.0)
-		Y=Y+360.0;
-		
-	Y=Y/steps;
-	
-	for(i=0;i<steps;i++)
-	{
-		myAngle=(myAngle[0]+X,myAngle[1]+Y,0);
-		self setPlayerAngles(myAngle);
-		wait 0.05;
-	}
 }
 
 stanceHack()
@@ -996,14 +1090,6 @@ target()
 			
 			for(;;)
 			{
-				if(daDist > distsq)
-				{
-					if(isObjDef)
-						self.bot.targets[key] = undefined;
-				
-					break;
-				}
-				
 				if(SmokeTrace(myEye, entOrigin, level.smokeRadius) && bulletTracePassed(myEye, entOrigin, false, ent))
 				{
 					if(!isObjDef)
@@ -1531,6 +1617,9 @@ canFire(curweap)
 	if(curweap == "none")
 		return false;
 
+	if(curweap == "at4_mp" && self.bot.lockingon)
+		return false;
+
 	if (self.bot.isreloading)
 		return false;
 
@@ -1618,7 +1707,7 @@ walk()
 		{
 			curweap = self getCurrentWeapon();
 			
-			if(self.bot.target.entity.classname == "script_vehicle" || self.bot.isfraggingafter)
+			if(self.bot.target.entity.classname == "script_vehicle" || self.bot.target.entity.model == "vehicle_uav_static_mp" || self.bot.isfraggingafter)
 			{
 				continue;
 			}
@@ -2059,4 +2148,46 @@ sprint()
 
 	self.bot.running = true;
 	self.bot.runningafter = true;
+}
+
+bot_lookat(pos, time)
+{
+	self notify("bots_aim_overlap");
+	self endon("bots_aim_overlap");
+	self endon("disconnect");
+	self endon("death");
+	self endon("spawned_player");
+	level endon ( "game_ended" );
+
+	if (!isDefined(pos))
+		return;
+
+	steps = time / 0.05;
+	if (!isDefined(steps) || steps <= 0)
+		steps = 1;
+
+	myAngle=self getPlayerAngles();
+	angles = VectorToAngles( (pos - self GetEye()) - anglesToForward(myAngle) );
+	
+	X=(angles[0]-myAngle[0]);
+	while(X > 170.0)
+		X=X-360.0;
+	while(X < -170.0)
+		X=X+360.0;
+	X=X/steps;
+	
+	Y=(angles[1]-myAngle[1]);
+	while(Y > 180.0)
+		Y=Y-360.0;
+	while(Y < -180.0)
+		Y=Y+360.0;
+		
+	Y=Y/steps;
+	
+	for(i=0;i<steps;i++)
+	{
+		myAngle=(myAngle[0]+X,myAngle[1]+Y,0);
+		self setPlayerAngles(myAngle);
+		wait 0.05;
+	}
 }
