@@ -1,1 +1,1 @@
-start iw4x.exe -dedicated +set sv_lanonly "1" +set fs_game "mods/dev" +set net_port "28960" +set developer "1" +set developer_script "1" +set scr_game_spectatetype "2" scr_war_scorelimit "0" +set sv_cheats "1" +set logfile "2" +devmap mp_rust
+start iw4x.exe -dedicated -console +set sv_lanonly "1" +set fs_game "mods/dev" +set net_port "28960" +set developer "1" +set developer_script "1" +set scr_game_spectatetype "2" scr_war_scorelimit "0" +set sv_cheats "1" +set logfile "2" +devmap mp_rust

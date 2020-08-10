@@ -28,7 +28,7 @@ added()
 	self.pers["bots"]["skill"]["semi_time"] = 0.05;
 	
 	self.pers["bots"]["behavior"] = [];
-	self.pers["bots"]["behavior"]["strafe"] = 50; // should?
+	self.pers["bots"]["behavior"]["strafe"] = 50;
 	self.pers["bots"]["behavior"]["nade"] = 50;
 	self.pers["bots"]["behavior"]["sprint"] = 50;
 	self.pers["bots"]["behavior"]["camp"] = 50;
@@ -36,7 +36,7 @@ added()
 	self.pers["bots"]["behavior"]["crouch"] = 10;
 	self.pers["bots"]["behavior"]["switch"] = 1;
 	self.pers["bots"]["behavior"]["class"] = 1;
-	self.pers["bots"]["behavior"]["jump"] = 100; // how
+	self.pers["bots"]["behavior"]["jump"] = 100;
 
 	self.pers["bots"]["unlocks"] = [];
 }
@@ -76,6 +76,7 @@ onDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint
 resetBotVars()
 {
 	self.bot.script_target = undefined;
+	self.bot.script_target_offset = undefined;
 	self.bot.targets = [];
 	self.bot.target = undefined;
 	self.bot.target_this_frame = undefined;
@@ -128,6 +129,8 @@ resetBotVars()
 	self.bot.jumpingafter = false;
 
 	self.bot.lockingon = false;
+
+	self.bot.knifing = false;
 }
 
 /*
@@ -157,7 +160,7 @@ onPlayerSpawned()
 		self thread UseRunThink();
 		self thread watchUsingRemote();
 
-		// knife (players and ents), footsounds, anims
+		// footsounds, anims
 		
 		self thread spawned();
 	}
@@ -515,11 +518,13 @@ moveHack()
 
 		self.bot.script_move_speed = moveSpeed;
 
+		moveTo = self.bot.moveTo;
+
 		completedMove = false;
-		if (DistanceSquared(self.origin, self.bot.moveTo) < (moveSpeed * moveSpeed))
+		if (DistanceSquared(self.origin, moveTo) < (moveSpeed * moveSpeed))
 		{
 			completedMove = true;
-			self SetOrigin(self.bot.moveTo);
+			self SetOrigin(moveTo);
 		}
 
 		// push out of players
@@ -553,7 +558,7 @@ moveHack()
 
 		if (!self.bot.climbing)
 		{
-			self SetOrigin(self.origin + (VectorNormalize((self.bot.moveTo[0], self.bot.moveTo[1], self.origin[2])-self.origin) * moveSpeed));
+			self SetOrigin(self.origin + (VectorNormalize((moveTo[0], moveTo[1], self.origin[2])-self.origin) * moveSpeed));
 
 			// clamp to ground
 			trace = physicsTrace(self.origin + (0.0,0.0,50.0), self.origin + (0.0,0.0,-40.0));
@@ -569,7 +574,7 @@ moveHack()
 			continue;
 		}
 		
-		self SetOrigin(self.origin + (VectorNormalize(self.bot.moveTo-self.origin) * moveSpeed));
+		self SetOrigin(self.origin + (VectorNormalize(moveTo-self.origin) * moveSpeed));
 	}
 }
 
@@ -591,7 +596,7 @@ fireHack()
 		if (self.bot.isswitching || self.bot.runningafter)
 			shouldFire = false;
 
-		if (self.bot.climbing)
+		if (self.bot.climbing || self.bot.knifing)
 			shouldFire = false;
 
 		if (self.bot.tryingtofrag)
@@ -1016,7 +1021,7 @@ reload_thread()
 	if (self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
 		return;
 	
-	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.climbing)
+	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.climbing || self.bot.knifing)
 		return;
 		
 	cur = self getCurrentWEapon();
@@ -1448,7 +1453,7 @@ aim()
 				nadeAimOffset = 0;
 				myeye = self getEye();
 
-				if(weaponClass(curweap) == "grenade")
+				if(weaponClass(curweap) == "grenade" || curweap == "throwingknife_mp")
 				{
 					if (getWeaponClass(curweap) == "weapon_projectile")
 						nadeAimOffset = dist/16000;
@@ -1502,9 +1507,12 @@ aim()
 					self thread bot_lookat(aimpos, aimspeed);
 				}
 				
-				if(false && isplay && conedot > 0.9 && dist < level.bots_maxKnifeDistance && trace_time > reaction_time)
+				knifeDist = level.bots_maxKnifeDistance;
+				if (self _hasPerk("specialty_extendedmelee"))
+					knifeDist *= 1.4;
+				if((isplay || target.classname == "misc_turret") && !self.bot.knifing && conedot > 0.9 && dist < knifeDist && trace_time > reaction_time)
 				{
-					self knife(target);
+					self thread knife(target, knifeDist);
 					continue;
 				}
 				
@@ -1620,7 +1628,7 @@ canFire(curweap)
 	if(curweap == "at4_mp" && self.bot.lockingon)
 		return false;
 
-	if (self.bot.isreloading)
+	if (self.bot.isreloading || self.bot.knifing)
 		return false;
 
 	if (curweap == "riotshield_mp")
@@ -1698,7 +1706,9 @@ walk()
 			
 		if(self maps\mp\_flashgrenades::isFlashbanged())
 		{
-			self botMoveTo(self.origin + self GetBotVelocity()*self.bot.script_move_speed);
+			myVel = self GetBotVelocity();
+			moveTo = PlayerPhysicsTrace(self.origin + (0, 0, 20), self.origin + (myVel[0], myVel[1], self.origin[2])*500, false, self);
+			self botMoveTo(moveTo);
 			continue;
 		}
 		
@@ -1758,16 +1768,15 @@ strafe(target)
 	anglesLeft = (0, angles[1]+90, 0);
 	anglesRight = (0, angles[1]-90, 0);
 	
-	myOrg = self.origin + (0, 0, 16);
-	left = myOrg + anglestoforward(anglesLeft)*500;
-	right = myOrg + anglestoforward(anglesRight)*500;
+	left = self.origin + anglestoforward(anglesLeft)*500;
+	right = self.origin + anglestoforward(anglesRight)*500;
 	
-	traceLeft = BulletTrace(myOrg, left, false, self);
-	traceRight = BulletTrace(myOrg, right, false, self);
+	traceLeft = PlayerPhysicsTrace(self.origin + (0, 0, 20), left, false, self);
+	traceRight = PlayerPhysicsTrace(self.origin + (0, 0, 20), right, false, self);
 	
-	strafe = traceLeft["position"];
-	if(traceRight["fraction"] > traceLeft["fraction"])
-		strafe = traceRight["position"];
+	strafe = traceLeft;
+	if(DistanceSquared(left, traceLeft) > DistanceSquared(right, traceRight))
+		strafe = traceRight;
 	
 	self botMoveTo(strafe);
 	wait 2;
@@ -1897,47 +1906,10 @@ movetowards(goal)
 	if(isDefined(goal))
 		self.bot.towards_goal = goal;
 
-	lastOri = self.origin;
-	stucks = 0;
-	timeslow = 0;
-	time = 0;
 	while(distanceSquared(self.origin, self.bot.towards_goal) > level.bots_goalDistance)
 	{
 		self botMoveTo(self.bot.towards_goal);
-		
-		if(time > 2.5)
-		{
-			time = 0;
-			if(distanceSquared(self.origin, lastOri) < 128)
-			{
-				stucks++;
-				
-				randomDir = self getRandomLargestStafe(stucks);
-			
-				self botMoveTo(randomDir);
-				wait stucks;
-			}
-			
-			lastOri = self.origin;
-		}
-		else if(timeslow > 1.5)
-		{
-			self thread jump();
-		}
-		else if(timeslow > 0.75)
-		{
-			self crouch();
-		}
-		
 		wait 0.05;
-		time += 0.05;
-		if(lengthsquared(self getBotVelocity()) < 1000)
-			timeslow += 0.05;
-		else
-			timeslow = 0;
-		
-		if(stucks == 3)
-			self notify("bad_path");
 	}
 	
 	self.bot.towards_goal = undefined;
@@ -1945,43 +1917,99 @@ movetowards(goal)
 }
 
 /*
-	Will return the pos of the largest trace from the bot.
-*/
-getRandomLargestStafe(dist)
-{
-	//find a better algo?
-	traces = NewHeap(::HeapTraceFraction);
-	myOrg = self.origin + (0, 0, 16);
-	
-	traces HeapInsert(bulletTrace(myOrg, myOrg + (-100*dist, 0, 0), false, self));
-	traces HeapInsert(bulletTrace(myOrg, myOrg + (100*dist, 0, 0), false, self));
-	traces HeapInsert(bulletTrace(myOrg, myOrg + (0, 100*dist, 0), false, self));
-	traces HeapInsert(bulletTrace(myOrg, myOrg + (0, -100*dist, 0), false, self));
-	traces HeapInsert(bulletTrace(myOrg, myOrg + (-100*dist, -100*dist, 0), false, self));
-	traces HeapInsert(bulletTrace(myOrg, myOrg + (-100*dist, 100*dist, 0), false, self));
-	traces HeapInsert(bulletTrace(myOrg, myOrg + (100*dist, -100*dist, 0), false, self));
-	traces HeapInsert(bulletTrace(myOrg, myOrg + (100*dist, 100*dist, 0), false, self));
-	
-	toptraces = [];
-	
-	top = traces.data[0];
-	toptraces[toptraces.size] = top;
-	traces HeapRemove();
-	
-	while(traces.data.size && top["fraction"] - traces.data[0]["fraction"] < 0.1)
-	{
-		toptraces[toptraces.size] = traces.data[0];
-		traces HeapRemove();
-	}
-	
-	return toptraces[randomInt(toptraces.size)]["position"];
-}
-
-/*
 	Bot will knife.
 */
-knife(ent)
+knife(ent, knifeDist)
 {
+	self endon("disconnect");
+	self endon("death");
+
+	self.bot.knifing = true;
+
+	isplay = isPlayer(ent);
+	curWeap = self GetCurrentWeapon();
+	usedRiot = self.hasRiotShieldEquipped;
+	distsq = DistanceSquared(self.origin, ent.origin);
+	damage = 135;
+	if (usedRiot)
+		damage = 52;
+
+	// play sound
+	if (usedRiot)
+	{
+		self playSound("melee_riotshield_swing");
+	}
+	else
+	{
+		if ((distsq / knifeDist) < 0.3333333)
+		{
+			self playSound("melee_swing_small");
+		}
+		else
+		{
+			self playSound("melee_swing_ps_large");
+		}
+	}
+
+	wait 0.15;
+
+	if (isDefined(ent) && isAlive(ent) && randomInt(20)) // 5percent chance of missing
+	{
+		if (isplay)
+		{
+			// teleport to target
+			pushOutDir = VectorNormalize((self.origin[0], self.origin[1], 0)-(ent.origin[0], ent.origin[1], 0));
+			pushoutPos = self.origin + (pushOutDir * (60-distance(ent.origin,self.origin)));
+			self SetOrigin((pushoutPos[0], pushoutPos[1], ent.origin[2]));
+			self notify("kill_goal");
+
+			for (;;)
+			{
+				// check riotshield
+				if (ent.hasRiotShield)
+				{
+					entCone = ent getConeDot(self.origin, ent.origin, ent GetPlayerAngles());
+					if ((entCone > 0.85 && ent.hasRiotShieldEquipped) || (entCone < -0.85 && !ent.hasRiotShieldEquipped))
+					{
+						// play riot shield hitting knife sound
+						if (!usedRiot)
+							self playSound("melee_knife_hit_shield");
+						else
+							self playSound("melee_riotshield_impact");
+
+						break;
+					}
+				}
+
+				if (!usedRiot)
+				{
+					//playFx( level.bots_bloodfx,target.origin + (0.0, 0.0, 30.0) );
+					self playSound("melee_knife_hit_body");
+				}
+				else
+					self playSound("melee_riotshield_impact");
+
+				ent thread maps\mp\gametypes\_callbacksetup::CodeCallback_PlayerDamage(self, self, damage, 0, "MOD_MELEE", curWeap, self.origin, VectorNormalize(ent.origin-self.origin), "none", 0);
+				break;
+			}
+		}
+		else
+		{
+			if (!usedRiot)
+				self playSound("melee_hit_other");
+			else
+				self playSound("melee_riotshield_impact");
+			
+			ent notify( "damage", damage, self, self.angles, self.origin, "MOD_MELEE" );
+		}
+	}
+
+	if(isSubStr(curWeap, "tactical_") || usedRiot)
+		wait 1;
+	else
+		wait 2;
+	
+	self.bot.knifing = false;
 }
 
 /*
@@ -2012,11 +2040,9 @@ botThrowGrenade(grenName)
 	self setSpawnWeapon(grenName);
 	self.bot.tryingtofrag = true;
 
-	ret = "grenade_pullback";
-	if (grenName != "throwingknife_mp")
-		ret = self waittill_any_timeout( 5, "grenade_pullback" );
+	ret = self waittill_any_timeout( 5, "grenade_pullback", "grenade_fire" );
 
-	if (ret != "timeout")
+	if (ret == "grenade_pullback")
 	{
 		ret = self waittill_any_timeout( 5, "grenade_fire", "weapon_change", "offhand_end" );
 	}
@@ -2083,7 +2109,7 @@ jump()
 	self endon("disconnect");
 
 	if (isDefined(self.lastStand) || self getStance() != "stand" ||
-			level.gameEnded || !gameFlag( "prematch_done" ) ||
+			level.gameEnded || !gameFlag( "prematch_done" ) || self IsUsingRemote() ||
 			self.bot.isfrozen || self.bot.climbing || self.bot.jumping || self.bot.jumpingafter)
 			return;
 
@@ -2092,7 +2118,7 @@ jump()
 
 	for (i = 0; i < 6; i++)
 	{
-		self SetOrigin(self.origin + (0, 0, 13));
+		self SetOrigin(PlayerPhysicsTrace(self.origin + (0, 0, 0), self.origin + (0, 0, 13), false, self));
 		wait 0.05;
 	}
 
@@ -2100,7 +2126,7 @@ jump()
 
 	for (i = 0; i < 6; i++)
 	{
-		self SetOrigin(self.origin + (0, 0, -5));
+		self SetOrigin(PlayerPhysicsTrace(self.origin + (0, 0, 0), self.origin + (0, 0, -5), false, self));
 		wait 0.05;
 	}
 
