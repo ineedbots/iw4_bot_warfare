@@ -160,7 +160,7 @@ onPlayerSpawned()
 		self thread UseRunThink();
 		self thread watchUsingRemote();
 
-		// footsounds, anims
+		// anims
 		
 		self thread spawned();
 	}
@@ -430,7 +430,7 @@ moveHack()
 	self.bot.last_pos = self.origin;
 	self.bot.moveTo = self.origin;
 
-	for (;;)
+	for (timer = 0;;timer += 0.05)
 	{
 		wait 0.05;
 
@@ -517,6 +517,7 @@ moveHack()
 		moveSpeed *= self.moveSpeedScaler;
 
 		self.bot.script_move_speed = moveSpeed;
+		// self bots_hasPerk("specialty_quieter")
 
 		moveTo = self.bot.moveTo;
 
@@ -1983,7 +1984,7 @@ knife(ent, knifeDist)
 
 				if (!usedRiot)
 				{
-					//playFx( level.bots_bloodfx,target.origin + (0.0, 0.0, 30.0) );
+					playFx( level.bots_bloodfx,ent.origin + (0.0, 0.0, 30.0) );
 					self playSound("melee_knife_hit_body");
 				}
 				else

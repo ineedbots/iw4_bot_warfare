@@ -8,11 +8,10 @@
 !/z_serverdev.bat
 !/z_server.bat
 !/z_bots.bat
+!/z_client.bat
 
 # Folder to not ignore
-!/mods/
-/mods/*
-!/mods/bots/
+!/userraw
 !/main/
 /main/*
 !/main/server.cfg

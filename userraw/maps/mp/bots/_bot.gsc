@@ -87,6 +87,8 @@ init()
 	level.bots_nonfullautoguns["striker"] = true;
 	level.bots_nonfullautoguns["usp"] = true;
 	level.bots_nonfullautoguns["wa2000"] = true;
+
+	level.bots_bloodfx = loadfx("impacts/flesh_hit_body_fatal_exit");
 	
 	level thread fixGamemodes();
 	
