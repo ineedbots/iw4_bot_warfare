@@ -196,6 +196,9 @@ getSecondaries()
 
 		weapon_name = tableLookupByRow( "mp/statstable.csv", i, 4 );
 
+		if (weapon_name == "gl")
+			continue;
+
 		secondaries[secondaries.size] = weapon_name;
 	}
 
@@ -231,6 +234,12 @@ getPerks(perktype)
 
 		perk_name = tableLookupByRow( "mp/perktable.csv", i, 1 );
 
+		if (perk_name == "specialty_c4death")
+			continue;
+
+		if (perk_name == "_specialty_blastshield")
+			continue;
+
 		perks[perks.size] = perk_name;
 	}
 
@@ -255,6 +264,9 @@ getKillstreaks()
 		if(streak_name == "b1")
 			continue;
 
+		if(streak_name == "sentry") // theres an airdrop version
+			continue;
+
 		if (isSubstr(streak_name, "KILLSTREAKS_"))
 			continue;
 
@@ -273,12 +285,6 @@ chooseRandomPerk(perkkind)
 		perk = random(perks);
 
 		if (perk == "specialty_null")
-			continue;
-
-		if (perk == "specialty_c4death")
-			continue;
-
-		if (perk == "_specialty_blastshield")
 			continue;
 
 		if (!self isItemUnlocked(perk))

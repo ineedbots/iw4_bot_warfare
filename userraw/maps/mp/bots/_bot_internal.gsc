@@ -430,9 +430,11 @@ moveHack()
 	self.bot.last_pos = self.origin;
 	self.bot.moveTo = self.origin;
 
-	for (timer = 0;;timer += 0.05)
+	timer = 0;
+	for (;;)
 	{
 		wait 0.05;
+		timer += 0.05;
 
 		self.bot.velocity = (self.origin-self.bot.last_pos)*20;
 		self.bot.last_pos = self.origin;
@@ -517,7 +519,44 @@ moveHack()
 		moveSpeed *= self.moveSpeedScaler;
 
 		self.bot.script_move_speed = moveSpeed;
-		// self bots_hasPerk("specialty_quieter")
+
+		// do foot sound
+		if ((moveSpeed > 0) && ((3.5 / moveSpeed) <= timer))
+		{
+			timer = 0;
+
+			if (!self _hasPerk("specialty_quieter"))
+			{
+				if (self.bot.climbing)
+					self playSound( "step_run_ladder" );
+				else
+				{
+					myOg = self getOrigin();
+					trace = bullettrace( myOg, myOg + (0.0, 0.0, -5.0), false, self );
+
+					if (trace[ "surfacetype" ] != "none")
+					{
+						if (inLastStand)
+							self playSound( "step_prone_" + trace[ "surfacetype" ] );
+						else
+						{
+							switch( stance )
+							{
+								case "stand":
+									self playSound( "step_run_" + trace[ "surfacetype" ] );
+								break;
+								case "crouch":
+									self playSound( "step_walk_" + trace[ "surfacetype" ] );
+								break;
+								case "prone":
+									self playSound( "step_prone_" + trace[ "surfacetype" ] );
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 
 		moveTo = self.bot.moveTo;
 
