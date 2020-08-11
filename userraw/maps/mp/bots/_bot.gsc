@@ -9,7 +9,7 @@
 init()
 {
 	load_waypoints();
-	hook_callbacks();
+	thread hook_callbacks();
 	
 	setDvar("testClients_watchKillcam", true);
 	setDvar("testclients_doReload", false);
@@ -143,6 +143,7 @@ onPlayerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 */
 hook_callbacks()
 {
+	wait 0.05;
 	level.prevCallbackPlayerDamage = level.callbackPlayerDamage;
 	level.callbackPlayerDamage = ::onPlayerDamage;
 	

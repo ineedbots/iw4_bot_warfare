@@ -54,6 +54,7 @@ connected()
 	self resetBotVars();
 	
 	self thread onPlayerSpawned();
+	self thread onDisconnected();
 }
 
 /*
@@ -61,6 +62,8 @@ connected()
 */
 onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, timeOffset, deathAnimDuration)
 {
+	self botsDeleteFakeAnim();
+	wait 0.05;
 }
 
 /*
@@ -68,6 +71,12 @@ onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, 
 */
 onDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset)
 {
+}
+
+onDisconnected()
+{
+	self waittill("disconnect");
+	self botsDeleteFakeAnim();
 }
 
 /*
@@ -133,6 +142,66 @@ resetBotVars()
 	self.bot.knifing = false;
 }
 
+makeFakeAnim()
+{
+	if(isDefined(self.bot_anim))
+		return;
+
+	self.bot_anim = spawn("script_model", self.origin);
+	self.bot_anim setModel(self.model);
+	self.bot_anim LinkTo(self, "tag_origin", (0, 0, 0), (0, 0, 0));
+	
+	self.bot_anim.headmodel = spawn( "script_model", self.bot_anim getTagOrigin( "j_spine4" ));
+	self.bot_anim.headmodel setModel(self.headmodel);
+	self.bot_anim.headmodel.angles = (270, 0, 270);
+	self.bot_anim.headmodel linkto( self.bot_anim, "j_spine4" );
+	
+	if(isDefined(self))
+	{
+		self thread maps\mp\gametypes\_weapons::detach_all_weapons();
+		self botHideParts();
+	}
+}
+
+botsDeleteFakeAnim()
+{
+	if(!isDefined(self.bot_anim))
+		return;
+
+	self.bot_anim.headmodel delete();
+	self.bot_anim.headmodel = undefined;
+	self.bot_anim delete();
+	self.bot_anim = undefined;
+	
+	if(isDefined(self))
+	{
+		self botShowParts();
+		self thread maps\mp\gametypes\_weapons::stowedWeaponsRefresh();
+	}
+}
+
+botHideParts()
+{
+	//hideallparts
+	self hidepart("j_ankle_le");//this is the only place where bot cannot be shot at...
+	self hidepart("j_hiptwist_le");
+	self hidepart("j_head");
+	self hidepart("j_helmet");
+	self hidepart("j_eyeball_le");
+	self hidepart("j_clavicle_le");
+}
+
+botShowParts()
+{
+	self showpart("j_ankle_le");
+	self showpart("j_hiptwist_le");
+	self showpart("j_head");
+	self showpart("j_helmet");
+	self showpart("j_eyeball_le");
+	self showpart("j_clavicle_le");
+	//showallparts
+}
+
 /*
 	When the bot spawns.
 */
@@ -159,8 +228,6 @@ onPlayerSpawned()
 
 		self thread UseRunThink();
 		self thread watchUsingRemote();
-
-		// anims
 		
 		self thread spawned();
 	}
@@ -899,6 +966,8 @@ spawned()
 	self thread stance();
 	self thread onNewEnemy();
 	self thread walk();
+
+	self makeFakeAnim();
 
 	self notify("bot_spawned");
 }
