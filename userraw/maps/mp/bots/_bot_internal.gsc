@@ -927,10 +927,10 @@ watchThrowback(frag)
 {
 	self endon("bot_kill_throwback");
 	self thread notifyAfterDelay(5, "bot_kill_throwback");
-	self waittill( "grenade_fire", grenade );
+	self waittill( "grenade_fire", grenade, wName );
 
 	// blew up already
-	if (!isDefined(frag.grenade))
+	if (!isDefined(frag.grenade) || wName != "frag_grenade_mp")
 	{
 		grenade delete();
 		return;
@@ -1708,7 +1708,7 @@ walk()
 		if(self maps\mp\_flashgrenades::isFlashbanged())
 		{
 			myVel = self GetBotVelocity();
-			moveTo = PlayerPhysicsTrace(self.origin + (0, 0, 20), self.origin + (myVel[0], myVel[1], self.origin[2])*500, false, self);
+			moveTo = PlayerPhysicsTrace(self.origin + (0, 0, 20), self.origin + (myVel[0], myVel[1], 0)*500, false, self);
 			self botMoveTo(moveTo);
 			continue;
 		}
