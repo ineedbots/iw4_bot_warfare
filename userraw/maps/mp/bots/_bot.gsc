@@ -91,7 +91,37 @@ init()
 
 	level.bots_bloodfx = loadfx("impacts/flesh_hit_body_fatal_exit");
 	PrecacheMpAnim("pb_combatrun_forward_loop");
+	PrecacheMpAnim("pb_crouch_run_forward");
+	PrecacheMpAnim("pb_sprint");
+
+	PrecacheMpAnim("pb_crouch_walk_forward_shield");
+	PrecacheMpAnim("pb_crouch_run_forward_pistol");
+	PrecacheMpAnim("pb_crouch_run_forward_RPG");
+	PrecacheMpAnim("pb_crouch_walk_forward_akimbo");
+	
+	PrecacheMpAnim("pb_combatrun_forward_shield");
+	PrecacheMpAnim("pb_pistol_run_fast");
+	PrecacheMpAnim("pb_combatrun_forward_RPG");
+	PrecacheMpAnim("pb_combatrun_forward_akimbo");
+	
+	PrecacheMpAnim("pb_sprint_shield");
+	PrecacheMpAnim("pb_sprint_akimbo");
+	PrecacheMpAnim("pb_sprint_pistol");
+	PrecacheMpAnim("pb_sprint_RPG");
+
+	PrecacheMpAnim("pb_climbup");
+	PrecacheMpAnim("pb_prone_crawl");
+	PrecacheMpAnim("pb_laststand_crawl");
+
+	PrecacheMpAnim("pb_combatrun_forward_loop");
+
 	PrecacheMpAnim("pt_stand_core_pullout");
+	
+	PrecacheMpAnim("pt_melee_pistol_1");
+	PrecacheMpAnim("pt_melee_prone_pistol");
+	PrecacheMpAnim("pt_melee_pistol_2");
+	PrecacheMpAnim("pt_laststand_melee");
+	PrecacheMpAnim("pt_melee_shield");
 	
 	level thread fixGamemodes();
 	

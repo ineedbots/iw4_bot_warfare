@@ -56,6 +56,7 @@ connected()
 	self thread onPlayerSpawned();
 	self thread onDisconnected();
 	self thread onGameEnded();
+	self thread onGiveLoadout();
 }
 
 /*
@@ -72,6 +73,17 @@ onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, 
 */
 onDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset)
 {
+}
+
+onGiveLoadout()
+{
+	self endon("disconnect");
+
+	for(;;)
+	{
+		self waittill("giveLoadout");
+		self botsDeleteFakeAnim();
+	}
 }
 
 onGameEnded()
@@ -438,6 +450,22 @@ emptyClipShoot()
 	}
 }
 
+checkShouldHideAnim(shouldHideAnim)
+{
+	isHidden = self isFakeAnimHidden();
+
+	if (self.bot.isreloading || self.bot.isfraggingafter)
+		shouldHideAnim = true;
+
+	if (self isInActiveAnim())
+		shouldHideAnim = false;
+
+	if (isHidden && !shouldHideAnim)
+		self showFakeAnim();
+	else if (!isHidden && shouldHideAnim)
+		self hideFakeAnim();
+}
+
 moveHack()
 {
 	self endon("disconnect");
@@ -446,11 +474,12 @@ moveHack()
 	self.bot.last_pos = self.origin;
 	self.bot.moveTo = self.origin;
 
-	timer = 0;
-	for (;;)
+	shouldHideAnim = true;
+	for (timer = 0;;timer += 0.05)
 	{
+		self checkShouldHideAnim(shouldHideAnim);
+		shouldHideAnim = true;
 		wait 0.05;
-		timer += 0.05;
 
 		self.bot.velocity = (self.origin-self.bot.last_pos)*20;
 		self.bot.last_pos = self.origin;
@@ -469,6 +498,7 @@ moveHack()
 		weapClass = weaponClass(curWeap);
 		inLastStand = isDefined(self.lastStand);
 		usingRemote = self isUsingRemote();
+		botAnim = "";
 
 		if (!self.bot.climbing)
 		{
@@ -572,6 +602,93 @@ moveHack()
 					}
 				}
 			}
+		}
+
+		if (inLastStand)
+			botAnim = "pb_laststand_crawl";
+		else if (self.bot.climbing)
+			botAnim = "pb_climbup";
+		else if (stance == "prone")
+			botAnim = "pb_prone_crawl";
+		else
+		{
+			if (stance == "stand")
+			{
+				if (self.bot.running)
+				{
+					// sprint
+					switch(weapClass)
+					{
+						case "pistol":
+							botAnim = "pb_sprint_pistol";
+						break;
+						case "rocketlauncher":
+							botAnim = "pb_sprint_RPG";
+						break;
+						default:
+							botAnim = "pb_sprint";
+						break;
+					}
+
+					if(self.hasRiotShieldEquipped)
+						botAnim = "pb_sprint_shield";
+
+					if(isSubStr(curWeap, "akimbo_"))
+						botAnim = "pb_sprint_akimbo";
+				}
+				else
+				{
+					// stand
+					switch(weapClass)
+					{
+						case "pistol":
+							botAnim = "pb_pistol_run_fast";
+						break;
+						case "rocketlauncher":
+							botAnim = "pb_combatrun_forward_RPG";
+						break;
+						default:
+							botAnim = "pb_combatrun_forward_loop";
+						break;
+					}
+
+					if(self.hasRiotShieldEquipped)
+						botAnim = "pb_combatrun_forward_shield";
+
+					if(isSubStr(curWeap, "akimbo_"))
+						botAnim = "pb_combatrun_forward_akimbo";
+				}
+			}
+			else
+			{
+				// crouch
+				switch(weapClass)
+				{
+					case "pistol":
+						botAnim = "pb_crouch_run_forward_pistol";
+					break;
+					case "rocketlauncher":
+						botAnim = "pb_crouch_run_forward_RPG";
+					break;
+					default:
+						botAnim = "pb_crouch_run_forward";
+					break;
+				}
+
+				if(self.hasRiotShieldEquipped)
+					botAnim = "pb_crouch_walk_forward_shield";
+
+				if(isSubStr(curWeap, "akimbo_"))
+					botAnim = "pb_crouch_walk_forward_akimbo";
+			}
+		}
+
+		if (botAnim != "")
+		{
+			shouldHideAnim = false;
+
+			if (!self botDoingAnim(botAnim))
+				self botDoAnim(botAnim);
 		}
 
 		moveTo = self.bot.moveTo;
@@ -763,7 +880,9 @@ doSwitch(newWeapon)
 	if (isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != newWeapon)
 		return;
 
-	self thread botDoAnim("pt_stand_core_pullout", 0.5, true);
+	if (!isDefined(self.lastStand))
+		self thread botDoAnim("pt_stand_core_pullout", 0.5, true);
+
 	self.bot.isswitching = true;
 
 	wait 1;  // fast pullout?
@@ -783,6 +902,7 @@ reload_watch()
 	{
 		self waittill("reload_start");
 		self.bot.isreloading = true;
+
 		self waittill_notify_or_timeout("reload", 7.5);
 		self.bot.isreloading = false;
 	}
@@ -2012,7 +2132,7 @@ knife(ent, knifeDist)
 	}
 	else
 	{
-		if ((distsq / knifeDist) < 0.3333333)
+		if ((distsq / knifeDist) < 0.5)
 		{
 			self playSound("melee_swing_small");
 			if (stance != "prone")
@@ -2316,6 +2436,14 @@ bot_lookat(pos, time)
 	}
 }
 
+isInActiveAnim()
+{
+	if (!isDefined(self.bot_anim))
+		return false;
+
+	return (self.bot_anim.inActiveAnim);
+}
+
 botDoingAnim(animName)
 {
 	if (!isDefined(self.bot_anim))
@@ -2385,6 +2513,14 @@ botsDeleteFakeAnim()
 	self.bot_anim.headmodel = undefined;
 	self.bot_anim delete();
 	self.bot_anim = undefined;
+}
+
+isFakeAnimHidden()
+{
+	if (!isDefined(self.bot_anim))
+		return true;
+
+	return (self.bot_anim.hidden);
 }
 
 showFakeAnim()
