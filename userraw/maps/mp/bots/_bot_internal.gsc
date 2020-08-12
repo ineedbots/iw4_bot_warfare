@@ -161,6 +161,7 @@ resetBotVars()
 	self.bot.lockingon = false;
 
 	self.bot.knifing = false;
+	self.bot.knifingafter = false;
 }
 
 /*
@@ -880,7 +881,7 @@ doSwitch(newWeapon)
 	if (isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != newWeapon)
 		return;
 
-	if (!isDefined(self.lastStand))
+	if (!isDefined(self.lastStand) && !self.bot.isfraggingafter && !self.bot.knifingafter)
 		self thread botDoAnim("pt_stand_core_pullout", 0.5, true);
 
 	self.bot.isswitching = true;
@@ -1508,7 +1509,7 @@ onNewEnemy()
 		if(!isDefined(self.bot.target))
 			continue;
 			
-		if(!isDefined(self.bot.target.entity) || !isPlayer(self.bot.target.entity))
+		if(!isDefined(self.bot.target.entity) || !self.bot.target.isplay)
 			continue;
 			
 		if(self.bot.target.didlook)
@@ -1900,7 +1901,7 @@ walk()
 				continue;
 			}
 			
-			if(isPlayer(self.bot.target.entity) && self.bot.target.trace_time && self canFire(curweap) && self isInRange(self.bot.target.dist, curweap))
+			if(self.bot.target.isplay && self.bot.target.trace_time && self canFire(curweap) && self isInRange(self.bot.target.dist, curweap))
 			{
 				if(self.bot.target.rand <= self.pers["bots"]["behavior"]["strafe"])
 					self strafe(self.bot.target.entity);
@@ -2102,7 +2103,11 @@ knife(ent, knifeDist)
 	self endon("disconnect");
 	self endon("death");
 
+	self notify("bot_kill_knife");
+	self endon("bot_kill_knife");
+
 	self.bot.knifing = true;
+	self.bot.knifingafter = true;
 
 	isplay = isPlayer(ent);
 	curWeap = self GetCurrentWeapon();
@@ -2119,9 +2124,13 @@ knife(ent, knifeDist)
 	lastWeap = self GetCurrentWeapon();
 
 	hasC4 = self HasWeapon("c4_mp");
-	if (!hasC4)
-		self giveWeapon("c4_mp");
-	self setSpawnWeapon("c4_mp");
+
+	if (!usedRiot)
+	{
+		if (!hasC4)
+			self giveWeapon("c4_mp");
+		self setSpawnWeapon("c4_mp");
+	}
 
 	// play sound
 	if (usedRiot)
@@ -2160,7 +2169,8 @@ knife(ent, knifeDist)
 		botAnimTime = 1.5;
 	}
 
-	self thread botDoAnim(botAnim, botAnimTime, true);
+	if (botAnim != "")
+		self thread botDoAnim(botAnim, botAnimTime, true);
 
 	wait 0.15;
 
@@ -2223,11 +2233,18 @@ knife(ent, knifeDist)
 	else
 		wait 2;
 
-	if (!hasC4)
-		self takeWeapon("c4_mp");
-	self setSpawnWeapon(lastWeap);
+	if (!usedRiot)
+	{
+		if (!hasC4)
+			self takeWeapon("c4_mp");
+		self setSpawnWeapon(lastWeap);
+	}
 	
 	self.bot.knifing = false;
+
+	wait 1;
+
+	self.bot.knifingafter = false;
 }
 
 /*
