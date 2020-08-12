@@ -64,8 +64,11 @@ connected()
 */
 onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, timeOffset, deathAnimDuration)
 {
-	self botsDeleteFakeAnim();
-	wait 0.05;
+	if (isDefined(self.bot_anim))
+	{
+		self botsDeleteFakeAnim();
+		wait 0.05;
+	}
 }
 
 /*
