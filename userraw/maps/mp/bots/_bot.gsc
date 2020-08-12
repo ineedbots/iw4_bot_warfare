@@ -90,6 +90,8 @@ init()
 	level.bots_nonfullautoguns["dragunov"] = true;
 
 	level.bots_bloodfx = loadfx("impacts/flesh_hit_body_fatal_exit");
+	PrecacheMpAnim("pb_combatrun_forward_loop");
+	PrecacheMpAnim("pt_stand_core_pullout");
 	
 	level thread fixGamemodes();
 	

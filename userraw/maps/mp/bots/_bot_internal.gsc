@@ -55,6 +55,7 @@ connected()
 	
 	self thread onPlayerSpawned();
 	self thread onDisconnected();
+	self thread onGameEnded();
 }
 
 /*
@@ -71,6 +72,14 @@ onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, 
 */
 onDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset)
 {
+}
+
+onGameEnded()
+{
+	self endon("disconnect");
+
+	level waittill("game_ended");
+	self botsDeleteFakeAnim();
 }
 
 onDisconnected()
@@ -140,66 +149,6 @@ resetBotVars()
 	self.bot.lockingon = false;
 
 	self.bot.knifing = false;
-}
-
-makeFakeAnim()
-{
-	if(isDefined(self.bot_anim))
-		return;
-
-	self.bot_anim = spawn("script_model", self.origin);
-	self.bot_anim setModel(self.model);
-	self.bot_anim LinkTo(self, "tag_origin", (0, 0, 0), (0, 0, 0));
-	
-	self.bot_anim.headmodel = spawn( "script_model", self.bot_anim getTagOrigin( "j_spine4" ));
-	self.bot_anim.headmodel setModel(self.headmodel);
-	self.bot_anim.headmodel.angles = (270, 0, 270);
-	self.bot_anim.headmodel linkto( self.bot_anim, "j_spine4" );
-	
-	if(isDefined(self))
-	{
-		self thread maps\mp\gametypes\_weapons::detach_all_weapons();
-		self botHideParts();
-	}
-}
-
-botsDeleteFakeAnim()
-{
-	if(!isDefined(self.bot_anim))
-		return;
-
-	self.bot_anim.headmodel delete();
-	self.bot_anim.headmodel = undefined;
-	self.bot_anim delete();
-	self.bot_anim = undefined;
-	
-	if(isDefined(self))
-	{
-		self botShowParts();
-		self thread maps\mp\gametypes\_weapons::stowedWeaponsRefresh();
-	}
-}
-
-botHideParts()
-{
-	//hideallparts
-	self hidepart("j_ankle_le");//this is the only place where bot cannot be shot at...
-	self hidepart("j_hiptwist_le");
-	self hidepart("j_head");
-	self hidepart("j_helmet");
-	self hidepart("j_eyeball_le");
-	self hidepart("j_clavicle_le");
-}
-
-botShowParts()
-{
-	self showpart("j_ankle_le");
-	self showpart("j_hiptwist_le");
-	self showpart("j_head");
-	self showpart("j_helmet");
-	self showpart("j_eyeball_le");
-	self showpart("j_clavicle_le");
-	//showallparts
 }
 
 /*
@@ -794,25 +743,27 @@ onWeaponChange()
 				if(isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != "none")
 					self setSpawnWeapon(self.lastDroppableWeapon);
 			break;
-			case "ac130_105mm_mp":
-			case "ac130_40mm_mp":
-			case "ac130_25mm_mp":
-			case "heli_remote_mp":
-			break;
 			default:
-				self thread doSwitch();
+				self thread doSwitch(newWeapon);
 			break;
 		}
 	}
 }
 
-doSwitch()
+doSwitch(newWeapon)
 {
 	self endon("disconnect");
 	self endon("death");
 	self notify("bot_weapon_change");
 	self endon("bot_weapon_change");
 
+	if (self.bot.climbing)
+		return;
+
+	if (isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != newWeapon)
+		return;
+
+	self thread botDoAnim("pt_stand_core_pullout", 0.5, true);
 	self.bot.isswitching = true;
 
 	wait 1;  // fast pullout?
@@ -966,8 +917,6 @@ spawned()
 	self thread stance();
 	self thread onNewEnemy();
 	self thread walk();
-
-	self makeFakeAnim();
 
 	self notify("bot_spawned");
 }
@@ -2039,26 +1988,59 @@ knife(ent, knifeDist)
 	curWeap = self GetCurrentWeapon();
 	usedRiot = self.hasRiotShieldEquipped;
 	distsq = DistanceSquared(self.origin, ent.origin);
+	inLastStand = isDefined(self.lastStand);
+	stance = self getStance();
 	damage = 135;
 	if (usedRiot)
 		damage = 52;
+
+	botAnim = "";
+	botAnimTime = 0;
+	lastWeap = self GetCurrentWeapon();
+
+	hasC4 = self HasWeapon("c4_mp");
+	if (!hasC4)
+		self giveWeapon("c4_mp");
+	self setSpawnWeapon("c4_mp");
 
 	// play sound
 	if (usedRiot)
 	{
 		self playSound("melee_riotshield_swing");
+		botAnim = "pt_melee_shield";
+		botAnimTime = 1;
 	}
 	else
 	{
 		if ((distsq / knifeDist) < 0.3333333)
 		{
 			self playSound("melee_swing_small");
+			if (stance != "prone")
+			{
+				botAnim = "pt_melee_pistol_1";
+				botAnimTime = 1;
+			}
+			else
+			{
+				botAnim = "pt_melee_prone_pistol";
+				botAnimTime = 1;
+			}
 		}
 		else
 		{
 			self playSound("melee_swing_ps_large");
+			botAnim = "pt_melee_pistol_2";
+			botAnimTime = 1.5;
 		}
 	}
+
+	if (inLastStand)
+	{
+		botAnim = "pt_laststand_melee";
+		botAnimTime = 1.5;
+	}
+
+	self thread botDoAnim(botAnim, botAnimTime, true);
 
 	wait 0.15;
 
@@ -2067,10 +2049,13 @@ knife(ent, knifeDist)
 		if (isplay)
 		{
 			// teleport to target
-			pushOutDir = VectorNormalize((self.origin[0], self.origin[1], 0)-(ent.origin[0], ent.origin[1], 0));
-			pushoutPos = self.origin + (pushOutDir * (60-distance(ent.origin,self.origin)));
-			self SetOrigin((pushoutPos[0], pushoutPos[1], ent.origin[2]));
-			self notify("kill_goal");
+			if (!inLastStand)
+			{
+				pushOutDir = VectorNormalize((self.origin[0], self.origin[1], 0)-(ent.origin[0], ent.origin[1], 0));
+				pushoutPos = self.origin + (pushOutDir * (60-distance(ent.origin,self.origin)));
+				self SetOrigin((pushoutPos[0], pushoutPos[1], ent.origin[2]));
+				self notify("kill_goal");
+			}
 
 			for (;;)
 			{
@@ -2117,6 +2102,10 @@ knife(ent, knifeDist)
 		wait 1;
 	else
 		wait 2;
+
+	if (!hasC4)
+		self takeWeapon("c4_mp");
+	self setSpawnWeapon(lastWeap);
 	
 	self.bot.knifing = false;
 }
@@ -2325,4 +2314,129 @@ bot_lookat(pos, time)
 		self setPlayerAngles(myAngle);
 		wait 0.05;
 	}
+}
+
+botDoingAnim(animName)
+{
+	if (!isDefined(self.bot_anim))
+		return false;
+
+	return (self.bot_anim.animation == animName);
+}
+
+botDoAnim(animName, time, isActiveAnim)
+{
+	self endon("death");
+	self endon("disconnect");
+
+	if(!isDefined(self.bot_anim))
+		self makeFakeAnim();
+
+	if (!isDefined(isActiveAnim))
+		isActiveAnim = false;
+	if (!isActiveAnim && self.bot_anim.inActiveAnim)
+		return;
+
+	self notify("bot_kill_anim");
+	self endon("bot_kill_anim");
+
+	self.bot_anim.inActiveAnim = isActiveAnim;
+	self.bot_anim.animation = animName;
+	self.bot_anim scriptModelPlayAnim(animName);
+
+	if (isDefined(time))
+		wait time;
+
+	self.bot_anim.inActiveAnim = false;
+}
+
+makeFakeAnim()
+{
+	if(isDefined(self.bot_anim))
+		return;
+
+	self.bot_anim = spawn("script_model", self.origin);
+	self.bot_anim setModel(self.model);
+	self.bot_anim LinkTo(self, "tag_origin", (0, 0, 0), (0, 0, 0));
+	self.bot_anim notsolid();
+	
+	self.bot_anim.headmodel = spawn( "script_model", self.bot_anim getTagOrigin( "j_spine4" ));
+	self.bot_anim.headmodel setModel(self.headmodel);
+	self.bot_anim.headmodel.angles = (270, 0, 270);
+	self.bot_anim.headmodel linkto( self.bot_anim, "j_spine4" );
+	self.bot_anim.headmodel notsolid();
+
+	self.bot_anim.animation = undefined;
+	self.bot_anim.inActiveAnim = false;
+	
+	self showFakeAnim();
+}
+
+botsDeleteFakeAnim()
+{
+	if(!isDefined(self.bot_anim))
+		return;
+
+	self hideFakeAnim();
+
+	self notify("bot_kill_anim");
+
+	self.bot_anim.headmodel delete();
+	self.bot_anim.headmodel = undefined;
+	self.bot_anim delete();
+	self.bot_anim = undefined;
+}
+
+showFakeAnim()
+{
+	if(isDefined(self))
+	{
+		self thread maps\mp\gametypes\_weapons::detach_all_weapons();
+		self botHideParts();
+	}
+
+	if(!isDefined(self.bot_anim))
+		return;
+
+	self.bot_anim show();
+	self.bot_anim.hidden = false;
+	self.bot_anim.headmodel show();
+}
+
+hideFakeAnim()
+{
+	if(isDefined(self))
+	{
+		self botShowParts();
+		self thread maps\mp\gametypes\_weapons::stowedWeaponsRefresh();
+	}
+
+	if(!isDefined(self.bot_anim))
+		return;
+
+	self.bot_anim hide();
+	self.bot_anim.hidden = true;
+	self.bot_anim.headmodel hide();
+}
+
+botHideParts()
+{
+	//hideallparts
+	self hidepart("j_ankle_le");//this is the only place where bot cannot be shot at...
+	self hidepart("j_hiptwist_le");
+	self hidepart("j_head");
+	self hidepart("j_helmet");
+	self hidepart("j_eyeball_le");
+	self hidepart("j_clavicle_le");
+}
+
+botShowParts()
+{
+	self showpart("j_ankle_le");
+	self showpart("j_hiptwist_le");
+	self showpart("j_head");
+	self showpart("j_helmet");
+	self showpart("j_eyeball_le");
+	self showpart("j_clavicle_le");
+	//showallparts
 }
