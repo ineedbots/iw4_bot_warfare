@@ -66,8 +66,11 @@ onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, 
 {
 	if (isDefined(self.bot_anim))
 	{
+		hidden = self isFakeAnimHidden();
 		self botsDeleteFakeAnim();
-		wait 0.05;
+
+		if (!hidden)
+			wait 0.05;
 	}
 }
 
