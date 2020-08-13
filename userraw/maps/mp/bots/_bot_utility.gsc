@@ -186,6 +186,26 @@ HasThreat()
 	return (isDefined(self GetThreat()));
 }
 
+IsKnifing()
+{
+	return self.bot.knifing;
+}
+
+IsDefusing()
+{
+	return (isDefined(self.isDefusing) && self.isDefusing);
+}
+
+isPlanting()
+{
+	return (isDefined(self.isPlanting) && self.isPlanting);
+}
+
+isWeaponDroppable(weap)
+{
+	return (maps\mp\gametypes\_weapons::mayDropWeapon(weap));
+}
+
 /*
 	Returns if we are stunned.
 */

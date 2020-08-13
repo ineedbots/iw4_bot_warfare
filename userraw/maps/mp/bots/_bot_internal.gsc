@@ -354,7 +354,7 @@ UseRunThink()
 			self.bot.isfrozen || self.bot.climbing ||
 			self.bot.isreloading ||
 			self.bot.ads_pressed || self.bot.fire_pressed ||
-			self.bot.isfragging ||
+			self.bot.isfragging || self.bot.knifing || 
 			lengthsquared(self.bot.velocity) <= 25 ||
 			self IsStunned() || self isArtShocked() || self maps\mp\_flashgrenades::isFlashbanged())
 			{
@@ -1060,7 +1060,12 @@ grenade_danager()
 		if (self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
 			continue;
 
-		if(self.bot.isfraggingafter || self.bot.climbing)
+		if(self.bot.isfraggingafter || self.bot.climbing || self.bot.knifingafter)
+			continue;
+
+		curWeap = self GetCurrentWeapon();
+
+		if (!isWeaponDroppable(curWeap))
 			continue;
 
 		myEye = self getEye();
@@ -1206,7 +1211,7 @@ reload_thread()
 	if (self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
 		return;
 	
-	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.climbing || self.bot.knifing)
+	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.climbing || self.bot.knifingafter)
 		return;
 		
 	cur = self getCurrentWEapon();
@@ -2108,6 +2113,18 @@ knife(ent, knifeDist)
 {
 	self endon("disconnect");
 	self endon("death");
+	level endon ( "game_ended" );
+
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
+		return;
+
+	curWeap = self GetCurrentWeapon();
+
+	if (!isWeaponDroppable(curWeap))
+		return;
+
+	if (self.bot.knifing || self.bot.isfraggingafter)
+		return;
 
 	self notify("bot_kill_knife");
 	self endon("bot_kill_knife");
@@ -2116,7 +2133,6 @@ knife(ent, knifeDist)
 	self.bot.knifingafter = true;
 
 	isplay = isPlayer(ent);
-	curWeap = self GetCurrentWeapon();
 	usedRiot = self.hasRiotShieldEquipped;
 	distsq = DistanceSquared(self.origin, ent.origin);
 	inLastStand = isDefined(self.lastStand);
@@ -2260,6 +2276,9 @@ reload()
 {
 	cur = self GetCurrentWeapon();
 
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
+		return;
+
 	self SetWeaponAmmoStock(cur, self GetWeaponAmmoClip(cur) + self GetWeaponAmmoStock(cur));
 	self setWeaponAmmoClip(cur, 0);
 	// the script should reload for us.
@@ -2269,14 +2288,27 @@ botThrowGrenade(grenName)
 {
 	self endon("death");
 	self endon("disconnect");
+	level endon ( "game_ended" );
+
+	if (isDefined(self.lastStand) && !self _hasPerk("specialty_laststandoffhand") && (!isDefined(self.inFinalStand) || !self.inFinalStand))
+		return "laststand";
+
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
+		return "can't move";
+
+	curWeap = self GetCurrentWeapon();
+
+	if (!isWeaponDroppable(curWeap))
+		return "cur weap is not droppable";
+
+	if (self.bot.knifingafter)
+		return "knifing";
 
 	if (self.bot.tryingtofrag || self.bot.isfraggingafter)
 		return "already nading";
 
 	if (!self getAmmoCount(grenName))
 		return "no ammo";
-
-	curWeap = self GetCurrentWeapon();
 
 	self setSpawnWeapon(grenName);
 	self.bot.tryingtofrag = true;
@@ -2348,10 +2380,11 @@ jump()
 {
 	self endon("death");
 	self endon("disconnect");
+	level endon ( "game_ended" );
 
 	if (isDefined(self.lastStand) || self getStance() != "stand" ||
 			level.gameEnded || !gameFlag( "prematch_done" ) || self IsUsingRemote() ||
-			self.bot.isfrozen || self.bot.climbing || self.bot.jumping || self.bot.jumpingafter)
+			self.bot.isfrozen || self.bot.climbing || self.bot.jumpingafter)
 			return;
 
 	self.bot.jumping = true;
@@ -2425,6 +2458,9 @@ bot_lookat(pos, time)
 	self endon("death");
 	self endon("spawned_player");
 	level endon ( "game_ended" );
+
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
+		return;
 
 	if (!isDefined(pos))
 		return;

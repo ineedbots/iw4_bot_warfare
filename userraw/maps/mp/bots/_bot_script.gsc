@@ -500,6 +500,33 @@ setKillstreaks()
 */
 onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, timeOffset, deathAnimDuration)
 {
+	self.killerLocation = undefined;
+
+	if(!IsDefined( self ) || !isDefined(self.team))
+		return;
+
+	if ( sMeansOfDeath == "MOD_FALLING" || sMeansOfDeath == "MOD_SUICIDE" )
+		return;
+
+	if ( iDamage <= 0 )
+		return;
+	
+	if(!IsDefined( eAttacker ) || !isDefined(eAttacker.team))
+		return;
+		
+	if(eAttacker == self)
+		return;
+		
+	if(level.teamBased && eAttacker.team == self.team)
+		return;
+
+	if ( !IsDefined( eInflictor ) || eInflictor.classname != "player" )
+		return;
+		
+	if(!isAlive(eAttacker))
+		return;
+	
+	self.killerLocation = eAttacker.origin;
 }
 
 /*
@@ -507,6 +534,101 @@ onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, 
 */
 onDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset)
 {
+	if(!IsDefined( self ) || !isDefined(self.team))
+		return;
+		
+	if(!isAlive(self))
+		return;
+
+	if ( sMeansOfDeath == "MOD_FALLING" || sMeansOfDeath == "MOD_SUICIDE" )
+		return;
+
+	if ( iDamage <= 0 )
+		return;
+	
+	if(!IsDefined( eAttacker ) || !isDefined(eAttacker.team))
+		return;
+		
+	if(eAttacker == self)
+		return;
+		
+	if(level.teamBased && eAttacker.team == self.team)
+		return;
+
+	if ( !IsDefined( eInflictor ) || eInflictor.classname != "player" )
+		return;
+		
+	if(!isAlive(eAttacker))
+		return;
+		
+	if (!isSubStr(sWeapon, "_silencer_"))
+		self bot_cry_for_help( eAttacker );
+	
+	self SetAttacker( eAttacker );
+}
+
+/*
+	When the bot gets attacked, have the bot ask for help from teammates.
+*/
+bot_cry_for_help( attacker )
+{
+	if ( !level.teamBased )
+	{
+		return;
+	}
+	
+	theTime = GetTime();
+	if ( IsDefined( self.help_time ) && theTime - self.help_time < 1000 )
+	{
+		return;
+	}
+	
+	self.help_time = theTime;
+
+	for ( i = level.players.size - 1; i >= 0; i-- )
+	{
+		player = level.players[i];
+
+		if ( !player is_bot() )
+		{
+			continue;
+		}
+		
+		if(!isDefined(player.team))
+			continue;
+
+		if ( !IsAlive( player ) )
+		{
+			continue;
+		}
+
+		if ( player == self )
+		{
+			continue;
+		}
+
+		if ( player.team != self.team )
+		{
+			continue;
+		}
+
+		dist = player.pers["bots"]["skill"]["help_dist"];
+		dist *= dist;
+		if ( DistanceSquared( self.origin, player.origin ) > dist )
+		{
+			continue;
+		}
+
+		if ( RandomInt( 100 ) < 50 )
+		{
+			self SetAttacker( attacker );
+
+			if ( RandomInt( 100 ) > 70 )
+			{
+				break;
+			}
+		}
+	}
 }
 
 onKillcam()
@@ -844,6 +966,9 @@ onSpawned()
 		
 		if(randomInt(100) <= self.pers["bots"]["behavior"]["class"])
 			self.bot_change_class = undefined;
+
+		self.bot_lock_goal = false;
+		self.help_time = undefined;
 	}
 }
 
@@ -883,5 +1008,74 @@ onBotSpawned()
 	{
 		self waittill("bot_spawned");
 		gameFlagWait("prematch_done");
+
+		self thread bot_killstreak_think();
+	}
+}
+
+bot_killstreak_think()
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon("game_ended");
+
+	for (;;)
+	{
+		wait randomIntRange(1, 3);
+
+		if ( !isDefined( self.pers["killstreaks"][0] ) )
+			continue;
+
+		if(self BotIsFrozen())
+			continue;
+			
+		if(self HasThreat())
+			continue;
+		
+		if(self IsBotReloading() || self IsBotFragging() || self IsKnifing())
+			continue;
+			
+		if(self isDefusing() || self isPlanting())
+			continue;
+
+		curWeap = self GetCurrentWeapon();
+		if (!isWeaponDroppable(curWeap))
+			continue;
+
+		streakName = self.pers["killstreaks"][0].streakName;
+
+		ksWeap = maps\mp\killstreaks\_killstreaks::getKillstreakWeapon( streakName );
+
+		if (maps\mp\killstreaks\_killstreaks::isRideKillstreak(streakName) || maps\mp\killstreaks\_killstreaks::isCarryKillstreak(streakName))
+		{
+			// sentry
+			// predator_missile
+			// ac130
+			// helicopter_minigun
+		}
+		else
+		{
+			// airdrop_mega
+			// airdrop_sentry_minigun
+			// airdrop
+			// case "harrier_airstrike":
+			//	case "stealth_airstrike":
+			//	case "precision_airstrike":
+			switch (streakName)
+			{
+				case "helicopter":
+				case "helicopter_flares":
+				case "uav":
+				case "nuke":
+				case "counter_uav":
+				case "emp":
+					self BotFreezeControls(true);
+					self setSpawnWeapon(ksWeap);
+					wait 1;
+					self setSpawnWeapon(curWeap);
+					self BotFreezeControls(false);
+					break;
+			}
+		}
 	}
 }
