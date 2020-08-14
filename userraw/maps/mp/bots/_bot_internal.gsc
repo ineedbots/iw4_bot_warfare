@@ -1669,6 +1669,11 @@ aim()
 							}
 						}
 					}
+					else
+					{
+						if (self canAds(dist, curweap))
+							self thread pressAds();
+					}
 					
 					if (!usingRemote)
 						self thread bot_lookat(last_pos + (0, 0, self getEyeHeight() + nadeAimOffset), aimspeed);
@@ -2293,7 +2298,7 @@ botThrowGrenade(grenName)
 	if (isDefined(self.lastStand) && !self _hasPerk("specialty_laststandoffhand") && (!isDefined(self.inFinalStand) || !self.inFinalStand))
 		return "laststand";
 
-	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self.bot.climbing)
 		return "can't move";
 
 	curWeap = self GetCurrentWeapon();

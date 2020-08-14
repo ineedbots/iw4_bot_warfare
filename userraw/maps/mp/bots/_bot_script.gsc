@@ -1019,6 +1019,13 @@ bot_killstreak_think()
 	self endon("death");
 	level endon("game_ended");
 
+	if (randomInt(2))
+		self maps\mp\killstreaks\_killstreaks::tryGiveKillstreak("airdrop");
+	else if (randomInt(2))
+		self maps\mp\killstreaks\_killstreaks::tryGiveKillstreak("airdrop_sentry_minigun");
+	else
+		self maps\mp\killstreaks\_killstreaks::tryGiveKillstreak("airdrop_mega");
+
 	for (;;)
 	{
 		wait randomIntRange(1, 3);
@@ -1042,6 +1049,9 @@ bot_killstreak_think()
 		if (!isWeaponDroppable(curWeap))
 			continue;
 
+		if (self isEMPed())
+			continue;
+
 		streakName = self.pers["killstreaks"][0].streakName;
 
 		ksWeap = maps\mp\killstreaks\_killstreaks::getKillstreakWeapon( streakName );
@@ -1055,26 +1065,98 @@ bot_killstreak_think()
 		}
 		else
 		{
-			// airdrop_mega
-			// airdrop_sentry_minigun
-			// airdrop
-			// case "harrier_airstrike":
-			//	case "stealth_airstrike":
-			//	case "precision_airstrike":
-			switch (streakName)
+			if (streakName == "airdrop_mega" || streakName == "airdrop_sentry_minigun" || streakName == "airdrop")
 			{
-				case "helicopter":
-				case "helicopter_flares":
-				case "uav":
-				case "nuke":
-				case "counter_uav":
-				case "emp":
-					self BotFreezeControls(true);
-					self setSpawnWeapon(ksWeap);
-					wait 1;
-					self setSpawnWeapon(curWeap);
-					self BotFreezeControls(false);
-					break;
+				if (self.bot_lock_goal || self HasScriptGoal())
+					continue;
+
+				if (streakName != "airdrop_mega" && level.littleBirds > 2)
+					continue;
+
+				if(!bulletTracePassed(self.origin, self.origin+(0,0,2048), false, self) && self.pers["bots"]["skill"]["base"] > 3)
+					continue;
+
+				myEye = self GetEye();
+				angles = self GetPlayerAngles();
+
+				forwardTrace = bulletTrace(myEye, myEye + AnglesToForward(angles)*256, false, self);
+
+				if (Distance(self.origin, forwardTrace["position"]) < 96)
+					continue;
+
+				if (!bulletTracePassed(forwardTrace["position"], forwardTrace["position"]+(0,0,2048), false, self) && self.pers["bots"]["skill"]["base"] > 3)
+					continue;
+
+				self SetScriptGoal(self.origin, 16);
+				self throwBotGrenade(ksWeap);
+
+				self waittill_any_timeout( 1, "bad_path" );
+				self ClearScriptGoal();
+			}
+			else
+			{
+				if (streakName == "harrier_airstrike" && level.planes > 1)
+					continue;
+
+				if (streakName == "nuke" && isDefined( level.nukeIncoming ))
+					continue;
+
+				location = undefined;
+				directionYaw = undefined;
+				switch (streakName)
+				{
+					case "harrier_airstrike":
+					case "stealth_airstrike":
+					case "precision_airstrike":
+						players = [];
+						for(i = level.players.size - 1; i >= 0; i--)
+						{
+							player = level.players[i];
+						
+							if(player == self)
+								continue;
+							if(!isDefined(player.team))
+								continue;
+							if(level.teamBased && self.team == player.team)
+								continue;
+							if(player.sessionstate != "playing")
+								continue;
+							if(!isReallyAlive(player))
+								continue;
+							if(player _hasPerk("specialty_coldblooded"))
+								continue;
+							if(!bulletTracePassed(player.origin, player.origin+(0,0,512), false, player) && self.pers["bots"]["skill"]["base"] > 3)
+								continue;
+								
+							players[players.size] = player;
+						}
+						
+						target = random(players);
+
+						if(isDefined(target))
+							location = target.origin + (randomIntRange((8-self.pers["bots"]["skill"]["base"])*-75, (8-self.pers["bots"]["skill"]["base"])*75), randomIntRange((8-self.pers["bots"]["skill"]["base"])*-75, (8-self.pers["bots"]["skill"]["base"])*75), 0);
+						else if(self.pers["bots"]["skill"]["base"] <= 3)
+							location = self.origin + (randomIntRange(-512, 512), randomIntRange(-512, 512), 0);
+						
+						directionYaw = randomInt(360);
+					case "helicopter":
+					case "helicopter_flares":
+					case "uav":
+					case "nuke":
+					case "counter_uav":
+					case "emp":
+						self BotFreezeControls(true);
+						self setSpawnWeapon(ksWeap);
+						wait 1;
+						if (isDefined(location))
+						{
+							self notify( "confirm_location", location, directionYaw );
+							wait 1;
+						}
+						self setSpawnWeapon(curWeap);
+						self BotFreezeControls(false);
+						break;
+				}
 			}
 		}
 	}

@@ -36,6 +36,11 @@ throwBotGrenade(gname)
 	return self maps\mp\bots\_bot_internal::botThrowGrenade(gname);
 }
 
+botIsClimbing()
+{
+	return self.bot.climbing;
+}
+
 BotGetTargetRandom()
 {
 	if (!isDefined(self.bot.target))
