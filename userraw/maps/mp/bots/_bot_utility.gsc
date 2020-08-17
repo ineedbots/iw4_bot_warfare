@@ -191,7 +191,7 @@ HasThreat()
 	return (isDefined(self GetThreat()));
 }
 
-IsKnifing()
+IsBotKnifing()
 {
 	return self.bot.knifing;
 }
@@ -204,6 +204,16 @@ IsDefusing()
 isPlanting()
 {
 	return (isDefined(self.isPlanting) && self.isPlanting);
+}
+
+inLastStand()
+{
+	return (isDefined(self.lastStand) && self.lastStand);
+}
+
+inFinalStand()
+{
+	return (isDefined(self.inFinalStand) && self.inFinalStand);
 }
 
 isWeaponDroppable(weap)

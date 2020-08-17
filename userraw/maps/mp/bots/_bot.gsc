@@ -126,6 +126,7 @@ init()
 	level thread fixGamemodes();
 	
 	level thread onPlayerConnect();
+	level thread addNotifyOnAirdrops();
 	
 	level thread handleBots();
 }
@@ -199,6 +200,38 @@ fixGamemodes()
 		
 		wait 0.05;
 	}
+}
+
+addNotifyOnAirdrops()
+{
+	for (;;)
+	{
+		wait 1;
+		dropCrates = getEntArray( "care_package", "targetname" );
+
+		for (i = dropCrates.size - 1; i >= 0; i--)
+		{
+			airdrop = dropCrates[i];
+
+			if (!isDefined(airdrop.owner))
+				continue;
+
+			if (isDefined(airdrop.doingPhysics))
+				continue;
+
+			airdrop.doingPhysics = true;
+			airdrop thread doNotifyOnAirdrop();
+		}
+	}
+}
+
+doNotifyOnAirdrop()
+{
+	self endon( "death" );
+	self waittill( "physics_finished" );
+
+	self.doingPhysics = false;
+	self.owner notify("crate_physics_done");
 }
 
 /*

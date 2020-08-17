@@ -349,7 +349,7 @@ UseRunThink()
 				self.bot.run_time -= 0.05;
 
 			if (self.bot.run_time <= 0 ||
-			isDefined(self.lastStand) || self getStance() != "stand" ||
+			self inLastStand() || self getStance() != "stand" ||
 			level.gameEnded || !gameFlag( "prematch_done" ) ||
 			self.bot.isfrozen || self.bot.climbing ||
 			self.bot.isreloading ||
@@ -395,7 +395,7 @@ stanceHack()
 	{
 		wait 0.05;
 
-		if(isDefined(self.lastStand))
+		if(self inLastStand())
 			continue;
 
 		if (level.gameEnded || !gameFlag( "prematch_done" ))
@@ -503,7 +503,7 @@ moveHack()
 		stance = self getStance();
 		curWeap = self GetCurrentWeapon();
 		weapClass = weaponClass(curWeap);
-		inLastStand = isDefined(self.lastStand);
+		inLastStand = self inLastStand();
 		usingRemote = self isUsingRemote();
 		botAnim = "";
 
@@ -887,7 +887,7 @@ doSwitch(newWeapon)
 	if (isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != newWeapon)
 		return;
 
-	if (!isDefined(self.lastStand) && !self.bot.isfraggingafter && !self.bot.knifingafter)
+	if (!self inLastStand() && !self.bot.isfraggingafter && !self.bot.knifingafter)
 		self thread botDoAnim("pt_stand_core_pullout", 0.5, true);
 
 	self.bot.isswitching = true;
@@ -922,10 +922,10 @@ onLastStand()
 
 	while (true)
 	{
-		while (!isDefined(self.lastStand))
+		while (!self inLastStand())
 			wait 0.05;
 
-		if (!isDefined(self.inFinalStand) || !self.inFinalStand)
+		if (!self inFinalStand())
 		{
 			pistol = undefined;
 			weaponsList = self GetWeaponsListPrimaries();
@@ -939,7 +939,7 @@ onLastStand()
 				self setSpawnWeapon(pistol);
 		}
 
-		while (isDefined(self.lastStand))
+		while (self inLastStand())
 			wait 0.05;
 	}
 }
@@ -2140,7 +2140,7 @@ knife(ent, knifeDist)
 	isplay = isPlayer(ent);
 	usedRiot = self.hasRiotShieldEquipped;
 	distsq = DistanceSquared(self.origin, ent.origin);
-	inLastStand = isDefined(self.lastStand);
+	inLastStand = self inLastStand();
 	stance = self getStance();
 	damage = 135;
 	if (usedRiot)
@@ -2295,7 +2295,7 @@ botThrowGrenade(grenName)
 	self endon("disconnect");
 	level endon ( "game_ended" );
 
-	if (isDefined(self.lastStand) && !self _hasPerk("specialty_laststandoffhand") && (!isDefined(self.inFinalStand) || !self.inFinalStand))
+	if (self inLastStand() && !self _hasPerk("specialty_laststandoffhand") && !self inFinalStand())
 		return "laststand";
 
 	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self.bot.climbing)
@@ -2387,7 +2387,7 @@ jump()
 	self endon("disconnect");
 	level endon ( "game_ended" );
 
-	if (isDefined(self.lastStand) || self getStance() != "stand" ||
+	if (self inLastStand() || self getStance() != "stand" ||
 			level.gameEnded || !gameFlag( "prematch_done" ) || self IsUsingRemote() ||
 			self.bot.isfrozen || self.bot.climbing || self.bot.jumpingafter)
 			return;

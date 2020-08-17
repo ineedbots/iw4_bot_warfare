@@ -1019,13 +1019,6 @@ bot_killstreak_think()
 	self endon("death");
 	level endon("game_ended");
 
-	if (randomInt(2))
-		self maps\mp\killstreaks\_killstreaks::tryGiveKillstreak("airdrop");
-	else if (randomInt(2))
-		self maps\mp\killstreaks\_killstreaks::tryGiveKillstreak("airdrop_sentry_minigun");
-	else
-		self maps\mp\killstreaks\_killstreaks::tryGiveKillstreak("airdrop_mega");
-
 	for (;;)
 	{
 		wait randomIntRange(1, 3);
@@ -1039,7 +1032,7 @@ bot_killstreak_think()
 		if(self HasThreat())
 			continue;
 		
-		if(self IsBotReloading() || self IsBotFragging() || self IsKnifing())
+		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
 			continue;
 			
 		if(self isDefusing() || self isPlanting())
@@ -1050,6 +1043,9 @@ bot_killstreak_think()
 			continue;
 
 		if (self isEMPed())
+			continue;
+
+		if (self botIsClimbing())
 			continue;
 
 		streakName = self.pers["killstreaks"][0].streakName;
@@ -1088,9 +1084,13 @@ bot_killstreak_think()
 					continue;
 
 				self SetScriptGoal(self.origin, 16);
-				self throwBotGrenade(ksWeap);
+				if (self throwBotGrenade(ksWeap) != "grenade_fire")
+				{
+					self ClearScriptGoal();
+					continue;
+				}
 
-				self waittill_any_timeout( 1, "bad_path" );
+				self waittill_any_timeout( 15, "bad_path", "crate_physics_done" );
 				self ClearScriptGoal();
 			}
 			else
@@ -1139,6 +1139,9 @@ bot_killstreak_think()
 							location = self.origin + (randomIntRange(-512, 512), randomIntRange(-512, 512), 0);
 						
 						directionYaw = randomInt(360);
+
+						if (!isDefined(location))
+							continue;
 					case "helicopter":
 					case "helicopter_flares":
 					case "uav":
