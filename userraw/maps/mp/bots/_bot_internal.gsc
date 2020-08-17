@@ -951,6 +951,14 @@ watchUsingRemote()
 
 	for (;;)
 	{
+		wait 1;
+
+		if (!isAlive(self))
+			return;
+
+		if (!self IsUsingRemote())
+			continue;
+
 		if (isDefined(level.chopper) && isDefined(level.chopper.gunner) && level.chopper.gunner == self)
 		{
 			self watchUsingMinigun();
@@ -973,8 +981,6 @@ watchUsingRemote()
 				self.bot.targets = [];
 			}
 		}
-
-		wait 1;
 	}
 }
 
@@ -989,6 +995,9 @@ watchUsingMinigun()
 			self setspawnweapon("heli_remote_mp");
 		}
 
+		if (isDefined(self.bot.target))
+			self thread pressFire();
+
 		wait 0.05;
 	}
 }
@@ -997,6 +1006,7 @@ watchAc130Weapon()
 {
 	self endon("ac130player_removed");
 	self endon("disconnect");
+	self endon("spawned_player");
 
 	while (isDefined(level.ac130Player) && level.ac130player == self)
 	{
@@ -1004,6 +1014,9 @@ watchAc130Weapon()
 
 		if (curWeap != "ac130_105mm_mp" && curWeap != "ac130_40mm_mp" && curWeap != "ac130_25mm_mp")
 			self setSpawnWeapon("ac130_105mm_mp");
+
+		if (isDefined(self.bot.target))
+			self thread pressFire();
 
 		wait 0.05;
 	}
@@ -1015,13 +1028,10 @@ watchUsingAc130()
 
 	while (isDefined(level.ac130Player) && level.ac130player == self)
 	{
-		self SetWeaponAmmoClip("ac130_105mm_mp", 999);
 		self setspawnweapon("ac130_105mm_mp");
 		wait 3+randomInt(3);
-		self SetWeaponAmmoClip("ac130_40mm_mp", 999);
 		self setspawnweapon("ac130_40mm_mp");
 		wait 4+randomInt(3);
-		self SetWeaponAmmoClip("ac130_25mm_mp", 999);
 		self setspawnweapon("ac130_25mm_mp");
 		wait 4+randomInt(3);
 	}
