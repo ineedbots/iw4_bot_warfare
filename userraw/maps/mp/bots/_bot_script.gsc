@@ -1013,11 +1013,52 @@ onBotSpawned()
 	}
 }
 
+getKillstreakTargetLocation()
+{
+	location = undefined;
+	players = [];
+	for(i = level.players.size - 1; i >= 0; i--)
+	{
+		player = level.players[i];
+	
+		if(player == self)
+			continue;
+		if(!isDefined(player.team))
+			continue;
+		if(level.teamBased && self.team == player.team)
+			continue;
+		if(player.sessionstate != "playing")
+			continue;
+		if(!isReallyAlive(player))
+			continue;
+		if(player _hasPerk("specialty_coldblooded"))
+			continue;
+		if(!bulletTracePassed(player.origin, player.origin+(0,0,2048), false, player) && self.pers["bots"]["skill"]["base"] > 3)
+			continue;
+			
+		players[players.size] = player;
+	}
+	
+	target = random(players);
+
+	if(isDefined(target))
+		location = target.origin + (randomIntRange((8-self.pers["bots"]["skill"]["base"])*-75, (8-self.pers["bots"]["skill"]["base"])*75), randomIntRange((8-self.pers["bots"]["skill"]["base"])*-75, (8-self.pers["bots"]["skill"]["base"])*75), 0);
+	else if(self.pers["bots"]["skill"]["base"] <= 3)
+		location = self.origin + (randomIntRange(-512, 512), randomIntRange(-512, 512), 0);
+
+	return location;
+}
+
 bot_killstreak_think()
 {
 	self endon("disconnect");
 	self endon("death");
 	level endon("game_ended");
+
+	if (randomInt(2))
+		self maps\mp\killstreaks\_killstreaks::tryGiveKillstreak("ac130");
+	else
+		self maps\mp\killstreaks\_killstreaks::tryGiveKillstreak("helicopter_minigun");
 
 	for (;;)
 	{
@@ -1048,16 +1089,121 @@ bot_killstreak_think()
 		if (self botIsClimbing())
 			continue;
 
+		if (self IsUsingRemote())
+			continue;
+
 		streakName = self.pers["killstreaks"][0].streakName;
+
+		if (level.inGracePeriod && maps\mp\killstreaks\_killstreaks::deadlyKillstreak(streakName))
+			continue;
 
 		ksWeap = maps\mp\killstreaks\_killstreaks::getKillstreakWeapon( streakName );
 
 		if (maps\mp\killstreaks\_killstreaks::isRideKillstreak(streakName) || maps\mp\killstreaks\_killstreaks::isCarryKillstreak(streakName))
 		{
-			// sentry
-			// predator_missile
-			// ac130
-			// helicopter_minigun
+			if (self inLastStand())
+				continue;
+				
+			if (streakName == "sentry")
+			{
+				myEye = self GetEye();
+				angles = self GetPlayerAngles();
+
+				forwardTrace = bulletTrace(myEye, myEye + AnglesToForward(angles)*1024, false, self);
+
+				if (Distance(self.origin, forwardTrace["position"]) < 1000 && self.pers["bots"]["skill"]["base"] > 3)
+					continue;
+
+				self BotFreezeControls(true);
+				wait 1;
+
+				sentryGun = maps\mp\killstreaks\_autosentry::createSentryForPlayer( "sentry_minigun", self );
+				sentryGun maps\mp\killstreaks\_autosentry::sentry_setPlaced();
+				self notify( "sentry_placement_finished", sentryGun );
+
+				self maps\mp\_matchdata::logKillstreakEvent( "sentry", self.origin );
+
+				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "sentry", true );
+				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "sentry" );
+				self maps\mp\killstreaks\_killstreaks::giveOwnedKillstreakItem();
+				wait 1;
+
+				self BotFreezeControls(false);
+			}
+			else if (streakName == "predator_missile")
+			{
+				location = self getKillstreakTargetLocation();
+
+				if(!isDefined(location))
+					continue;
+
+				self setUsingRemote( "remotemissile" );
+				self setSpawnWeapon(ksWeap);
+				self BotFreezeControls(true);
+				wait 1;
+				
+				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "predator_missile", true );
+				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "predator_missile" );
+				self maps\mp\killstreaks\_killstreaks::giveOwnedKillstreakItem();
+
+				rocket = MagicBullet( "remotemissile_projectile_mp", self.origin + (0.0,0.0,7000.0 - (self.pers["bots"]["skill"]["base"] * 400)), location, self );
+				rocket.lifeId = self.pers["killstreaks"][0].lifeId;
+				rocket.type = "remote";
+					
+				rocket thread maps\mp\gametypes\_weapons::AddMissileToSightTraces( self.pers["team"] );
+				rocket thread maps\mp\killstreaks\_remotemissile::handleDamage();
+				thread maps\mp\killstreaks\_remotemissile::MissileEyes( self, rocket );
+
+				self waittill( "stopped_using_remote" );
+
+				wait 1;
+				self setSpawnWeapon(curWeap);
+				self BotFreezeControls(false);
+			}
+			else if (streakName == "ac130")
+			{
+				if ( isDefined( level.ac130player ) || level.ac130InUse )
+					continue;
+
+				level.ac130InUse = true;
+				self setUsingRemote( "ac130" );
+				self setSpawnWeapon(ksWeap);
+
+				self maps\mp\_matchdata::logKillstreakEvent( "ac130", self.origin );
+	
+				self.ac130LifeId = self.pers["killstreaks"][0].lifeId;
+				level.ac130.planeModel.crashed = undefined;
+
+				thread maps\mp\killstreaks\_ac130::setAC130Player( self );
+
+				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "ac130", true );
+				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "ac130" );
+				self maps\mp\killstreaks\_killstreaks::giveOwnedKillstreakItem();
+
+				self waittill( "stopped_using_remote" );
+
+				wait 1;
+				self setSpawnWeapon(curWeap);
+			}
+			else if (streakName == "helicopter_minigun")
+			{
+				if (isDefined( level.chopper ))
+					continue;
+
+				self setUsingRemote( "helicopter_minigun" );
+				self setSpawnWeapon(ksWeap);
+
+				self thread maps\mp\killstreaks\_helicopter::startHelicopter(self.pers["killstreaks"][0].lifeId, "minigun");
+
+				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "helicopter_minigun", true );
+				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "helicopter_minigun" );
+				self maps\mp\killstreaks\_killstreaks::giveOwnedKillstreakItem();
+
+				self waittill( "stopped_using_remote" );
+
+				wait 1;
+				self setSpawnWeapon(curWeap);
+			}
 		}
 		else
 		{
@@ -1077,7 +1223,7 @@ bot_killstreak_think()
 
 				forwardTrace = bulletTrace(myEye, myEye + AnglesToForward(angles)*256, false, self);
 
-				if (Distance(self.origin, forwardTrace["position"]) < 96)
+				if (Distance(self.origin, forwardTrace["position"]) < 96 && self.pers["bots"]["skill"]["base"] > 3)
 					continue;
 
 				if (!bulletTracePassed(forwardTrace["position"], forwardTrace["position"]+(0,0,2048), false, self) && self.pers["bots"]["skill"]["base"] > 3)
@@ -1108,36 +1254,7 @@ bot_killstreak_think()
 					case "harrier_airstrike":
 					case "stealth_airstrike":
 					case "precision_airstrike":
-						players = [];
-						for(i = level.players.size - 1; i >= 0; i--)
-						{
-							player = level.players[i];
-						
-							if(player == self)
-								continue;
-							if(!isDefined(player.team))
-								continue;
-							if(level.teamBased && self.team == player.team)
-								continue;
-							if(player.sessionstate != "playing")
-								continue;
-							if(!isReallyAlive(player))
-								continue;
-							if(player _hasPerk("specialty_coldblooded"))
-								continue;
-							if(!bulletTracePassed(player.origin, player.origin+(0,0,512), false, player) && self.pers["bots"]["skill"]["base"] > 3)
-								continue;
-								
-							players[players.size] = player;
-						}
-						
-						target = random(players);
-
-						if(isDefined(target))
-							location = target.origin + (randomIntRange((8-self.pers["bots"]["skill"]["base"])*-75, (8-self.pers["bots"]["skill"]["base"])*75), randomIntRange((8-self.pers["bots"]["skill"]["base"])*-75, (8-self.pers["bots"]["skill"]["base"])*75), 0);
-						else if(self.pers["bots"]["skill"]["base"] <= 3)
-							location = self.origin + (randomIntRange(-512, 512), randomIntRange(-512, 512), 0);
-						
+						location = self getKillstreakTargetLocation();
 						directionYaw = randomInt(360);
 
 						if (!isDefined(location))

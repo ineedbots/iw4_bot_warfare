@@ -925,7 +925,7 @@ onLastStand()
 		while (!self inLastStand())
 			wait 0.05;
 
-		if (!self inFinalStand())
+		if (!self inFinalStand() && !self IsUsingRemote())
 		{
 			pistol = undefined;
 			weaponsList = self GetWeaponsListPrimaries();
@@ -1015,10 +1015,13 @@ watchUsingAc130()
 
 	while (isDefined(level.ac130Player) && level.ac130player == self)
 	{
+		self SetWeaponAmmoClip("ac130_105mm_mp", 999);
 		self setspawnweapon("ac130_105mm_mp");
 		wait 3+randomInt(3);
+		self SetWeaponAmmoClip("ac130_40mm_mp", 999);
 		self setspawnweapon("ac130_40mm_mp");
 		wait 4+randomInt(3);
+		self SetWeaponAmmoClip("ac130_25mm_mp", 999);
 		self setspawnweapon("ac130_25mm_mp");
 		wait 4+randomInt(3);
 	}
@@ -1060,7 +1063,7 @@ grenade_danager()
 		if (self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
 			continue;
 
-		if(self.bot.isfraggingafter || self.bot.climbing || self.bot.knifingafter)
+		if(self.bot.isfraggingafter || self.bot.climbing || self.bot.knifingafter || self IsUsingRemote())
 			continue;
 
 		curWeap = self GetCurrentWeapon();
@@ -1705,7 +1708,7 @@ aim()
 				knifeDist = level.bots_maxKnifeDistance;
 				if (self _hasPerk("specialty_extendedmelee"))
 					knifeDist *= 1.4;
-				if((isplay || target.classname == "misc_turret") && !self.bot.knifing && conedot > 0.9 && dist < knifeDist && trace_time > reaction_time)
+				if((isplay || target.classname == "misc_turret") && !self.bot.knifing && conedot > 0.9 && dist < knifeDist && trace_time > reaction_time && !usingRemote)
 				{
 					self thread knife(target, knifeDist);
 					continue;
@@ -2120,7 +2123,7 @@ knife(ent, knifeDist)
 	self endon("death");
 	level endon ( "game_ended" );
 
-	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self IsUsingRemote())
 		return;
 
 	curWeap = self GetCurrentWeapon();
@@ -2281,7 +2284,7 @@ reload()
 {
 	cur = self GetCurrentWeapon();
 
-	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self IsUsingRemote())
 		return;
 
 	self SetWeaponAmmoStock(cur, self GetWeaponAmmoClip(cur) + self GetWeaponAmmoStock(cur));
@@ -2298,7 +2301,7 @@ botThrowGrenade(grenName)
 	if (self inLastStand() && !self _hasPerk("specialty_laststandoffhand") && !self inFinalStand())
 		return "laststand";
 
-	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self.bot.climbing)
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self.bot.climbing || self IsUsingRemote())
 		return "can't move";
 
 	curWeap = self GetCurrentWeapon();
@@ -2417,6 +2420,9 @@ jump()
 */
 stand()
 {
+	if (self IsUsingRemote())
+		return;
+
 	self.bot.stance = "stand";
 }
 
@@ -2425,6 +2431,9 @@ stand()
 */
 crouch()
 {
+	if (self IsUsingRemote())
+		return;
+
 	self.bot.stance = "crouch";
 }
 
@@ -2433,6 +2442,9 @@ crouch()
 */
 prone()
 {
+	if (self IsUsingRemote())
+		return;
+	
 	curWeap = self GetCurrentWeapon();
 
 	if (curWeap == "riotshield_mp")
