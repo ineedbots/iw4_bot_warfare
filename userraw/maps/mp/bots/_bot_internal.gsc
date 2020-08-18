@@ -216,7 +216,7 @@ lockon_watch()
 		if (!isDefined(self.bot.target) || !isDefined(self.bot.target.entity))
 			continue;
 
-		if (self.bot.target.entity.classname != "script_vehicle" && self.bot.target.entity.model != "vehicle_uav_static_mp")
+		if (!entIsVehicle(self.bot.target.entity))
 			continue;
 
 		weap = self getCurrentWeapon();
@@ -1925,7 +1925,7 @@ walk()
 		{
 			curweap = self getCurrentWeapon();
 			
-			if(self.bot.target.entity.classname == "script_vehicle" || self.bot.target.entity.model == "vehicle_uav_static_mp" || self.bot.isfraggingafter)
+			if(entIsVehicle(self.bot.target.entity) || self.bot.isfraggingafter)
 			{
 				continue;
 			}

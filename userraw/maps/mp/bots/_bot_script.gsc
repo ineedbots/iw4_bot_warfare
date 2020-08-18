@@ -1010,6 +1010,184 @@ onBotSpawned()
 		gameFlagWait("prematch_done");
 
 		self thread bot_killstreak_think();
+		self thread bot_target_vehicle();
+		self thread bot_weapon_think();
+	}
+}
+
+bot_weapon_think()
+{
+	self endon("death");
+	self endon("disconnect");
+	level endon("game_ended");
+	
+	for(;;)
+	{
+		self waittill_any_timeout(randomIntRange(2, 4), "bot_force_check_switch");
+		
+		if(self IsBotReloading() || self IsBotFragging() || self botIsClimbing() || self IsBotKnifing())
+			continue;
+
+		if(self BotIsFrozen())
+			continue;
+			
+		if(self isDefusing() || self isPlanting())
+			continue;
+
+		if (self IsUsingRemote())
+			continue;
+
+		curWeap = self GetCurrentWeapon();
+		hasTarget = self hasThreat();
+		if(hasTarget)
+		{
+			threat = self getThreat();
+			rocketAmmo = self getRocketAmmo();
+			
+			if(entIsVehicle(threat) && isDefined(rocketAmmo))
+			{
+				if (curWeap != rocketAmmo)
+					self setSpawnWeapon(rocketAmmo);
+				continue;
+			}
+		}
+		
+		if(curWeap != "none" && self getAmmoCount(curWeap) && curWeap != "stinger_mp" && curWeap != "javelin_mp")
+		{
+			if(randomInt(100) > self.pers["bots"]["behavior"]["switch"])
+				continue;
+				
+			if(hasTarget)
+				continue;
+		}
+		
+		weaponslist = self getweaponslistall();
+		weap = "";
+		while(weaponslist.size)
+		{
+			weapon = weaponslist[randomInt(weaponslist.size)];
+			weaponslist = array_remove(weaponslist, weapon);
+			
+			if(!self getAmmoCount(weapon))
+				continue;
+					
+			if (!isWeaponDroppable(weapon))
+				continue;
+				
+			if(curWeap == weapon || weapon == "none" || weapon == "")
+				continue;
+				
+			weap = weapon;
+			break;
+		}
+		
+		if(weap == "")
+			continue;
+		
+		self setSpawnWeapon(weap);
+	}
+}
+
+getRocketAmmo()
+{
+	answer = undefined;
+
+	if(self getAmmoCount("rpg_mp"))
+		answer = "rpg_mp"; 
+		
+	if(self getAmmoCount("at4_mp"))
+		answer = "at4_mp"; 
+		
+	if(self getAmmoCount("stinger_mp"))
+		answer = "stinger_mp";
+
+	return answer;
+}
+
+getLockonAmmo()
+{
+	answer = undefined;
+		
+	if(self getAmmoCount("at4_mp"))
+		answer = "at4_mp"; 
+		
+	if(self getAmmoCount("stinger_mp"))
+		answer = "stinger_mp";
+
+	return answer;
+}
+
+bot_target_vehicle()
+{
+	self endon("disconnect");
+	self endon("death");
+
+	for (;;)
+	{
+		wait randomIntRange(2, 4);
+
+		if(self HasScriptEnemy())
+			continue;
+
+		if (self IsUsingRemote())
+			continue;
+
+		rocketAmmo = self getRocketAmmo();
+		if(!isDefined(rocketAmmo) && self BotGetRandom() < 90)
+			continue;
+
+		targets = maps\mp\_stinger::GetTargetList();
+
+		if (!targets.size)
+			continue;
+
+		lockOnAmmo = self getLockonAmmo();
+		myEye = self GetEye();
+		target = undefined;
+		for (i = targets.size - 1; i >= 0; i--)
+		{
+			tempTarget = targets[i];
+
+			if (isDefined(tempTarget.owner) && tempTarget.owner == self)
+				continue;
+
+			if(!bulletTracePassed( myEye, tempTarget.origin, false, tempTarget ))
+				continue;
+
+			if (tempTarget.health <= 0)
+				continue;
+
+			if (tempTarget.classname != "script_vehicle" && !isDefined(lockOnAmmo))
+				continue;
+
+			target = tempTarget;
+		}
+
+		if (!isDefined(target))
+			continue;
+
+		self SetScriptEnemy( target, (0, 0, 0) );
+		self bot_attack_vehicle( target );
+		self ClearScriptEnemy();
+		self notify("bot_force_check_switch");
+	}
+}
+
+bot_attack_vehicle( target )
+{
+	target endon("death");
+
+	wait_time = RandomIntRange( 7, 10 );
+
+	for ( i = 0; i < wait_time; i++ )
+	{
+		self notify("bot_force_check_switch");
+		wait( 1 );
+
+		if ( !IsDefined( target ) )
+		{
+			return;
+		}
 	}
 }
 
@@ -1054,11 +1232,6 @@ bot_killstreak_think()
 	self endon("disconnect");
 	self endon("death");
 	level endon("game_ended");
-
-	if (randomInt(2))
-		self maps\mp\killstreaks\_killstreaks::tryGiveKillstreak("ac130");
-	else
-		self maps\mp\killstreaks\_killstreaks::tryGiveKillstreak("helicopter_minigun");
 
 	for (;;)
 	{
@@ -1245,6 +1418,15 @@ bot_killstreak_think()
 					continue;
 
 				if (streakName == "nuke" && isDefined( level.nukeIncoming ))
+					continue;
+
+				if (streakName == "counter_uav" && self.pers["bots"]["skill"]["base"] > 3 && ((level.teamBased && level.activeCounterUAVs[self.team]) || (!level.teamBased && level.activeCounterUAVs[self.guid])))
+					continue;
+
+				if (streakName == "uav" && self.pers["bots"]["skill"]["base"] > 3 && ((level.teamBased && level.activeUAVs[self.team]) || (!level.teamBased && level.activeUAVs[self.guid])))
+					continue;
+
+				if (streakName == "emp" && self.pers["bots"]["skill"]["base"] > 3 && ((level.teamBased && level.teamEMPed[level.otherTeam[self.team]]) || (!level.teamBased && isDefined( level.empPlayer ))))
 					continue;
 
 				location = undefined;

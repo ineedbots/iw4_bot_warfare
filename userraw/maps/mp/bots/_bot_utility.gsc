@@ -13,6 +13,11 @@ is_bot()
 	return ((isDefined(self.pers["isBot"]) && self.pers["isBot"]) || (isDefined(self.pers["isBotWarfare"]) && self.pers["isBotWarfare"]) || isSubStr( self.guid, "bot" ));
 }
 
+entIsVehicle(ent)
+{
+	return (ent.classname == "script_vehicle" || ent.model == "vehicle_uav_static_mp" || ent.model == "vehicle_ac130_coop");
+}
+
 /*
 	Returns how much the bot is ads'ing all the way.
 */
