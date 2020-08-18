@@ -140,6 +140,9 @@ handleBots()
 	level thread diffBots();
 	level addBots();
 
+	while(!level.intermission)
+		wait 0.05;
+
 	setDvar("bots_manage_add", getBotArray().size);
 }
 

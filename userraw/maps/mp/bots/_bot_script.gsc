@@ -258,7 +258,7 @@ getKillstreaks()
 	{
 		streak_name = tableLookupByRow( "mp/killstreakTable.csv", i, 1 );
 
-		if(streak_name == "")
+		if(streak_name == "" || streak_name == "none")
 			continue;
 
 		if(streak_name == "b1")
@@ -1052,7 +1052,7 @@ bot_weapon_think()
 			}
 		}
 		
-		if(curWeap != "none" && self getAmmoCount(curWeap) && curWeap != "stinger_mp" && curWeap != "javelin_mp")
+		if(curWeap != "none" && self getAmmoCount(curWeap) && curWeap != "stinger_mp" && curWeap != "javelin_mp" && curWeap != "onemanarmy_mp")
 		{
 			if(randomInt(100) > self.pers["bots"]["behavior"]["switch"])
 				continue;
@@ -1071,10 +1071,10 @@ bot_weapon_think()
 			if(!self getAmmoCount(weapon))
 				continue;
 					
-			if (!isWeaponDroppable(weapon))
+			if (!isWeaponPrimary(weapon))
 				continue;
 				
-			if(curWeap == weapon || weapon == "none" || weapon == "")
+			if(curWeap == weapon || weapon == "none" || weapon == "" || weapon == "javelin_mp" || weapon == "stinger_mp" || weapon == "onemanarmy_mp")
 				continue;
 				
 			weap = weapon;
@@ -1253,7 +1253,7 @@ bot_killstreak_think()
 			continue;
 
 		curWeap = self GetCurrentWeapon();
-		if (!isWeaponDroppable(curWeap))
+		if (!isWeaponPrimary(curWeap))
 			continue;
 
 		if (self isEMPed())

@@ -1078,7 +1078,7 @@ grenade_danager()
 
 		curWeap = self GetCurrentWeapon();
 
-		if (!isWeaponDroppable(curWeap))
+		if (!isWeaponPrimary(curWeap))
 			continue;
 
 		myEye = self getEye();
@@ -2138,7 +2138,7 @@ knife(ent, knifeDist)
 
 	curWeap = self GetCurrentWeapon();
 
-	if (!isWeaponDroppable(curWeap))
+	if (!isWeaponPrimary(curWeap))
 		return;
 
 	if (self.bot.knifing || self.bot.isfraggingafter)
@@ -2316,7 +2316,7 @@ botThrowGrenade(grenName)
 
 	curWeap = self GetCurrentWeapon();
 
-	if (!isWeaponDroppable(curWeap))
+	if (!isWeaponPrimary(curWeap))
 		return "cur weap is not droppable";
 
 	if (self.bot.knifingafter)

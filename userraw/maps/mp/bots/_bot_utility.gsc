@@ -13,11 +13,6 @@ is_bot()
 	return ((isDefined(self.pers["isBot"]) && self.pers["isBot"]) || (isDefined(self.pers["isBotWarfare"]) && self.pers["isBotWarfare"]) || isSubStr( self.guid, "bot" ));
 }
 
-entIsVehicle(ent)
-{
-	return (ent.classname == "script_vehicle" || ent.model == "vehicle_uav_static_mp" || ent.model == "vehicle_ac130_coop");
-}
-
 /*
 	Returns how much the bot is ads'ing all the way.
 */
@@ -168,19 +163,6 @@ GetThreat()
 }
 
 /*
-	Returns if the given weapon is full auto.
-*/
-WeaponIsFullAuto(weap)
-{
-	weaptoks = strtok(weap, "_");
-
-	assert(isDefined(weaptoks[0]));
-	assert(isString(weaptoks[0]));
-	
-	return !isDefined(level.bots_nonfullautoguns[weaptoks[0]]);
-}
-
-/*
 	Returns if the bot has a script enemy.
 */
 HasScriptEnemy()
@@ -199,6 +181,34 @@ HasThreat()
 IsBotKnifing()
 {
 	return self.bot.knifing;
+}
+
+getBotVelocity()
+{
+	return self.bot.velocity;
+}
+
+isWeaponPrimary(weap)
+{
+	return (maps\mp\gametypes\_weapons::isPrimaryWeapon(weap) || maps\mp\gametypes\_weapons::isAltModeWeapon(weap));
+}
+
+entIsVehicle(ent)
+{
+	return (ent.classname == "script_vehicle" || ent.model == "vehicle_uav_static_mp" || ent.model == "vehicle_ac130_coop");
+}
+
+/*
+	Returns if the given weapon is full auto.
+*/
+WeaponIsFullAuto(weap)
+{
+	weaptoks = strtok(weap, "_");
+
+	assert(isDefined(weaptoks[0]));
+	assert(isString(weaptoks[0]));
+	
+	return !isDefined(level.bots_nonfullautoguns[weaptoks[0]]);
 }
 
 IsDefusing()
@@ -232,11 +242,6 @@ isWeaponDroppable(weap)
 IsStunned()
 {
 	return (isdefined(self.concussionEndTime) && self.concussionEndTime > gettime());
-}
-
-getBotVelocity()
-{
-	return self.bot.velocity;
 }
 
 /*
