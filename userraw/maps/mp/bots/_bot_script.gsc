@@ -1053,6 +1053,143 @@ onBotSpawned()
 		self thread bot_target_vehicle();
 		self thread bot_weapon_think();
 		self thread bot_crate_think();
+		self thread bot_turret_think();
+	}
+}
+
+turret_death_monitor(turret)
+{
+	self endon ("death");
+	self endon ("disconnect");
+	self endon ("bad_path");
+	self endon ("goal");
+
+	for (;;)
+	{
+		wait 0.05;
+
+		if (!isDefined(turret))
+			break;
+
+		if (turret.health <= 20000)
+			break;
+
+		if (isDefined(turret.carriedBy))
+			break;
+	}
+
+	self notify("bad_path");
+}
+
+bot_turret_attack( enemy )
+{
+	wait_time = RandomIntRange( 7, 10 );
+
+	for ( i = 0; i < wait_time; i++ )
+	{
+		wait( 1 );
+
+		if ( !IsDefined( enemy ) )
+			return;
+		
+		if(enemy.health <= 20000)
+			return;
+
+		if (isDefined(enemy.carriedBy))
+			return;
+
+		//if ( !BulletTracePassed( self getEye(), enemy.origin + ( 0, 0, 15 ), false, enemy ) )
+		//	return;
+	}
+}
+
+bot_turret_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon ( "game_ended" );
+
+	myteam = self.pers[ "team" ];
+
+	for ( ;; )
+	{
+		wait( 1 );
+
+		turrets = level.turrets;
+		turretsKeys = getArrayKeys(turrets);
+		if ( turretsKeys.size == 0 )
+		{
+			wait( randomintrange( 3, 5 ) );
+			continue;
+		}
+
+		if (self HasScriptEnemy() || self IsUsingRemote())
+			continue;
+
+		myEye = self GetEye();
+		turret = undefined;
+		for (i = turretsKeys.size - 1; i >= 0; i--)
+		{
+			tempTurret = turrets[turretsKeys[i]];
+
+			if(tempTurret.health <= 20000)
+				continue;
+			if (isDefined(tempTurret.carriedBy))
+				continue;
+			if(isDefined(tempTurret.owner) && tempTurret.owner == self)
+				continue;
+			if(tempTurret.team == self.pers["team"] && level.teamBased)
+				continue;
+			if(!bulletTracePassed(myEye, tempTurret.origin + (0, 0, 15), false, tempTurret))
+				continue;
+
+			turret = tempTurret;
+		}
+
+		if (!isDefined(turret))
+			continue;
+
+		forward = AnglesToForward( turret.angles );
+		forward = VectorNormalize( forward );
+
+		delta = self.origin - turret.origin;
+		delta = VectorNormalize( delta );
+		
+		dot = VectorDot( forward, delta );
+
+		facing = true;
+		if ( dot < 0.342 ) // cos 70 degrees
+			facing = false;
+		if ( turret isStunned() )
+			facing = false;
+		if(self hasPerk("specialty_coldblooded"))
+			facing = false;
+
+		if ( facing && !BulletTracePassed( myEye, turret.origin + ( 0, 0, 15 ), false, turret ) )
+			continue;
+		
+		if ( !IsDefined( turret.bots ) )
+			turret.bots = 0;
+		if ( turret.bots >= 2 )
+			continue;
+		
+		if(!facing && !self.bot_lock_goal && !self HasScriptGoal())
+		{
+			self thread bot_inc_bots(turret, true);
+			self SetScriptGoal(turret.origin, 16);
+			self thread turret_death_monitor( turret );
+			
+			self waittill_any_return("bad_path", "goal");
+
+			self ClearScriptGoal();
+		}
+		
+		if(!isDefined(turret))
+			continue;
+
+		self SetScriptEnemy( turret, (0, 0, 15) );
+		self bot_turret_attack(turret);
+		self ClearScriptEnemy();
 	}
 }
 
