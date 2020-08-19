@@ -864,7 +864,7 @@ onWeaponChange()
 		switch (newWeapon)
 		{
 			case "none":
-				if(isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != "none")
+				if(isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != "none" && !self.disabledWeapon)
 					self setSpawnWeapon(self.lastDroppableWeapon);
 			break;
 			default:

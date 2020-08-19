@@ -996,6 +996,46 @@ onGiveLoadout()
 	}
 }
 
+bot_inc_bots(obj, unreach)
+{
+	level endon("game_ended");
+	
+	if (!isDefined(obj.bots))
+		obj.bots = 0;
+	
+	obj.bots++;
+	
+	ret = self waittill_any_return("death", "disconnect", "bad_path", "goal", "bot_inc_bots");
+	
+	if (isDefined(obj) && (ret != "bad_path" || !isDefined(unreach)))
+		obj.bots--;
+}
+
+bots_watch_touch_obj(obj)
+{
+	self endon ("death");
+	self endon ("disconnect");
+	self endon ("bad_path");
+	self endon ("goal");
+
+	for (;;)
+	{
+		wait 0.05;
+
+		if (!isDefined(obj))
+		{
+			self notify("bad_path");
+			return;
+		}
+
+		if (self IsTouching(obj))
+		{
+			self notify("goal");
+			return;
+		}
+	}
+}
+
 /*
 	When the bot spawned, after the difficulty wait. Start the logic for the bot.
 */
@@ -1012,6 +1052,107 @@ onBotSpawned()
 		self thread bot_killstreak_think();
 		self thread bot_target_vehicle();
 		self thread bot_weapon_think();
+		self thread bot_crate_think();
+	}
+}
+
+bot_crate_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+	
+	myteam = self.pers[ "team" ];
+	
+	first = true;
+	
+	for ( ;; )
+	{
+		if(first)
+			first = false;
+		else
+			self waittill_any_timeout( randomintrange( 3, 5 ), "crate_physics_done" );
+		
+		if ( RandomInt( 100 ) < 20 )
+			continue;
+		
+		if ( self HasScriptGoal() || self.bot_lock_goal )
+		{
+			wait 0.05;//because bot_crate_landed notify causes a same frame ClearScriptGoal
+			
+			if( self HasScriptGoal() || self.bot_lock_goal )
+				continue;
+		}
+		
+		crates = getEntArray( "care_package", "targetname" );
+		if ( crates.size == 0 )
+			continue;
+
+		wantsClosest = randomint(2);
+
+		crate = undefined;
+		for (i = crates.size - 1; i >= 0; i--)
+		{
+			tempCrate = crates[i];
+
+			if (!isDefined(tempCrate.doingPhysics) || tempCrate.doingPhysics)
+				continue;
+
+			if ( !IsDefined( tempCrate.bots ) )
+				tempCrate.bots = 0;
+			
+			if ( tempCrate.bots >= 3 )
+				continue;
+
+			if (isDefined(crate))
+			{
+				if (wantsClosest)
+				{
+					if (Distance(crate.origin, self.origin) < Distance(tempCrate.origin, self.origin))
+						continue;
+				}
+				else
+				{
+					if (maps\mp\killstreaks\_killstreaks::getStreakCost(crate.crateType) > maps\mp\killstreaks\_killstreaks::getStreakCost(tempCrate.crateType))
+						continue;
+				}
+			}
+
+			crate = tempCrate;
+		}
+
+		if (!isDefined(crate))
+			continue;
+
+		self.bot_lock_goal = true;
+		self thread bot_inc_bots(crate, true);
+		self SetScriptGoal(crate.origin, 16);
+		self thread bots_watch_touch_obj(crate);
+
+		path = self waittill_any_return("bad_path", "goal");
+
+		self.bot_lock_goal = false;
+		self ClearScriptGoal();
+
+		if (path == "bad_path")
+			continue;
+
+		self _DisableWeapon();
+		self BotFreezeControls(true);
+
+		waitTime = 5;
+		if (crate.owner == self)
+			waitTime = 1.5;
+		
+		crate waittill_notify_or_timeout("captured", waitTime);
+
+		self _EnableWeapon();
+		self BotFreezeControls(false);
+
+		if (!isDefined(crate))
+			continue;
+
+		crate notify ( "captured", self );
 	}
 }
 
