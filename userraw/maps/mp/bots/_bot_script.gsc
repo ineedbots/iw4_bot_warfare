@@ -279,10 +279,20 @@ chooseRandomPerk(perkkind)
 {
 	perks = getPerks(perkkind);
 	rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData("experience") );
+	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
 
 	while (true)
 	{
 		perk = random(perks);
+
+		if (!allowOp)
+		{
+			if (perkkind == "perk4")
+				return "specialty_null";
+
+			if (perk == "specialty_pistoldeath")
+				continue;
+		}
 
 		if (perk == "specialty_null")
 			continue;
@@ -315,10 +325,17 @@ chooseRandomCamo()
 chooseRandomPrimary()
 {
 	primaries = getPrimaries();
+	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
 
 	while (true)
 	{
 		primary = random(primaries);
+
+		if (!allowOp)
+		{
+			if (primary == "riotshield")
+				continue;	
+		}
 
 		if (!self isItemUnlocked(primary))
 			continue;
@@ -333,10 +350,17 @@ chooseRandomSecondary(perk1)
 		return "onemanarmy";
 
 	secondaries = getSecondaries();
+	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
 
 	while (true)
 	{
 		secondary = random(secondaries);
+
+		if (!allowOp)
+		{
+			if (secondary == "at4" || secondary == "rpg" || secondary == "m79")
+				continue;
+		}
 
 		if (!self isItemUnlocked(secondary))
 			continue;
@@ -351,6 +375,7 @@ chooseRandomSecondary(perk1)
 chooseRandomAttachmentComboForGun(gun)
 {
 	atts = getAttachmentsForGun(gun);
+	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
 
 	while (true)
 	{
@@ -359,6 +384,12 @@ chooseRandomAttachmentComboForGun(gun)
 
 		if (!isValidAttachmentCombo(att1, att2))
 			continue;
+
+		if (!allowOp)
+		{
+			if (att1 == "gl" || att2 == "gl")
+				continue;
+		}
 
 		retAtts = [];
 		retAtts[0] = att1;
