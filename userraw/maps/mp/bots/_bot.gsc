@@ -127,6 +127,7 @@ init()
 	
 	level thread onPlayerConnect();
 	level thread addNotifyOnAirdrops();
+	level thread watchScrabler();
 	
 	level thread handleBots();
 }
@@ -250,6 +251,43 @@ onPlayerConnect()
 		player thread onWeaponFired();
 		
 		player thread connected();
+	}
+}
+
+watchScrabler()
+{
+	for (;;)
+	{
+		wait 1;
+
+		for ( i = level.players.size - 1; i >= 0; i-- )
+		{
+			player = level.players[i];
+
+			player.bot_isScrambled = false;
+
+			if (!player _HasPerk("specialty_localjammer") || !isReallyAlive(player))
+				continue;
+
+			if (player isEMPed())
+				continue;
+
+			for ( h = level.players.size - 1; h >= 0; h-- )
+			{
+				player2 = level.players[h];
+
+				if (player2 == player)
+					continue;
+
+				if(level.teamBased && player2.team == player.team)
+					continue;
+
+				if (Distance(player2.origin, player.origin) > 100)
+					continue;
+
+				player.bot_isScrambled = true;
+			}
+		}
 	}
 }
 

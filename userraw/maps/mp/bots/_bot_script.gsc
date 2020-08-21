@@ -1085,6 +1085,199 @@ onBotSpawned()
 		self thread bot_weapon_think();
 		self thread bot_crate_think();
 		self thread bot_turret_think();
+		self thread bot_revenge_think();
+		self thread bot_uav_think();
+		self thread bot_listen_to_steps();
+	}
+}
+
+bot_listen_to_steps()
+{
+	self endon("disconnect");
+	self endon("death");
+	
+	for(;;)
+	{
+		wait 1;
+		
+		if(self HasScriptGoal() || self.bot_lock_goal)
+			continue;
+			
+		if(self.pers["bots"]["skill"]["base"] < 3)
+			continue;
+			
+		dist = level.bots_listenDist;
+		if(self hasPerk("specialty_selectivehearing"))
+			dist *= 1.4;
+		
+		dist *= dist;
+		
+		heard = undefined;
+		for(i = level.players.size-1 ; i >= 0; i--)
+		{
+			player = level.players[i];
+
+			if(player == self)
+				continue;
+			if(level.teamBased && self.team == player.team)
+				continue;
+			if(player.sessionstate != "playing")
+				continue;
+			if(!isReallyAlive(player))
+				continue;
+
+			if ( player is_bot() && lengthsquared( player getBotVelocity() ) < 20000 )
+				continue;
+
+			if( lengthsquared( player getVelocity() ) < 20000 )
+				continue;
+			
+			if( distanceSquared(player.origin, self.origin) > dist )
+				continue;
+			
+			if( player hasPerk("specialty_quieter"))
+				continue;
+				
+			heard = player;
+			break;
+		}
+
+		hasHeartbeat = (isSubStr(self GetCurrentWeapon(), "_heartbeat_") && !self IsEMPed());
+		heartbeatDist = 350*350;
+
+		if(!IsDefined(heard) && hasHeartbeat)
+		{
+			for(i = level.players.size-1 ; i >= 0; i--)
+			{
+				player = level.players[i];
+
+				if(player == self)
+					continue;
+				if(level.teamBased && self.team == player.team)
+					continue;
+				if(player.sessionstate != "playing")
+					continue;
+				if(!isReallyAlive(player))
+					continue;
+
+				if (player hasPerk("specialty_heartbreaker"))
+					continue;
+
+				if (distanceSquared(player.origin, self.origin) > heartbeatDist)
+					continue;
+
+				if (GetConeDot(player.origin, self.origin, self GetPlayerAngles()) < 0.6)
+					continue;
+
+				heard = player;
+			}
+		}
+		
+		if(!IsDefined(heard))
+			continue;
+		
+		if(bulletTracePassed(self getEye(), heard getTagOrigin( "j_spineupper" ), false, heard))
+		{
+			self setAttacker(heard);
+			continue;
+		}
+		
+		self SetScriptGoal( heard.origin, 64 );
+		self waittill_any( "goal", "bad_path" );
+		self ClearScriptGoal();
+	}
+}
+
+bot_uav_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	
+	for(;;)
+	{
+		wait 0.75;
+		
+		if ( self HasScriptGoal() || self.bot_lock_goal )
+			continue;
+			
+		if(self.pers["bots"]["skill"]["base"] <= 1)
+			continue;
+			
+		if (self isEMPed() || self.bot_isScrambled)
+			continue;
+
+		if (self _hasPerk("_specialty_blastshield"))
+			continue;
+
+		if ((level.teamBased && level.activeCounterUAVs[level.otherTeam[self.team]]) || (!level.teamBased && self.isRadarBlocked))
+			continue;
+		
+		hasRadar = ((level.teamBased && level.activeUAVs[self.team]) || (!level.teamBased && level.activeUAVs[self.guid]));
+		if( level.hardcoreMode && !hasRadar )
+			continue;
+			
+		dist = self.pers["bots"]["skill"]["help_dist"];
+		dist *= 8;
+		
+		for ( i = level.players.size - 1; i >= 0; i-- )
+		{
+			player = level.players[i];
+			
+			if(player == self)
+				continue;
+				
+			if(!isDefined(player.team))
+				continue;
+				
+			if(player.sessionstate != "playing")
+				continue;
+			
+			if(level.teambased && player.team == self.team)
+				continue;
+			
+			if(!isReallyAlive(player))
+				continue;
+			
+			if(DistanceSquared(self.origin, player.origin) > dist)
+				continue;
+			
+			if((!isSubStr(player getCurrentWeapon(), "_silencer_") && player.bots_firing) || (hasRadar && !player hasPerk("specialty_coldblooded")))
+			{
+				self SetScriptGoal( player.origin, 128 );
+
+				self waittill_any( "goal", "bad_path" );
+				
+				self ClearScriptGoal();
+				break;
+			}
+		}
+	}
+}
+
+bot_revenge_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	
+	if(self.pers["bots"]["skill"]["base"] <= 1)
+		return;
+	
+	if(!isDefined(self.killerLocation))
+		return;
+	
+	for(;;)
+	{
+		wait( RandomIntRange( 1, 5 ) );
+		
+		if(self HasScriptGoal() || self.bot_lock_goal)
+			return;
+		
+		if ( randomint( 100 ) < 75 )
+			return;
+		
+		self SetScriptGoal( self.killerLocation, 64 );
+		self waittill_any( "goal", "bad_path" );
+		self ClearScriptGoal();
 	}
 }
 
@@ -1153,6 +1346,9 @@ bot_turret_think()
 			wait( randomintrange( 3, 5 ) );
 			continue;
 		}
+
+		if(self.pers["bots"]["skill"]["base"] <= 1)
+			continue;
 
 		if (self HasScriptEnemy() || self IsUsingRemote())
 			continue;
@@ -1434,6 +1630,9 @@ bot_target_vehicle()
 	for (;;)
 	{
 		wait randomIntRange(2, 4);
+
+		if(self.pers["bots"]["skill"]["base"] <= 1)
+			continue;
 
 		if(self HasScriptEnemy())
 			continue;
@@ -1732,7 +1931,7 @@ bot_killstreak_think()
 				if (streakName == "counter_uav" && self.pers["bots"]["skill"]["base"] > 3 && ((level.teamBased && level.activeCounterUAVs[self.team]) || (!level.teamBased && level.activeCounterUAVs[self.guid])))
 					continue;
 
-				if (streakName == "uav" && self.pers["bots"]["skill"]["base"] > 3 && ((level.teamBased && level.activeUAVs[self.team]) || (!level.teamBased && level.activeUAVs[self.guid])))
+				if (streakName == "uav" && self.pers["bots"]["skill"]["base"] > 3 && ((level.teamBased && (level.activeUAVs[self.team] || level.activeCounterUAVs[level.otherTeam[self.team]])) || (!level.teamBased && (level.activeUAVs[self.guid] || self.isRadarBlocked))))
 					continue;
 
 				if (streakName == "emp" && self.pers["bots"]["skill"]["base"] > 3 && ((level.teamBased && level.teamEMPed[level.otherTeam[self.team]]) || (!level.teamBased && isDefined( level.empPlayer ))))
