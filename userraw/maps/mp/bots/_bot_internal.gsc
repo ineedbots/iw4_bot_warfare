@@ -566,7 +566,7 @@ moveHack()
 		}
 
 		if (self _hasPerk("specialty_lightweight"))
-			moveSpeed *= 1.15;
+			moveSpeed *= 1.07;
 
 		moveSpeed *= (getdvarfloat("g_speed")/190.0);
 		moveSpeed *= self.moveSpeedScaler;

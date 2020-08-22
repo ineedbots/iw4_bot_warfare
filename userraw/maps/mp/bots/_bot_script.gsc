@@ -1088,6 +1088,138 @@ onBotSpawned()
 		self thread bot_revenge_think();
 		self thread bot_uav_think();
 		self thread bot_listen_to_steps();
+		self thread bot_equipment_kill_think();
+	}
+}
+
+bot_equipment_kill_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon ( "game_ended" );
+
+	myteam = self.pers[ "team" ];
+
+	for ( ;; )
+	{
+		wait( RandomIntRange( 1, 3 ) );
+		
+		if(self HasScriptEnemy())
+			continue;
+
+		hasSitrep = self _HasPerk( "specialty_detectexplosive" );
+		grenades = getEntArray( "grenade", "classname" );
+		myEye = self getEye();
+		myAngles = self getPlayerAngles();
+		dist = 512*512;
+		target = undefined;
+
+		for ( i = 0; i < grenades.size; i++ )
+		{
+			item = grenades[i];
+
+			if ( !IsDefined( item.name ) )
+				continue;
+
+			if ( IsDefined( item.owner ) && ((level.teamBased && item.owner.team == self.team) || item.owner == self) )
+				continue;
+			
+			if (item.name != "c4_mp" && item.name != "claymore_mp")
+				continue;
+				
+			if(!hasSitrep && !bulletTracePassed(myEye, item.origin, false, item))
+				continue;
+				
+			if(getConeDot(item.origin, self.origin, myAngles) < 0.6)
+				continue;
+			
+			if ( DistanceSquared( item.origin, self.origin ) < dist )
+			{
+				target = item;
+				break;
+			}
+		}
+		
+		if ( !IsDefined( target ) )
+		{
+			for ( i = 0; i < level.players.size; i++ )
+			{
+				player = level.players[i];
+
+				if ( player == self )
+					continue;
+				
+				if(!isDefined(player.team))
+					continue;
+				
+				if ( level.teamBased && player.team == myteam )
+					continue;
+
+				ti = player.setSpawnPoint;
+				if(!isDefined(ti))
+					continue;
+				
+				if(!isDefined(ti.bots))
+					ti.bots = 0;
+				
+				if(ti.bots >= 2)
+					continue;
+				
+				if(!hasSitrep && !bulletTracePassed(myEye, ti.origin, false, ti))
+					continue;
+				
+				if(getConeDot(ti.origin, self.origin, myAngles) < 0.6)
+					continue;
+
+				if ( DistanceSquared( ti.origin, self.origin ) < dist )
+				{
+					target = ti;
+					break;
+				}
+			}
+		}
+		
+		if ( !IsDefined( target ) )
+			continue;
+
+		if (isDefined(target.enemyTrigger))
+		{
+			if ( self.bot_lock_goal || self HasScriptGoal() )
+				continue;
+
+			self thread bot_inc_bots(target, true);
+			self SetScriptGoal(target.origin, 16);
+			self thread bots_watch_touch_obj( target );
+			
+			path = self waittill_any_return("bad_path", "goal");
+
+			self ClearScriptGoal();
+
+			if (path != "goal")
+				continue;
+
+			target.enemyTrigger notify("trigger", self);
+			continue;
+		}
+
+		self SetScriptEnemy( target );
+		self bot_equipment_attack(target);
+		self ClearScriptEnemy();
+	}
+}
+
+bot_equipment_attack(equ)
+{
+	wait_time = RandomIntRange( 7, 10 );
+
+	for ( i = 0; i < wait_time; i++ )
+	{
+		wait( 1 );
+
+		if ( !IsDefined( equ ) )
+		{
+			return;
+		}
 	}
 }
 
@@ -1217,7 +1349,7 @@ bot_uav_think()
 			continue;
 			
 		dist = self.pers["bots"]["skill"]["help_dist"];
-		dist *= 8;
+		dist *= dist * 8;
 		
 		for ( i = level.players.size - 1; i >= 0; i-- )
 		{
