@@ -1107,6 +1107,9 @@ bot_equipment_kill_think()
 		if(self HasScriptEnemy())
 			continue;
 
+		if(self.pers["bots"]["skill"]["base"] <= 1)
+			continue;
+
 		hasSitrep = self _HasPerk( "specialty_detectexplosive" );
 		grenades = getEntArray( "grenade", "classname" );
 		myEye = self getEye();
