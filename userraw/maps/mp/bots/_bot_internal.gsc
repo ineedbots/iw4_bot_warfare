@@ -116,6 +116,7 @@ resetBotVars()
 	self.bot.targets = [];
 	self.bot.target = undefined;
 	self.bot.target_this_frame = undefined;
+	self.bot.jav_loc = undefined;
 	
 	self.bot.script_aimpos = undefined;
 	
@@ -188,6 +189,7 @@ onPlayerSpawned()
 		self thread reload_watch();
 		self thread grenade_watch();
 		self thread lockon_watch();
+		self thread jav_loc_watch();
 
 		self thread adsHack();
 		self thread fireHack();
@@ -198,6 +200,32 @@ onPlayerSpawned()
 		self thread watchUsingRemote();
 		
 		self thread spawned();
+	}
+}
+
+jav_loc_watch()
+{
+	self endon("disconnect");
+	self endon("death");
+
+	for (;;)
+	{
+		wait 0.05;
+
+		if(!gameFlag( "prematch_done" ) || level.gameEnded || self.bot.isfrozen || self maps\mp\_flashgrenades::isFlashbanged())
+			continue;
+
+		if (!isDefined(self.bot.jav_loc))
+			continue;
+
+		weap = self getCurrentWeapon();
+		if (weap != "javelin_mp")
+			continue;
+
+		if (!self GetCurrentWeaponClipAmmo())
+			continue;
+
+		self WeaponLockFinalize( self.bot.jav_loc, (0,0,0), true );
 	}
 }
 
@@ -1642,6 +1670,16 @@ aim()
 
 		usingRemote = self IsUsingRemote();
 		
+		if (isDefined(self.bot.jav_loc) && !usingRemote)
+		{
+			lookPos = self.bot.jav_loc;
+
+			self thread bot_lookat(lookPos, aimspeed);
+			self thread pressAds();
+			self botFire();
+			continue;
+		}
+
 		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity) && !self.bot.climbing)
 		{
 			no_trace_look_time = self.pers["bots"]["skill"]["no_trace_look_time"];
@@ -1929,12 +1967,12 @@ walk()
 			continue;
 		}
 		
-		hasTarget = (isDefined(self.bot.target) && isDefined(self.bot.target.entity) && !self.bot.climbing);
+		hasTarget = (((isDefined(self.bot.target) && isDefined(self.bot.target.entity)) || isDefined(self.bot.jav_loc)) && !self.bot.climbing);
 		if(hasTarget)
 		{
 			curweap = self getCurrentWeapon();
 			
-			if(entIsVehicle(self.bot.target.entity) || self.bot.isfraggingafter)
+			if(isDefined(self.bot.jav_loc) || entIsVehicle(self.bot.target.entity) || self.bot.isfraggingafter)
 			{
 				continue;
 			}

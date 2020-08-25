@@ -134,6 +134,21 @@ ClearScriptGoal()
 	self SetScriptGoal(undefined, 0);
 }
 
+HasBotJavelinLocation()
+{
+	return isDefined(self.bot.jav_loc);
+}
+
+SetBotJavelinLocation(loc)
+{
+	self.bot.jav_loc = loc;
+}
+
+ClearBotJavelinLocation()
+{
+	self SetBotJavelinLocation(undefined);
+}
+
 /*
 	Sets the script enemy for a bot.
 */

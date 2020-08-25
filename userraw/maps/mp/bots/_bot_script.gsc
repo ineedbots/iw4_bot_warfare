@@ -1080,8 +1080,6 @@ onBotSpawned()
 		self waittill("bot_spawned");
 		gameFlagWait("prematch_done");
 
-		self GiveWeapon("at4_mp");
-
 		self thread bot_killstreak_think();
 		self thread bot_target_vehicle();
 		self thread bot_weapon_think();
@@ -1091,6 +1089,22 @@ onBotSpawned()
 		self thread bot_uav_think();
 		self thread bot_listen_to_steps();
 		self thread bot_equipment_kill_think();
+		self thread bot_jav_loc_think();
+	}
+}
+
+bot_jav_loc_think()
+{
+	self endon("disconnect");
+	self endon("death");
+
+	self GiveWeapon("javelin_mp");
+	for (;;)
+	{
+		wait 0.05;
+
+		self SetWeaponAmmoClip("javelin_mp", 1);
+		self SetBotJavelinLocation((randomIntRange(-10000, 10000),randomIntRange(-10000, 10000),1000));
 	}
 }
 
@@ -1692,6 +1706,14 @@ bot_weapon_think()
 					self setSpawnWeapon(rocketAmmo);
 				continue;
 			}
+		}
+
+		if (self HasBotJavelinLocation() && self GetAmmoCount("javelin_mp"))
+		{
+			if (curWeap != "javelin_mp")
+				self setSpawnWeapon("javelin_mp");
+
+			continue;
 		}
 		
 		if(curWeap != "none" && self getAmmoCount(curWeap) && curWeap != "stinger_mp" && curWeap != "javelin_mp" && curWeap != "onemanarmy_mp")
