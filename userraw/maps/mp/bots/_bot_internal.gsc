@@ -220,7 +220,7 @@ lockon_watch()
 			continue;
 
 		weap = self getCurrentWeapon();
-		if (weap != "stinger_mp" && weap != "at4_mp")
+		if (weap != "stinger_mp" && weap != "at4_mp" && weap != "javelin_mp")
 			continue;
 
 		if (!self GetCurrentWeaponClipAmmo())
@@ -247,16 +247,26 @@ doLockon()
 	self notify("bot_kill_lockon_sound");
 
 	// fire!
-	if (isDefined(self.bot.target) && isDefined(self.bot.target.entity))
+	weap = self getCurrentWeapon();
+	while (isDefined(self.bot.target) && isDefined(self.bot.target.entity))
 	{
-		weap = self getCurrentWeapon();
-		self SetWeaponAmmoClip(weap, self GetCurrentWeaponClipAmmo()-1);
-
-		rocket = MagicBullet(weap, self getEye(), self.bot.target.entity.origin, self );
-		rocket Missile_SetTargetEnt( self.bot.target.entity );
-		
 		self.stingerTarget = self.bot.target.entity;
-		self notify( "missile_fire", rocket, weap );
+		self.javelinTarget = self.bot.target.entity;
+
+		if (weap != "javelin_mp")
+		{
+			if ( self.stingerTarget.model == "vehicle_av8b_harrier_jet_mp"  || self.stingerTarget.model == "vehicle_little_bird_armed" )
+				self WeaponLockFinalize( self.stingerTarget );
+			else
+				self WeaponLockFinalize( self.stingerTarget, (100,0,-32) );
+		}
+		else
+			self WeaponLockFinalize( self.javelinTarget, (0,0,0), false );
+
+		if (weap == "at4_mp")
+			self.bot.lockingon = false; // so that the bot can fire
+
+		wait 0.05;
 	}
 
 	self notify("bot_kill_lockon");
@@ -280,7 +290,7 @@ watchBotLockonEvents()
 	self endon("disconnect");
 	self endon("bot_kill_lockon");
 
-	self waittill_any("flash_rumble_loop", "new_enemy", "weapon_change", "weapon_fired");
+	self waittill_any("flash_rumble_loop", "new_enemy", "weapon_change", "missile_fire");
 
 	self notify("bot_kill_lockon");
 }

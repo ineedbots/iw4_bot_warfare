@@ -1080,6 +1080,8 @@ onBotSpawned()
 		self waittill("bot_spawned");
 		gameFlagWait("prematch_done");
 
+		self GiveWeapon("at4_mp");
+
 		self thread bot_killstreak_think();
 		self thread bot_target_vehicle();
 		self thread bot_weapon_think();
@@ -1730,16 +1732,13 @@ bot_weapon_think()
 
 getRocketAmmo()
 {
-	answer = undefined;
+	answer = self getLockonAmmo();
+
+	if (isDefined(answer))
+		return answer;
 
 	if(self getAmmoCount("rpg_mp"))
-		answer = "rpg_mp"; 
-		
-	if(self getAmmoCount("at4_mp"))
-		answer = "at4_mp"; 
-		
-	if(self getAmmoCount("stinger_mp"))
-		answer = "stinger_mp";
+		answer = "rpg_mp";
 
 	return answer;
 }
@@ -1753,6 +1752,9 @@ getLockonAmmo()
 		
 	if(self getAmmoCount("stinger_mp"))
 		answer = "stinger_mp";
+
+	if(self getAmmoCount("javelin_mp"))
+		answer = "javelin_mp";
 
 	return answer;
 }
