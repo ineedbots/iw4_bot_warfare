@@ -505,13 +505,14 @@ moveHack()
 		weapClass = weaponClass(curWeap);
 		inLastStand = self inLastStand();
 		usingRemote = self isUsingRemote();
+		moveTo = self.bot.moveTo;
 		botAnim = "";
 
 		if (!self.bot.climbing)
 		{
 			// a number between 0 and 1, 1 being totally flat, same level.    0 being totally above or below.      about 0.7 is a 45 degree angle
-			verticleDegree = getConeDot(self.bot.moveTo + (1, 1, 0), self.origin  + (-1, -1, 0), VectorToAngles((self.bot.moveTo[0], self.bot.moveTo[1], self.origin[2]) - self.origin));
-			self.bot.climbing = (abs(self.bot.moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64 && !self.bot.jumpingafter);
+			verticleDegree = getConeDot(moveTo + (1, 1, 0), self.origin  + (-1, -1, 0), VectorToAngles((moveTo[0], moveTo[1], self.origin[2]) - self.origin));
+			self.bot.climbing = (abs(moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64 && !self.bot.jumpingafter);
 		}
 
 		if (inLastStand || usingRemote)
@@ -698,8 +699,6 @@ moveHack()
 				self botDoAnim(botAnim);
 		}
 
-		moveTo = self.bot.moveTo;
-
 		completedMove = false;
 		if (DistanceSquared(self.origin, moveTo) < (moveSpeed * moveSpeed))
 		{
@@ -741,14 +740,14 @@ moveHack()
 			self SetOrigin(self.origin + (VectorNormalize((moveTo[0], moveTo[1], self.origin[2])-self.origin) * moveSpeed));
 
 			// clamp to ground
-			trace = physicsTrace(self.origin + (0.0,0.0,50.0), self.origin + (0.0,0.0,-40.0));
+			trace = physicsTrace(self.origin + (0.0,0.0,50.0), self.origin + (0.0,0.0,-40.0), false, undefined);
 			if(!self.bot.jumping && (trace[2] - (self.origin[2]-40.0)) > 0.0 && ((self.origin[2]+50.0) - trace[2]) > 0.0)
 			{
 				self SetOrigin(trace);
 			}
 			else
 			{
-				self SetOrigin(self.origin - (0,0,5));
+				self SetOrigin(physicsTrace(self.origin + (0,0,5), self.origin - (0,0,5), false, undefined));
 			}
 
 			continue;
@@ -1839,7 +1838,7 @@ canFire(curweap)
 	if (self.bot.isreloading || self.bot.knifing)
 		return false;
 
-	if (curweap == "riotshield_mp")
+	if (curweap == "riotshield_mp" || curweap == "onemanarmy_mp")
 		return false;
 
 	if (self IsUsingRemote())
@@ -1867,7 +1866,7 @@ canAds(dist, curweap)
 	if(weapclass == "spread" || weapclass == "grenade")
 		return false;
 
-	if (curweap == "riotshield_mp")
+	if (curweap == "riotshield_mp" || curweap == "onemanarmy_mp")
 		return false;
 
 	if (isSubStr(curweap, "_akimbo_"))
@@ -2410,7 +2409,7 @@ jump()
 
 	for (i = 0; i < 6; i++)
 	{
-		self SetOrigin(PlayerPhysicsTrace(self.origin + (0, 0, 0), self.origin + (0, 0, 13), false, self));
+		self SetOrigin(PlayerPhysicsTrace(self.origin + (0, 0, 5), self.origin + (0, 0, 13), false, self));
 		wait 0.05;
 	}
 
@@ -2418,7 +2417,7 @@ jump()
 
 	for (i = 0; i < 6; i++)
 	{
-		self SetOrigin(PlayerPhysicsTrace(self.origin + (0, 0, 0), self.origin + (0, 0, -5), false, self));
+		self SetOrigin(PlayerPhysicsTrace(self.origin + (0, 0, 5), self.origin + (0, 0, -5), false, self));
 		wait 0.05;
 	}
 
