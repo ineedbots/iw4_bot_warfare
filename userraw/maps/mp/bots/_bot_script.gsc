@@ -1090,6 +1090,19 @@ onBotSpawned()
 		self thread bot_listen_to_steps();
 		self thread bot_equipment_kill_think();
 		self thread bot_jav_loc_think();
+		self thread bot_perk_think();
+	}
+}
+
+bot_perk_think()
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon("game_ended");
+
+	for (;;)
+	{
+		wait 0.05;
 	}
 }
 
@@ -1097,14 +1110,58 @@ bot_jav_loc_think()
 {
 	self endon("disconnect");
 	self endon("death");
+	level endon("game_ended");
 
-	self GiveWeapon("javelin_mp");
 	for (;;)
 	{
-		wait 0.05;
+		wait randomintRange(2, 4);
 
-		self SetWeaponAmmoClip("javelin_mp", 1);
-		self SetBotJavelinLocation((randomIntRange(-10000, 10000),randomIntRange(-10000, 10000),1000));
+		if (randomInt(100) < 50)
+			continue;
+
+		if (!self GetAmmoCount("javelin_mp"))
+			continue;
+
+		if (self HasThreat() || self HasBotJavelinLocation())
+			continue;
+
+		if(self BotIsFrozen())
+			continue;
+		
+		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
+			continue;
+			
+		if(self isDefusing() || self isPlanting())
+			continue;
+
+		curWeap = self GetCurrentWeapon();
+		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
+			continue;
+
+		if (self botIsClimbing())
+			continue;
+
+		if (self IsUsingRemote())
+			continue;
+
+		traceForward = self maps\mp\_javelin::EyeTraceForward();
+		if (!isDefined(traceForward))
+			continue;
+
+		loc = traceForward[0];
+		if (self maps\mp\_javelin::TargetPointTooClose(loc))
+			continue;
+
+		if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
+			continue;
+
+		if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
+			continue;
+
+		self setSpawnWeapon("javelin_mp");
+		self SetBotJavelinLocation(loc);
+		self waittill_any("missile_fire", "weapon_change");
+		self ClearBotJavelinLocation(loc);
 	}
 }
 
@@ -1590,6 +1647,12 @@ bot_crate_think()
 		
 		if ( RandomInt( 100 ) < 20 )
 			continue;
+
+		if(self isDefusing() || self isPlanting())
+			continue;
+
+		if(self IsUsingRemote() || self BotIsFrozen())
+			continue;
 		
 		if ( self HasScriptGoal() || self.bot_lock_goal )
 		{
@@ -1664,6 +1727,8 @@ bot_crate_think()
 		self _EnableWeapon();
 		self BotFreezeControls(false);
 
+		self notify("bot_force_check_switch");
+
 		if (!isDefined(crate))
 			continue;
 
@@ -1684,7 +1749,7 @@ bot_weapon_think()
 		if(self IsBotReloading() || self IsBotFragging() || self botIsClimbing() || self IsBotKnifing())
 			continue;
 
-		if(self BotIsFrozen())
+		if(self BotIsFrozen() || self.disabledWeapon)
 			continue;
 			
 		if(self isDefusing() || self isPlanting())
@@ -1920,7 +1985,7 @@ bot_killstreak_think()
 			continue;
 
 		curWeap = self GetCurrentWeapon();
-		if (!isWeaponPrimary(curWeap))
+		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
 			continue;
 
 		if (self isEMPed())

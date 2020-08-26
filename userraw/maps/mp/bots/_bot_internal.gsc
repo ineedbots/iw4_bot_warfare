@@ -225,8 +225,61 @@ jav_loc_watch()
 		if (!self GetCurrentWeaponClipAmmo())
 			continue;
 
-		self WeaponLockFinalize( self.bot.jav_loc, (0,0,0), true );
+		if (self isEMPed())
+			continue;
+
+		self watchJavLock();
 	}
+}
+
+watchJavLock()
+{
+	self endon("bot_kill_lockon_jav");
+
+	self thread watchJavLockEvents();
+	self thread watchJavLockHas();
+
+	self thread maps\mp\_javelin::LoopLocalSeekSound( "javelin_clu_aquiring_lock", 0.6 );
+	wait 2;
+
+	self notify( "stop_lockon_sound" );
+	self PlayLocalSound( "javelin_clu_lock" );
+	wait 1;
+
+	while (isDefined(self.bot.jav_loc))
+	{
+		self WeaponLockFinalize( self.bot.jav_loc, (0,0,0), true );
+		wait 0.05;
+	}
+
+	self notify("bot_kill_lockon_jav");
+}
+
+watchJavLockHas()
+{
+	self endon("bot_kill_lockon_jav");
+	self endon("disconnect");
+	self endon("death");
+
+	while (isDefined(self.bot.jav_loc))
+	{
+		wait 0.05;
+	}
+
+	self notify( "stop_lockon_sound" );
+	self notify("bot_kill_lockon_jav");
+}
+
+watchJavLockEvents()
+{
+	self endon("bot_kill_lockon_jav");
+	self endon("disconnect");
+	self endon("death");
+
+	self waittill_any("flash_rumble_loop", "weapon_change", "missile_fire");
+
+	self notify( "stop_lockon_sound" );
+	self notify("bot_kill_lockon_jav");
 }
 
 lockon_watch()
@@ -252,6 +305,9 @@ lockon_watch()
 			continue;
 
 		if (!self GetCurrentWeaponClipAmmo())
+			continue;
+
+		if (weap == "javelin_mp" && self isEMPed())
 			continue;
 
 		self.bot.lockingon = true;
@@ -1113,9 +1169,12 @@ grenade_danager()
 		if(self.bot.isfraggingafter || self.bot.climbing || self.bot.knifingafter || self IsUsingRemote())
 			continue;
 
+		if(self isDefusing() || self isPlanting())
+			continue;
+
 		curWeap = self GetCurrentWeapon();
 
-		if (!isWeaponPrimary(curWeap))
+		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
 			continue;
 
 		myEye = self getEye();
@@ -2185,7 +2244,10 @@ knife(ent, knifeDist)
 
 	curWeap = self GetCurrentWeapon();
 
-	if (!isWeaponPrimary(curWeap))
+	if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
+		return;
+
+	if(self isDefusing() || self isPlanting())
 		return;
 
 	if (self.bot.knifing || self.bot.isfraggingafter)
@@ -2361,9 +2423,12 @@ botThrowGrenade(grenName)
 	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self.bot.climbing || self IsUsingRemote())
 		return "can't move";
 
+	if(self isDefusing() || self isPlanting())
+		return "bomb";
+
 	curWeap = self GetCurrentWeapon();
 
-	if (!isWeaponPrimary(curWeap))
+	if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
 		return "cur weap is not droppable";
 
 	if (self.bot.knifingafter)

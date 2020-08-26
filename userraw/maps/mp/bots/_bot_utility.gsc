@@ -142,6 +142,7 @@ HasBotJavelinLocation()
 SetBotJavelinLocation(loc)
 {
 	self.bot.jav_loc = loc;
+	self notify("new_enemy");
 }
 
 ClearBotJavelinLocation()
