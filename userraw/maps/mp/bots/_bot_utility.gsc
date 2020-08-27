@@ -598,6 +598,7 @@ load_waypoints()
 	level.waypointsTube = [];
 	level.waypointsGren = [];
 	level.waypointsClay = [];
+	level.waypointsJav = [];
 	
 	for(i = 0; i < level.waypointCount; i++)
 		if(level.waypoints[i].type == "crouch" && level.waypoints[i].childCount == 1)
@@ -608,6 +609,8 @@ load_waypoints()
 			level.waypointsGren[level.waypointsGren.size] = level.waypoints[i];
 		else if(level.waypoints[i].type == "claymore")
 			level.waypointsClay[level.waypointsClay.size] = level.waypoints[i];
+		else if(level.waypoints[i].type == "javelin")
+			level.waypointsJav[level.waypointsJav.size] = level.waypoints[i];
 }
 
 /*

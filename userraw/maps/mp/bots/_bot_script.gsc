@@ -1067,6 +1067,7 @@ bots_watch_touch_obj(obj)
 
 		if (self IsTouching(obj))
 		{
+			self notify("script_goal");
 			self notify("goal");
 			return;
 		}
@@ -1108,7 +1109,7 @@ bot_perk_think()
 
 	for (;;)
 	{
-		wait randomIntRange(3,5);
+		wait randomIntRange(5,7);
 
 		if (self IsUsingRemote())
 			continue;
@@ -1123,15 +1124,15 @@ bot_perk_think()
 		{
 			if (!self _hasPerk("_specialty_blastshield"))
 			{
-				if (randomInt(100) < 50)
-					continue;
+				if (randomInt(100) < 65)
+					break;
 
 				self _setPerk("_specialty_blastshield");
 			}
 			else
 			{
 				if (randomInt(100) < 90)
-					continue;
+					break;
 
 				self _unsetPerk("_specialty_blastshield");
 			}
@@ -1160,17 +1161,14 @@ bot_perk_think()
 			{
 				weap = weaponsList[i];
 
-				if (self getAmmoCount(weap))
-					continue;
-
-				if (!isWeaponPrimary(weap))
+				if (self getAmmoCount(weap) || weap == "onemanarmy_mp")
 					continue;
 
 				anyWeapout = true;
 			}
 
-			if (!anyWeapout && randomInt(100) < 90)
-				continue;
+			if ((!anyWeapout && randomInt(100) < 90) || randomInt(100) < 10)
+				break;
 
 			self BotFreezeControls(true);
 			self setSpawnWeapon("onemanarmy_mp");
@@ -1382,11 +1380,11 @@ bot_equipment_kill_think()
 			self SetScriptGoal(target.origin, 16);
 			self thread bots_watch_touch_obj( target );
 			
-			path = self waittill_any_return("bad_path", "goal");
+			path = self waittill_any_return("bad_path", "goal", "script_goal");
 
 			self ClearScriptGoal();
 
-			if (path != "goal")
+			if (path != "script_goal")
 				continue;
 
 			target.enemyTrigger notify("trigger", self);
@@ -1823,12 +1821,12 @@ bot_crate_think()
 		self SetScriptGoal(crate.origin, 16);
 		self thread bots_watch_touch_obj(crate);
 
-		path = self waittill_any_return("bad_path", "goal");
+		path = self waittill_any_return("bad_path", "goal", "script_goal");
 
 		self.bot_lock_goal = false;
 		self ClearScriptGoal();
 
-		if (path == "bad_path")
+		if (path != "script_goal")
 			continue;
 
 		self _DisableWeapon();

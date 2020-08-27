@@ -2109,6 +2109,8 @@ watchOnGoal(goal, dis)
 	while(DistanceSquared(self.origin, goal) > dis)
 		wait 0.05;
 		
+	if (isDefined(self.bot.script_goal) && self.bot.script_goal == goal)
+		self notify("script_goal");
 	self notify("goal");
 }
 
