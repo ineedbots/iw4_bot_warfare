@@ -1185,9 +1185,6 @@ grenade_danager()
 			if (isDefined(frag.throwback))
 				continue;
 
-			if (isDefined(frag.owner) && frag.owner == self)
-				continue;
-
 			if (level.teamBased && frag.team == self.team)
 				continue;
 
@@ -1201,21 +1198,22 @@ grenade_danager()
 				continue;
 
 			frag.throwback = true;
+			weap = "frag_grenade_mp";
 
-			hasFrag = self HasWeapon("frag_grenade_mp");
-			fragCount = self GetAmmoCount("frag_grenade_mp");
+			offhand = self GetCurrentOffhand();
+			offhandcount = self GetAmmoCount(offhand);
 
-			if (!hasFrag)
-				self _GiveWeapon("frag_grenade_mp", 0);
-			self SetWeaponAmmoClip("frag_grenade_mp", 1);
+			self TakeWeapon(offhand);// for some odd reason, mw2 will not give you a frag if you have any other primary offhand
+			self GiveWeapon(weap);
 
 			self thread watchThrowback(frag);
-			self botThrowGrenade("frag_grenade_mp");
+			self botThrowGrenade(weap);
 			
 			frag.throwback = undefined;
-			self SetWeaponAmmoClip("frag_grenade_mp", fragCount);
-			if (!hasFrag)
-				self TakeWeapon("frag_grenade_mp");
+
+			self TakeWeapon(weap);
+			self GiveWeapon(offhand);
+			self setWeaponAmmoClip(offhand, offhandcount);
 			break;
 		}
 	}
