@@ -2329,7 +2329,7 @@ knife(ent, knifeDist)
 	botAnimTime = 0;
 	lastWeap = self GetCurrentWeapon();
 
-	hasC4 = self HasWeapon("c4_mp");
+	hasC4 = self HasWeapon("c4_mp"); // mw2 will give you the c4 despite having another offhand primary
 
 	if (!usedRiot)
 	{
@@ -2587,7 +2587,7 @@ jump()
 
 	for (i = 0; i < 6; i++)
 	{
-		self SetOrigin(PlayerPhysicsTrace(self.origin + (0, 0, 5), self.origin + (0, 0, -5), false, self));
+		self SetOrigin(PhysicsTrace(self.origin, self.origin + (0, 0, -5), false, self));
 		wait 0.05;
 	}
 
