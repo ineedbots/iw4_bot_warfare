@@ -2021,7 +2021,8 @@ walk()
 		if(self maps\mp\_flashgrenades::isFlashbanged())
 		{
 			myVel = self GetBotVelocity();
-			moveTo = PlayerPhysicsTrace(self.origin + (0, 0, 20), self.origin + (myVel[0], myVel[1], 0)*500, false, self);
+			moveTo = PlayerPhysicsTrace(self.origin + (0, 0, 32), self.origin + (myVel[0], myVel[1], 0)*500, false, self);
+			moveTo = PhysicsTrace(moveTo + (0, 0, 50), moveTo + (0, 0, -40), false, self);
 			self botMoveTo(moveTo);
 			continue;
 		}
@@ -2048,7 +2049,41 @@ walk()
 		if(level.waypointCount)
 			goal = level.waypoints[randomInt(level.waypointCount)].origin;
 		else
-			goal = (0, 0, 0);
+		{
+			stepDist = 64;
+			forward = AnglesToForward(self GetPlayerAngles())*stepDist;
+			forward = (forward[0], forward[1], 0);
+			myOrg = self.origin + (0, 0, 32);
+
+			goal = playerPhysicsTrace(myOrg, myOrg + forward, false, self);
+			goal = PhysicsTrace(goal + (0, 0, 50), goal + (0, 0, -40), false, self);
+
+			// too small, lets bounce off the wall
+			if (Distance(goal, myOrg) < stepDist - 1 || randomInt(100) < 5)
+			{
+				trace = bulletTrace(myOrg, myOrg + forward, false, self);
+
+				if (trace["surfacetype"] == "none" || randomInt(100) < 25)
+				{
+					// didnt hit anything, just choose a random direction then
+					dir = (0,randomIntRange(-180, 180),0);
+					goal = playerPhysicsTrace(myOrg, myOrg + AnglesToForward(dir) * stepDist, false, self);
+					goal = PhysicsTrace(goal + (0, 0, 50), goal + (0, 0, -40), false, self);
+				}
+				else
+				{
+					// hit a surface, lets get the reflection vector
+					// r = d - 2 (d . n) n
+					d = VectorNormalize(trace["position"] - myOrg);
+					n = trace["normal"];
+					
+					r = d - 2 * (VectorDot(d, n)) * n;
+
+					goal = playerPhysicsTrace(myOrg, myOrg + (r[0], r[1], 0) * stepDist, false, self);
+					goal = PhysicsTrace(goal + (0, 0, 50), goal + (0, 0, -40), false, self);
+				}
+			}
+		}
 		
 		if(isDefined(self.bot.script_goal) && !hasTarget)
 		{
@@ -2085,8 +2120,10 @@ strafe(target)
 	left = self.origin + anglestoforward(anglesLeft)*500;
 	right = self.origin + anglestoforward(anglesRight)*500;
 	
-	traceLeft = PlayerPhysicsTrace(self.origin + (0, 0, 20), left, false, self);
-	traceRight = PlayerPhysicsTrace(self.origin + (0, 0, 20), right, false, self);
+	traceLeft = PlayerPhysicsTrace(self.origin + (0, 0, 32), left, false, self);
+	traceLeft = PhysicsTrace(traceLeft + (0, 0, 50), traceLeft + (0, 0, -40), false, self);
+	traceRight = PlayerPhysicsTrace(self.origin + (0, 0, 32), right, false, self);
+	traceRight = PhysicsTrace(traceRight + (0, 0, 50), traceRight + (0, 0, -40), false, self);
 	
 	strafe = traceLeft;
 	if(DistanceSquared(left, traceLeft) > DistanceSquared(right, traceRight))
@@ -2204,7 +2241,8 @@ doWalk(goal, dist)
 	
 	if(DistanceSquared(self.origin, goal) > distsq)
 	{
-		self movetowards(goal);
+		ppt = PlayerPhysicsTrace(self.origin + (0,0,32), goal, false, self);
+		self movetowards(ppt);
 	}
 	
 	self notify("finished_goal");
@@ -2222,10 +2260,29 @@ movetowards(goal)
 	if(isDefined(goal))
 		self.bot.towards_goal = goal;
 
+	lastOri = self.origin;
+	stucks = 0;
+	time = 0;
 	while(distanceSquared(self.origin, self.bot.towards_goal) > level.bots_goalDistance)
 	{
+		if (time > 1)
+		{
+			time = 0;
+
+			if (DistanceSquared(self.origin, lastOri) < 128)
+				stucks++;
+			else
+				stucks = 0;
+
+			if(stucks >= 3)
+				self notify("bad_path");
+
+			lastOri = self.origin;
+		}
+
 		self botMoveTo(self.bot.towards_goal);
 		wait 0.05;
+		time += 0.05;
 	}
 	
 	self.bot.towards_goal = undefined;
