@@ -999,6 +999,7 @@ onSpawned()
 			self.bot_change_class = undefined;
 
 		self.bot_lock_goal = false;
+		self.bot_oma_class = undefined;
 		self.help_time = undefined;
 	}
 }
@@ -1023,7 +1024,12 @@ onGiveLoadout()
 	{
 		self waittill("giveLoadout");
 
-		self botGiveLoadout(self.team, self.class, true);
+		class = self.class;
+		if (isDefined(self.bot_oma_class))
+			class = self.bot_oma_class;
+
+		self botGiveLoadout(self.team, class, !isDefined(self.bot_oma_class));
+		self.bot_oma_class = undefined;
 	}
 }
 
@@ -1102,7 +1108,116 @@ bot_perk_think()
 
 	for (;;)
 	{
-		wait 0.05;
+		wait randomIntRange(3,5);
+
+		if (self IsUsingRemote())
+			continue;
+
+		if(self BotIsFrozen())
+			continue;
+
+		if(self isDefusing() || self isPlanting())
+			continue;
+
+		for (;self _hasPerk("specialty_blastshield");)
+		{
+			if (!self _hasPerk("_specialty_blastshield"))
+			{
+				if (randomInt(100) < 50)
+					continue;
+
+				self _setPerk("_specialty_blastshield");
+			}
+			else
+			{
+				if (randomInt(100) < 90)
+					continue;
+
+				self _unsetPerk("_specialty_blastshield");
+			}
+
+			break;
+		}
+
+		for (;self _hasPerk("specialty_onemanarmy") && self hasWeapon("onemanarmy_mp");)
+		{
+			curWeap = self GetCurrentWeapon();
+			if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
+				break;
+
+			if (self botIsClimbing())
+				break;
+
+			if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
+				break;
+
+			if (self HasThreat() || self HasBotJavelinLocation())
+				break;
+
+			anyWeapout = false;
+			weaponsList = self GetWeaponsListAll();
+			for (i = 0; i < weaponsList.size; i++)
+			{
+				weap = weaponsList[i];
+
+				if (self getAmmoCount(weap))
+					continue;
+
+				if (!isWeaponPrimary(weap))
+					continue;
+
+				anyWeapout = true;
+			}
+
+			if (!anyWeapout && randomInt(100) < 90)
+				continue;
+
+			self BotFreezeControls(true);
+			self setSpawnWeapon("onemanarmy_mp");
+
+			class = "";
+			rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData( "experience" ) ) + 1;
+			if(rank < 4 || randomInt(100) < 2)
+			{
+				while(class == "")
+				{
+					switch(randomInt(5))
+					{
+						case 0:
+							class = "class0";
+							break;
+						case 1:
+							class = "class1";
+							break;
+						case 2:
+							class = "class2";
+							break;
+						case 3:
+							if(rank >= 2)
+								class = "class3";
+							break;
+						case 4:
+							if(rank >= 3)
+								class = "class4";
+							break;
+					}
+				}
+			}
+			else
+			{
+				class = "custom"+(randomInt(5)+1);
+			}
+			self.bot_oma_class = class;
+
+			self waittill("weapon_change");
+			wait 1;
+			self BotFreezeControls(false);
+
+			self notify ( "menuresponse", game["menu_onemanarmy"], self.bot_oma_class );
+
+			self waittill ( "changed_kit" );
+			break;
+		}
 	}
 }
 
@@ -1116,7 +1231,7 @@ bot_jav_loc_think()
 	{
 		wait randomintRange(2, 4);
 
-		if (randomInt(100) < 50)
+		if (randomInt(100) < 20)
 			continue;
 
 		if (!self GetAmmoCount("javelin_mp"))
@@ -1158,8 +1273,8 @@ bot_jav_loc_think()
 		if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
 			continue;
 
-		self setSpawnWeapon("javelin_mp");
 		self SetBotJavelinLocation(loc);
+		self notify("bot_force_check_switch");
 		self waittill_any("missile_fire", "weapon_change");
 		self ClearBotJavelinLocation(loc);
 	}
@@ -1640,12 +1755,13 @@ bot_crate_think()
 	
 	for ( ;; )
 	{
+		ret = "crate_physics_done";
 		if(first)
 			first = false;
 		else
-			self waittill_any_timeout( randomintrange( 3, 5 ), "crate_physics_done" );
+			ret = self waittill_any_timeout( randomintrange( 3, 5 ), "crate_physics_done" );
 		
-		if ( RandomInt( 100 ) < 20 )
+		if ( RandomInt( 100 ) < 20 && ret != "crate_physics_done" )
 			continue;
 
 		if(self isDefusing() || self isPlanting())
@@ -1778,6 +1894,13 @@ bot_weapon_think()
 			if (curWeap != "javelin_mp")
 				self setSpawnWeapon("javelin_mp");
 
+			continue;
+		}
+
+		if (isDefined(self.bot_oma_class))
+		{
+			if (curWeap != "onemanarmy_mp")
+				self setSpawnWeapon("onemanarmy_mp");
 			continue;
 		}
 		
@@ -1975,7 +2098,7 @@ bot_killstreak_think()
 		if(self BotIsFrozen())
 			continue;
 			
-		if(self HasThreat())
+		if(self HasThreat() || self HasBotJavelinLocation())
 			continue;
 		
 		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
