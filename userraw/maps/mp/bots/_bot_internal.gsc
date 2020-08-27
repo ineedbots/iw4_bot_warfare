@@ -2587,7 +2587,7 @@ jump()
 
 	for (i = 0; i < 6; i++)
 	{
-		self SetOrigin(PhysicsTrace(self.origin, self.origin + (0, 0, -5), false, self));
+		self SetOrigin(PhysicsTrace(self.origin + (0, 0, 5), self.origin + (0, 0, -5), false, self));
 		wait 0.05;
 	}
 
