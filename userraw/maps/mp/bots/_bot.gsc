@@ -8,6 +8,12 @@
 */
 init()
 {
+	if(getDvar("bots_main_debug") == "")
+		setDvar("bots_main_debug", 0);
+
+	if(getDVarint("bots_main_debug"))
+    return;
+
 	load_waypoints();
 	thread hook_callbacks();
 	

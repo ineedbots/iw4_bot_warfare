@@ -1,36 +1,36 @@
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
-#include bots\bots_funcs;
+#include maps\mp\bots\_bot_utility;
 
 init()
 {
-	if(getDVarint("bots_main_debug"))
-	{
-		if(!getDVarint("developer"))
-		{
-			setdvar("developer_script", 1);
-			setdvar("developer", 1);
-			
-			setdvar("sv_mapRotation", "map "+getDvar("mapname"));
-			exitLevel(false);
-		}
-		
-		setdvar("bots_main_menu", 0);
-		setdvar("bots_manage_fill_mode", 0);
-		setdvar("bots_manage_fill", 0);
-		setdvar("bots_manage_add", 0);
-		setdvar("bots_manage_fill_kick", 1);
-		
-		setDvarIfUninitialized("bots_main_debug_distance", 500.0);
-		setDvarIfUninitialized("bots_main_debug_cone", 0.65);
-		setDvarIfUninitialized("bots_main_debug_minDist", 30.0);
-		setDvarIfUninitialized("bots_main_debug_drawThrough", false);
-		
-		level waittill( "connected", player);
-		
-		player thread onPlayerSpawned();
-	}
+  if(!getDVarint("bots_main_debug"))
+    return;
+	
+  if(!getDVarint("developer"))
+  {
+    setdvar("developer_script", 1);
+    setdvar("developer", 1);
+    
+    setdvar("sv_mapRotation", "map "+getDvar("mapname"));
+    exitLevel(false);
+  }
+  
+  setdvar("bots_main_menu", 0);
+  setdvar("bots_manage_fill_mode", 0);
+  setdvar("bots_manage_fill", 0);
+  setdvar("bots_manage_add", 0);
+  setdvar("bots_manage_fill_kick", 1);
+  
+  setDvarIfUninitialized("bots_main_debug_distance", 500.0);
+  setDvarIfUninitialized("bots_main_debug_cone", 0.65);
+  setDvarIfUninitialized("bots_main_debug_minDist", 30.0);
+  setDvarIfUninitialized("bots_main_debug_drawThrough", false);
+  
+  level waittill( "connected", player);
+  
+  player thread onPlayerSpawned();
 }
 
 onPlayerSpawned()
