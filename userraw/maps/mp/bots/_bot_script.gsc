@@ -1227,11 +1227,10 @@ bot_jav_loc_think()
 
 	for (;;)
 	{
-		//wait randomintRange(2, 4);
+		wait randomintRange(2, 4);
 
-	//	if (randomInt(100) < 20)
-		//	continue;
-		wait 0.05;
+		if (randomInt(100) < 20)
+			continue;
 
 		if (!self GetAmmoCount("javelin_mp"))
 			continue;
