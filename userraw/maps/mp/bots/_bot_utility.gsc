@@ -613,6 +613,149 @@ load_waypoints()
 			level.waypointsJav[level.waypointsJav.size] = level.waypoints[i];
 }
 
+getMapName(mapname)
+{
+  switch(mapname)
+	{
+		case "mp_abandon":
+			return "Carnival";
+		case "mp_rundown":
+			return "Rundown";
+		case "mp_afghan":
+			return "Afghan";
+		case "mp_boneyard":
+			return "Scrapyard";
+		case "mp_brecourt":
+			return "Wasteland";
+		case "mp_cargoship":
+			return "Wetwork";
+		case "mp_checkpoint":
+			return "Karachi";
+		case "mp_compact":
+			return "Salvage";
+		case "mp_complex":
+			return "Bailout";
+		case "mp_crash":
+			return "Crash";
+		case "mp_cross_fire":
+			return "Crossfire";
+		case "mp_derail":
+			return "Derail";
+		case "mp_estate":
+			return "Estate";
+		case "mp_favela":
+			return "Favela";
+		case "mp_fuel2":
+			return "Fuel";
+		case "mp_highrise":
+			return "Highrise";
+		case "mp_invasion":
+			return "Invasion";
+		case "mp_killhouse":
+			return "Killhouse";
+		case "mp_nightshift":
+			return "Skidrow";
+		case "mp_nuked":
+			return "Nuketown";
+		case "oilrig":
+			return "Oilrig";
+		case "mp_quarry":
+			return "Quarry";
+		case "mp_rust":
+			return "Rust";
+		case "mp_storm":
+			return "Storm";
+		case "mp_strike":
+			return "Strike";
+		case "mp_subbase":
+			return "Subbase";
+		case "mp_terminal":
+			return "Terminal";
+		case "mp_trailerpark":
+			return "Trailer Park";
+		case "mp_overgrown":
+			return "Overgrown";
+		case "mp_underpass":
+			return "Underpass";
+		case "mp_vacant":
+			return "Vacant";
+		case "iw4_credits":
+			return "IW4 Test Map";
+		case "airport":
+			return "Airport";
+		case "co_hunted":
+			return "Hunted";
+		case "invasion":
+			return "Burgertown";
+		case "mp_bloc":
+			return "Bloc";
+		case "mp_bog_sh":
+			return "Bog";
+		case "contingency":
+			return "Contingency";
+		case "gulag":
+			return "Gulag";
+		case "so_ghillies":
+			return "Pripyat";
+		case "ending":
+			return "Museum";
+		case "af_chase":
+			return "Afghan Chase";
+		case "af_caves":
+			return "Afghan Caves";
+		case "arcadia":
+			return "Arcadia";
+		case "boneyard":
+			return "Boneyard";
+		case "cliffhanger":
+			return "Cliffhanger";
+		case "dcburning":
+			return "DCBurning";
+		case "dcemp":
+			return "DCEMP";
+		case "downtown":
+			return "Downtown";
+		case "estate":
+			return "EstateSP";
+		case "favela":
+			return "FavelaSP";
+		case "favela_escape":
+			return "Favela Escape";
+		case "roadkill":
+			return "Roadkill";
+		case "trainer":
+			return "TH3 PIT";
+		case "so_bridge":
+			return "Bridge";
+		case "dc_whitehouse":
+			return "Whitehouse";
+		case "mp_shipment_long":
+			return "ShipmentLong";
+		case "mp_shipment":
+			return "Shipment";
+		case "mp_firingrange":
+			return "Firing Range";
+		case "mp_rust_long":
+			return "RustLong";
+		case "mp_cargoship_sh":
+			return "Freighter";
+		case "mp_storm_spring":
+			return "Chemical Plant";
+		case "mp_crash_trop":
+		case "mp_crash_tropical":
+			return "Crash Tropical";
+		case "mp_fav_tropical":
+			return "Favela Tropical";
+		case "mp_estate_trop":
+		case "mp_estate_tropical":
+			return "Estate Tropical";
+		case "mp_bloc_sh":
+			return "Forgotten City";
+		default:
+			return mapname;
+	}
+}
+
 /*
 	Returns a good amount of players.
 */

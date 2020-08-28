@@ -23,13 +23,21 @@ init()
   setdvar("bots_manage_add", 0);
   setdvar("bots_manage_fill_kick", 1);
   
-  setDvarIfUninitialized("bots_main_debug_distance", 500.0);
-  setDvarIfUninitialized("bots_main_debug_cone", 0.65);
-  setDvarIfUninitialized("bots_main_debug_minDist", 30.0);
-  setDvarIfUninitialized("bots_main_debug_drawThrough", false);
+  if (getDvar("bots_main_debug_distance") == "")
+    setDvar("bots_main_debug_distance", 500.0);
+
+  if (getDvar("bots_main_debug_cone") == "")
+    setDvar("bots_main_debug_cone", 0.65);
+
+  if (getDvar("bots_main_debug_minDist") == "")
+    setDvar("bots_main_debug_minDist", 500.0);
+
+  if (getDvar("bots_main_debug_drawThrough") == "")
+    setDvar("bots_main_debug_drawThrough", false);
   
   level waittill( "connected", player);
   
+  DeleteAllWaypoints();
   player thread onPlayerSpawned();
 }
 
@@ -108,24 +116,29 @@ updateWaypointsStats()
 	self initHudElem3();
 	self initHudElem4();
 	
-	for(;;)
+	for(time=0;;time+=0.05)
 	{
+    wait 0.05;
+
 		totalWpsHud setText(level.waypointCount);
 		
 		closest = -1;
 		myEye = self getEye();
+    myAngles = self GetPlayerAngles();
 		for(i = 0; i < level.waypointCount; i++)
 		{
 			if(closest == -1 || closer(self.origin, level.waypoints[i].origin, level.waypoints[closest].origin))
 				closest = i;
+
+      wpOrg = level.waypoints[i].origin + (0, 0, 25);
 			
-			if(distance(level.waypoints[i].origin, self.origin) < getDvarFloat("bots_main_debug_distance") && (bulletTracePassed(myEye, level.waypoints[i].origin + (0, 0, 25), false, self) || getDVarint("bots_main_debug_drawThrough")))
+			if(distance(level.waypoints[i].origin, self.origin) < getDvarFloat("bots_main_debug_distance") && (bulletTracePassed(myEye, wpOrg, false, self) || getDVarint("bots_main_debug_drawThrough")))
 			{
 				for(h = 0; h < level.waypoints[i].childCount; h++)
-					line(level.waypoints[i].origin + (0, 0, 25), level.waypoints[level.waypoints[i].children[h]].origin + (0, 0, 25), (1,0,1));
+					line(wpOrg, level.waypoints[level.waypoints[i].children[h]].origin + (0, 0, 25), (1,0,1));
 				
-				if(self bots_IsFacingAtTarget(level.waypoints[i], getDvarFloat("bots_main_debug_cone")))
-					print3d(level.waypoints[i].origin + (0, 0, 25), i, (1,0,0), 2);
+				if(getConeDot(wpOrg, myEye, myAngles) > getDvarFloat("bots_main_debug_cone"))
+					print3d(wpOrg, i, (1,0,0), 2);
 			}
 		}
 		
@@ -133,7 +146,7 @@ updateWaypointsStats()
 		
 		nearestWP setText(self.nearest);
 		
-		children setText(buildChildString(self.nearest));
+		children setText(buildChildCountString(self.nearest));
 		
 		type setText(buildTypeString(self.nearest));
 		
@@ -142,8 +155,12 @@ updateWaypointsStats()
 		infotext.x = infotext.x - 2;
 		if(infotext.x <= -800)
 			infotext.x = 800;
-		
-		wait 0.05;
+
+    if (self UseButtonPressed() && time > 2)
+    {
+      time = 0;
+      self iPrintLnBold(self.nearest + " children:  " + buildChildString(self.nearest));
+    }
 	}
 }
 
@@ -178,19 +195,21 @@ watchAutoLinkCommand()
 	self endon("disconnect");
 	self endon("death");
 	
-	self notifyOnPlayerCommand("[{weapnext}]", "weapnext");
+	self notifyOnPlayerCommand("[{+frag}]", "+frag");
 	for( ;; )
 	{
-		self waittill("[{weapnext}]");
+		self waittill("[{+frag}]");
 		if(level.autoLink)
 		{
 			self iPrintlnBold("Auto link disabled");
 			level.autoLink = false;
+      level.wpToLink = -1;
 		}
 		else
 		{
 			self iPrintlnBold("Auto link enabled");
 			level.autoLink = true;
+      level.wpToLink = self.nearest;
 		}
 	}
 }
@@ -259,7 +278,7 @@ watchSaveWaypointsCommand()
 		self checkForWarnings();
 		logprint("***********ABiliTy's WPDump**************\n\n");
 		logprint("\n\n\n\n");
-		mpnm=bots_getMapName(getdvar("mapname"));
+		mpnm=getMapName(getdvar("mapname"));
 		logprint("\n\n"+mpnm+"()\n{\n/*");
 		logprint("*/waypoints = [];\n/*");
 		for(i = 0; i < level.waypointCount; i++)
@@ -284,7 +303,7 @@ LoadWaypoints()
 {
 	self DeleteAllWaypoints();
 	self iPrintlnBold("Loading WPS...");
-	bots_loadWaypoints();
+	load_waypoints();
 	
 	self checkForWarnings();
 }
@@ -492,33 +511,22 @@ AddWaypoint()
 	}
 }
 
-roundUp( floatVal )
-{
-	if ( int( floatVal ) != floatVal )
-		return int( floatVal+1 );
-	else
-		return int( floatVal );
-}
-
 DeleteAllWaypoints()
 {
-	foreach(wp in level.waypoints)
-	{
-		wp = undefined;
-	}
-	
 	level.waypoints = [];
 	level.waypointCount = 0;
 	
-	foreach(wp in game["bots"]["waypoints"])
-	{
-		wp = undefined;
-	}
-	
-	game["bots"]["waypoints"] = [];
-	game["bots"]["waypoints"] = undefined;
-	
 	self iprintln("DelAllWps");
+}
+
+buildChildCountString ( wp )
+{
+  if ( wp == -1 )
+		return "";
+	
+	wpstr = level.waypoints[wp].childCount + "";
+	
+	return wpstr;
 }
 
 buildChildString( wp )
@@ -551,9 +559,9 @@ destroyOnDeath(hud)
 {
 	hud endon("death");
 	self waittill_either("death","disconnect");
+	hud notify("death");
 	hud destroy();
 	hud = undefined;
-	hud notify("death");
 }
 
 initHudElem(txt, xl, yl)
