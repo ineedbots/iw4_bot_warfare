@@ -1227,10 +1227,11 @@ bot_jav_loc_think()
 
 	for (;;)
 	{
-		wait randomintRange(2, 4);
+		//wait randomintRange(2, 4);
 
-		if (randomInt(100) < 20)
-			continue;
+	//	if (randomInt(100) < 20)
+		//	continue;
+		wait 0.05;
 
 		if (!self GetAmmoCount("javelin_mp"))
 			continue;
@@ -1272,8 +1273,12 @@ bot_jav_loc_think()
 			continue;
 
 		self SetBotJavelinLocation(loc);
-		self notify("bot_force_check_switch");
-		self waittill_any("missile_fire", "weapon_change");
+		self setSpawnWeapon("javelin_mp");
+
+		wait 0.05;
+		if (self GetCurrentWeapon() == "javelin_mp")
+			self waittill_any("missile_fire", "weapon_change");
+			
 		self ClearBotJavelinLocation(loc);
 	}
 }
