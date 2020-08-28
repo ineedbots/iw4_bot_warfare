@@ -1688,7 +1688,7 @@ watchToLook()
 				continue;
 			
 			self.bot.jump_time = thetime;
-			self jump();
+			self thread jump();
 		}
 		else
 		{
