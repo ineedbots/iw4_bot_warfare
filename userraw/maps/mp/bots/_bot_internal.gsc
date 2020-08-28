@@ -1726,6 +1726,7 @@ aim()
 			aimspeed = 1;
 
 		usingRemote = self IsUsingRemote();
+		curweap = self getCurrentWeapon();
 		
 		if (isDefined(self.bot.jav_loc) && !usingRemote)
 		{
@@ -1733,7 +1734,9 @@ aim()
 
 			self thread bot_lookat(lookPos, aimspeed);
 			self thread pressAds();
-			self botFire();
+			
+			if (curweap == "javelin_mp")
+				self botFire();
 			continue;
 		}
 
@@ -1751,7 +1754,6 @@ aim()
 				isplay = self.bot.target.isplay;
 				offset = self.bot.target.offset;
 				dist = self.bot.target.dist;
-				curweap = self getCurrentWeapon();
 				eyePos = self getEye();
 				angles = self GetPlayerAngles();
 				rand = self.bot.target.rand;
