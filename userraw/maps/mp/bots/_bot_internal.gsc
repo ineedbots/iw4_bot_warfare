@@ -2085,10 +2085,13 @@ walk()
 			}
 		}
 		
+		isScriptGoal = false;
 		if(isDefined(self.bot.script_goal) && !hasTarget)
 		{
 			goal = self.bot.script_goal;
 			dist = self.bot.script_goal_dist;
+
+			isScriptGoal = true;
 		}
 		else
 		{
@@ -2098,7 +2101,7 @@ walk()
 			self notify("new_goal");
 		}
 		
-		self doWalk(goal, dist);
+		self doWalk(goal, dist, isScriptGoal);
 		self.bot.towards_goal = undefined;
 		self.bot.next_wp = -1;
 		self.bot.second_next_wp = -1;
@@ -2145,9 +2148,7 @@ watchOnGoal(goal, dis)
 	
 	while(DistanceSquared(self.origin, goal) > dis)
 		wait 0.05;
-		
-	if (isDefined(self.bot.script_goal) && DistanceSquared(self.bot.script_goal, goal) <= dis)
-		self notify("script_goal");
+	
 	self notify("goal");
 }
 
@@ -2208,10 +2209,24 @@ killWalkOnEvents()
 	self notify("kill_goal");
 }
 
+doWalkScriptNotify()
+{
+	self endon("kill_goal");
+	self endon("disconnect");
+	self endon("death");
+	
+	ret = self waittill_any_return("goal", "bad_path");
+	
+	if (ret == "goal")
+		self notify("script_goal");
+	else
+		self notify("script_bad_path");
+}
+
 /*
 	Will walk to the given goal when dist near. Uses AStar path finding with the level's nodes.
 */
-doWalk(goal, dist)
+doWalk(goal, dist, isScriptGoal)
 {
 	self endon("kill_goal");
 	self endon("goal");//so that the watchOnGoal notify can happen same frame, not a frame later
@@ -2219,6 +2234,8 @@ doWalk(goal, dist)
 	distsq = dist*dist;
 	self thread killWalkOnEvents();
 	self thread watchOnGoal(goal, distsq);
+	if (isScriptGoal)
+		self thread doWalkScriptNotify();
 	
 	current = self initAStar(goal);
 	while(current >= 0)
