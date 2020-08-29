@@ -1822,7 +1822,7 @@ bot_crate_think()
 
 		self.bot_lock_goal = true;
 		self thread bot_inc_bots(crate, true);
-		self SetScriptGoal(crate.origin, 16);
+		self SetScriptGoal(crate.origin, 32);
 		self thread bots_watch_touch_obj(crate);
 
 		path = self waittill_any_return("bad_path", "goal", "script_goal");
