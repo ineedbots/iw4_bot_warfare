@@ -123,6 +123,7 @@ SetScriptGoal(goal, dist)
 {
 	self.bot.script_goal = goal;
 	self.bot.script_goal_dist = dist;
+	self notify("new_goal_internal");
 	self notify("new_goal");
 }
 

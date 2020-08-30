@@ -2098,7 +2098,7 @@ walk()
 			if(hasTarget)
 				goal = self.bot.target.last_seen_pos;
 				
-			self notify("new_goal");
+			self notify("new_goal_internal");
 		}
 		
 		self doWalk(goal, dist, isScriptGoal);
@@ -2149,7 +2149,7 @@ watchOnGoal(goal, dis)
 	while(DistanceSquared(self.origin, goal) > dis)
 		wait 0.05;
 	
-	self notify("goal");
+	self notify("goal_internal");
 }
 
 /*
@@ -2204,23 +2204,22 @@ killWalkOnEvents()
 	self endon("disconnect");
 	self endon("death");
 	
-	self waittill_any("flash_rumble_loop", "new_enemy", "new_goal", "goal", "bad_path");
+	self waittill_any("flash_rumble_loop", "new_enemy", "new_goal_internal", "goal_internal", "bad_path_internal");
 	
 	self notify("kill_goal");
 }
 
 doWalkScriptNotify()
 {
-	self endon("kill_goal");
 	self endon("disconnect");
 	self endon("death");
 	
-	ret = self waittill_any_return("goal", "bad_path");
+	ret = self waittill_any_return("kill_goal", "goal_internal", "bad_path_internal");
 	
-	if (ret == "goal")
-		self notify("script_goal");
-	else
-		self notify("script_bad_path");
+	if (ret == "goal_internal")
+		self notify("goal");
+	else if (ret == "bad_path_internal")
+		self notify("bad_path");
 }
 
 /*
@@ -2229,7 +2228,7 @@ doWalkScriptNotify()
 doWalk(goal, dist, isScriptGoal)
 {
 	self endon("kill_goal");
-	self endon("goal");//so that the watchOnGoal notify can happen same frame, not a frame later
+	self endon("goal_internal");//so that the watchOnGoal notify can happen same frame, not a frame later
 	
 	distsq = dist*dist;
 	self thread killWalkOnEvents();
@@ -2266,7 +2265,7 @@ doWalk(goal, dist, isScriptGoal)
 	
 	wait 1;
 	if(DistanceSquared(self.origin, goal) > distsq)
-		self notify("bad_path");
+		self notify("bad_path_internal");
 }
 
 /*
@@ -2292,7 +2291,7 @@ movetowards(goal)
 				stucks = 0;
 
 			if(stucks >= 3)
-				self notify("bad_path");
+				self notify("bad_path_internal");
 
 			lastOri = self.origin;
 		}

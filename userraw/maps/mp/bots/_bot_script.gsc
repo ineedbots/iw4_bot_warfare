@@ -1042,9 +1042,9 @@ bot_inc_bots(obj, unreach)
 	
 	obj.bots++;
 	
-	ret = self waittill_any_return("death", "disconnect", "script_bad_path", "script_goal", "bot_inc_bots");
+	ret = self waittill_any_return("death", "disconnect", "bad_path", "goal", "new_goal");
 	
-	if (isDefined(obj) && (ret != "script_bad_path" || !isDefined(unreach)))
+	if (isDefined(obj) && (ret != "bad_path" || !isDefined(unreach)))
 		obj.bots--;
 }
 
@@ -1052,8 +1052,9 @@ bots_watch_touch_obj(obj)
 {
 	self endon ("death");
 	self endon ("disconnect");
-	self endon ("script_bad_path");
-	self endon ("script_goal");
+	self endon ("bad_path");
+	self endon ("goal");
+	self endon ("new_goal");
 
 	for (;;)
 	{
@@ -1061,13 +1062,13 @@ bots_watch_touch_obj(obj)
 
 		if (!isDefined(obj))
 		{
-			self notify("script_bad_path");
+			self notify("bad_path");
 			return;
 		}
 
 		if (self IsTouching(obj))
 		{
-			self notify("script_goal");
+			self notify("goal");
 			return;
 		}
 	}
@@ -1376,18 +1377,19 @@ bot_equipment_kill_think()
 
 		if (isDefined(target.enemyTrigger))
 		{
-			if ( self.bot_lock_goal || self HasScriptGoal() )
+			if ( self HasScriptGoal() )
 				continue;
 
 			self thread bot_inc_bots(target, true);
 			self SetScriptGoal(target.origin, 16);
 			self thread bots_watch_touch_obj( target );
 			
-			path = self waittill_any_return("script_bad_path", "script_goal");
+			path = self waittill_any_return("bad_path", "goal", "new_goal");
 
-			self ClearScriptGoal();
+			if (path != "new_goal")
+				self ClearScriptGoal();
 
-			if (path != "script_goal")
+			if (path != "goal")
 				continue;
 
 			target.enemyTrigger notify("trigger", self);
@@ -1424,7 +1426,7 @@ bot_listen_to_steps()
 	{
 		wait 1;
 		
-		if(self HasScriptGoal() || self.bot_lock_goal)
+		if(self HasScriptGoal())
 			continue;
 			
 		if(self.pers["bots"]["skill"]["base"] < 3)
@@ -1507,8 +1509,9 @@ bot_listen_to_steps()
 		}
 		
 		self SetScriptGoal( heard.origin, 64 );
-		self waittill_any( "script_goal", "script_bad_path" );
-		self ClearScriptGoal();
+
+		if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+			self ClearScriptGoal();
 	}
 }
 
@@ -1521,7 +1524,7 @@ bot_uav_think()
 	{
 		wait 0.75;
 		
-		if ( self HasScriptGoal() || self.bot_lock_goal )
+		if ( self HasScriptGoal() )
 			continue;
 			
 		if(self.pers["bots"]["skill"]["base"] <= 1)
@@ -1569,9 +1572,8 @@ bot_uav_think()
 			{
 				self SetScriptGoal( player.origin, 128 );
 
-				self waittill_any( "script_goal", "script_bad_path" );
-				
-				self ClearScriptGoal();
+				if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+					self ClearScriptGoal();
 				break;
 			}
 		}
@@ -1593,15 +1595,16 @@ bot_revenge_think()
 	{
 		wait( RandomIntRange( 1, 5 ) );
 		
-		if(self HasScriptGoal() || self.bot_lock_goal)
+		if(self HasScriptGoal())
 			return;
 		
 		if ( randomint( 100 ) < 75 )
 			return;
 		
 		self SetScriptGoal( self.killerLocation, 64 );
-		self waittill_any( "script_goal", "script_bad_path" );
-		self ClearScriptGoal();
+
+		if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+			self ClearScriptGoal();
 	}
 }
 
@@ -1609,8 +1612,9 @@ turret_death_monitor(turret)
 {
 	self endon ("death");
 	self endon ("disconnect");
-	self endon ("script_bad_path");
-	self endon ("script_goal");
+	self endon ("bad_path");
+	self endon ("goal");
+	self endon ("new_goal");
 
 	for (;;)
 	{
@@ -1626,7 +1630,7 @@ turret_death_monitor(turret)
 			break;
 	}
 
-	self notify("script_bad_path");
+	self notify("bad_path");
 }
 
 bot_turret_attack( enemy )
@@ -1724,15 +1728,14 @@ bot_turret_think()
 		if ( turret.bots >= 2 )
 			continue;
 		
-		if(!facing && !self.bot_lock_goal && !self HasScriptGoal())
+		if(!facing && !self HasScriptGoal())
 		{
 			self thread bot_inc_bots(turret, true);
 			self SetScriptGoal(turret.origin, 16);
 			self thread turret_death_monitor( turret );
 			
-			self waittill_any_return("script_bad_path", "script_goal");
-
-			self ClearScriptGoal();
+			if(self waittill_any_return("bad_path", "goal", "new_goal") != "new_goal")
+				self ClearScriptGoal();
 		}
 		
 		if(!isDefined(turret))
@@ -1764,20 +1767,20 @@ bot_crate_think()
 		
 		if ( RandomInt( 100 ) < 20 && ret != "crate_physics_done" )
 			continue;
+		
+		if ( self HasScriptGoal() )
+		{
+			wait 0.1;//because bot_crate_landed notify causes a same frame ClearScriptGoal
+			
+			if( self HasScriptGoal() )
+				continue;
+		}
 
 		if(self isDefusing() || self isPlanting())
 			continue;
 
 		if(self IsUsingRemote() || self BotIsFrozen())
 			continue;
-		
-		if ( self HasScriptGoal() || self.bot_lock_goal )
-		{
-			wait 0.05;//because bot_crate_landed notify causes a same frame ClearScriptGoal
-			
-			if( self HasScriptGoal() || self.bot_lock_goal )
-				continue;
-		}
 		
 		crates = getEntArray( "care_package", "targetname" );
 		if ( crates.size == 0 )
@@ -1824,12 +1827,14 @@ bot_crate_think()
 		self SetScriptGoal(crate.origin, 32);
 		self thread bots_watch_touch_obj(crate);
 
-		path = self waittill_any_return("script_bad_path", "script_goal");
+		path = self waittill_any_return("bad_path", "goal", "new_goal");
 
 		self.bot_lock_goal = false;
-		self ClearScriptGoal();
 
-		if (path != "script_goal")
+		if (path != "new_goal")
+			self ClearScriptGoal();
+
+		if (path != "goal")
 			continue;
 
 		self _DisableWeapon();
@@ -2238,7 +2243,7 @@ bot_killstreak_think()
 		{
 			if (streakName == "airdrop_mega" || streakName == "airdrop_sentry_minigun" || streakName == "airdrop")
 			{
-				if (self.bot_lock_goal || self HasScriptGoal())
+				if (self HasScriptGoal())
 					continue;
 
 				if (streakName != "airdrop_mega" && level.littleBirds > 2)
@@ -2265,8 +2270,8 @@ bot_killstreak_think()
 					continue;
 				}
 
-				self waittill_any_timeout( 15, "script_bad_path", "crate_physics_done" );
-				self ClearScriptGoal();
+				if (self waittill_any_timeout( 15, "new_goal", "crate_physics_done" ) != "new_goal")
+					self ClearScriptGoal();
 			}
 			else
 			{
