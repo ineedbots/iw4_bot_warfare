@@ -1377,7 +1377,7 @@ bot_equipment_kill_think()
 
 		if (isDefined(target.enemyTrigger))
 		{
-			if ( self HasScriptGoal() )
+			if ( self HasScriptGoal() || self.bot_lock_goal )
 				continue;
 
 			self thread bot_inc_bots(target, true);
@@ -1426,7 +1426,7 @@ bot_listen_to_steps()
 	{
 		wait 1;
 		
-		if(self HasScriptGoal())
+		if(self HasScriptGoal() || self.bot_lock_goal)
 			continue;
 			
 		if(self.pers["bots"]["skill"]["base"] < 3)
@@ -1524,7 +1524,7 @@ bot_uav_think()
 	{
 		wait 0.75;
 		
-		if ( self HasScriptGoal() )
+		if ( self HasScriptGoal() || self.bot_lock_goal )
 			continue;
 			
 		if(self.pers["bots"]["skill"]["base"] <= 1)
@@ -1595,7 +1595,7 @@ bot_revenge_think()
 	{
 		wait( RandomIntRange( 1, 5 ) );
 		
-		if(self HasScriptGoal())
+		if(self HasScriptGoal() || self.bot_lock_goal)
 			return;
 		
 		if ( randomint( 100 ) < 75 )
@@ -1728,7 +1728,7 @@ bot_turret_think()
 		if ( turret.bots >= 2 )
 			continue;
 		
-		if(!facing && !self HasScriptGoal())
+		if(!facing && !self HasScriptGoal() && !self.bot_lock_goal)
 		{
 			self thread bot_inc_bots(turret, true);
 			self SetScriptGoal(turret.origin, 16);
@@ -1768,11 +1768,11 @@ bot_crate_think()
 		if ( RandomInt( 100 ) < 20 && ret != "crate_physics_done" )
 			continue;
 		
-		if ( self HasScriptGoal() )
+		if ( self HasScriptGoal() || self.bot_lock_goal )
 		{
 			wait 0.1;//because bot_crate_landed notify causes a same frame ClearScriptGoal
 			
-			if( self HasScriptGoal() )
+			if( self HasScriptGoal() || self.bot_lock_goal )
 				continue;
 		}
 
@@ -2243,7 +2243,7 @@ bot_killstreak_think()
 		{
 			if (streakName == "airdrop_mega" || streakName == "airdrop_sentry_minigun" || streakName == "airdrop")
 			{
-				if (self HasScriptGoal())
+				if (self HasScriptGoal() || self.bot_lock_goal)
 					continue;
 
 				if (streakName != "airdrop_mega" && level.littleBirds > 2)
