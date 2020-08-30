@@ -2328,28 +2328,6 @@ bot_killstreak_think()
 	}
 }
 
-bot_dom_go_cap_flag(flag, myteam)
-{
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "goal" );
-	self endon( "bad_path" );
-	self endon( "new_goal" );
-	
-	for (;;)
-	{
-		wait 0.5;
-
-		if (!isDefined(flag))
-			break;
-
-		if (flag maps\mp\gametypes\dom::getFlagTeam() == myTeam)
-			break;
-	}
-	
-	self notify("bad_path");
-}
-
 bot_dom_cap_think()
 {
 	self endon( "death" );
@@ -2441,4 +2419,26 @@ bot_dom_cap_think()
 		
 		self.bot_lock_goal = false;
 	}
+}
+
+bot_dom_go_cap_flag(flag, myteam)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+	
+	for (;;)
+	{
+		wait 0.5;
+
+		if (!isDefined(flag))
+			break;
+
+		if (flag maps\mp\gametypes\dom::getFlagTeam() == myTeam)
+			break;
+	}
+	
+	self notify("bad_path");
 }
