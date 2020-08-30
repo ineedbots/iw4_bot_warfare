@@ -140,6 +140,16 @@ HasBotJavelinLocation()
 	return isDefined(self.bot.jav_loc);
 }
 
+SetScriptAimPos(pos)
+{
+	self.bot.script_aimpos = pos;
+}
+
+ClearScriptAimPos()
+{
+	self SetScriptAimPos(undefined);
+}
+
 SetBotJavelinLocation(loc)
 {
 	self.bot.jav_loc = loc;
