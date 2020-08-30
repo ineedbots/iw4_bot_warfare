@@ -1100,6 +1100,9 @@ onBotSpawned()
 		self thread bot_equipment_kill_think();
 		self thread bot_jav_loc_think();
 		self thread bot_perk_think();
+
+		self thread bot_dom_def_think();
+		self thread bot_dom_spawn_kill_think();
 	}
 }
 
@@ -2326,6 +2329,146 @@ bot_killstreak_think()
 			}
 		}
 	}
+}
+
+bot_dom_spawn_kill_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+
+	if ( level.gametype != "dom" )
+		return;
+
+	myTeam = self.pers[ "team" ];		
+	otherTeam = getOtherTeam( myTeam );
+
+	for ( ;; )
+	{
+		wait( randomintrange( 10, 20 ) );
+		
+		if ( randomint( 100 ) < 20 )
+			continue;
+		
+		if ( self HasScriptGoal() || self.bot_lock_goal)
+			continue;
+		
+		myFlagCount = maps\mp\gametypes\dom::getTeamFlagCount( myTeam );
+
+		if ( myFlagCount == level.flags.size )
+			continue;
+
+		otherFlagCount = maps\mp\gametypes\dom::getTeamFlagCount( otherTeam );
+		
+		if (myFlagCount <= otherFlagCount || otherFlagCount != 1)
+			continue;
+		
+		flag = undefined;
+		for ( i = 0; i < level.flags.size; i++ )
+		{
+			if ( level.flags[i] maps\mp\gametypes\dom::getFlagTeam() == myTeam )
+				continue;
+		}
+		
+		if(!isDefined(flag))
+			continue;
+		
+		if(DistanceSquared(self.origin, flag.origin) < 2048*2048)
+			continue;
+
+		self SetScriptGoal( flag.origin, 1024 );
+		
+		self thread bot_dom_watch_flags(myFlagCount, myTeam);
+
+		if (self waittill_any_return( "goal", "bad_path". "new_goal" ) != "new_goal")
+			self ClearScriptGoal();
+	}
+}
+
+bot_dom_watch_flags(count, myTeam)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+
+	for (;;)
+	{
+		wait 0.5;
+
+		if (maps\mp\gametypes\dom::getTeamFlagCount( myTeam ) != count)
+			break;
+	}
+	
+	self notify("bad_path");
+}
+
+bot_dom_def_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+
+	if ( level.gametype != "dom" )
+		return;
+
+	myTeam = self.pers[ "team" ];
+
+	for ( ;; )
+	{
+		wait( randomintrange( 1, 3 ) );
+		
+		if ( randomint( 100 ) < 35 )
+			continue;
+		
+		if ( self HasScriptGoal() || self.bot_lock_goal )
+			continue;
+		
+		flag = undefined;
+		for ( i = 0; i < level.flags.size; i++ )
+		{
+			if ( level.flags[i] maps\mp\gametypes\dom::getFlagTeam() != myTeam )
+				continue;
+			
+			if ( !level.flags[i].useObj.objPoints[myTeam].isFlashing )
+				continue;
+			
+			if ( !isDefined(flag) || DistanceSquared(self.origin,level.flags[i].origin) < DistanceSquared(self.origin,flag.origin) )
+				flag = level.flags[i];
+		}
+		
+		if ( !isDefined(flag) )
+			continue;
+
+		self SetScriptGoal( flag.origin, 128 );
+		
+		self thread bot_dom_watch_for_flashing(flag, myTeam);
+		self thread bots_watch_touch_obj(flag);
+
+		if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+			self ClearScriptGoal();
+	}
+}
+
+bot_dom_watch_for_flashing(flag, myTeam)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+	
+	for (;;)
+	{
+		wait 0.5;
+
+		if (!isDefined(flag))
+			break;
+
+		if (flag maps\mp\gametypes\dom::getFlagTeam() != myTeam || !flag.useObj.objPoints[myTeam].isFlashing)
+			break;
+	}
+	
+	self notify("bad_path");
 }
 
 bot_dom_cap_think()
