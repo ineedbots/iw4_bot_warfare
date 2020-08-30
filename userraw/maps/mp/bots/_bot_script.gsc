@@ -1001,6 +1001,8 @@ onSpawned()
 		self.bot_lock_goal = false;
 		self.bot_oma_class = undefined;
 		self.help_time = undefined;
+
+		self thread bot_dom_cap_think();
 	}
 }
 
@@ -1380,8 +1382,8 @@ bot_equipment_kill_think()
 			if ( self HasScriptGoal() || self.bot_lock_goal )
 				continue;
 
-			self thread bot_inc_bots(target, true);
 			self SetScriptGoal(target.origin, 16);
+			self thread bot_inc_bots(target, true);
 			self thread bots_watch_touch_obj( target );
 			
 			path = self waittill_any_return("bad_path", "goal", "new_goal");
@@ -1730,9 +1732,10 @@ bot_turret_think()
 		
 		if(!facing && !self HasScriptGoal() && !self.bot_lock_goal)
 		{
+			self SetScriptGoal(turret.origin, 32);
 			self thread bot_inc_bots(turret, true);
-			self SetScriptGoal(turret.origin, 16);
 			self thread turret_death_monitor( turret );
+			self thread bots_watch_touch_obj( turret );
 			
 			if(self waittill_any_return("bad_path", "goal", "new_goal") != "new_goal")
 				self ClearScriptGoal();
@@ -1823,8 +1826,8 @@ bot_crate_think()
 			continue;
 
 		self.bot_lock_goal = true;
-		self thread bot_inc_bots(crate, true);
 		self SetScriptGoal(crate.origin, 32);
+		self thread bot_inc_bots(crate, true);
 		self thread bots_watch_touch_obj(crate);
 
 		path = self waittill_any_return("bad_path", "goal", "new_goal");
@@ -2322,5 +2325,120 @@ bot_killstreak_think()
 				}
 			}
 		}
+	}
+}
+
+bot_dom_go_cap_flag(flag, myteam)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+	
+	for (;;)
+	{
+		wait 0.5;
+
+		if (!isDefined(flag))
+			break;
+
+		if (flag maps\mp\gametypes\dom::getFlagTeam() == myTeam)
+			break;
+	}
+	
+	self notify("bad_path");
+}
+
+bot_dom_cap_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	
+	if ( level.gametype != "dom" )
+		return;
+
+	myTeam = self.pers[ "team" ];		
+	otherTeam = getOtherTeam( myTeam );
+
+	for ( ;; )
+	{
+		wait( randomintrange( 3, 12 ) );
+		
+		if ( self.bot_lock_goal )
+		{
+			continue;
+		}
+
+		if ( !isDefined(level.flags) || level.flags.size == 0 )
+			continue;
+
+		myFlagCount = maps\mp\gametypes\dom::getTeamFlagCount( myTeam );
+
+		if ( myFlagCount == level.flags.size )
+			continue;
+
+		otherFlagCount = maps\mp\gametypes\dom::getTeamFlagCount( otherTeam );
+
+		if ( myFlagCount < otherFlagCount )
+		{
+			if ( randomint( 100 ) < 15 )
+				continue;
+		}
+		else if ( myFlagCount == otherFlagCount )
+		{
+			if ( randomint( 100 ) < 35 )
+				continue;	
+		}
+		else if ( myFlagCount > otherFlagCount )
+		{
+			if ( randomint( 100 ) < 95 )
+				continue;
+		}
+
+		flag = undefined;
+		for ( i = 0; i < level.flags.size; i++ )
+		{
+			if ( level.flags[i] maps\mp\gametypes\dom::getFlagTeam() == myTeam )
+				continue;
+
+			if ( !isDefined(flag) || DistanceSquared(self.origin,level.flags[i].origin) < DistanceSquared(self.origin,flag.origin) )
+				flag = level.flags[i];
+		}
+
+		if ( !isDefined(flag) )
+			continue;
+		
+		self.bot_lock_goal = true;
+		self SetScriptGoal( flag.origin, 64 );
+		
+		self thread bot_dom_go_cap_flag(flag, myteam);
+		self thread bots_watch_touch_obj(flag);
+	
+		event = self waittill_any_return( "goal", "bad_path", "new_goal" );
+		
+		if (event != "new_goal")
+			self ClearScriptGoal();
+
+		if (event != "goal")
+		{
+			self.bot_lock_goal = false;
+			continue;
+		}
+		
+		self SetScriptGoal( self.origin, 64 );
+
+		while ( flag maps\mp\gametypes\dom::getFlagTeam() != myTeam && self isTouching(flag) )
+		{
+			cur = flag.useObj.curProgress;
+			wait 0.5;
+			
+			if(flag.useObj.curProgress == cur)
+				break;//some enemy is near us, kill him
+		}
+
+		self ClearScriptGoal();
+		
+		self.bot_lock_goal = false;
 	}
 }
