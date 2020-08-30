@@ -2231,10 +2231,11 @@ doWalk(goal, dist, isScriptGoal)
 	self endon("goal_internal");//so that the watchOnGoal notify can happen same frame, not a frame later
 	
 	distsq = dist*dist;
-	self thread killWalkOnEvents();
-	self thread watchOnGoal(goal, distsq);
 	if (isScriptGoal)
 		self thread doWalkScriptNotify();
+
+	self thread killWalkOnEvents();
+	self thread watchOnGoal(goal, distsq);
 	
 	current = self initAStar(goal);
 	while(current >= 0)
