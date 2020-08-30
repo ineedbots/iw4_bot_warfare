@@ -34,6 +34,8 @@ init()
 
   if (getDvar("bots_main_debug_drawThrough") == "")
     setDvar("bots_main_debug_drawThrough", false);
+
+	setDvar("player_sustainAmmo", 1);
   
   level waittill( "connected", player);
   
@@ -53,12 +55,18 @@ onPlayerSpawned()
 
 StartDev()
 {
+	self endon("disconnect");
+	self endon("death");
+
 	level.wpToLink = -1;
 	level.autoLink = false;
 	self.nearest = -1;
 	
 	self takeAllWeapons();
 	self giveWeapon("usp_tactical_mp");//to knife windows
+	self giveWeapon("javelin_mp");//to mark jav spots
+	self SetOffhandPrimaryClass( "other" );
+	self giveWeapon("semtex_mp");
 	self _clearperks();
 	self.specialty = [];
 	self maps\mp\perks\_perks::givePerk("specialty_fastmantle");
@@ -139,6 +147,12 @@ updateWaypointsStats()
 				
 				if(getConeDot(wpOrg, myEye, myAngles) > getDvarFloat("bots_main_debug_cone"))
 					print3d(wpOrg, i, (1,0,0), 2);
+
+				if (isDefined(level.waypoints[i].angles) && level.waypoints[i].type != "stand")
+					line(wpOrg, wpOrg + AnglesToForward(level.waypoints[i].angles) * 64, (1,1,1));
+
+				if (isDefined(level.waypoints[i].jav_point))
+					line(wpOrg, level.waypoints[i].jav_point, (0,0,0));
 			}
 		}
 		
@@ -293,6 +307,9 @@ watchSaveWaypointsCommand()
 			}
 			if(isDefined(level.waypoints[i].angles) && (level.waypoints[i].type == "claymore" || level.waypoints[i].type == "tube" || (level.waypoints[i].type == "crouch" && level.waypoints[i].childCount == 1) || level.waypoints[i].type == "climb" || level.waypoints[i].type == "grenade"))
 				logprint("*/waypoints["+i+"].angles = "+level.waypoints[i].angles+";\n/*");
+
+			if (isDefined(level.waypoints[i].jav_point) && level.waypoints[i].type == "javelin")
+				logprint("*/waypoints["+i+"].jav_point = "+level.waypoints[i].jav_point+";\n/*");
 		}
 		logprint("*/return waypoints;\n}\n\n\n\n");
 		self iprintln("Saved!!!");
@@ -330,8 +347,10 @@ checkForWarnings()
 		if(level.waypoints[i].childCount != level.waypoints[i].children.size)
 			self iprintln("WARNING: waypoint "+i+" childCount is not "+level.waypoints[i].children.size);
 		
-		foreach(child in level.waypoints[i].children)
+		for (h = 0; h < level.waypoints[i].childCount; h++)
 		{
+			child = level.waypoints[i].children[h];
+
 			if(!isDefined(level.waypoints[child]))
 				self iprintln("WARNING: waypoint "+i+" child "+child+" is undefined");
 			else if(child == i)
@@ -343,6 +362,9 @@ checkForWarnings()
 			self iprintln("WARNING: waypoint "+i+" type is undefined");
 			continue;
 		}
+
+		if (level.waypoints[i].type == "javelin" && !isDefined(level.waypoints[i].jav_point))
+			self iprintln("WARNING: waypoint "+i+" jav_point is undefined");
 		
 		if(!isDefined(level.waypoints[i].angles) && (level.waypoints[i].type == "claymore" || level.waypoints[i].type == "tube" || (level.waypoints[i].type == "crouch" && level.waypoints[i].childCount == 1) || level.waypoints[i].type == "climb" || level.waypoints[i].type == "grenade"))
 			self iprintln("WARNING: waypoint "+i+" angles is undefined");
@@ -392,18 +414,23 @@ LinkWaypoint(nwp)
 	}
 	
 	weGood = true;
-	foreach(child in level.waypoints[level.wpToLink].children)
+	for (i = 0; i < level.waypoints[level.wpToLink].childCount; i++)
 	{
+		child = level.waypoints[level.wpToLink].children[i];
+
 		if(child == nwp)
 		{
 			weGood = false;
 			break;
 		}
 	}
+	
 	if(weGood)
 	{
-		foreach(child in level.waypoints[nwp].children)
+		for (i = 0; i < level.waypoints[nwp].childCount; i++)
 		{
+			child = level.waypoints[nwp].children[i];
+			
 			if(child == level.wpToLink)
 			{
 				weGood = false;
@@ -438,8 +465,10 @@ DeleteWaypoint(nwp)
 	
 	level.wpToLink = -1;
 	
-	foreach(child in level.waypoints[nwp].children)
+	for (i = 0; i < level.waypoints[nwp].childCount; i++)
 	{
+		child = level.waypoints[nwp].children[i];
+		
 		level.waypoints[child].children = array_remove(level.waypoints[child].children, nwp);
 		
 		level.waypoints[child].childCount = level.waypoints[child].children.size;
@@ -479,7 +508,9 @@ AddWaypoint()
 	pos = self getOrigin();
 	level.waypoints[level.waypointCount].origin = pos;
 	
-	if(self AdsButtonPressed())
+	if (isDefined(self.javelinTargetPoint))
+		level.waypoints[level.waypointCount].type = "javelin";
+	else if(self AdsButtonPressed())
 		level.waypoints[level.waypointCount].type = "climb";
 	else if(self AttackButtonPressed() && self UseButtonPressed())
 		level.waypoints[level.waypointCount].type = "tube";
@@ -494,6 +525,11 @@ AddWaypoint()
 	
 	level.waypoints[level.waypointCount].children = [];
 	level.waypoints[level.waypointCount].childCount = 0;
+
+	if (level.waypoints[level.waypointCount].type == "javelin")
+	{
+		level.waypoints[level.waypointCount].jav_point = self.javelinTargetPoint;
+	}
 	
 	self iprintln(level.waypoints[level.waypointCount].type + " Waypoint "+ level.waypointCount +" Added at "+pos);
 	
