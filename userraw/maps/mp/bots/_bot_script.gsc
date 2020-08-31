@@ -2379,7 +2379,7 @@ bot_dom_spawn_kill_think()
 		
 		self thread bot_dom_watch_flags(myFlagCount, myTeam);
 
-		if (self waittill_any_return( "goal", "bad_path". "new_goal" ) != "new_goal")
+		if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
 			self ClearScriptGoal();
 	}
 }

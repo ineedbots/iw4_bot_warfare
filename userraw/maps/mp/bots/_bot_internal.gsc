@@ -2204,7 +2204,10 @@ killWalkOnEvents()
 	self endon("disconnect");
 	self endon("death");
 	
-	self waittill_any("flash_rumble_loop", "new_enemy", "new_goal_internal", "goal_internal", "bad_path_internal");
+	ret = self waittill_any_return("flash_rumble_loop", "new_enemy", "new_goal_internal", "goal_internal", "bad_path_internal");
+
+	if (ret == "goal_internal")
+		waittillframeend;
 	
 	self notify("kill_goal");
 }
@@ -2214,7 +2217,7 @@ doWalkScriptNotify()
 	self endon("disconnect");
 	self endon("death");
 	
-	ret = self waittill_any_return("kill_goal", "goal_internal", "bad_path_internal");
+	ret = self waittill_any_return("goal_internal", "kill_goal", "bad_path_internal");
 	
 	if (ret == "goal_internal")
 		self notify("goal");
