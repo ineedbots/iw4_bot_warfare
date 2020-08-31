@@ -1060,7 +1060,7 @@ bots_watch_touch_obj(obj)
 
 	for (;;)
 	{
-		wait 0.05;
+		wait 0.5;
 
 		if (!isDefined(obj))
 		{
@@ -1623,7 +1623,7 @@ turret_death_monitor(turret)
 
 	for (;;)
 	{
-		wait 0.05;
+		wait 0.5;
 
 		if (!isDefined(turret))
 			break;

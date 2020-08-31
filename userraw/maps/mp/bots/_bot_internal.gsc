@@ -2022,7 +2022,6 @@ walk()
 		{
 			myVel = self GetBotVelocity();
 			moveTo = PlayerPhysicsTrace(self.origin + (0, 0, 32), self.origin + (myVel[0], myVel[1], 0)*500, false, self);
-			moveTo = PhysicsTrace(moveTo + (0, 0, 50), moveTo + (0, 0, -40), false, self);
 			self botMoveTo(moveTo);
 			continue;
 		}
@@ -2124,9 +2123,7 @@ strafe(target)
 	right = self.origin + anglestoforward(anglesRight)*500;
 	
 	traceLeft = PlayerPhysicsTrace(self.origin + (0, 0, 32), left, false, self);
-	traceLeft = PhysicsTrace(traceLeft + (0, 0, 50), traceLeft + (0, 0, -40), false, self);
 	traceRight = PlayerPhysicsTrace(self.origin + (0, 0, 32), right, false, self);
-	traceRight = PhysicsTrace(traceRight + (0, 0, 50), traceRight + (0, 0, -40), false, self);
 	
 	strafe = traceLeft;
 	if(DistanceSquared(left, traceLeft) > DistanceSquared(right, traceRight))
