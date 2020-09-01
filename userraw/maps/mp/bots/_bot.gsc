@@ -207,8 +207,42 @@ fixGamemodes()
 				level.bombZones[i].onUse = ::onUsePlantObjectFix;
 			break;
 		}
+
+		if(isDefined(level.radios) && level.gametype == "koth")
+		{
+			level thread fixKoth();
+			
+			break;
+		}
 		
 		wait 0.05;
+	}
+}
+
+fixKoth()
+{
+	level.radio = undefined;
+	
+	for(;;)
+	{
+		wait 0.05;
+		
+		if(!isDefined(level.radioObject))
+		{
+			continue;
+		}
+		
+		for(i = level.radios.size - 1; i >= 0; i--)
+		{
+			if(level.radioObject != level.radios[i].gameobject)
+				continue;
+				
+			level.radio = level.radios[i];
+			break;
+		}
+		
+		while(isDefined(level.radioObject) && level.radio.gameobject == level.radioObject)
+			wait 0.05;
 	}
 }
 

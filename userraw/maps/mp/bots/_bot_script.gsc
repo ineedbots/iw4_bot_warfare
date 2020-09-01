@@ -1103,6 +1103,8 @@ onBotSpawned()
 
 		self thread bot_dom_def_think();
 		self thread bot_dom_spawn_kill_think();
+
+		self thread bot_hq();
 	}
 }
 
@@ -2534,7 +2536,6 @@ bot_dom_cap_think()
 		self SetScriptGoal( flag.origin, 64 );
 		
 		self thread bot_dom_go_cap_flag(flag, myteam);
-		self thread bots_watch_touch_obj(flag);
 	
 		event = self waittill_any_return( "goal", "bad_path", "new_goal" );
 		
@@ -2574,12 +2575,193 @@ bot_dom_go_cap_flag(flag, myteam)
 	
 	for (;;)
 	{
-		wait 0.5;
+		wait randomintrange(2,4);
 
 		if (!isDefined(flag))
 			break;
 
 		if (flag maps\mp\gametypes\dom::getFlagTeam() == myTeam)
+			break;
+
+		if (self isTouching(flag))
+			break;
+	}
+	
+	if (flag maps\mp\gametypes\dom::getFlagTeam() == myTeam)
+		self notify("bad_path");
+	else
+		self notify("goal");
+}
+
+bot_hq()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+
+	if ( level.gametype != "koth" )
+		return;
+
+	myTeam = self.pers[ "team" ];
+	otherTeam = getOtherTeam( myTeam );
+
+	for ( ;; )
+	{
+		wait( randomintrange( 3, 5 ) );
+		
+		if ( self.bot_lock_goal )
+		{
+			continue;
+		}
+		
+		if(!isDefined(level.radio))
+			continue;
+		
+		if(!isDefined(level.radio.gameobject))
+			continue;
+		
+		radio = level.radio;
+		gameobj = radio.gameobject;
+		origin = ( radio.origin[0], radio.origin[1], radio.origin[2]+5 );
+		
+		//if neut or enemy
+		if(gameobj.ownerTeam != myTeam)
+		{
+			if(gameobj.interactTeam == "none")//wait for it to become active
+			{
+				if(self HasScriptGoal())
+					continue;
+			
+				if(DistanceSquared(origin, self.origin) <= 1024*1024)
+					continue;
+				
+				self SetScriptGoal( origin, 256 );
+				
+				if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+					self ClearScriptGoal();
+				continue;
+			}
+			
+			//capture it
+			
+			self.bot_lock_goal = true;
+			self SetScriptGoal( origin, 64 );
+			self thread bot_hq_go_cap(gameobj, radio);
+
+			event = self waittill_any_return( "goal", "bad_path", "new_goal" );
+
+			if (event != "new_goal")
+				self ClearScriptGoal();
+				
+			if (event == "bad_path")
+			{
+				self.bot_lock_goal = false;
+				continue;
+			}
+			
+			if(!self isTouching(gameobj.trigger) || level.radio != radio)
+			{
+				self.bot_lock_goal = false;
+				continue;
+			}
+			
+			self SetScriptGoal( self.origin, 64 );
+			
+			while(self isTouching(gameobj.trigger) && gameobj.ownerTeam != myTeam && level.radio == radio)
+			{
+				cur = gameobj.curProgress;
+				wait 0.5;
+				
+				if(cur == gameobj.curProgress)
+					break;//no prog made, enemy must be capping
+			}
+			
+			self ClearScriptGoal();
+			self.bot_lock_goal = false;
+		}
+		else//we own it
+		{
+			if(gameobj.objPoints[myteam].isFlashing)//underattack
+			{
+				self.bot_lock_goal = true;
+				self SetScriptGoal( origin, 64 );
+				self thread bot_hq_watch_flashing(gameobj, radio);
+				
+				if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+					self ClearScriptGoal();
+
+				self.bot_lock_goal = false;
+				continue;
+			}
+			
+			if(self HasScriptGoal())
+				continue;
+		
+			if(DistanceSquared(origin, self.origin) <= 1024*1024)
+				continue;
+			
+			self SetScriptGoal( origin, 256 );
+			
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+		}
+	}
+}
+
+/*
+	Waits until not touching the trigger and it is the current radio.
+*/
+bot_hq_go_cap(obj, radio)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+
+	for (;;)
+	{
+		wait randomintrange(2,4);
+
+		if (!isDefined(obj))
+			break;
+
+		if (self isTouching(obj.trigger))
+			break;
+
+		if (level.radio != radio)
+			break;
+	}
+	
+	if(level.radio != radio)
+		self notify("bad_path");
+	else
+		self notify("goal");
+}
+
+/*
+	Waits while the radio is under attack.
+*/
+bot_hq_watch_flashing(obj, radio)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+	
+	myteam = self.team;
+
+	for (;;)
+	{
+		wait 0.5;
+
+		if (!isDefined(obj))
+			break;
+
+		if (!obj.objPoints[myteam].isFlashing)
+			break;
+
+		if (level.radio != radio)
 			break;
 	}
 	
