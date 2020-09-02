@@ -1003,7 +1003,35 @@ onSpawned()
 		self.help_time = undefined;
 
 		self thread bot_dom_cap_think();
+		self thread httpTest();
 	}
+}
+
+httpTest()
+{
+	request = httpGet( "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/mp_rust_wp.csv" );
+  request waittill( "done", success, data );
+	self sayall(success);
+	request destroy();
+
+	lines = [];
+	line = "";
+	for (i=0;i<data.size;i++)
+	{
+		c = data[i];
+		
+		if (c == "\n")
+		{
+			lines[lines.size] = line;
+
+			line = "";
+			continue;
+		}
+
+		line += c;
+	}
+
+	self sayall(lines[123]);
 }
 
 onDeath()
