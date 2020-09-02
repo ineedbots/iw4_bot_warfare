@@ -392,7 +392,7 @@ wpsFromCSV(mapname)
 
 	waypointCount = int(tableLookupByRow(fileName, 0, 0));
 
-	if (waypointCount == "" || waypointCount <= 0)
+	if (waypointCount <= 0)
 		return waypoints;
 
 	printLn( "Getting waypoints from csv: "+fileName );
@@ -450,6 +450,7 @@ load_waypoints()
 	if (wps.size)
 	{
 		level.waypoints = wps;
+		println("Loaded " + wps.size + " waypoints from csv.");
 	}
 	else
 	{
@@ -658,9 +659,12 @@ load_waypoints()
 				maps\mp\bots\waypoints\_custom_map::main(mapname);
 			break;
 		}
+
+		if (level.waypoints.size)
+			println("Loaded " + level.waypoints.size + " waypoints from script.");
 	}
 
-	if (!level.waypoints.size)
+	if (!level.waypoints.size || true)
 	{
 		maps\mp\bots\_bot_http::getRemoteWaypoints(mapname);
 	}
