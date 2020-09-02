@@ -387,7 +387,6 @@ RoundUp( floatVal )
 wpsFromCSV(mapname)
 {
 	fileName =  "waypoints/"+ toLower(mapname) + "_wp.csv";
-	printLn( "Getting waypoints from csv: "+fileName );
 
 	waypoints = [];
 
@@ -395,6 +394,8 @@ wpsFromCSV(mapname)
 
 	if (waypointCount == "" || waypointCount <= 0)
 		return waypoints;
+
+	printLn( "Getting waypoints from csv: "+fileName );
 
 	for (i = 1; i <= waypointCount; i++)
 	{
@@ -439,6 +440,9 @@ wpsFromCSV(mapname)
 */
 load_waypoints()
 {
+	level.waypointCount = 0;
+	level.waypoints = [];
+
 	mapname = getDvar("mapname");
 
 	wps = wpsFromCSV(mapname);
@@ -449,7 +453,6 @@ load_waypoints()
 	}
 	else
 	{
-		level.waypoints = [];
 		switch(mapname)
 		{
 			case "mp_afghan":
@@ -655,6 +658,11 @@ load_waypoints()
 				maps\mp\bots\waypoints\_custom_map::main(mapname);
 			break;
 		}
+	}
+
+	if (!level.waypoints.size)
+	{
+		maps\mp\bots\_bot_http::getRemoteWaypoints(mapname);
 	}
 
 	level.waypointCount = level.waypoints.size;

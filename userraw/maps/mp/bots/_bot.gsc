@@ -14,7 +14,7 @@ init()
 	if(getDVarint("bots_main_debug"))
     return;
 
-	load_waypoints();
+	thread load_waypoints();
 	thread hook_callbacks();
 	
 	setDvar("testClients_watchKillcam", true);
