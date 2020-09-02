@@ -1727,6 +1727,7 @@ aim()
 
 		usingRemote = self IsUsingRemote();
 		curweap = self getCurrentWeapon();
+		eyePos = self getEye();
 		
 		if (isDefined(self.bot.jav_loc) && !usingRemote)
 		{
@@ -1754,7 +1755,6 @@ aim()
 				isplay = self.bot.target.isplay;
 				offset = self.bot.target.offset;
 				dist = self.bot.target.dist;
-				eyePos = self getEye();
 				angles = self GetPlayerAngles();
 				rand = self.bot.target.rand;
 				no_trace_ads_time = self.pers["bots"]["skill"]["no_trace_ads_time"];
@@ -1848,23 +1848,26 @@ aim()
 			}
 		}
 		
-		if (!isDefined(self.bot.script_aimpos))
+		if (self.bot.next_wp != -1 && isDefined(level.waypoints[self.bot.next_wp].angles) && self.bot.climbing)
 		{
-			if (!usingRemote)
-			{
-				lookat = undefined;
-				if(self.bot.second_next_wp != -1 && !self.bot.running)
-					lookat = level.waypoints[self.bot.second_next_wp].origin;
-				else if(isDefined(self.bot.towards_goal))
-					lookat = self.bot.towards_goal;
-				
-				if(isDefined(lookat))
-					self thread bot_lookat(lookat + (0, 0, self getEyeHeight()), aimspeed);
-			}
+			forwardPos = anglesToForward(level.waypoints[self.bot.next_wp].angles) * 1024;
+
+			self thread bot_lookat(eyePos + forwardPos, aimspeed);
 		}
-		else
+		else if (isDefined(self.bot.script_aimpos))
 		{
 			self thread bot_lookat(self.bot.script_aimpos, aimspeed);
+		}
+		else if (!usingRemote)
+		{
+			lookat = undefined;
+			if(self.bot.second_next_wp != -1 && !self.bot.running)
+				lookat = level.waypoints[self.bot.second_next_wp].origin;
+			else if(isDefined(self.bot.towards_goal))
+				lookat = self.bot.towards_goal;
+			
+			if(isDefined(lookat))
+				self thread bot_lookat(lookat + (0, 0, self getEyeHeight()), aimspeed);
 		}
 	}
 }
