@@ -259,6 +259,11 @@ inFinalStand()
 	return (isDefined(self.inFinalStand) && self.inFinalStand);
 }
 
+isFlagCarrier()
+{
+	return (isDefined(self.carryFlag) && self.carryFlag);
+}
+
 isWeaponDroppable(weap)
 {
 	return (maps\mp\gametypes\_weapons::mayDropWeapon(weap));

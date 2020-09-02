@@ -1105,6 +1105,8 @@ onBotSpawned()
 		self thread bot_dom_spawn_kill_think();
 
 		self thread bot_hq();
+
+		self thread bot_cap();
 	}
 }
 
@@ -2766,4 +2768,210 @@ bot_hq_watch_flashing(obj, radio)
 	}
 	
 	self notify("bad_path");
+}
+
+bot_cap()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+
+	if ( level.gametype != "ctf" )
+		return;
+
+	myTeam = self.pers[ "team" ];
+	otherTeam = getOtherTeam( myTeam );
+
+	for ( ;; )
+	{
+		wait( randomintrange( 3, 5 ) );
+		
+		if ( self IsUsingRemote() || self.bot_lock_goal )
+		{
+			continue;
+		}
+		
+		if(!isDefined(level.capZones))
+			continue;
+		
+		if(!isDefined(level.teamFlags))
+			continue;
+		
+		myflag = level.teamFlags[myteam];
+		myzone = level.capZones[myteam];
+		
+		theirflag = level.teamFlags[otherTeam];
+		theirzone = level.capZones[otherTeam];
+		
+		if(!myflag maps\mp\gametypes\_gameobjects::isHome())
+		{
+			carrier = myflag.carrier;
+			
+			if(!isDefined(carrier))//someone doesnt has our flag
+			{
+				if(!isDefined(theirflag.carrier) && DistanceSquared(self.origin, theirflag.curorigin) < DistanceSquared(self.origin, myflag.curorigin)) //no one has their flag and its closer
+					self bot_cap_get_flag(theirflag);
+				else//go get it
+					self bot_cap_get_flag(myflag);
+					
+				continue;
+			}
+			else
+			{
+				if(theirflag maps\mp\gametypes\_gameobjects::isHome() && randomint(100) < 50)
+				{ //take their flag
+					self bot_cap_get_flag(theirflag);
+				}
+				else
+				{
+					if(self HasScriptGoal())
+						continue;
+					
+					if(!isDefined(theirzone.bots))
+						theirzone.bots = 0;
+					
+					origin = theirzone.curorigin;
+					
+					if(theirzone.bots > 2 || randomInt(100) < 45)
+					{
+						//kill carrier
+						if(carrier _hasPerk( "specialty_coldblooded" ))
+							continue;
+						
+						origin = carrier.origin;
+						
+						self SetScriptGoal( origin, 64 );
+						self thread bot_escort_obj(myflag, carrier);
+
+						if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+							self ClearScriptGoal();
+						continue;
+					}
+					
+					self thread bot_inc_bots(theirzone);
+					
+					//camp their zone
+					if(DistanceSquared(origin, self.origin) <= 1024*1024)
+					{
+						wait 4;
+						continue;
+					}
+					
+					self SetScriptGoal( origin, 256 );
+					self thread bot_escort_obj(myflag, carrier);
+					
+					if(self waittill_any( "goal", "bad_path", "new_goal" ) != "new_goal")
+						self ClearScriptGoal();
+				}
+			}
+		}
+		else//our flag is ok
+		{
+			if(self isFlagCarrier())//if have flag
+			{
+				//go cap
+				origin = myzone.curorigin;
+				
+				self.bot_lock_goal = true;
+				self SetScriptGoal( origin, 32 );
+
+				self thread bot_get_obj(myflag);
+				evt = self waittill_any_return( "goal", "bad_path", "new_goal" );
+				
+				wait 1;
+				if (evt != "new_goal")
+					self ClearScriptGoal();
+				self.bot_lock_goal = false;
+				continue;
+			}
+			
+			carrier = theirflag.carrier;
+			
+			if(!isDefined(carrier))//if no one has enemy flag
+			{
+				self bot_cap_get_flag(theirflag);
+				continue;
+			}
+			
+			//escort them
+			
+			if(self HasScriptGoal())
+				continue;
+			
+			origin = carrier.origin;
+			
+			if(DistanceSquared(origin, self.origin) <= 1024*1024)
+				continue;
+			
+			self SetScriptGoal( origin, 256 );
+			self thread bot_escort_obj(theirflag, carrier);
+
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+		}
+	}
+}
+
+bot_cap_get_flag(flag)
+{
+	origin = flag.curorigin;
+	
+	//go get it
+	
+	self.bot_lock_goal = true;
+	self SetScriptGoal( origin, 32 );
+	
+	self thread bot_get_obj(flag);
+
+	evt = self waittill_any_return( "goal", "bad_path", "new_goal" );
+
+	wait 1;
+	
+	self.bot_lock_goal = false;
+	if (evt != "new_goal")
+		self ClearScriptGoal();
+}
+
+bot_escort_obj(obj, carrier)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+
+	for (;;)
+	{
+		wait 0.5;
+
+		if (!isDefined(obj))
+			break;
+
+		if (!isDefined(obj.carrier) || carrier == obj.carrier)
+			break;
+	}
+	
+	self notify("goal");
+}
+
+bot_get_obj(obj)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+	
+	for (;;)
+	{
+		wait 0.5;
+
+		if (!isDefined(obj))
+			break;
+
+		if (isDefined(obj.carrier))
+			break;
+	}
+	
+	self notify("goal");
 }
