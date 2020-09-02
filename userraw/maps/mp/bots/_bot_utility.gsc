@@ -384,6 +384,65 @@ RoundUp( floatVal )
 		return i;
 }
 
+tokenizeLine(line, tok)
+{
+  tokens = [];
+
+  token = "";
+  for (i = 0; i < line.size; i++)
+  {
+    c = line[i];
+
+    if (c == tok)
+    {
+      tokens[tokens.size] = token;
+      token = "";
+      continue;
+    }
+
+    token += c;
+  }
+  tokens[tokens.size] = token;
+
+  return tokens;
+}
+
+parseTokensIntoWaypoint(tokens)
+{
+	waypoint = spawnStruct();
+
+	orgStr = tokens[0];
+	orgToks = strtok(orgStr, " ");
+	waypoint.origin = (int(orgToks[0]), int(orgToks[1]), int(orgToks[2]));
+
+	childStr = tokens[1];
+	childToks = strtok(childStr, " ");
+	waypoint.childCount = childToks.size;
+	waypoint.children = [];
+	for( j=0; j<childToks.size; j++ )
+		waypoint.children[j] = int(childToks[j]);
+
+	type = tokens[2];
+	waypoint.type = type;
+
+	anglesStr = tokens[3];
+	if (isDefined(anglesStr) && anglesStr != "")
+	{
+		anglesToks = strtok(anglesStr, " ");
+		waypoint.angles = (int(anglesToks[0]), int(anglesToks[1]), int(anglesToks[2]));
+	}
+
+	javStr = tokens[4];
+	if (isDefined(javStr) && javStr != "")
+	{
+		javToks = strtok(javStr, " ");
+		waypoint.jav_point = (int(javToks[0]), int(javToks[1]), int(javToks[2]));
+	}
+
+	return waypoint;
+}
+
+// https://github.com/leiizko/cod4x_lua_plugin/blob/master/LuaScripts/Rotu-R/waypoints.gsc
 wpsFromCSV(mapname)
 {
 	fileName =  "waypoints/"+ toLower(mapname) + "_wp.csv";
@@ -399,35 +458,14 @@ wpsFromCSV(mapname)
 
 	for (i = 1; i <= waypointCount; i++)
 	{
-		waypoint = spawnStruct();
-
-		orgStr = tableLookupByRow(fileName, i, 0);
-		orgToks = strtok(orgStr, " ");
-		waypoint.origin = (int(orgToks[0]), int(orgToks[1]), int(orgToks[2]));
-
-		childStr = tableLookupByRow(fileName, i, 1);
-		childToks = strtok(childStr, " ");
-		waypoint.childCount = childToks.size;
-		waypoint.children = [];
-		for( j=0; j<childToks.size; j++ )
-			waypoint.children[j] = int(childToks[j]);
-
-		type = tableLookupByRow(fileName, i, 2);
-		waypoint.type = type;
-
-		anglesStr = tableLookupByRow(fileName, i, 3);
-		if (anglesStr != "")
-		{
-			anglesToks = strtok(anglesStr, " ");
-			waypoint.angles = (int(anglesToks[0]), int(anglesToks[1]), int(anglesToks[2]));
-		}
-
-		javStr = tableLookupByRow(fileName, i, 4);
-		if (javStr != "")
-		{
-			javToks = strtok(javStr, " ");
-			waypoint.jav_point = (int(javToks[0]), int(javToks[1]), int(javToks[2]));
-		}
+		tokens = [];
+		tokens[tokens.size] = tableLookupByRow(fileName, i, 0);
+		tokens[tokens.size] = tableLookupByRow(fileName, i, 1);
+		tokens[tokens.size] = tableLookupByRow(fileName, i, 2);
+		tokens[tokens.size] = tableLookupByRow(fileName, i, 3);
+		tokens[tokens.size] = tableLookupByRow(fileName, i, 4);
+		
+		waypoint = parseTokensIntoWaypoint(tokens);
 
 		waypoints[i-1] = waypoint;
 	}
