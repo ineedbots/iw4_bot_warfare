@@ -24,13 +24,13 @@ init()
   setdvar("bots_manage_fill_kick", 1);
   
   if (getDvar("bots_main_debug_distance") == "")
-    setDvar("bots_main_debug_distance", 500.0);
+    setDvar("bots_main_debug_distance", 512.0);
 
   if (getDvar("bots_main_debug_cone") == "")
     setDvar("bots_main_debug_cone", 0.65);
 
   if (getDvar("bots_main_debug_minDist") == "")
-    setDvar("bots_main_debug_minDist", 500.0);
+    setDvar("bots_main_debug_minDist", 32.0);
 
   if (getDvar("bots_main_debug_drawThrough") == "")
     setDvar("bots_main_debug_drawThrough", false);
@@ -312,6 +312,37 @@ watchSaveWaypointsCommand()
 				logprint("*/waypoints["+i+"].jav_point = "+level.waypoints[i].jav_point+";\n/*");
 		}
 		logprint("*/return waypoints;\n}\n\n\n\n");
+
+		PrintLn(level.waypointCount);
+		for(i = 0; i < level.waypointCount; i++)
+		{
+			str = "";
+			wp = level.waypoints[i];
+
+			str += wp.origin[0] + " " + wp.origin[1] + " " + wp.origin[2] + ",";
+
+			for(h = 0; h < wp.childCount; h++)
+			{
+				str += wp.children[h];
+
+				if (h < wp.childCount - 1)
+					str += " ";
+			}
+			str += "," + wp.type + ",";
+
+			if (isDefined(wp.angles))
+				str += wp.angles[0] + " " + wp.angles[1] + " " + wp.angles[2] + ",";
+			else
+				str += ",";
+
+			if (isDefined(wp.jav_point))
+				str += wp.jav_point[0] + " " + wp.jav_point[1] + " " + wp.jav_point[2] + ",";
+			else
+				str += ",";
+
+			PrintLn(str);
+		}
+
 		self iprintln("Saved!!!");
 	}
 }

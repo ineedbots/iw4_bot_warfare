@@ -384,219 +384,277 @@ RoundUp( floatVal )
 		return i;
 }
 
+wpsFromCSV(mapname)
+{
+	fileName =  "waypoints/"+ toLower(mapname) + "_wp.csv";
+	printLn( "Getting waypoints from csv: "+fileName );
+
+	waypoints = [];
+
+	waypointCount = int(tableLookupByRow(fileName, 0, 0));
+
+	if (waypointCount == "" || waypointCount <= 0)
+		return waypoints;
+
+	for (i = 1; i <= waypointCount; i++)
+	{
+		waypoint = spawnStruct();
+
+		orgStr = tableLookupByRow(fileName, i, 0);
+		orgToks = strtok(orgStr, " ");
+		waypoint.origin = (int(orgToks[0]), int(orgToks[1]), int(orgToks[2]));
+
+		childStr = tableLookupByRow(fileName, i, 1);
+		childToks = strtok(childStr, " ");
+		waypoint.childCount = childToks.size;
+		waypoint.children = [];
+		for( j=0; j<childToks.size; j++ )
+			waypoint.children[j] = int(childToks[j]);
+
+		type = tableLookupByRow(fileName, i, 2);
+		waypoint.type = type;
+
+		anglesStr = tableLookupByRow(fileName, i, 3);
+		if (anglesStr != "")
+		{
+			anglesToks = strtok(anglesStr, " ");
+			waypoint.angles = (int(anglesToks[0]), int(anglesToks[1]), int(anglesToks[2]));
+		}
+
+		javStr = tableLookupByRow(fileName, i, 4);
+		if (javStr != "")
+		{
+			javToks = strtok(javStr, " ");
+			waypoint.jav_point = (int(javToks[0]), int(javToks[1]), int(javToks[2]));
+		}
+
+		waypoints[i-1] = waypoint;
+	}
+
+	return waypoints;
+}
+
 /*
 	Loads the waypoints. Populating everything needed for the waypoints.
 */
 load_waypoints()
 {
 	mapname = getDvar("mapname");
-	
-	level.waypoints = [];
-	
-	switch(mapname)
-	{
-		case "mp_afghan":
-			level.waypoints = maps\mp\bots\waypoints\afghan::Afghan();
-		break;
-		case "mp_derail":
-			level.waypoints = maps\mp\bots\waypoints\derail::Derail();
-		break;
-		case "mp_estate":
-		case "mp_estate_trop":
-		case "mp_estate_tropical":
-			level.waypoints = maps\mp\bots\waypoints\estate::Estate();
-		break;
-		case "mp_favela":
-		case "mp_fav_tropical":
-			level.waypoints = maps\mp\bots\waypoints\favela::Favela();
-		break;
-		case "mp_highrise":
-			level.waypoints = maps\mp\bots\waypoints\highrise::Highrise();
-		break;
-		case "mp_invasion":
-			level.waypoints = maps\mp\bots\waypoints\invasion::Invasion();
-		break;
-		case "mp_checkpoint":
-			level.waypoints = maps\mp\bots\waypoints\karachi::Karachi();
-		break;
-		case "mp_quarry":
-			level.waypoints = maps\mp\bots\waypoints\quarry::Quarry();
-		break;
-		case "mp_rundown":
-			level.waypoints = maps\mp\bots\waypoints\rundown::Rundown();
-		break;
-		case "mp_rust":
-			level.waypoints = maps\mp\bots\waypoints\rust::Rust();
-		break;
-		case "mp_boneyard":
-			level.waypoints = maps\mp\bots\waypoints\scrapyard::Scrapyard();
-		break;
-		case "mp_nightshift":
-			level.waypoints = maps\mp\bots\waypoints\skidrow::Skidrow();
-		break;
-		case "mp_subbase":
-			level.waypoints = maps\mp\bots\waypoints\subbase::Subbase();
-		break;
-		case "mp_terminal":
-			level.waypoints = maps\mp\bots\waypoints\terminal::Terminal();
-		break;
-		case "mp_underpass":
-			level.waypoints = maps\mp\bots\waypoints\underpass::Underpass();
-		break;
-		case "mp_brecourt":
-			level.waypoints = maps\mp\bots\waypoints\wasteland::Wasteland();
-		break;
-		
-		case "mp_complex":
-			level.waypoints = maps\mp\bots\waypoints\bailout::Bailout();
-		break;
-		case "mp_crash":
-		case "mp_crash_trop":
-		case "mp_crash_tropical":
-			level.waypoints = maps\mp\bots\waypoints\crash::Crash();
-		break;
-		case "mp_overgrown":
-			level.waypoints = maps\mp\bots\waypoints\overgrown::Overgrown();
-		break;
-		case "mp_compact":
-			level.waypoints = maps\mp\bots\waypoints\salvage::Salvage();
-		break;
-		case "mp_storm":
-		case "mp_storm_spring":
-			level.waypoints = maps\mp\bots\waypoints\storm::Storm();
-		break;
-		
-		case "mp_abandon":
-			level.waypoints = maps\mp\bots\waypoints\carnival::Carnival();
-		break;
-		case "mp_fuel2":
-			level.waypoints = maps\mp\bots\waypoints\fuel::Fuel();
-		break;
-		case "mp_strike":
-			level.waypoints = maps\mp\bots\waypoints\strike::Strike();
-		break;
-		case "mp_trailerpark":
-			level.waypoints = maps\mp\bots\waypoints\trailerPark::TrailerPark();
-		break;
-		case "mp_vacant":
-			level.waypoints = maps\mp\bots\waypoints\vacant::Vacant();
-		break;
-		
-		case "mp_nuked":
-			level.waypoints = maps\mp\bots\waypoints\nuketown::Nuketown();
-		break;
-		
-		case "mp_cross_fire":
-			level.waypoints = maps\mp\bots\waypoints\crossfire::Crossfire();
-		break;
-		case "mp_bloc":
-		case "mp_bloc_sh":
-			level.waypoints = maps\mp\bots\waypoints\bloc::Bloc();
-		break;
-		case "mp_cargoship":
-		case "mp_cargoship_sh":
-			level.waypoints = maps\mp\bots\waypoints\wetwork::Wetwork();
-		break;
-		
-		case "mp_killhouse":
-			level.waypoints = maps\mp\bots\waypoints\killhouse::Killhouse();
-		break;
-		
-		case "mp_bog_sh":
-			level.waypoints = maps\mp\bots\waypoints\bog::Bog();
-		break;
-		
-		case "mp_firingrange":
-			level.waypoints = maps\mp\bots\waypoints\firingrange::Firingrange();
-		break;
-		case "mp_shipment":
-			level.waypoints = maps\mp\bots\waypoints\shipment::Shipment();
-		break;
-		case "mp_shipment_long":
-			level.waypoints = maps\mp\bots\waypoints\shipmentlong::ShipmentLong();
-		break;
-		case "mp_rust_long":
-			level.waypoints = maps\mp\bots\waypoints\rustlong::Rustlong();
-		break;
-		
-		case "invasion":
-			level.waypoints = maps\mp\bots\waypoints\burgertown::Burgertown();
-		break;
-		case "iw4_credits":
-			level.waypoints = maps\mp\bots\waypoints\testmap::Testmap();
-		break;
-		case "oilrig":
-			level.waypoints = maps\mp\bots\waypoints\oilrig::Oilrig();
-		break;
-		case "co_hunted":
-			level.waypoints = maps\mp\bots\waypoints\hunted::Hunted();
-		break;
-		case "contingency":
-			level.waypoints = maps\mp\bots\waypoints\contingency::Contingency();
-		break;
-		case "gulag":
-			level.waypoints = maps\mp\bots\waypoints\gulag::Gulag();
-		break;
-		case "so_ghillies":
-			level.waypoints = maps\mp\bots\waypoints\pripyat::Pripyat();
-		break;
-		
-		case "airport":
-			level.waypoints = maps\mp\bots\waypoints\airport::Airport();
-		break;
-		case "ending":
-			level.waypoints = maps\mp\bots\waypoints\museum::Museum();
-		break;
-		case "af_chase":
-			level.waypoints = maps\mp\bots\waypoints\afghanchase::AfghanChase();
-		break;
-		case "trainer":
-			level.waypoints = maps\mp\bots\waypoints\trainer::Trainer();
-		break;
-		case "roadkill":
-			level.waypoints = maps\mp\bots\waypoints\roadkill::Roadkill();
-		break;
-		case "dcemp":
-			level.waypoints = maps\mp\bots\waypoints\dcemp::DCEMP();
-		break;
-		
-		case "dcburning":
-			level.waypoints = maps\mp\bots\waypoints\dcburning::DCBurning();
-		break;
-		case "af_caves":
-			level.waypoints = maps\mp\bots\waypoints\afghancaves::AfghanCaves();
-		break;
-		case "arcadia":
-			level.waypoints = maps\mp\bots\waypoints\arcadia::Arcadia();
-		break;
-		case "boneyard":
-			level.waypoints = maps\mp\bots\waypoints\boneyard::Boneyard();
-		break;
-		case "cliffhanger":
-			level.waypoints = maps\mp\bots\waypoints\cliffhanger::Cliffhanger();
-		break;
-		case "downtown":
-			level.waypoints = maps\mp\bots\waypoints\downtown::Downtown();
-		break;
-		case "estate":
-			level.waypoints = maps\mp\bots\waypoints\estatesp::EstateSP();
-		break;
-		case "favela":
-			level.waypoints = maps\mp\bots\waypoints\favelasp::FavelaSP();
-		break;
-		case "favela_escape":
-			level.waypoints = maps\mp\bots\waypoints\favelaescape::FavelaEscape();
-		break;
-		case "so_bridge":
-			level.waypoints = maps\mp\bots\waypoints\bridge::Bridge();
-		break;
-		case "dc_whitehouse":
-			level.waypoints = maps\mp\bots\waypoints\whitehouse::Whitehouse();
-		break;
 
-		default:
-			maps\mp\bots\waypoints\_custom_map::main(mapname);
-		break;
+	wps = wpsFromCSV(mapname);
+	
+	if (wps.size)
+	{
+		level.waypoints = wps;
+	}
+	else
+	{
+		level.waypoints = [];
+		switch(mapname)
+		{
+			case "mp_afghan":
+				level.waypoints = maps\mp\bots\waypoints\afghan::Afghan();
+			break;
+			case "mp_derail":
+				level.waypoints = maps\mp\bots\waypoints\derail::Derail();
+			break;
+			case "mp_estate":
+			case "mp_estate_trop":
+			case "mp_estate_tropical":
+				level.waypoints = maps\mp\bots\waypoints\estate::Estate();
+			break;
+			case "mp_favela":
+			case "mp_fav_tropical":
+				level.waypoints = maps\mp\bots\waypoints\favela::Favela();
+			break;
+			case "mp_highrise":
+				level.waypoints = maps\mp\bots\waypoints\highrise::Highrise();
+			break;
+			case "mp_invasion":
+				level.waypoints = maps\mp\bots\waypoints\invasion::Invasion();
+			break;
+			case "mp_checkpoint":
+				level.waypoints = maps\mp\bots\waypoints\karachi::Karachi();
+			break;
+			case "mp_quarry":
+				level.waypoints = maps\mp\bots\waypoints\quarry::Quarry();
+			break;
+			case "mp_rundown":
+				level.waypoints = maps\mp\bots\waypoints\rundown::Rundown();
+			break;
+			case "mp_rust":
+				level.waypoints = maps\mp\bots\waypoints\rust::Rust();
+			break;
+			case "mp_boneyard":
+				level.waypoints = maps\mp\bots\waypoints\scrapyard::Scrapyard();
+			break;
+			case "mp_nightshift":
+				level.waypoints = maps\mp\bots\waypoints\skidrow::Skidrow();
+			break;
+			case "mp_subbase":
+				level.waypoints = maps\mp\bots\waypoints\subbase::Subbase();
+			break;
+			case "mp_terminal":
+				level.waypoints = maps\mp\bots\waypoints\terminal::Terminal();
+			break;
+			case "mp_underpass":
+				level.waypoints = maps\mp\bots\waypoints\underpass::Underpass();
+			break;
+			case "mp_brecourt":
+				level.waypoints = maps\mp\bots\waypoints\wasteland::Wasteland();
+			break;
+			
+			case "mp_complex":
+				level.waypoints = maps\mp\bots\waypoints\bailout::Bailout();
+			break;
+			case "mp_crash":
+			case "mp_crash_trop":
+			case "mp_crash_tropical":
+				level.waypoints = maps\mp\bots\waypoints\crash::Crash();
+			break;
+			case "mp_overgrown":
+				level.waypoints = maps\mp\bots\waypoints\overgrown::Overgrown();
+			break;
+			case "mp_compact":
+				level.waypoints = maps\mp\bots\waypoints\salvage::Salvage();
+			break;
+			case "mp_storm":
+			case "mp_storm_spring":
+				level.waypoints = maps\mp\bots\waypoints\storm::Storm();
+			break;
+			
+			case "mp_abandon":
+				level.waypoints = maps\mp\bots\waypoints\carnival::Carnival();
+			break;
+			case "mp_fuel2":
+				level.waypoints = maps\mp\bots\waypoints\fuel::Fuel();
+			break;
+			case "mp_strike":
+				level.waypoints = maps\mp\bots\waypoints\strike::Strike();
+			break;
+			case "mp_trailerpark":
+				level.waypoints = maps\mp\bots\waypoints\trailerPark::TrailerPark();
+			break;
+			case "mp_vacant":
+				level.waypoints = maps\mp\bots\waypoints\vacant::Vacant();
+			break;
+			
+			case "mp_nuked":
+				level.waypoints = maps\mp\bots\waypoints\nuketown::Nuketown();
+			break;
+			
+			case "mp_cross_fire":
+				level.waypoints = maps\mp\bots\waypoints\crossfire::Crossfire();
+			break;
+			case "mp_bloc":
+			case "mp_bloc_sh":
+				level.waypoints = maps\mp\bots\waypoints\bloc::Bloc();
+			break;
+			case "mp_cargoship":
+			case "mp_cargoship_sh":
+				level.waypoints = maps\mp\bots\waypoints\wetwork::Wetwork();
+			break;
+			
+			case "mp_killhouse":
+				level.waypoints = maps\mp\bots\waypoints\killhouse::Killhouse();
+			break;
+			
+			case "mp_bog_sh":
+				level.waypoints = maps\mp\bots\waypoints\bog::Bog();
+			break;
+			
+			case "mp_firingrange":
+				level.waypoints = maps\mp\bots\waypoints\firingrange::Firingrange();
+			break;
+			case "mp_shipment":
+				level.waypoints = maps\mp\bots\waypoints\shipment::Shipment();
+			break;
+			case "mp_shipment_long":
+				level.waypoints = maps\mp\bots\waypoints\shipmentlong::ShipmentLong();
+			break;
+			case "mp_rust_long":
+				level.waypoints = maps\mp\bots\waypoints\rustlong::Rustlong();
+			break;
+			
+			case "invasion":
+				level.waypoints = maps\mp\bots\waypoints\burgertown::Burgertown();
+			break;
+			case "iw4_credits":
+				level.waypoints = maps\mp\bots\waypoints\testmap::Testmap();
+			break;
+			case "oilrig":
+				level.waypoints = maps\mp\bots\waypoints\oilrig::Oilrig();
+			break;
+			case "co_hunted":
+				level.waypoints = maps\mp\bots\waypoints\hunted::Hunted();
+			break;
+			case "contingency":
+				level.waypoints = maps\mp\bots\waypoints\contingency::Contingency();
+			break;
+			case "gulag":
+				level.waypoints = maps\mp\bots\waypoints\gulag::Gulag();
+			break;
+			case "so_ghillies":
+				level.waypoints = maps\mp\bots\waypoints\pripyat::Pripyat();
+			break;
+			
+			case "airport":
+				level.waypoints = maps\mp\bots\waypoints\airport::Airport();
+			break;
+			case "ending":
+				level.waypoints = maps\mp\bots\waypoints\museum::Museum();
+			break;
+			case "af_chase":
+				level.waypoints = maps\mp\bots\waypoints\afghanchase::AfghanChase();
+			break;
+			case "trainer":
+				level.waypoints = maps\mp\bots\waypoints\trainer::Trainer();
+			break;
+			case "roadkill":
+				level.waypoints = maps\mp\bots\waypoints\roadkill::Roadkill();
+			break;
+			case "dcemp":
+				level.waypoints = maps\mp\bots\waypoints\dcemp::DCEMP();
+			break;
+			
+			case "dcburning":
+				level.waypoints = maps\mp\bots\waypoints\dcburning::DCBurning();
+			break;
+			case "af_caves":
+				level.waypoints = maps\mp\bots\waypoints\afghancaves::AfghanCaves();
+			break;
+			case "arcadia":
+				level.waypoints = maps\mp\bots\waypoints\arcadia::Arcadia();
+			break;
+			case "boneyard":
+				level.waypoints = maps\mp\bots\waypoints\boneyard::Boneyard();
+			break;
+			case "cliffhanger":
+				level.waypoints = maps\mp\bots\waypoints\cliffhanger::Cliffhanger();
+			break;
+			case "downtown":
+				level.waypoints = maps\mp\bots\waypoints\downtown::Downtown();
+			break;
+			case "estate":
+				level.waypoints = maps\mp\bots\waypoints\estatesp::EstateSP();
+			break;
+			case "favela":
+				level.waypoints = maps\mp\bots\waypoints\favelasp::FavelaSP();
+			break;
+			case "favela_escape":
+				level.waypoints = maps\mp\bots\waypoints\favelaescape::FavelaEscape();
+			break;
+			case "so_bridge":
+				level.waypoints = maps\mp\bots\waypoints\bridge::Bridge();
+			break;
+			case "dc_whitehouse":
+				level.waypoints = maps\mp\bots\waypoints\whitehouse::Whitehouse();
+			break;
+
+			default:
+				maps\mp\bots\waypoints\_custom_map::main(mapname);
+			break;
+		}
 	}
 
 	level.waypointCount = level.waypoints.size;
