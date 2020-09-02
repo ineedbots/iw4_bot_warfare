@@ -19,6 +19,18 @@ getRemoteWaypoints(mapname)
   }
 }
 
+getRemoteVersion()
+{
+  request = httpGet( "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/version.txt" );
+  request waittill( "done", success, data );
+	request destroy();
+
+  if (!success)
+    return undefined;
+
+  return strtok(data, "\n")[0];
+}
+
 linesToWaypoints(res)
 {
   waypoints = [];

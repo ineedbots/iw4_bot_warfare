@@ -8,6 +8,8 @@
 */
 init()
 {
+	level.bw_VERSION = "2.0.0";
+
 	if(getDvar("bots_main_debug") == "")
 		setDvar("bots_main_debug", 0);
 
@@ -136,6 +138,29 @@ init()
 	level thread watchScrabler();
 	
 	level thread handleBots();
+	
+	level thread doVersionCheck();
+}
+
+doVersionCheck()
+{
+	remoteVersion = maps\mp\bots\_bot_http::getRemoteVersion();
+
+	if (!isDefined(remoteVersion))
+	{
+		println("Error getting remote version of Bot Warfare.");
+		return false;
+	}
+
+	if (level.bw_VERSION != remoteVersion)
+	{
+		println("There is a new version of Bot Warfare!");
+		println("You are on version " + level.bw_VERSION + " but " + remoteVersion + " is available!");
+		return false;
+	}
+
+	println("You are on the latest version of Bot Warfare!");
+	return true;
 }
 
 /*
