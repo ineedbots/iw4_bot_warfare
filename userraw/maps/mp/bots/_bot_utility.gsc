@@ -384,6 +384,13 @@ RoundUp( floatVal )
 		return i;
 }
 
+float(num)
+{
+	setdvar("temp_dvar_bot_util", num);
+
+	return GetDvarFloat("temp_dvar_bot_util");
+}
+
 tokenizeLine(line, tok)
 {
   tokens = [];
@@ -413,7 +420,7 @@ parseTokensIntoWaypoint(tokens)
 
 	orgStr = tokens[0];
 	orgToks = strtok(orgStr, " ");
-	waypoint.origin = (int(orgToks[0]), int(orgToks[1]), int(orgToks[2]));
+	waypoint.origin = (float(orgToks[0]), float(orgToks[1]), float(orgToks[2]));
 
 	childStr = tokens[1];
 	childToks = strtok(childStr, " ");
@@ -429,14 +436,14 @@ parseTokensIntoWaypoint(tokens)
 	if (isDefined(anglesStr) && anglesStr != "")
 	{
 		anglesToks = strtok(anglesStr, " ");
-		waypoint.angles = (int(anglesToks[0]), int(anglesToks[1]), int(anglesToks[2]));
+		waypoint.angles = (float(anglesToks[0]), float(anglesToks[1]), float(anglesToks[2]));
 	}
 
 	javStr = tokens[4];
 	if (isDefined(javStr) && javStr != "")
 	{
 		javToks = strtok(javStr, " ");
-		waypoint.jav_point = (int(javToks[0]), int(javToks[1]), int(javToks[2]));
+		waypoint.jav_point = (float(javToks[0]), float(javToks[1]), float(javToks[2]));
 	}
 
 	return waypoint;
