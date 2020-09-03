@@ -1,0 +1,3 @@
+[submodule "usermaps/waypoints"]
+	path = usermaps/waypoints
+	url = https://github.com/ineedbots/iw4x_waypoints
