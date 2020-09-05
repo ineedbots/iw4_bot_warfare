@@ -1107,7 +1107,139 @@ onBotSpawned()
 		self thread bot_hq();
 
 		self thread bot_cap();
+
+		self thread bot_think_follow();
 	}
+}
+
+/*
+	Bot logic for bot determining to camp.
+*/
+bot_think_camp()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	
+	for(;;)
+	{
+		wait randomintrange(2,4);
+		
+		if ( self HasScriptGoal() || self.bot_lock_goal )
+			continue;
+			
+		if(randomInt(100) > self.pers["bots"]["behavior"]["camp"])
+			continue;
+	}
+}
+
+/*
+	Bot logic for bot determining to follow another player.
+*/
+bot_think_follow()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	
+	for(;;)
+	{
+		wait randomIntRange(3,5);
+		
+		if ( self HasScriptGoal() || self.bot_lock_goal )
+			continue;
+			
+		if(randomInt(100) > self.pers["bots"]["behavior"]["follow"])
+			continue;
+			
+		if (!level.teamBased)
+			continue;
+
+		toFollow = undefined;
+
+		for (i = level.players.size - 1; i >= 0; i--)
+		{
+			player = level.players[i];
+
+			if (player == self)
+				continue;
+
+			if(!isReallyAlive(player))
+				continue;
+
+			if (player.team != self.team)
+				continue;
+
+			if (Distance(player.origin, self.origin) > self.pers["bots"]["skill"]["help_dist"])
+				continue;
+
+			toFollow = player;
+		}
+
+		if (!isDefined(toFollow))
+			continue;
+
+		self followPlayer(toFollow, randomIntRange(10,20));
+	}
+}
+
+watchForFollowNewGoal()
+{
+	self endon("death");
+	self endon("disconnect");
+	self endon("kill_follow_bot");
+
+	for (;;)
+	{
+		self waittill("new_goal");
+
+		if (!isDefined(self.bot_was_follow_script_update))
+			break;
+	}
+
+	self notify("kill_follow_bot");
+}
+
+killFollowAfterTime(time)
+{
+	self endon("death");
+	self endon("disconnect");
+	self endon("kill_follow_bot");
+
+	wait time;
+
+	self ClearScriptGoal();
+	self notify("kill_follow_bot");
+}
+
+followPlayer(who, time)
+{
+	self endon("kill_follow_bot");
+
+	self thread watchForFollowNewGoal();
+	self thread killFollowAfterTime(time);
+
+	for (;;)
+	{
+		wait 0.05;
+
+		if (!isDefined(who) || !isReallyAlive(who))
+			break;
+
+		myGoal = self GetScriptGoal();
+
+		if (isDefined(myGoal) && Distance(myGoal, who.origin) < 64)
+			continue;
+	
+		self.bot_was_follow_script_update = true;
+		self SetScriptGoal(who.origin, 32);
+		waittillframeend;
+		self.bot_was_follow_script_update = undefined;
+
+		self waittill_either("goal", "bad_path");
+	}
+
+	self ClearScriptGoal();
+
+	self notify("kill_follow_bot");
 }
 
 bot_perk_think()

@@ -113,7 +113,7 @@ SetAttacker(att)
 */
 HasScriptGoal()
 {
-	return (isDefined(self.bot.script_goal));
+	return (isDefined(self GetScriptGoal()));
 }
 
 /*
@@ -126,6 +126,11 @@ SetScriptGoal(goal, dist)
 	waittillframeend;
 	self notify("new_goal_internal");
 	self notify("new_goal");
+}
+
+GetScriptGoal()
+{
+	return self.bot.script_goal;
 }
 
 /*

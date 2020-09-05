@@ -2252,18 +2252,21 @@ doWalk(goal, dist, isScriptGoal)
 	self thread watchOnGoal(goal, distsq);
 	
 	current = self initAStar(goal);
-	while(current >= 0)
+	if (current >= 0 && DistanceSquared(self.origin, level.waypoints[self.bot.astar[current]].origin) < DistanceSquared(self.origin, goal))
 	{
-		self.bot.next_wp = self.bot.astar[current];
-		self.bot.second_next_wp = -1;
-		if(current != 0)
-			self.bot.second_next_wp = self.bot.astar[current-1];
+		while(current >= 0)
+		{
+			self.bot.next_wp = self.bot.astar[current];
+			self.bot.second_next_wp = -1;
+			if(current != 0)
+				self.bot.second_next_wp = self.bot.astar[current-1];
+			
+			self notify("new_static_waypoint");
+			
+			self movetowards(level.waypoints[self.bot.next_wp].origin);
 		
-		self notify("new_static_waypoint");
-		
-		self movetowards(level.waypoints[self.bot.next_wp].origin);
-	
-		current = self removeAStar();
+			current = self removeAStar();
+		}
 	}
 	
 	self.bot.next_wp = -1;
