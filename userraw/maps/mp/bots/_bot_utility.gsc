@@ -121,6 +121,8 @@ HasScriptGoal()
 */
 SetScriptGoal(goal, dist)
 {
+	if (!isDefined(dist))
+		dist = 16;
 	self.bot.script_goal = goal;
 	self.bot.script_goal_dist = dist;
 	waittillframeend;

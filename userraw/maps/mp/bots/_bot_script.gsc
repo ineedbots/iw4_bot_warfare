@@ -1177,7 +1177,8 @@ bot_think_follow()
 		if (!isDefined(toFollow))
 			continue;
 
-		self followPlayer(toFollow, randomIntRange(10,20));
+		self thread killFollowAfterTime(randomIntRange(10,20));
+		self followPlayer(toFollow);
 	}
 }
 
@@ -1210,12 +1211,11 @@ killFollowAfterTime(time)
 	self notify("kill_follow_bot");
 }
 
-followPlayer(who, time)
+followPlayer(who)
 {
 	self endon("kill_follow_bot");
 
 	self thread watchForFollowNewGoal();
-	self thread killFollowAfterTime(time);
 
 	for (;;)
 	{
@@ -1398,19 +1398,50 @@ bot_jav_loc_think()
 		if (self IsUsingRemote())
 			continue;
 
-		traceForward = self maps\mp\_javelin::EyeTraceForward();
-		if (!isDefined(traceForward))
-			continue;
+		javWp = undefined;
 
-		loc = traceForward[0];
-		if (self maps\mp\_javelin::TargetPointTooClose(loc))
-			continue;
+		for (i = 0; i < level.waypointsJav.size; i++)
+		{
+			if (Distance(self.origin, level.waypointsJav[i].origin) > 1024)
+				continue;
 
-		if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
-			continue;
+			if (isDefined(javWp) && closer(self.origin, javWp.origin, level.waypointsJav[i].origin))
+				continue;
 
-		if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
-			continue;
+			javWp = level.waypointsJav[i];
+		}
+		
+		loc = undefined;
+		if (!isDefined(javWp) || self HasScriptGoal() || self.bot_lock_goal)
+		{
+			traceForward = self maps\mp\_javelin::EyeTraceForward();
+			if (!isDefined(traceForward))
+				continue;
+
+			loc = traceForward[0];
+			if (self maps\mp\_javelin::TargetPointTooClose(loc))
+				continue;
+
+			if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
+				continue;
+
+			if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
+				continue;
+		}
+		else
+		{
+			loc = javWp.jav_point;
+			
+			self SetScriptGoal(javWp.origin, 16);
+
+			ret = self waittill_any_return("new_goal", "goal", "bad_path");
+
+			if (ret != "new_goal")
+				self ClearScriptGoal();
+
+			if (ret != "goal")
+				continue;
+		}
 
 		self SetBotJavelinLocation(loc);
 		self setSpawnWeapon("javelin_mp");
