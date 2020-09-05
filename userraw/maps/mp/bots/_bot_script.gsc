@@ -1123,7 +1123,7 @@ bot_think_camp()
 	
 	for(;;)
 	{
-		wait .05;
+		wait randomintrange(2,4);
 		
 		if ( self HasScriptGoal() || self.bot_lock_goal )
 			continue;
