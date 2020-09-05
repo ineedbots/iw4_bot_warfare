@@ -1101,14 +1101,15 @@ onBotSpawned()
 		self thread bot_jav_loc_think();
 		self thread bot_perk_think();
 
+		self thread bot_think_follow();
+		self thread bot_think_camp();
+
 		self thread bot_dom_def_think();
 		self thread bot_dom_spawn_kill_think();
 
 		self thread bot_hq();
 
 		self thread bot_cap();
-
-		self thread bot_think_follow();
 	}
 }
 
@@ -1122,14 +1123,72 @@ bot_think_camp()
 	
 	for(;;)
 	{
-		wait randomintrange(2,4);
+		wait .05;
 		
 		if ( self HasScriptGoal() || self.bot_lock_goal )
 			continue;
 			
 		if(randomInt(100) > self.pers["bots"]["behavior"]["camp"])
 			continue;
+
+		campSpot = undefined;
+
+		for (i = 0; i < level.waypointsCamp.size; i++)
+		{
+			if (Distance(self.origin, level.waypointsCamp[i].origin) > 1024)
+				continue;
+
+			if (isDefined(campSpot) && closer(self.origin, campSpot.origin, level.waypointsCamp[i].origin))
+				continue;
+
+			campSpot = level.waypointsCamp[i];
+		}
+
+		if (!isDefined(campSpot))
+			continue;
+
+		self SetScriptGoal(campSpot.origin, 16);
+
+		ret = self waittill_any_return("new_goal", "goal", "bad_path");
+
+		if (ret != "new_goal")
+			self ClearScriptGoal();
+
+		if (ret != "goal")
+			continue;
+
+		self thread killCampAfterTime(randomIntRange(10,20));
+		self CampAtSpot(campSpot.origin, campSpot.angles);
 	}
+}
+
+killCampAfterTime(time)
+{
+	self endon("death");
+	self endon("disconnect");
+	self endon("kill_camp_bot");
+
+	wait time;
+	self ClearScriptGoal();
+	self ClearScriptAimPos();
+
+	self notify("kill_camp_bot");
+}
+
+CampAtSpot(origin, angles)
+{
+	self endon("kill_camp_bot");
+
+	self SetScriptGoal(origin, 16);
+	if (isDefined(angles))
+	{
+		self SetScriptAimPos(origin + AnglesToForward(angles) * 2048);
+	}
+
+	self waittill("new_goal");
+	self ClearScriptAimPos();
+
+	self notify("kill_camp_bot");
 }
 
 /*
@@ -1196,6 +1255,7 @@ watchForFollowNewGoal()
 			break;
 	}
 
+	self ClearScriptAimPos();
 	self notify("kill_follow_bot");
 }
 
@@ -1208,6 +1268,7 @@ killFollowAfterTime(time)
 	wait time;
 
 	self ClearScriptGoal();
+	self ClearScriptAimPos();
 	self notify("kill_follow_bot");
 }
 
@@ -1224,6 +1285,7 @@ followPlayer(who)
 		if (!isDefined(who) || !isReallyAlive(who))
 			break;
 
+		self SetScriptAimPos(who.origin + (0, 0, 42));
 		myGoal = self GetScriptGoal();
 
 		if (isDefined(myGoal) && Distance(myGoal, who.origin) < 64)
@@ -1238,6 +1300,7 @@ followPlayer(who)
 	}
 
 	self ClearScriptGoal();
+	self ClearScriptAimPos();
 
 	self notify("kill_follow_bot");
 }
