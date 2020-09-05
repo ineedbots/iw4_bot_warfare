@@ -36,10 +36,11 @@ init()
     setDvar("bots_main_debug_drawThrough", false);
 
 	setDvar("player_sustainAmmo", 1);
+
+	level.waypoints = [];
+	level.waypointCount = 0;
   
   level waittill( "connected", player);
-  
-  DeleteAllWaypoints();
   player thread onPlayerSpawned();
 }
 
@@ -63,7 +64,7 @@ StartDev()
 	self.nearest = -1;
 	
 	self takeAllWeapons();
-	self giveWeapon("usp_tactical_mp");//to knife windows
+	self giveWeapon("m16_gl_mp");//to knife windows
 	self giveWeapon("javelin_mp");//to mark jav spots
 	self SetOffhandPrimaryClass( "other" );
 	self giveWeapon("semtex_mp");

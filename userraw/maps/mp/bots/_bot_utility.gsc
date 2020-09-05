@@ -722,6 +722,8 @@ load_waypoints()
 		level.waypoints[i].bots = [];
 		level.waypoints[i].bots["allies"] = 1;
 		level.waypoints[i].bots["axis"] = 1;
+
+		level.waypoints[i].childCount = level.waypoints[i].children.size;
 	}
 	
 	level.waypointsKDTree = WaypointsToKDTree();
