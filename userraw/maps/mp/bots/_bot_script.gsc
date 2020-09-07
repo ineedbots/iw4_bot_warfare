@@ -1001,6 +1001,7 @@ onSpawned()
 		self.bot_lock_goal = false;
 		self.bot_oma_class = undefined;
 		self.help_time = undefined;
+		self.bot_was_follow_script_update = undefined;
 
 		self thread bot_dom_cap_think();
 	}
@@ -1090,17 +1091,20 @@ onBotSpawned()
 		gameFlagWait("prematch_done");
 
 		self thread bot_killstreak_think();
-		self thread bot_target_vehicle();
 		self thread bot_weapon_think();
-		self thread bot_crate_think();
-		self thread bot_turret_think();
-		self thread bot_revenge_think();
-		self thread bot_uav_think();
-		self thread bot_listen_to_steps();
-		self thread bot_equipment_kill_think();
-		self thread bot_jav_loc_think();
 		self thread bot_perk_think();
 
+		self thread bot_target_vehicle();
+		self thread bot_equipment_kill_think();
+		self thread bot_turret_think();
+
+		self thread bot_crate_think();
+		self thread bot_revenge_think();
+
+		self thread bot_uav_think();
+		self thread bot_listen_to_steps();
+
+		self thread bot_jav_loc_think();
 		self thread bot_think_follow();
 		self thread bot_think_camp();
 

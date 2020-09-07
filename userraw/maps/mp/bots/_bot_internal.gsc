@@ -1780,7 +1780,7 @@ aim()
 							if(!self.bot.isfraggingafter)
 							{
 								nade = self getValidGrenade();
-								if(isDefined(nade) && rand <= self.pers["bots"]["behavior"]["nade"] && bulletTracePassed(myEye, myEye + (0, 0, 75), false, self) && bulletTracePassed(last_pos, last_pos + (0, 0, 100), false, target)) //bots_minGrenadeDistance
+								if(isDefined(nade) && rand <= self.pers["bots"]["behavior"]["nade"] && bulletTracePassed(myEye, myEye + (0, 0, 75), false, self) && bulletTracePassed(last_pos, last_pos + (0, 0, 100), false, target) && dist > level.bots_minGrenadeDistance && dist < level.bots_maxGrenadeDistance)
 								{
 									self thread botThrowGrenade(nade);
 									self notify("kill_goal");
@@ -2252,8 +2252,8 @@ doWalk(goal, dist, isScriptGoal)
 	self thread watchOnGoal(goal, distsq);
 	
 	current = self initAStar(goal);
-	if (current >= 0 && DistanceSquared(self.origin, level.waypoints[self.bot.astar[current]].origin) < DistanceSquared(self.origin, goal))
-	{
+	//if (current >= 0 && DistanceSquared(self.origin, level.waypoints[self.bot.astar[current]].origin) < DistanceSquared(self.origin, goal))
+	//{
 		while(current >= 0)
 		{
 			self.bot.next_wp = self.bot.astar[current];
@@ -2267,7 +2267,7 @@ doWalk(goal, dist, isScriptGoal)
 		
 			current = self removeAStar();
 		}
-	}
+	//}
 	
 	self.bot.next_wp = -1;
 	self.bot.second_next_wp = -1;
