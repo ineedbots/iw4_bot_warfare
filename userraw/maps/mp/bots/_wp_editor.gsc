@@ -5,6 +5,9 @@
 
 init()
 {
+	if(getDvar("bots_main_debug") == "")
+		setDvar("bots_main_debug", 0);
+
   if(!getDVarint("bots_main_debug"))
     return;
 	
@@ -17,11 +20,13 @@ init()
     exitLevel(false);
   }
   
+	setDvar("bots_main", 0);
   setdvar("bots_main_menu", 0);
   setdvar("bots_manage_fill_mode", 0);
   setdvar("bots_manage_fill", 0);
   setdvar("bots_manage_add", 0);
   setdvar("bots_manage_fill_kick", 1);
+	setDvar("bots_manage_fill_spec", 1);
   
   if (getDvar("bots_main_debug_distance") == "")
     setDvar("bots_main_debug_distance", 512.0);

@@ -2,6 +2,16 @@
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 
+is_host()
+{
+	return (isDefined(self.pers["bot_host"]) && self.pers["bot_host"]);
+}
+
+doHostCheck()
+{
+	self.pers["bot_host"] = false;
+}
+
 /*
 	Returns if the player is a bot.
 */
