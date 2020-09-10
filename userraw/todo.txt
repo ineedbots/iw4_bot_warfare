@@ -11,4 +11,3 @@ menu
 code comments
 documentation and tutorials
 modules (iw4x (http), iw4m1)
-push remote to git
