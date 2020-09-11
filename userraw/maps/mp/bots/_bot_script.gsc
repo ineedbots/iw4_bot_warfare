@@ -1427,6 +1427,100 @@ bot_perk_think()
 	}
 }
 
+bot_use_grenade_think()
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon("game_ended");
+
+	for (;;)
+	{
+		wait randomintRange(2, 4);
+
+		if (randomInt(100) < 20)
+			continue;
+
+		nade = self getValidGrenade();
+		if (!isDefined(nade))
+			continue;
+
+		if (self HasThreat() || self HasBotJavelinLocation())
+			continue;
+
+		if(self BotIsFrozen())
+			continue;
+		
+		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
+			continue;
+			
+		if(self isDefusing() || self isPlanting())
+			continue;
+
+		curWeap = self GetCurrentWeapon();
+		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
+			continue;
+
+		if (self botIsClimbing())
+			continue;
+
+		if (self IsUsingRemote())
+			continue;
+
+		nadeWp = undefined;
+
+		for (i = 0; i < level.waypointsGren.size; i++)
+		{
+			if (Distance(self.origin, level.waypointsGren[i].origin) > 1024)
+				continue;
+
+			if (isDefined(nadeWp) && closer(self.origin, nadeWp.origin, level.waypointsGren[i].origin))
+				continue;
+
+			nadeWp = level.waypointsGren[i];
+		}
+		
+		loc = undefined;
+		myEye = self GetEye();
+		if (!isDefined(nadeWp) || self HasScriptGoal() || self.bot_lock_goal)
+		{
+			traceForward = BulletTrace(myEye, myEye + AnglesToForward(self GetPlayerAngles()) * 900, false, self);
+
+			loc = traceForward["position"];
+			dist = DistanceSquared(self.origin, loc);
+			if (dist < level.bots_minGrenadeDistance || dist > level.bots_maxGrenadeDistance)
+				continue;
+
+			if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
+				continue;
+
+			if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
+				continue;
+
+			loc += (0, 0, dist/3000);
+		}
+		else
+		{
+			loc = nadeWp.origin + AnglesToForward(nadeWp.angles) * 2048;
+			
+			self SetScriptGoal(nadeWp.origin, 16);
+
+			ret = self waittill_any_return("new_goal", "goal", "bad_path");
+
+			if (ret != "new_goal")
+				self ClearScriptGoal();
+
+			if (ret != "goal")
+				continue;
+		}
+
+		self SetScriptAimPos(loc);
+
+		self throwBotGrenade(nade);
+
+		self ClearScriptAimPos(loc);
+	}
+}
+
 bot_jav_loc_think()
 {
 	self endon("disconnect");

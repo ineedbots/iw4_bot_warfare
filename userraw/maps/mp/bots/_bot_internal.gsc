@@ -1906,35 +1906,6 @@ doSemiTime()
 }
 
 /*
-	Returns a random grenade in the bot's inventory.
-*/
-getValidGrenade()
-{
-	grenadeTypes = [];
-	grenadeTypes[grenadeTypes.size] = "frag_grenade_mp";
-	grenadeTypes[grenadeTypes.size] = "smoke_grenade_mp";
-	grenadeTypes[grenadeTypes.size] = "flash_grenade_mp";
-	grenadeTypes[grenadeTypes.size] = "concussion_grenade_mp";
-	grenadeTypes[grenadeTypes.size] = "semtex_mp";
-	grenadeTypes[grenadeTypes.size] = "throwingknife_mp";
-	
-	possibles = [];
-	
-	for(i = 0; i < grenadeTypes.size; i++)
-	{
-		if ( !self hasWeapon( grenadeTypes[i] ) )
-			continue;
-			
-		if ( !self getAmmoCount( grenadeTypes[i] ) )
-			continue;
-			
-		possibles[possibles.size] = grenadeTypes[i];
-	}
-	
-	return random(possibles);
-}
-
-/*
 	Returns true if the bot can fire their current weapon.
 */
 canFire(curweap)
