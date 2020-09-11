@@ -1107,6 +1107,7 @@ onBotSpawned()
 		self thread bot_jav_loc_think();
 		self thread bot_think_follow();
 		self thread bot_think_camp();
+		self thread bot_use_grenade_think();
 
 		self thread bot_dom_def_think();
 		self thread bot_dom_spawn_kill_think();
