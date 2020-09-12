@@ -191,6 +191,7 @@ onPlayerSpawned()
 		self thread grenade_watch();
 		self thread lockon_watch();
 		self thread jav_loc_watch();
+		self thread ti_fix();
 
 		self thread adsHack();
 		self thread fireHack();
@@ -201,6 +202,22 @@ onPlayerSpawned()
 		self thread watchUsingRemote();
 		
 		self thread spawned();
+	}
+}
+
+ti_fix()
+{
+	self endon("disconnect");
+	self endon("death");
+
+	for (;;)
+	{
+		self waittill( "grenade_fire", lightstick, weapName );
+				
+		if ( weapName != "flare_mp" )
+			continue;
+
+		self.TISpawnPosition = self.origin;
 	}
 }
 
