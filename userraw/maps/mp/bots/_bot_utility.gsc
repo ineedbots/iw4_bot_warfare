@@ -41,6 +41,14 @@ BotPressAttack(time)
 	self maps\mp\bots\_bot_internal::pressFire(time);
 }
 
+BotStopMoving(what)
+{
+	self.bot.stop_move = what;
+
+	if(what)
+		self notify("kill_goal");
+}
+
 getValidTube()
 {
 	weaps = self getweaponslistall();

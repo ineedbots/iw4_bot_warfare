@@ -132,6 +132,7 @@ resetBotVars()
 	self.bot.last_pos = self.origin;
 	self.bot.moveTo = self.origin;
 	self.bot.climbing = false;
+	self.bot.stop_move = false;
 	
 	self.bot.isfrozen = false;
 	self.bot.isreloading = false;
@@ -2000,7 +2001,7 @@ walk()
 		
 		self botMoveTo(self.origin);
 		
-		if(self.bot.isfrozen)
+		if(self.bot.isfrozen || self.bot.stop_move)
 			continue;
 			
 		if(self maps\mp\_flashgrenades::isFlashbanged())

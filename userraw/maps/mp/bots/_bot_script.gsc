@@ -1516,6 +1516,7 @@ bot_use_tube_think()
 		}
 
 		self SetScriptAimPos(loc);
+		self BotStopMoving(true);
 		wait 1;
 
 		self setSpawnWeapon(tube);
@@ -1529,6 +1530,7 @@ bot_use_tube_think()
 		}
 
 		self ClearScriptAimPos(loc);
+		self BotStopMoving(false);
 	}
 }
 
@@ -1632,11 +1634,13 @@ bot_use_grenade_think()
 		}
 
 		self SetScriptAimPos(loc);
+		self BotStopMoving(true);
 		wait 1;
 
 		self throwBotGrenade(nade);
 
 		self ClearScriptAimPos(loc);
+		self BotStopMoving(false);
 	}
 }
 
@@ -2696,9 +2700,6 @@ bot_killstreak_think()
 		{
 			if (streakName == "airdrop_mega" || streakName == "airdrop_sentry_minigun" || streakName == "airdrop")
 			{
-				if (self HasScriptGoal() || self.bot_lock_goal)
-					continue;
-
 				if (streakName != "airdrop_mega" && level.littleBirds > 2)
 					continue;
 
@@ -2716,15 +2717,15 @@ bot_killstreak_think()
 				if (!bulletTracePassed(forwardTrace["position"], forwardTrace["position"]+(0,0,2048), false, self) && self.pers["bots"]["skill"]["base"] > 3)
 					continue;
 
-				self SetScriptGoal(self.origin, 16);
+				self BotStopMoving(true);
 				if (self throwBotGrenade(ksWeap) != "grenade_fire")
 				{
-					self ClearScriptGoal();
+					self BotStopMoving(false);
 					continue;
 				}
 
 				if (self waittill_any_timeout( 15, "new_goal", "crate_physics_done" ) != "new_goal")
-					self ClearScriptGoal();
+					self BotStopMoving(false);
 			}
 			else
 			{
