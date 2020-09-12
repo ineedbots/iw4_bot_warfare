@@ -1104,11 +1104,12 @@ onBotSpawned()
 		self thread bot_uav_think();
 		self thread bot_listen_to_steps();
 
-		self thread bot_jav_loc_think();
 		self thread bot_think_follow();
 		self thread bot_think_camp();
+		self thread bot_jav_loc_think();
 		self thread bot_use_grenade_think();
 		self thread bot_use_tube_think();
+		self thread bot_use_equipment_think();
 
 		self thread bot_dom_def_think();
 		self thread bot_dom_spawn_kill_think();
@@ -1544,6 +1545,98 @@ fire_current_weapon()
 	{
 		self thread BotPressAttack(0.1);
 		wait 0.05;
+	}
+}
+
+bot_use_equipment_think()
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon("game_ended");
+
+	for (;;)
+	{
+		wait randomintRange(2, 4);
+
+		if (randomInt(100) < 20)
+			continue;
+
+		nade = undefined;
+		if (self GetAmmoCount("claymore_mp"))
+			nade = "claymore_mp";
+		if (self GetAmmoCount("flare_mp"))
+			nade = "flare_mp";
+		
+		if (!isDefined(nade))
+			continue;
+
+		if (self HasThreat() || self HasBotJavelinLocation() || self HasScriptAimPos())
+			continue;
+
+		if(self BotIsFrozen())
+			continue;
+		
+		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
+			continue;
+			
+		if(self isDefusing() || self isPlanting())
+			continue;
+
+		curWeap = self GetCurrentWeapon();
+		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
+			continue;
+
+		if (self botIsClimbing())
+			continue;
+
+		if (self IsUsingRemote())
+			continue;
+
+		clayWp = undefined;
+
+		for (i = 0; i < level.waypointsClay.size; i++)
+		{
+			if (Distance(self.origin, level.waypointsClay[i].origin) > 1024)
+				continue;
+
+			if (isDefined(clayWp) && closer(self.origin, clayWp.origin, level.waypointsClay[i].origin))
+				continue;
+
+			clayWp = level.waypointsClay[i];
+		}
+		
+		loc = undefined;
+		if (!isDefined(clayWp) || self HasScriptGoal() || self.bot_lock_goal)
+		{
+			myEye = self GetEye();
+			loc = myEye + AnglesToForward(self GetPlayerAngles()) * 256;
+
+			if (!bulletTracePassed(myEye, loc, false, self))
+				continue;
+		}
+		else
+		{
+			loc = clayWp.origin + AnglesToForward(clayWp.angles) * 2048;
+			
+			self SetScriptGoal(clayWp.origin, 16);
+
+			ret = self waittill_any_return("new_goal", "goal", "bad_path");
+
+			if (ret != "new_goal")
+				self ClearScriptGoal();
+
+			if (ret != "goal")
+				continue;
+		}
+
+		self SetScriptAimPos(loc);
+		self BotStopMoving(true);
+		wait 1;
+
+		self throwBotGrenade(nade);
+
+		self ClearScriptAimPos(loc);
+		self BotStopMoving(false);
 	}
 }
 

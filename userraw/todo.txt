@@ -1,7 +1,6 @@
 _script:
 bomb gamemodes,
 unreleased gamemodes
-tube, grenade equipment waypoints use
 
 _utility:
 host assignment
