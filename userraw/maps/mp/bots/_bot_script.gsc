@@ -1438,7 +1438,7 @@ bot_use_tube_think()
 
 	for (;;)
 	{
-		wait randomintRange(2, 4);
+		wait randomintRange(3, 7);
 
 		chance = self.pers["bots"]["behavior"]["nade"] / 2;
 		if (chance > 20)
@@ -1656,7 +1656,7 @@ bot_use_grenade_think()
 
 	for (;;)
 	{
-		wait randomintRange(2, 4);
+		wait randomintRange(4, 7);
 
 		chance = self.pers["bots"]["behavior"]["nade"] / 2;
 		if (chance > 20)
