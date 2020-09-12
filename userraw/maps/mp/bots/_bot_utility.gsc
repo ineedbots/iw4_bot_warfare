@@ -41,6 +41,24 @@ BotPressAttack(time)
 	self maps\mp\bots\_bot_internal::pressFire(time);
 }
 
+getValidTube()
+{
+	weaps = self getweaponslistall();
+
+	for (i = 0; i < weaps.size; i++)
+	{
+		weap = weaps[i];
+
+		if(!self getAmmoCount(weap))
+			continue;
+
+		if ((isSubStr(weap, "gl_") && !isSubStr(weap, "_gl_")) || weap == "m79_mp")
+			return weap;
+	}
+
+	return undefined;
+}
+
 /*
 	Returns a random grenade in the bot's inventory.
 */
@@ -195,6 +213,16 @@ SetScriptAimPos(pos)
 ClearScriptAimPos()
 {
 	self SetScriptAimPos(undefined);
+}
+
+GetScriptAimPos()
+{
+	return self.bot.script_aimpos;
+}
+
+HasScriptAimPos()
+{
+	return isDefined(self GetScriptAimPos());
 }
 
 SetBotJavelinLocation(loc)

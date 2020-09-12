@@ -1108,6 +1108,7 @@ onBotSpawned()
 		self thread bot_think_follow();
 		self thread bot_think_camp();
 		self thread bot_use_grenade_think();
+		self thread bot_use_tube_think();
 
 		self thread bot_dom_def_think();
 		self thread bot_dom_spawn_kill_think();
@@ -1130,7 +1131,7 @@ bot_think_camp()
 	{
 		wait randomintrange(2,4);
 		
-		if ( self HasScriptGoal() || self.bot_lock_goal )
+		if ( self HasScriptGoal() || self.bot_lock_goal || self HasScriptAimPos() )
 			continue;
 			
 		if(randomInt(100) > self.pers["bots"]["behavior"]["camp"])
@@ -1208,7 +1209,7 @@ bot_think_follow()
 	{
 		wait randomIntRange(3,5);
 		
-		if ( self HasScriptGoal() || self.bot_lock_goal )
+		if ( self HasScriptGoal() || self.bot_lock_goal || self HasScriptAimPos() )
 			continue;
 			
 		if(randomInt(100) > self.pers["bots"]["behavior"]["follow"])
@@ -1428,6 +1429,122 @@ bot_perk_think()
 	}
 }
 
+bot_use_tube_think()
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon("game_ended");
+
+	for (;;)
+	{
+		wait randomintRange(2, 4);
+
+		if (randomInt(100) < 20)
+			continue;
+
+		tube = self getValidTube();
+		if (!isDefined(tube))
+			continue;
+
+		if (self HasThreat() || self HasBotJavelinLocation() || self HasScriptAimPos())
+			continue;
+
+		if(self BotIsFrozen())
+			continue;
+		
+		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
+			continue;
+			
+		if(self isDefusing() || self isPlanting())
+			continue;
+
+		curWeap = self GetCurrentWeapon();
+		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
+			continue;
+
+		if (self botIsClimbing())
+			continue;
+
+		if (self IsUsingRemote())
+			continue;
+
+		tubeWp = undefined;
+
+		for (i = 0; i < level.waypointsTube.size; i++)
+		{
+			if (Distance(self.origin, level.waypointsTube[i].origin) > 1024)
+				continue;
+
+			if (isDefined(tubeWp) && closer(self.origin, tubeWp.origin, level.waypointsTube[i].origin))
+				continue;
+
+			tubeWp = level.waypointsTube[i];
+		}
+		
+		loc = undefined;
+		myEye = self GetEye();
+		if (!isDefined(tubeWp) || self HasScriptGoal() || self.bot_lock_goal)
+		{
+			traceForward = BulletTrace(myEye, myEye + AnglesToForward(self GetPlayerAngles()) * 900 * 5, false, self);
+
+			loc = traceForward["position"];
+			dist = DistanceSquared(self.origin, loc);
+			if (dist < level.bots_minGrenadeDistance || dist > level.bots_maxGrenadeDistance * 5)
+				continue;
+
+			if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
+				continue;
+
+			if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
+				continue;
+
+			loc += (0, 0, dist/16000);
+		}
+		else
+		{
+			loc = tubeWp.origin + AnglesToForward(tubeWp.angles) * 2048;
+			
+			self SetScriptGoal(tubeWp.origin, 16);
+
+			ret = self waittill_any_return("new_goal", "goal", "bad_path");
+
+			if (ret != "new_goal")
+				self ClearScriptGoal();
+
+			if (ret != "goal")
+				continue;
+		}
+
+		self SetScriptAimPos(loc);
+		wait 1;
+
+		self setSpawnWeapon(tube);
+
+		wait 0.05;
+		if (self GetCurrentWeapon() == tube)
+		{
+			self thread fire_current_weapon();
+			self waittill_any_timeout(15, "missile_fire", "weapon_change");
+			self notify("stop_firing_weapon");
+		}
+
+		self ClearScriptAimPos(loc);
+	}
+}
+
+fire_current_weapon()
+{
+	self endon("death");
+	self endon("disconnect");
+	self endon("stop_firing_weapon");
+
+	for (;;)
+	{
+		self thread BotPressAttack(0.1);
+		wait 0.05;
+	}
+}
+
 bot_use_grenade_think()
 {
 	self endon("disconnect");
@@ -1445,7 +1562,7 @@ bot_use_grenade_think()
 		if (!isDefined(nade))
 			continue;
 
-		if (self HasThreat() || self HasBotJavelinLocation())
+		if (self HasThreat() || self HasBotJavelinLocation() || self HasScriptAimPos())
 			continue;
 
 		if(self BotIsFrozen())
@@ -1515,6 +1632,7 @@ bot_use_grenade_think()
 		}
 
 		self SetScriptAimPos(loc);
+		wait 1;
 
 		self throwBotGrenade(nade);
 
@@ -1538,7 +1656,7 @@ bot_jav_loc_think()
 		if (!self GetAmmoCount("javelin_mp"))
 			continue;
 
-		if (self HasThreat() || self HasBotJavelinLocation())
+		if (self HasThreat() || self HasBotJavelinLocation() || self HasScriptAimPos())
 			continue;
 
 		if(self BotIsFrozen())
@@ -1610,7 +1728,7 @@ bot_jav_loc_think()
 
 		wait 0.05;
 		if (self GetCurrentWeapon() == "javelin_mp")
-			self waittill_any("missile_fire", "weapon_change");
+			self waittill_any_timeout(15, "missile_fire", "weapon_change");
 			
 		self ClearBotJavelinLocation(loc);
 	}
