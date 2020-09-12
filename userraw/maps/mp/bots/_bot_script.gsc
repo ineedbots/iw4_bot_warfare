@@ -1440,7 +1440,11 @@ bot_use_tube_think()
 	{
 		wait randomintRange(2, 4);
 
-		if (randomInt(100) < 20)
+		chance = self.pers["bots"]["behavior"]["nade"] / 2;
+		if (chance > 20)
+			chance = 20;
+
+		if (randomInt(100) < chance)
 			continue;
 
 		tube = self getValidTube();
@@ -1558,7 +1562,11 @@ bot_use_equipment_think()
 	{
 		wait randomintRange(2, 4);
 
-		if (randomInt(100) < 20)
+		chance = self.pers["bots"]["behavior"]["nade"] / 2;
+		if (chance > 20)
+			chance = 20;
+
+		if (randomInt(100) < chance)
 			continue;
 
 		nade = undefined;
@@ -1650,7 +1658,11 @@ bot_use_grenade_think()
 	{
 		wait randomintRange(2, 4);
 
-		if (randomInt(100) < 20)
+		chance = self.pers["bots"]["behavior"]["nade"] / 2;
+		if (chance > 20)
+			chance = 20;
+
+		if (randomInt(100) < chance)
 			continue;
 
 		nade = self getValidGrenade();
@@ -1747,7 +1759,11 @@ bot_jav_loc_think()
 	{
 		wait randomintRange(2, 4);
 
-		if (randomInt(100) < 20)
+		chance = self.pers["bots"]["behavior"]["nade"] / 2;
+		if (chance > 20)
+			chance = 20;
+
+		if (randomInt(100) < chance)
 			continue;
 
 		if (!self GetAmmoCount("javelin_mp"))
