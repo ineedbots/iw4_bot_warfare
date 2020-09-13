@@ -1,6 +1,7 @@
 _script:
 bomb gamemodes,
 unreleased gamemodes
+tweak chances of camp and others
 
 _other:
 dvars
