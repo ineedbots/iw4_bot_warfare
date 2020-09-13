@@ -10,6 +10,27 @@ is_host()
 doHostCheck()
 {
 	self.pers["bot_host"] = false;
+
+	if (self is_bot())
+		return;
+
+	DvarGUID = getDvar("bots_main_GUIDs");
+	result = false;
+	if (DvarGUID != "")
+	{
+		guids = strtok(DvarGUID, ",");
+
+		for (i = 0; i < guids.size; i++)
+		{
+			if(self.guid == guids[i])
+				result = true;
+		}
+	}
+	
+	if (!self isHost() && !result)
+		return;
+
+	self.pers["bot_host"] = true;
 }
 
 /*
