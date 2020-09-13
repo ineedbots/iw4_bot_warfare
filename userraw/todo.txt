@@ -2,10 +2,8 @@ _script:
 bomb gamemodes,
 unreleased gamemodes
 
-_utility:
-host assignment
-
 _other:
+dvars
 menu
 code comments
 documentation and tutorials
