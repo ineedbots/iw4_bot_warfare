@@ -2431,7 +2431,7 @@ bot_crate_think()
 			continue;
 
 		self.bot_lock_goal = true;
-		self SetScriptGoal(crate.origin, 32);
+		self SetScriptGoal(crate.origin, 64);
 		self thread bot_inc_bots(crate, true);
 		self thread bots_watch_touch_obj(crate);
 
