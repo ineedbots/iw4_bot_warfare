@@ -1234,11 +1234,31 @@ killCampAfterTime(time)
 	self notify("kill_camp_bot");
 }
 
+killCampAfterEntGone(ent)
+{
+	self endon("death");
+	self endon("disconnect");
+	self endon("kill_camp_bot");
+
+	for (;;)
+	{
+		wait 0.05;
+
+		if (!isDefined(ent))
+			break;
+	}
+
+	self ClearScriptGoal();
+	self ClearScriptAimPos();
+
+	self notify("kill_camp_bot");
+}
+
 CampAtSpot(origin, angles)
 {
 	self endon("kill_camp_bot");
 
-	self SetScriptGoal(origin, 16);
+	self SetScriptGoal(origin, 64);
 	if (isDefined(angles))
 	{
 		self SetScriptAimPos(origin + AnglesToForward(angles) * 2048);
