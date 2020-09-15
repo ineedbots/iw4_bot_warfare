@@ -1579,7 +1579,7 @@ bot_use_tube_think()
 		if (self GetCurrentWeapon() == tube)
 		{
 			self thread fire_current_weapon();
-			self waittill_any_timeout(15, "missile_fire", "weapon_change");
+			self waittill_any_timeout(5, "missile_fire", "weapon_change");
 			self notify("stop_firing_weapon");
 		}
 
@@ -1881,9 +1881,9 @@ bot_jav_loc_think()
 
 		wait 0.05;
 		if (self GetCurrentWeapon() == "javelin_mp")
-			self waittill_any_timeout(15, "missile_fire", "weapon_change");
+			self waittill_any_timeout(6, "missile_fire", "weapon_change");
 			
-		self ClearBotJavelinLocation(loc);
+		self ClearBotJavelinLocation();
 	}
 }
 
@@ -2876,8 +2876,10 @@ bot_killstreak_think()
 					continue;
 				}
 
-				if (self waittill_any_timeout( 15, "new_goal", "crate_physics_done" ) != "new_goal")
-					self BotStopMoving(false);
+				if (randomInt(100) < 80)
+					self waittill_any_timeout( 15, "crate_physics_done" );
+
+				self BotStopMoving(false);
 			}
 			else
 			{
