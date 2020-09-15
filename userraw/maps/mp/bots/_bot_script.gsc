@@ -1490,13 +1490,12 @@ bot_perk_think()
 			}
 			self.bot_oma_class = class;
 
-			self waittill("weapon_change");
 			wait 1;
 			self BotFreezeControls(false);
 
 			self notify ( "menuresponse", game["menu_onemanarmy"], self.bot_oma_class );
 
-			self waittill ( "changed_kit" );
+			self waittill_any_timeout ( 10, "changed_kit" );
 			break;
 		}
 	}
