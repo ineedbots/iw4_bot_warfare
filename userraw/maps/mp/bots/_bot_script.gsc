@@ -1114,6 +1114,7 @@ start_bot_threads()
 
 	self thread bot_uav_think();
 	self thread bot_listen_to_steps();
+	self thread follow_target();
 
 	self thread bot_think_follow();
 	self thread bot_think_camp();
@@ -1128,6 +1129,35 @@ start_bot_threads()
 	self thread bot_hq();
 
 	self thread bot_cap();
+}
+
+follow_target()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	
+	for(;;)
+	{
+		wait 1;
+		
+		if ( self HasScriptGoal() || self.bot_lock_goal )
+			continue;
+		
+		if ( !self HasThreat() )
+			continue;
+
+		threat = self GetThreat();
+
+		if (!isPlayer(threat))
+			continue;
+
+		if(randomInt(100) > self.pers["bots"]["behavior"]["follow"]*5)
+			continue;
+
+		self SetScriptGoal(threat.origin, 64);
+		if (self waittill_any_return("new_goal", "goal", "bad_path") != "new_goal")
+			self ClearScriptGoal();
+	}
 }
 
 /*
