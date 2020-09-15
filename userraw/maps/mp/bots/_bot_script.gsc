@@ -1259,7 +1259,7 @@ CampAtSpot(origin, anglePos)
 	self endon("kill_camp_bot");
 
 	self SetScriptGoal(origin, 64);
-	if (isDefined(angles))
+	if (isDefined(anglePos))
 	{
 		self SetScriptAimPos(anglePos);
 	}
