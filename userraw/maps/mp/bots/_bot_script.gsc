@@ -1131,6 +1131,19 @@ start_bot_threads()
 	self thread bot_cap();
 }
 
+stop_go_target_on_death(tar)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "new_goal" );
+	self endon( "bad_path" );
+	self endon( "goal" );
+
+	tar waittill_either("death", "disconnect");
+
+	self ClearScriptGoal();
+}
+
 follow_target()
 {
 	self endon( "death" );
@@ -1154,6 +1167,8 @@ follow_target()
 		if(randomInt(100) > self.pers["bots"]["behavior"]["follow"]*5)
 			continue;
 
+		self thread stop_go_target_on_death(threat);
+
 		self SetScriptGoal(threat.origin, 64);
 		if (self waittill_any_return("new_goal", "goal", "bad_path") != "new_goal")
 			self ClearScriptGoal();
@@ -1170,7 +1185,7 @@ bot_think_camp()
 	
 	for(;;)
 	{
-		wait randomintrange(2,4);
+		wait randomintrange(4,7);
 		
 		if ( self HasScriptGoal() || self.bot_lock_goal || self HasScriptAimPos() )
 			continue;
@@ -1178,18 +1193,15 @@ bot_think_camp()
 		if(randomInt(100) > self.pers["bots"]["behavior"]["camp"])
 			continue;
 
-		campSpot = undefined;
-
+		campSpots = [];
 		for (i = 0; i < level.waypointsCamp.size; i++)
 		{
 			if (Distance(self.origin, level.waypointsCamp[i].origin) > 1024)
 				continue;
 
-			if (isDefined(campSpot) && closer(self.origin, campSpot.origin, level.waypointsCamp[i].origin))
-				continue;
-
-			campSpot = level.waypointsCamp[i];
+			campSpots[campSpots.size] = level.waypointsCamp[i];
 		}
+		campSpot = random(campSpots);
 
 		if (!isDefined(campSpot))
 			continue;
@@ -1259,8 +1271,7 @@ bot_think_follow()
 		if (!level.teamBased)
 			continue;
 
-		toFollow = undefined;
-
+		follows = [];
 		for (i = level.players.size - 1; i >= 0; i--)
 		{
 			player = level.players[i];
@@ -1277,8 +1288,9 @@ bot_think_follow()
 			if (Distance(player.origin, self.origin) > self.pers["bots"]["skill"]["help_dist"])
 				continue;
 
-			toFollow = player;
+			follows[follows.size] = player;
 		}
+		toFollow = random(follows);
 
 		if (!isDefined(toFollow))
 			continue;
@@ -1513,18 +1525,15 @@ bot_use_tube_think()
 		if (self IsUsingRemote())
 			continue;
 
-		tubeWp = undefined;
-
+		tubeWps = [];
 		for (i = 0; i < level.waypointsTube.size; i++)
 		{
 			if (Distance(self.origin, level.waypointsTube[i].origin) > 1024)
 				continue;
-
-			if (isDefined(tubeWp) && closer(self.origin, tubeWp.origin, level.waypointsTube[i].origin))
-				continue;
-
-			tubeWp = level.waypointsTube[i];
+			
+			tubeWps[tubeWps.size] = level.waypointsTube[i];
 		}
+		tubeWp = random(tubeWps);
 		
 		loc = undefined;
 		myEye = self GetEye();
@@ -1574,7 +1583,7 @@ bot_use_tube_think()
 			self notify("stop_firing_weapon");
 		}
 
-		self ClearScriptAimPos(loc);
+		self ClearScriptAimPos();
 		self BotStopMoving(false);
 	}
 }
@@ -1640,18 +1649,15 @@ bot_use_equipment_think()
 		if (self IsUsingRemote())
 			continue;
 
-		clayWp = undefined;
-
+		clayWps = [];
 		for (i = 0; i < level.waypointsClay.size; i++)
 		{
 			if (Distance(self.origin, level.waypointsClay[i].origin) > 1024)
 				continue;
 
-			if (isDefined(clayWp) && closer(self.origin, clayWp.origin, level.waypointsClay[i].origin))
-				continue;
-
-			clayWp = level.waypointsClay[i];
+			clayWps[clayWps.size] = level.waypointsClay[i];
 		}
+		clayWp = random(clayWps);
 		
 		loc = undefined;
 		if (!isDefined(clayWp) || self HasScriptGoal() || self.bot_lock_goal)
@@ -1683,7 +1689,7 @@ bot_use_equipment_think()
 
 		self throwBotGrenade(nade);
 
-		self ClearScriptAimPos(loc);
+		self ClearScriptAimPos();
 		self BotStopMoving(false);
 	}
 }
@@ -1731,18 +1737,15 @@ bot_use_grenade_think()
 		if (self IsUsingRemote())
 			continue;
 
-		nadeWp = undefined;
-
+		nadeWps = [];
 		for (i = 0; i < level.waypointsGren.size; i++)
 		{
 			if (Distance(self.origin, level.waypointsGren[i].origin) > 1024)
 				continue;
 
-			if (isDefined(nadeWp) && closer(self.origin, nadeWp.origin, level.waypointsGren[i].origin))
-				continue;
-
-			nadeWp = level.waypointsGren[i];
+			nadeWps[nadeWps.size] = level.waypointsGren[i];
 		}
+		nadeWp = random(nadeWps);
 		
 		loc = undefined;
 		myEye = self GetEye();
@@ -1784,7 +1787,7 @@ bot_use_grenade_think()
 
 		self throwBotGrenade(nade);
 
-		self ClearScriptAimPos(loc);
+		self ClearScriptAimPos();
 		self BotStopMoving(false);
 	}
 }
@@ -1831,18 +1834,15 @@ bot_jav_loc_think()
 		if (self IsUsingRemote())
 			continue;
 
-		javWp = undefined;
-
+		javWps = [];
 		for (i = 0; i < level.waypointsJav.size; i++)
 		{
 			if (Distance(self.origin, level.waypointsJav[i].origin) > 1024)
 				continue;
 
-			if (isDefined(javWp) && closer(self.origin, javWp.origin, level.waypointsJav[i].origin))
-				continue;
-
-			javWp = level.waypointsJav[i];
+			javWps[javWps.size] = level.waypointsJav[i];
 		}
+		javWp = random(javWps);
 		
 		loc = undefined;
 		if (!isDefined(javWp) || self HasScriptGoal() || self.bot_lock_goal)
@@ -1997,7 +1997,7 @@ bot_equipment_kill_think()
 			if (path != "goal")
 				continue;
 
-			target.enemyTrigger notify("trigger", self);
+			target.enemyTrigger notify("trigger", self); // camp at ti?
 			continue;
 		}
 
@@ -2101,6 +2101,7 @@ bot_listen_to_steps()
 					continue;
 
 				heard = player;
+				break;
 			}
 		}
 		
@@ -2175,6 +2176,7 @@ bot_uav_think()
 			
 			if((!isSubStr(player getCurrentWeapon(), "_silencer_") && player.bots_firing) || (hasRadar && !player hasPerk("specialty_coldblooded")))
 			{
+				// what about setAttacker for higher skilled bots
 				self SetScriptGoal( player.origin, 128 );
 
 				if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
@@ -2743,6 +2745,7 @@ bot_killstreak_think()
 		{
 			if (self inLastStand())
 				continue;
+			// what about going to a safe (camp) location before using a remote?
 				
 			if (streakName == "sentry")
 			{
