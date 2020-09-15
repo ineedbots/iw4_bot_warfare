@@ -2150,9 +2150,6 @@ bot_uav_think()
 	{
 		wait 0.75;
 		
-		if ( self HasScriptGoal() || self.bot_lock_goal )
-			continue;
-			
 		if(self.pers["bots"]["skill"]["base"] <= 1)
 			continue;
 			
@@ -2196,11 +2193,19 @@ bot_uav_think()
 			
 			if((!isSubStr(player getCurrentWeapon(), "_silencer_") && player.bots_firing) || (hasRadar && !player hasPerk("specialty_coldblooded")))
 			{
-				// what about setAttacker for higher skilled bots
-				self SetScriptGoal( player.origin, 128 );
+				if (Distance(self.origin, player.origin) < self.pers["bots"]["skill"]["help_dist"] && bulletTracePassed(self getEye(), player getTagOrigin( "j_spineupper" ), false, player))
+				{
+					self SetAttacker(player);
+				}
 
-				if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
-					self ClearScriptGoal();
+				if (!self HasScriptGoal() && !self.bot_lock_goal)
+				{
+					self thread stop_go_target_on_death(player);
+					self SetScriptGoal( player.origin, 128 );
+
+					if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+						self ClearScriptGoal();
+				}
 				break;
 			}
 		}
