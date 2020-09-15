@@ -1002,6 +1002,7 @@ onSpawned()
 		self.bot_oma_class = undefined;
 		self.help_time = undefined;
 		self.bot_was_follow_script_update = undefined;
+		self.bot_perf_switch_weapon = undefined;
 
 		self thread bot_dom_cap_think();
 	}
@@ -1456,9 +1457,6 @@ bot_perk_think()
 			if ((!anyWeapout && randomInt(100) < 90) || randomInt(100) < 10)
 				break;
 
-			self BotFreezeControls(true);
-			self setSpawnWeapon("onemanarmy_mp");
-
 			class = "";
 			rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData( "experience" ) ) + 1;
 			if(rank < 4 || randomInt(100) < 2)
@@ -1492,7 +1490,16 @@ bot_perk_think()
 				class = "custom"+(randomInt(5)+1);
 			}
 			self.bot_oma_class = class;
+			self notify("bot_force_check_switch");
+			wait 0.1;
 
+			if (self GetCurrentWeapon() != "onemanarmy_mp")
+			{
+				self.bot_oma_class = undefined;
+				break;
+			}
+
+			self BotFreezeControls(true);
 			wait 1;
 			self BotFreezeControls(false);
 
@@ -1598,9 +1605,10 @@ bot_use_tube_think()
 		self BotStopMoving(true);
 		wait 1;
 
-		self setSpawnWeapon(tube);
-
-		wait 0.05;
+		self.bot_perf_switch_weapon = tube;
+		self notify("bot_force_check_switch");
+		wait 0.1;
+		
 		if (self GetCurrentWeapon() == tube)
 		{
 			self thread fire_current_weapon();
@@ -1905,11 +1913,11 @@ bot_jav_loc_think()
 			continue;
 
 		self SetBotJavelinLocation(loc);
-		self setSpawnWeapon("javelin_mp");
+		self notify("bot_force_check_switch");
 
-		wait 0.05;
+		wait 0.1;
 		if (self GetCurrentWeapon() == "javelin_mp")
-			self waittill_any_timeout(6, "missile_fire", "weapon_change");
+			self waittill_any_timeout(10, "missile_fire", "weapon_change");
 			
 		self ClearBotJavelinLocation();
 	}
@@ -2558,6 +2566,15 @@ bot_weapon_think()
 		{
 			if (curWeap != "onemanarmy_mp")
 				self setSpawnWeapon("onemanarmy_mp");
+			continue;
+		}
+
+		if (isDefined(self.bot_perf_switch_weapon))
+		{
+			if (curWeap != self.bot_perf_switch_weapon)
+				self setSpawnWeapon(self.bot_perf_switch_weapon);
+
+			self.bot_perf_switch_weapon = undefined;
 			continue;
 		}
 		
