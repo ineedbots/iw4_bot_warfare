@@ -2016,7 +2016,7 @@ bot_equipment_kill_think()
 			if (path != "goal")
 				continue;
 
-			if (self BotGetRandom() > 60)
+			if (randomInt(100) > self.pers["bots"]["behavior"]["camp"] * 10)
 				target.enemyTrigger notify("trigger", self);
 			else
 			{
