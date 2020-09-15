@@ -1438,6 +1438,9 @@ bot_perk_think()
 			if (self HasThreat() || self HasBotJavelinLocation())
 				break;
 
+			if (self InLastStand() && !self InFinalStand())
+				break;
+
 			anyWeapout = false;
 			weaponsList = self GetWeaponsListAll();
 			for (i = 0; i < weaponsList.size; i++)
@@ -1587,6 +1590,9 @@ bot_use_tube_think()
 			if (ret != "goal")
 				continue;
 		}
+
+		if (self InLastStand() && !self InFinalStand())
+			continue;
 
 		self SetScriptAimPos(loc);
 		self BotStopMoving(true);
@@ -1894,6 +1900,9 @@ bot_jav_loc_think()
 			if (ret != "goal")
 				continue;
 		}
+
+		if (self InLastStand() && !self InFinalStand())
+			continue;
 
 		self SetBotJavelinLocation(loc);
 		self setSpawnWeapon("javelin_mp");
@@ -2519,6 +2528,9 @@ bot_weapon_think()
 		if (self IsUsingRemote())
 			continue;
 
+		if (self InLastStand() && !self InFinalStand())
+			continue;
+
 		curWeap = self GetCurrentWeapon();
 		hasTarget = self hasThreat();
 		if(hasTarget)
@@ -2763,6 +2775,9 @@ bot_killstreak_think()
 			continue;
 
 		if (self IsUsingRemote())
+			continue;
+
+		if (self InLastStand() && !self InFinalStand())
 			continue;
 
 		streakName = self.pers["killstreaks"][0].streakName;
