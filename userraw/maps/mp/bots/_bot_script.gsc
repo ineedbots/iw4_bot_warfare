@@ -1217,7 +1217,7 @@ bot_think_camp()
 			continue;
 
 		self thread killCampAfterTime(randomIntRange(10,20));
-		self CampAtSpot(campSpot.origin, campSpot.angles);
+		self CampAtSpot(campSpot.origin, campSpot.origin + AnglesToForward(campSpot.angles) * 2048);
 	}
 }
 
@@ -1254,14 +1254,14 @@ killCampAfterEntGone(ent)
 	self notify("kill_camp_bot");
 }
 
-CampAtSpot(origin, angles)
+CampAtSpot(origin, anglePos)
 {
 	self endon("kill_camp_bot");
 
 	self SetScriptGoal(origin, 64);
 	if (isDefined(angles))
 	{
-		self SetScriptAimPos(origin + AnglesToForward(angles) * 2048);
+		self SetScriptAimPos(anglePos);
 	}
 
 	self waittill("new_goal");
@@ -2005,7 +2005,7 @@ bot_equipment_kill_think()
 			if ( self HasScriptGoal() || self.bot_lock_goal )
 				continue;
 
-			self SetScriptGoal(target.origin, 16);
+			self SetScriptGoal(target.origin, 64);
 			self thread bot_inc_bots(target, true);
 			self thread bots_watch_touch_obj( target );
 			
@@ -2017,7 +2017,14 @@ bot_equipment_kill_think()
 			if (path != "goal")
 				continue;
 
-			target.enemyTrigger notify("trigger", self); // camp at ti?
+			if (self BotGetRandom() > 60)
+				target.enemyTrigger notify("trigger", self);
+			else
+			{
+				self thread killCampAfterTime(randomIntRange(10,20));
+				self thread killCampAfterEntGone(target);
+				self CampAtSpot(target.origin, target.origin + (0, 0, 42));
+			}
 			continue;
 		}
 
