@@ -1227,7 +1227,7 @@ killCampAfterTime(time)
 	self endon("disconnect");
 	self endon("kill_camp_bot");
 
-	wait time;
+	wait time + 0.05;
 	self ClearScriptGoal();
 	self ClearScriptAimPos();
 
@@ -2777,7 +2777,27 @@ bot_killstreak_think()
 		{
 			if (self inLastStand())
 				continue;
-			// what about going to a safe (camp) location before using a remote?
+
+			if (self.pers["killstreaks"][0].lifeId <= self.pers["deaths"] && !self HasScriptGoal() && !self.bot_lock_goal && streakName != "sentry")
+			{
+				campSpots = [];
+				for (i = 0; i < level.waypointsCamp.size; i++)
+				{
+					if (Distance(self.origin, level.waypointsCamp[i].origin) > 1024)
+						continue;
+
+					campSpots[campSpots.size] = level.waypointsCamp[i];
+				}
+				campSpot = random(campSpots);
+
+				if (isDefined(campSpot))
+				{
+					self SetScriptGoal(campSpot.origin, 16);
+
+					if (self waittill_any_return("new_goal", "goal", "bad_path") != "new_goal")
+						self ClearScriptGoal();
+				}
+			}
 				
 			if (streakName == "sentry")
 			{
