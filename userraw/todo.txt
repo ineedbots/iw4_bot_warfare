@@ -1,11 +1,9 @@
 _script:
 bomb gamemodes,
 unreleased gamemodes
-tweak chances of camp and others
 
 _other:
-dvars
-menu
+dvars, loadout, behaviour, menu
 code comments
 documentation and tutorials
 modules (iw4x (http), iw4m1)
