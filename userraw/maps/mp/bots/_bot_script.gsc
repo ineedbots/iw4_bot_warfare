@@ -1554,6 +1554,9 @@ bot_use_tube_think()
 		if (self IsUsingRemote())
 			continue;
 
+		if (self InLastStand() && !self InFinalStand())
+			continue;
+
 		tubeWps = [];
 		for (i = 0; i < level.waypointsTube.size; i++)
 		{
@@ -1598,9 +1601,6 @@ bot_use_tube_think()
 				continue;
 		}
 
-		if (self InLastStand() && !self InFinalStand())
-			continue;
-
 		self SetScriptAimPos(loc);
 		self BotStopMoving(true);
 		wait 1;
@@ -1608,7 +1608,7 @@ bot_use_tube_think()
 		self.bot_perf_switch_weapon = tube;
 		self notify("bot_force_check_switch");
 		wait 0.1;
-		
+
 		if (self GetCurrentWeapon() == tube)
 		{
 			self thread fire_current_weapon();
@@ -1867,6 +1867,9 @@ bot_jav_loc_think()
 		if (self IsUsingRemote())
 			continue;
 
+		if (self InLastStand() && !self InFinalStand())
+			continue;
+
 		javWps = [];
 		for (i = 0; i < level.waypointsJav.size; i++)
 		{
@@ -1908,9 +1911,6 @@ bot_jav_loc_think()
 			if (ret != "goal")
 				continue;
 		}
-
-		if (self InLastStand() && !self InFinalStand())
-			continue;
 
 		self SetBotJavelinLocation(loc);
 		self notify("bot_force_check_switch");
