@@ -2837,7 +2837,7 @@ bot_killstreak_think()
 			if (self inLastStand())
 				continue;
 
-			if (self.pers["killstreaks"][0].lifeId <= self.pers["deaths"] && !self HasScriptGoal() && !self.bot_lock_goal && streakName != "sentry")
+			if (self.pers["killstreaks"][0].lifeId == self.pers["deaths"] && !self HasScriptGoal() && !self.bot_lock_goal && streakName != "sentry")
 			{
 				campSpots = [];
 				for (i = 0; i < level.waypointsCamp.size; i++)
