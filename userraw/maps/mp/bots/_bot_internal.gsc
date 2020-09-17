@@ -157,6 +157,7 @@ resetBotVars()
 	self.bot.runningafter = false;
 
 	self.bot.fire_pressed = false;
+	self.bot.is_frozen_internal = true;
 
 	self.bot.ads_pressed = false;
 	self.bot.ads_lowest = 9;
@@ -853,7 +854,7 @@ moveHack()
 
 			// clamp to ground
 			trace = physicsTrace(self.origin + (0.0,0.0,50.0), self.origin + (0.0,0.0,-40.0), false, undefined);
-			if(!self.bot.jumping && (trace[2] - (self.origin[2]-40.0)) > 0.0 && ((self.origin[2]+50.0) - trace[2]) > 0.0)
+			if(!self.bot.jumping && self.bot.is_frozen_internal && (trace[2] - (self.origin[2]-40.0)) > 0.0 && ((self.origin[2]+50.0) - trace[2]) > 0.0)
 			{
 				self SetOrigin(trace);
 			}
@@ -899,6 +900,7 @@ fireHack()
 		if (self.bot.isfrozen)
 			shouldFire = false;
 
+		self.bot.is_frozen_internal = !shouldFire;
 		self FreezeControls(!shouldFire);
 	}
 }
