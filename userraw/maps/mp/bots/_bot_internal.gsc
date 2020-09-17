@@ -627,10 +627,10 @@ moveHack()
 		{
 			// a number between 0 and 1, 1 being totally flat, same level.    0 being totally above or below.      about 0.7 is a 45 degree angle
 			verticleDegree = getConeDot(moveTo + (1, 1, 0), self.origin  + (-1, -1, 0), VectorToAngles((moveTo[0], moveTo[1], self.origin[2]) - self.origin));
-			self.bot.climbing = (abs(moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64 && !self.bot.jumpingafter);
+			self.bot.climbing = (abs(moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64);
 		}
 
-		if (inLastStand || usingRemote)
+		if (inLastStand || usingRemote || self.bot.jumpingafter)
 			self.bot.climbing = false;
 
 		if (usingRemote)
@@ -2063,7 +2063,7 @@ walk()
 		if(self.bot.isfrozen || self.bot.stop_move)
 			continue;
 			
-		if(self maps\mp\_flashgrenades::isFlashbanged())
+		if(self maps\mp\_flashgrenades::isFlashbanged() && !self.bot.jumpingafter)
 		{
 			myVel = self GetBotVelocity();
 			moveTo = PlayerPhysicsTrace(self.origin + (0, 0, 32), self.origin + (myVel[0], myVel[1], 0)*500, false, self);
@@ -2081,7 +2081,7 @@ walk()
 				continue;
 			}
 			
-			if(self.bot.target.isplay && self.bot.target.trace_time && self canFire(curweap) && self isInRange(self.bot.target.dist, curweap))
+			if(self.bot.target.isplay && self.bot.target.trace_time && self canFire(curweap) && self isInRange(self.bot.target.dist, curweap) && !self.bot.jumpingafter)
 			{
 				if(self.bot.target.rand <= self.pers["bots"]["behavior"]["strafe"])
 					self strafe(self.bot.target.entity);
