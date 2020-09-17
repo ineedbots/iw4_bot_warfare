@@ -2756,6 +2756,19 @@ getKillstreakTargetLocation()
 	return location;
 }
 
+clear_remote_on_death(isac130)
+{
+	self endon("disconnect");
+	self endon("bot_clear_remote_on_death");
+	level endon("game_ended");
+
+	self waittill("death");
+
+	if (isDefined(isac130) && isac130)
+		level.ac130InUse = false;
+	self ClearUsingRemote();
+}
+
 bot_killstreak_think()
 {
 	self endon("disconnect");
@@ -2865,8 +2878,9 @@ bot_killstreak_think()
 
 				self setUsingRemote( "remotemissile" );
 				self setSpawnWeapon(ksWeap);
-				self BotFreezeControls(true);
+				self thread clear_remote_on_death();
 				wait 1;
+				self notify("bot_clear_remote_on_death");
 				
 				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "predator_missile", true );
 				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "predator_missile" );
@@ -2883,8 +2897,7 @@ bot_killstreak_think()
 				self waittill( "stopped_using_remote" );
 
 				wait 1;
-				self setSpawnWeapon(curWeap);
-				self BotFreezeControls(false);
+				self setSpawnWeapon(curWeap); 
 			}
 			else if (streakName == "ac130")
 			{
@@ -2894,6 +2907,9 @@ bot_killstreak_think()
 				level.ac130InUse = true;
 				self setUsingRemote( "ac130" );
 				self setSpawnWeapon(ksWeap);
+				self thread clear_remote_on_death(true);
+				wait 1;
+				self notify("bot_clear_remote_on_death");
 
 				self maps\mp\_matchdata::logKillstreakEvent( "ac130", self.origin );
 	
@@ -2918,6 +2934,9 @@ bot_killstreak_think()
 
 				self setUsingRemote( "helicopter_minigun" );
 				self setSpawnWeapon(ksWeap);
+				self thread clear_remote_on_death();
+				wait 1;
+				self notify("bot_clear_remote_on_death");
 
 				self thread maps\mp\killstreaks\_helicopter::startHelicopter(self.pers["killstreaks"][0].lifeId, "minigun");
 
