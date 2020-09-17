@@ -565,7 +565,7 @@ emptyClipShoot()
 
 		cur = self GetCurrentWeapon();
 
-		if (IsWeaponClipOnly(cur) || !self GetWeaponAmmoStock(cur) || self IsUsingRemote())
+		if (cur == "none" || IsWeaponClipOnly(cur) || !self GetWeaponAmmoStock(cur) || self IsUsingRemote())
 			continue;
 
 		self thread pressFire();
@@ -1014,7 +1014,7 @@ doNoneSwitch()
 		self.bot.switch_to_after_none = undefined;
 	}
 
-	self setSpawnWeapon(weap);
+	self SetSpawnWeapon(weap);
 }
 
 doSwitch(newWeapon)

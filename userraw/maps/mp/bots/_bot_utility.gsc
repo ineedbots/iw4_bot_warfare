@@ -117,15 +117,12 @@ getValidGrenade()
 	return random(possibles);
 }
 
-botChangeWeapon(weapon)
+botChangeWeapon(weapon)// intrestingly, this allows the bots to use pullout and pulldown anims and etc, but bugs out when the bot is frozen while midburst of a firerate limited weapon (m16, only shot one shot, or two shots, even though its a 3 round burst) (never switches until unfrozen)
 {
 	self endon("death");
 	self endon("disconnect");
 
-	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self IsUsingRemote())
-		return;
-
-	if(self isDefusing() || self isPlanting())
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
 		return;
 
 	if (self.bot.knifing || self.bot.isfraggingafter)
@@ -133,6 +130,33 @@ botChangeWeapon(weapon)
 
 	if (self.disabledWeapon)
 		return;
+
+	if (self InLastStand() && !self InFinalStand())
+		return;
+		
+	self.bot.switch_to_after_none = weapon;
+	self.bot.switching = true;
+	ret = undefined;
+
+	if (self GetCurrentWeapon() == "none")
+	{
+		self notify("weapon_change");
+		ret = self waittill_any_timeout(5, "weapon_change");
+	}
+	else
+	{
+		self _DisableWeapon();
+		self waittill_any_timeout(5, "weapon_change");
+		self _EnableWeapon();
+		ret = self waittill_any_timeout(5, "weapon_change");
+	}
+
+	if (ret == "timeout")
+		return false;
+
+	waittillframeend;
+	self notify("bot_weapon_change", self GetCurrentWeapon());
+	return true;
 }
 
 throwBotGrenade(gname, gtime)
