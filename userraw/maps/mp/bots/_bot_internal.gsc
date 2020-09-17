@@ -72,9 +72,9 @@ onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, 
 		if (!hidden)
 		{
 			if (isDefined(eAttacker) && isDefined(eAttacker.guid) && isDefined(self.attackerData[eAttacker.guid]) && isDefined(self.attackerData[eAttacker.guid].firstTimeDamaged))
-				self.attackerData[eAttacker.guid].firstTimeDamaged += 50;
-
-			wait 0.05
+				self.attackerData[eAttacker.guid].firstTimeDamaged += 100; // two frames?? but it works??
+				
+			wait 0.05;
 		}
 	}
 }
