@@ -1682,6 +1682,9 @@ bot_use_equipment_think()
 		if (self IsUsingRemote())
 			continue;
 
+		if (self inLastStand() && !self _hasPerk("specialty_laststandoffhand") && !self inFinalStand())
+			continue;
+
 		clayWps = [];
 		for (i = 0; i < level.waypointsClay.size; i++)
 		{
@@ -1768,6 +1771,9 @@ bot_use_grenade_think()
 			continue;
 
 		if (self IsUsingRemote())
+			continue;
+
+		if (self inLastStand() && !self _hasPerk("specialty_laststandoffhand") && !self inFinalStand())
 			continue;
 
 		nadeWps = [];
@@ -1871,6 +1877,9 @@ bot_jav_loc_think()
 			continue;
 
 		if (self InLastStand() && !self InFinalStand())
+			continue;
+
+		if (self isEMPed())
 			continue;
 
 		javWps = [];
@@ -2666,6 +2675,9 @@ bot_target_vehicle()
 
 		rocketAmmo = self getRocketAmmo();
 		if(!isDefined(rocketAmmo) && self BotGetRandom() < 90)
+			continue;
+
+		if (isDefined(rocketAmmo) && rocketAmmo == "javelin_mp" && self isEMPed())
 			continue;
 
 		targets = maps\mp\_stinger::GetTargetList();
