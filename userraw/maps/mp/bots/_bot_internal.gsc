@@ -854,13 +854,16 @@ moveHack()
 
 			// clamp to ground
 			trace = physicsTrace(self.origin + (0.0,0.0,50.0), self.origin + (0.0,0.0,-40.0), false, undefined);
-			if(!self.bot.jumping && self.bot.is_frozen_internal && (trace[2] - (self.origin[2]-40.0)) > 0.0 && ((self.origin[2]+50.0) - trace[2]) > 0.0)
+			if (self.bot.is_frozen_internal)
 			{
-				self SetOrigin(trace);
-			}
-			else
-			{
-				self SetOrigin(physicsTrace(self.origin + (0,0,5), self.origin - (0,0,5), false, undefined));
+				if(!self.bot.jumping && (trace[2] - (self.origin[2]-40.0)) > 0.0 && ((self.origin[2]+50.0) - trace[2]) > 0.0)
+				{
+					self SetOrigin(trace);
+				}
+				else
+				{
+					self SetOrigin(physicsTrace(self.origin + (0,0,5), self.origin - (0,0,5), false, undefined));
+				}
 			}
 
 			continue;
@@ -2462,9 +2465,9 @@ knife(ent, knifeDist)
 	}
 
 	if(isSubStr(curWeap, "tactical_") || usedRiot)
-		wait 1;
+		wait 0.75;
 	else
-		wait 2;
+		wait 1.5;
 
 	if (!usedRiot)
 	{
