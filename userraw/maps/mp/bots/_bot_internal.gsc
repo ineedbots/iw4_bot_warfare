@@ -149,6 +149,7 @@ resetBotVars()
 	self.bot.rand = randomInt(100);
 
 	self.bot.isswitching = false;
+	self.bot.switch_to_after_none = undefined;
 
 	self.bot.stance = "stand";
 
@@ -986,8 +987,7 @@ onWeaponChange()
 		switch (newWeapon)
 		{
 			case "none":
-				if(isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != "none" && !self.disabledWeapon)
-					self setSpawnWeapon(self.lastDroppableWeapon);
+				self thread doNoneSwitch();
 			break;
 			default:
 				self thread doSwitch(newWeapon);
@@ -996,17 +996,38 @@ onWeaponChange()
 	}
 }
 
+doNoneSwitch()
+{
+	self endon("disconnect");
+	self endon("death");
+	self endon("weapon_change");
+
+	self.bot.isswitching = false;
+
+	while (self.disabledWeapon)
+		wait 0.05;
+
+	weap = self.lastDroppableWeapon;
+	if (isDefined(self.bot.switch_to_after_none))
+	{
+		weap = self.bot.switch_to_after_none;
+		self.bot.switch_to_after_none = undefined;
+	}
+
+	self setSpawnWeapon(weap);
+}
+
 doSwitch(newWeapon)
 {
 	self endon("disconnect");
 	self endon("death");
-	self notify("bot_weapon_change");
-	self endon("bot_weapon_change");
+	self endon("weapon_change");
 
 	if (self.bot.climbing)
 		return;
 
-	if (isDefined(self.lastDroppableWeapon) && self.lastDroppableWeapon != newWeapon)
+	waittillframeend;
+	if (self.lastDroppableWeapon != newWeapon)
 		return;
 
 	if (!self inLastStand() && !self.bot.isfraggingafter && !self.bot.knifingafter)
