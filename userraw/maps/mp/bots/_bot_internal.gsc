@@ -904,10 +904,13 @@ fireHack()
 				shouldFire = false;
 		}
 
-		if (level.gameEnded || !gameFlag( "prematch_done" ))
+		if (self.bot.isfrozen)
 			shouldFire = false;
 
-		if (self.bot.isfrozen)
+		if (isDefined(self.bot.target) && self IsUsingRemote())
+			shouldFire = true;
+
+		if (level.gameEnded || !gameFlag( "prematch_done" ))
 			shouldFire = false;
 
 		self.bot.is_frozen_internal = !shouldFire;
