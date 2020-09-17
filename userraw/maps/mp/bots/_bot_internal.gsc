@@ -140,6 +140,7 @@ resetBotVars()
 	self.bot.isfragging = false;
 	self.bot.isfraggingafter = false;
 	self.bot.tryingtofrag = false;
+	self.bot.tryingtofragpullback = false;
 	
 	self.bot.semi_time = false;
 	self.bot.greedy_path = false;
@@ -895,7 +896,12 @@ fireHack()
 			shouldFire = false;
 
 		if (self.bot.tryingtofrag)
-			shouldFire = true;
+		{
+			if (self.bot.tryingtofragpullback)
+				shouldFire = true;
+			else
+				shouldFire = false;
+		}
 
 		if (level.gameEnded || !gameFlag( "prematch_done" ))
 			shouldFire = false;
@@ -1805,7 +1811,10 @@ aim()
 								nade = self getValidGrenade();
 								if(isDefined(nade) && rand <= self.pers["bots"]["behavior"]["nade"] && bulletTracePassed(myEye, myEye + (0, 0, 75), false, self) && bulletTracePassed(last_pos, last_pos + (0, 0, 100), false, target) && dist > level.bots_minGrenadeDistance && dist < level.bots_maxGrenadeDistance)
 								{
-									self thread botThrowGrenade(nade);
+									time = 0.5;
+									if (nade == "frag_grenade_mp")
+										time = 2;
+									self thread botThrowGrenade(nade, time);
 									self notify("kill_goal");
 								}
 							}
@@ -2346,9 +2355,12 @@ knife(ent, knifeDist)
 	self.bot.knifing = true;
 	self.bot.knifingafter = true;
 
-	isplay = isPlayer(ent);
+	isplay = (isDefined(ent) && isPlayer(ent));
 	usedRiot = self.hasRiotShieldEquipped;
-	distsq = DistanceSquared(self.origin, ent.origin);
+	org = (0, 0, 99999999);
+	if (isDefined(ent))
+		org = ent.origin;
+	distsq = DistanceSquared(self.origin, org);
 	inLastStand = self inLastStand();
 	stance = self getStance();
 	damage = 135;
@@ -2498,7 +2510,7 @@ reload()
 	// the script should reload for us.
 }
 
-botThrowGrenade(grenName)
+botThrowGrenade(grenName, grenTime)
 {
 	self endon("death");
 	self endon("disconnect");
@@ -2529,15 +2541,24 @@ botThrowGrenade(grenName)
 
 	self setSpawnWeapon(grenName);
 	self.bot.tryingtofrag = true;
+	self.bot.tryingtofragpullback = true;
 
 	ret = self waittill_any_timeout( 5, "grenade_pullback", "grenade_fire" );
 
 	if (ret == "grenade_pullback")
 	{
+		if (isDefined(grenTime))
+		{
+			self.bot.tryingtofragpullback = false;
+			wait grenTime;
+			self.bot.tryingtofragpullback = true;
+		}
+
 		ret = self waittill_any_timeout( 5, "grenade_fire", "weapon_change", "offhand_end" );
 	}
 
 	self.bot.tryingtofrag = false;
+	self.bot.tryingtofragpullback = false;
 
 	self setSpawnWeapon(curWeap);
 
@@ -2601,7 +2622,7 @@ jump()
 
 	if (self inLastStand() || self getStance() != "stand" ||
 			level.gameEnded || !gameFlag( "prematch_done" ) || self IsUsingRemote() ||
-			self.bot.isfrozen || self.bot.climbing || self.bot.jumpingafter)
+			self.bot.isfrozen || self.bot.stop_move || self.bot.climbing || self.bot.jumpingafter)
 			return;
 
 	self.bot.jumping = true;

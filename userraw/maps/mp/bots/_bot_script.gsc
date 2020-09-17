@@ -1818,7 +1818,10 @@ bot_use_grenade_think()
 		self BotStopMoving(true);
 		wait 1;
 
-		self throwBotGrenade(nade);
+		time = 0.5;
+		if (nade == "frag_grenade_mp")
+			time = 2;
+		self throwBotGrenade(nade, time);
 
 		self ClearScriptAimPos();
 		self BotStopMoving(false);

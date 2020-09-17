@@ -3,9 +3,6 @@ bomb gamemodes,
 unreleased gamemodes
 switch weapon with disable weapon
 
-_internal:
-grenade cook time
-
 _other:
 dvars, loadout, behaviour, menu
 code comments

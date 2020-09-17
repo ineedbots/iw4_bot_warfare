@@ -117,9 +117,9 @@ getValidGrenade()
 	return random(possibles);
 }
 
-throwBotGrenade(gname)
+throwBotGrenade(gname, gtime)
 {
-	return self maps\mp\bots\_bot_internal::botThrowGrenade(gname);
+	return self maps\mp\bots\_bot_internal::botThrowGrenade(gname, gtime);
 }
 
 botIsClimbing()
