@@ -117,6 +117,24 @@ getValidGrenade()
 	return random(possibles);
 }
 
+botChangeWeapon(weapon)
+{
+	self endon("death");
+	self endon("disconnect");
+
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self IsUsingRemote())
+		return;
+
+	if(self isDefusing() || self isPlanting())
+		return;
+
+	if (self.bot.knifing || self.bot.isfraggingafter)
+		return;
+
+	if (self.disabledWeapon)
+		return;
+}
+
 throwBotGrenade(gname, gtime)
 {
 	return self maps\mp\bots\_bot_internal::botThrowGrenade(gname, gtime);

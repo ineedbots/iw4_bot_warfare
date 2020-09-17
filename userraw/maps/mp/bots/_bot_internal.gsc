@@ -1070,6 +1070,10 @@ onLastStand()
 
 		if (!self inFinalStand() && !self IsUsingRemote())
 		{
+			while (self.bot.knifing || self.bot.tryingtofrag || self.disabledWeapon)
+				wait 0.05;
+			waittillframeend;
+
 			pistol = undefined;
 			weaponsList = self GetWeaponsListPrimaries();
 			foreach ( weapon in weaponsList )
@@ -1212,6 +1216,9 @@ grenade_danager()
 	for(;;)
 	{
 		wait 1;
+
+		if (self inLastStand() && !self _hasPerk("specialty_laststandoffhand") && !self inFinalStand())
+			continue;
 
 		if (self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
 			continue;
