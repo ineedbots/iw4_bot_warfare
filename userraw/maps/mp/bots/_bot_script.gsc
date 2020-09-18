@@ -3019,6 +3019,13 @@ bot_killstreak_think()
 				self thread clear_remote_on_death();
 				wait 1;
 				self notify("bot_clear_remote_on_death");
+
+				if (self isEMPed())
+				{
+					self ClearUsingRemote();
+					self setSpawnWeapon(curWeap);
+					continue;
+				}
 				
 				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "predator_missile", true );
 				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "predator_missile" );
@@ -3049,6 +3056,14 @@ bot_killstreak_think()
 				wait 1;
 				self notify("bot_clear_remote_on_death");
 
+				if (self isEMPed()) // bcuz of the wait
+				{
+					level.ac130InUse = false;
+					self ClearUsingRemote();
+					self setSpawnWeapon(curWeap);
+					continue;
+				}
+
 				self maps\mp\_matchdata::logKillstreakEvent( "ac130", self.origin );
 	
 				self.ac130LifeId = self.pers["killstreaks"][0].lifeId;
@@ -3075,6 +3090,13 @@ bot_killstreak_think()
 				self thread clear_remote_on_death();
 				wait 1;
 				self notify("bot_clear_remote_on_death");
+
+				if (isDefined( level.chopper ) || self isEMPed())
+				{
+					self ClearUsingRemote();
+					self setSpawnWeapon(curWeap);
+					continue;
+				}
 
 				self thread maps\mp\killstreaks\_helicopter::startHelicopter(self.pers["killstreaks"][0].lifeId, "minigun");
 
