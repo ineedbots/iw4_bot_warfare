@@ -1094,6 +1094,22 @@ nearAnyOfWaypoints(dist, waypoints)
 	return false;
 }
 
+getNearestWaypointOfWaypoints(waypoints)
+{
+	answer = undefined;
+	for (i = 0; i < waypoints.size; i++)
+	{
+		waypoint = waypoints[i];
+
+		if (isDefined(answer) && closer(self.origin, answer.origin, waypoint.origin))
+			continue;
+
+		answer = waypoint;
+	}
+
+	return answer;
+}
+
 bot_escort_obj(obj, carrier)
 {
 	self endon( "death" );
@@ -1900,16 +1916,22 @@ bot_jav_loc_think()
 	self endon("death");
 	level endon("game_ended");
 
+	doFastContinue = false;
 	for (;;)
 	{
-		wait randomintRange(2, 4);
+		if (doFastContinue)
+			doFastContinue = false;
+		else
+		{
+			wait randomintRange(2, 4);
 
-		chance = self.pers["bots"]["behavior"]["nade"] / 2;
-		if (chance > 20)
-			chance = 20;
+			chance = self.pers["bots"]["behavior"]["nade"] / 2;
+			if (chance > 20)
+				chance = 20;
 
-		if (randomInt(100) > chance)
-			continue;
+			if (randomInt(100) > chance)
+				continue;
+		}
 
 		if (!self GetAmmoCount("javelin_mp"))
 			continue;
@@ -1942,46 +1964,56 @@ bot_jav_loc_think()
 		if (self isEMPed())
 			continue;
 
-		javWps = [];
-		for (i = 0; i < level.waypointsJav.size; i++)
-		{
-			if (Distance(self.origin, level.waypointsJav[i].origin) > 1024)
-				continue;
-
-			javWps[javWps.size] = level.waypointsJav[i];
-		}
-		javWp = random(javWps);
-		
 		loc = undefined;
-		if (!isDefined(javWp) || self HasScriptGoal() || self.bot_lock_goal)
+
+		if (!self nearAnyOfWaypoints(128, level.waypointsJav))
 		{
-			traceForward = self maps\mp\_javelin::EyeTraceForward();
-			if (!isDefined(traceForward))
-				continue;
+			javWps = [];
+			for (i = 0; i < level.waypointsJav.size; i++)
+			{
+				if (Distance(self.origin, level.waypointsJav[i].origin) > 1024)
+					continue;
 
-			loc = traceForward[0];
-			if (self maps\mp\_javelin::TargetPointTooClose(loc))
-				continue;
+				javWps[javWps.size] = level.waypointsJav[i];
+			}
+			javWp = random(javWps);
+			
+			if (!isDefined(javWp) || self HasScriptGoal() || self.bot_lock_goal)
+			{
+				traceForward = self maps\mp\_javelin::EyeTraceForward();
+				if (!isDefined(traceForward))
+					continue;
 
-			if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
-				continue;
+				loc = traceForward[0];
+				if (self maps\mp\_javelin::TargetPointTooClose(loc))
+					continue;
 
-			if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
+				if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
+					continue;
+
+				if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
+					continue;
+			}
+			else
+			{
+				self SetScriptGoal(javWp.origin, 16);
+
+				ret = self waittill_any_return("new_goal", "goal", "bad_path");
+
+				if (ret != "new_goal")
+					self ClearScriptGoal();
+
+				if (ret != "goal")
+					continue;
+
+				doFastContinue = true;
 				continue;
+			}
 		}
 		else
 		{
+			javWp = self getNearestWaypointOfWaypoints(level.waypointsJav);
 			loc = javWp.jav_point;
-			
-			self SetScriptGoal(javWp.origin, 16);
-
-			ret = self waittill_any_return("new_goal", "goal", "bad_path");
-
-			if (ret != "new_goal")
-				self ClearScriptGoal();
-
-			if (ret != "goal")
-				continue;
 		}
 
 		self SetBotJavelinLocation(loc);
