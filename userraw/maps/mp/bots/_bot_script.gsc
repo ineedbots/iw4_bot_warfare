@@ -1593,16 +1593,23 @@ bot_use_tube_think()
 	self endon("death");
 	level endon("game_ended");
 
+	doFastContinue = false;
+
 	for (;;)
 	{
-		wait randomintRange(3, 7);
+		if (doFastContinue)
+			doFastContinue = false;
+		else
+		{
+			wait randomintRange(3, 7);
 
-		chance = self.pers["bots"]["behavior"]["nade"] / 2;
-		if (chance > 20)
-			chance = 20;
+			chance = self.pers["bots"]["behavior"]["nade"] / 2;
+			if (chance > 20)
+				chance = 20;
 
-		if (randomInt(100) > chance)
-			continue;
+			if (randomInt(100) > chance)
+				continue;
+		}
 
 		tube = self getValidTube();
 		if (!isDefined(tube))
@@ -1633,49 +1640,62 @@ bot_use_tube_think()
 		if (self InLastStand() && !self InFinalStand())
 			continue;
 
-		tubeWps = [];
-		for (i = 0; i < level.waypointsTube.size; i++)
-		{
-			if (Distance(self.origin, level.waypointsTube[i].origin) > 1024)
-				continue;
-			
-			tubeWps[tubeWps.size] = level.waypointsTube[i];
-		}
-		tubeWp = random(tubeWps);
-		
 		loc = undefined;
-		myEye = self GetEye();
-		if (!isDefined(tubeWp) || self HasScriptGoal() || self.bot_lock_goal)
+
+		if (!self nearAnyOfWaypoints(128, level.waypointsTube))
 		{
-			traceForward = BulletTrace(myEye, myEye + AnglesToForward(self GetPlayerAngles()) * 900 * 5, false, self);
+			tubeWps = [];
+			for (i = 0; i < level.waypointsTube.size; i++)
+			{
+				if (Distance(self.origin, level.waypointsTube[i].origin) > 1024)
+					continue;
+				
+				tubeWps[tubeWps.size] = level.waypointsTube[i];
+			}
+			tubeWp = random(tubeWps);
+			
+			myEye = self GetEye();
+			if (!isDefined(tubeWp) || self HasScriptGoal() || self.bot_lock_goal)
+			{
+				traceForward = BulletTrace(myEye, myEye + AnglesToForward(self GetPlayerAngles()) * 900 * 5, false, self);
 
-			loc = traceForward["position"];
-			dist = DistanceSquared(self.origin, loc);
-			if (dist < level.bots_minGrenadeDistance || dist > level.bots_maxGrenadeDistance * 5)
+				loc = traceForward["position"];
+				dist = DistanceSquared(self.origin, loc);
+				if (dist < level.bots_minGrenadeDistance || dist > level.bots_maxGrenadeDistance * 5)
+					continue;
+
+				if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
+					continue;
+
+				if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
+					continue;
+
+				loc += (0, 0, dist/16000);
+			}
+			else
+			{
+				self SetScriptGoal(tubeWp.origin, 16);
+
+				ret = self waittill_any_return("new_goal", "goal", "bad_path");
+
+				if (ret != "new_goal")
+					self ClearScriptGoal();
+
+				if (ret != "goal")
+					continue;
+
+				doFastContinue = true;
 				continue;
-
-			if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
-				continue;
-
-			if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
-				continue;
-
-			loc += (0, 0, dist/16000);
+			}
 		}
 		else
 		{
+			tubeWp = self getNearestWaypointOfWaypoints(level.waypointsTube);
 			loc = tubeWp.origin + AnglesToForward(tubeWp.angles) * 2048;
-			
-			self SetScriptGoal(tubeWp.origin, 16);
-
-			ret = self waittill_any_return("new_goal", "goal", "bad_path");
-
-			if (ret != "new_goal")
-				self ClearScriptGoal();
-
-			if (ret != "goal")
-				continue;
 		}
+
+		if (!isDefined(loc))
+			continue;
 
 		self SetScriptAimPos(loc);
 		self BotStopMoving(true);
@@ -1701,6 +1721,7 @@ fire_current_weapon()
 {
 	self endon("death");
 	self endon("disconnect");
+	self endon("weapon_change");
 	self endon("stop_firing_weapon");
 
 	for (;;)
@@ -1716,16 +1737,23 @@ bot_use_equipment_think()
 	self endon("death");
 	level endon("game_ended");
 
+	doFastContinue = false;
+
 	for (;;)
 	{
-		wait randomintRange(2, 4);
+		if (doFastContinue)
+			doFastContinue = false;
+		else
+		{
+			wait randomintRange(2, 4);
 
-		chance = self.pers["bots"]["behavior"]["nade"] / 2;
-		if (chance > 20)
-			chance = 20;
+			chance = self.pers["bots"]["behavior"]["nade"] / 2;
+			if (chance > 20)
+				chance = 20;
 
-		if (randomInt(100) > chance)
-			continue;
+			if (randomInt(100) > chance)
+				continue;
+		}
 
 		nade = undefined;
 		if (self GetAmmoCount("claymore_mp"))
@@ -1761,39 +1789,52 @@ bot_use_equipment_think()
 		if (self inLastStand() && !self _hasPerk("specialty_laststandoffhand") && !self inFinalStand())
 			continue;
 
-		clayWps = [];
-		for (i = 0; i < level.waypointsClay.size; i++)
-		{
-			if (Distance(self.origin, level.waypointsClay[i].origin) > 1024)
-				continue;
-
-			clayWps[clayWps.size] = level.waypointsClay[i];
-		}
-		clayWp = random(clayWps);
-		
 		loc = undefined;
-		if (!isDefined(clayWp) || self HasScriptGoal() || self.bot_lock_goal)
-		{
-			myEye = self GetEye();
-			loc = myEye + AnglesToForward(self GetPlayerAngles()) * 256;
 
-			if (!bulletTracePassed(myEye, loc, false, self))
+		if (!self nearAnyOfWaypoints(128, level.waypointsClay))
+		{
+			clayWps = [];
+			for (i = 0; i < level.waypointsClay.size; i++)
+			{
+				if (Distance(self.origin, level.waypointsClay[i].origin) > 1024)
+					continue;
+
+				clayWps[clayWps.size] = level.waypointsClay[i];
+			}
+			clayWp = random(clayWps);
+			
+			if (!isDefined(clayWp) || self HasScriptGoal() || self.bot_lock_goal)
+			{
+				myEye = self GetEye();
+				loc = myEye + AnglesToForward(self GetPlayerAngles()) * 256;
+
+				if (!bulletTracePassed(myEye, loc, false, self))
+					continue;
+			}
+			else
+			{
+				self SetScriptGoal(clayWp.origin, 16);
+
+				ret = self waittill_any_return("new_goal", "goal", "bad_path");
+
+				if (ret != "new_goal")
+					self ClearScriptGoal();
+
+				if (ret != "goal")
+					continue;
+				
+				doFastContinue = true;
 				continue;
+			}
 		}
 		else
 		{
+			clayWp = self getNearestWaypointOfWaypoints(level.waypointsClay);
 			loc = clayWp.origin + AnglesToForward(clayWp.angles) * 2048;
-			
-			self SetScriptGoal(clayWp.origin, 16);
-
-			ret = self waittill_any_return("new_goal", "goal", "bad_path");
-
-			if (ret != "new_goal")
-				self ClearScriptGoal();
-
-			if (ret != "goal")
-				continue;
 		}
+
+		if (!isDefined(loc))
+			continue;
 
 		self SetScriptAimPos(loc);
 		self BotStopMoving(true);
@@ -1812,16 +1853,23 @@ bot_use_grenade_think()
 	self endon("death");
 	level endon("game_ended");
 
+	doFastContinue = false;
+
 	for (;;)
 	{
-		wait randomintRange(4, 7);
+		if (doFastContinue)
+			doFastContinue = false;
+		else
+		{
+			wait randomintRange(4, 7);
 
-		chance = self.pers["bots"]["behavior"]["nade"] / 2;
-		if (chance > 20)
-			chance = 20;
+			chance = self.pers["bots"]["behavior"]["nade"] / 2;
+			if (chance > 20)
+				chance = 20;
 
-		if (randomInt(100) > chance)
-			continue;
+			if (randomInt(100) > chance)
+				continue;
+		}
 
 		nade = self getValidGrenade();
 		if (!isDefined(nade))
@@ -1852,49 +1900,62 @@ bot_use_grenade_think()
 		if (self inLastStand() && !self _hasPerk("specialty_laststandoffhand") && !self inFinalStand())
 			continue;
 
-		nadeWps = [];
-		for (i = 0; i < level.waypointsGren.size; i++)
-		{
-			if (Distance(self.origin, level.waypointsGren[i].origin) > 1024)
-				continue;
-
-			nadeWps[nadeWps.size] = level.waypointsGren[i];
-		}
-		nadeWp = random(nadeWps);
-		
 		loc = undefined;
-		myEye = self GetEye();
-		if (!isDefined(nadeWp) || self HasScriptGoal() || self.bot_lock_goal)
+
+		if (!self nearAnyOfWaypoints(128, level.waypointsGren))
 		{
-			traceForward = BulletTrace(myEye, myEye + AnglesToForward(self GetPlayerAngles()) * 900, false, self);
+			nadeWps = [];
+			for (i = 0; i < level.waypointsGren.size; i++)
+			{
+				if (Distance(self.origin, level.waypointsGren[i].origin) > 1024)
+					continue;
 
-			loc = traceForward["position"];
-			dist = DistanceSquared(self.origin, loc);
-			if (dist < level.bots_minGrenadeDistance || dist > level.bots_maxGrenadeDistance)
+				nadeWps[nadeWps.size] = level.waypointsGren[i];
+			}
+			nadeWp = random(nadeWps);
+
+			myEye = self GetEye();
+			if (!isDefined(nadeWp) || self HasScriptGoal() || self.bot_lock_goal)
+			{
+				traceForward = BulletTrace(myEye, myEye + AnglesToForward(self GetPlayerAngles()) * 900, false, self);
+
+				loc = traceForward["position"];
+				dist = DistanceSquared(self.origin, loc);
+				if (dist < level.bots_minGrenadeDistance || dist > level.bots_maxGrenadeDistance)
+					continue;
+
+				if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
+					continue;
+
+				if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
+					continue;
+
+				loc += (0, 0, dist/3000);
+			}
+			else
+			{
+				self SetScriptGoal(nadeWp.origin, 16);
+
+				ret = self waittill_any_return("new_goal", "goal", "bad_path");
+
+				if (ret != "new_goal")
+					self ClearScriptGoal();
+
+				if (ret != "goal")
+					continue;
+
+				doFastContinue = true;
 				continue;
-
-			if (!bulletTracePassed(self.origin + (0, 0, 5), self.origin + (0, 0, 2048), false, self))
-				continue;
-
-			if (!bulletTracePassed(loc + (0, 0, 5), loc + (0, 0, 2048), false, self))
-				continue;
-
-			loc += (0, 0, dist/3000);
+			}
 		}
 		else
 		{
+			nadeWp = self getNearestWaypointOfWaypoints(level.waypointsGren);
 			loc = nadeWp.origin + AnglesToForward(nadeWp.angles) * 2048;
-			
-			self SetScriptGoal(nadeWp.origin, 16);
-
-			ret = self waittill_any_return("new_goal", "goal", "bad_path");
-
-			if (ret != "new_goal")
-				self ClearScriptGoal();
-
-			if (ret != "goal")
-				continue;
 		}
+
+		if (!isDefined(loc))
+			continue;
 
 		self SetScriptAimPos(loc);
 		self BotStopMoving(true);
@@ -2015,6 +2076,9 @@ bot_jav_loc_think()
 			javWp = self getNearestWaypointOfWaypoints(level.waypointsJav);
 			loc = javWp.jav_point;
 		}
+
+		if (!isDefined(loc))
+			continue;
 
 		self SetBotJavelinLocation(loc);
 		self notify("bot_force_check_switch");
