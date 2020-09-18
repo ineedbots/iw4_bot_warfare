@@ -1078,6 +1078,66 @@ bots_watch_touch_obj(obj)
 	}
 }
 
+nearAnyOfWaypoints(dist, waypoints)
+{
+	dist *= dist;
+	for (i = 0; i < waypoints.size; i++)
+	{
+		waypoint = waypoints[i];
+
+		if (DistanceSquared(waypoint.origin, self.origin) > dist)
+			continue;
+
+		return true;
+	}
+
+	return false;
+}
+
+bot_escort_obj(obj, carrier)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+
+	for (;;)
+	{
+		wait 0.5;
+
+		if (!isDefined(obj))
+			break;
+
+		if (!isDefined(obj.carrier) || carrier == obj.carrier)
+			break;
+	}
+	
+	self notify("goal");
+}
+
+bot_get_obj(obj)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+	
+	for (;;)
+	{
+		wait 0.5;
+
+		if (!isDefined(obj))
+			break;
+
+		if (isDefined(obj.carrier))
+			break;
+	}
+	
+	self notify("goal");
+}
+
 /*
 	When the bot spawned, after the difficulty wait. Start the logic for the bot.
 */
@@ -2784,6 +2844,24 @@ clear_remote_on_death(isac130)
 	self ClearUsingRemote();
 }
 
+isAnyEnemyPlanes()
+{
+	for (i = 0; i < level.planes.size; i++)
+	{
+		plane = level.planes[i];
+
+		if (level.teamBased && plane.team == self.team)
+			continue;
+
+		if (isDefined(plane.owner) && plane.owner == self)
+			continue;
+
+		return true;
+	}
+
+	return false;
+}
+
 bot_killstreak_think()
 {
 	self endon("disconnect");
@@ -2832,12 +2910,15 @@ bot_killstreak_think()
 
 		ksWeap = maps\mp\killstreaks\_killstreaks::getKillstreakWeapon( streakName );
 
+		if (isStrStart(streakName, "helicopter_") && self isAnyEnemyPlanes() && self.pers["bots"]["skill"]["base"] > 3)
+			continue;
+
 		if (maps\mp\killstreaks\_killstreaks::isRideKillstreak(streakName) || maps\mp\killstreaks\_killstreaks::isCarryKillstreak(streakName))
 		{
 			if (self inLastStand())
 				continue;
 
-			if (self.pers["killstreaks"][0].lifeId == self.pers["deaths"] && !self HasScriptGoal() && !self.bot_lock_goal && streakName != "sentry")
+			if (self.pers["killstreaks"][0].lifeId == self.pers["deaths"] && !self HasScriptGoal() && !self.bot_lock_goal && streakName != "sentry" && !self nearAnyOfWaypoints(128, level.waypointsCamp))
 			{
 				campSpots = [];
 				for (i = 0; i < level.waypointsCamp.size; i++)
@@ -2855,6 +2936,8 @@ bot_killstreak_think()
 
 					if (self waittill_any_return("new_goal", "goal", "bad_path") != "new_goal")
 						self ClearScriptGoal();
+
+					continue;
 				}
 			}
 				
@@ -3645,48 +3728,4 @@ bot_cap_get_flag(flag)
 	self.bot_lock_goal = false;
 	if (evt != "new_goal")
 		self ClearScriptGoal();
-}
-
-bot_escort_obj(obj, carrier)
-{
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "goal" );
-	self endon( "bad_path" );
-	self endon( "new_goal" );
-
-	for (;;)
-	{
-		wait 0.5;
-
-		if (!isDefined(obj))
-			break;
-
-		if (!isDefined(obj.carrier) || carrier == obj.carrier)
-			break;
-	}
-	
-	self notify("goal");
-}
-
-bot_get_obj(obj)
-{
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "goal" );
-	self endon( "bad_path" );
-	self endon( "new_goal" );
-	
-	for (;;)
-	{
-		wait 0.5;
-
-		if (!isDefined(obj))
-			break;
-
-		if (isDefined(obj.carrier))
-			break;
-	}
-	
-	self notify("goal");
 }

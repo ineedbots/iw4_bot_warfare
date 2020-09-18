@@ -559,6 +559,11 @@ tokenizeLine(line, tok)
   return tokens;
 }
 
+isStrStart( string1, subStr )
+{
+	return ( getSubStr( string1, 0, subStr.size ) == subStr );
+}
+
 parseTokensIntoWaypoint(tokens)
 {
 	waypoint = spawnStruct();
