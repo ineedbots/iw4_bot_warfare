@@ -2031,6 +2031,21 @@ botGiveLoadout( team, class, allowCopycat )
 
 	//loadoutSecondaryCamo = "none";
 
+	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
+	if (!allowOp)
+	{
+		loadoutDeathstreak = "specialty_none";
+
+		if (loadoutPrimary == "riotshield_mp")
+			loadoutPrimary = "m4_mp";
+
+		if (loadoutSecondary == "at4_mp")
+			loadoutSecondary = "usp_mp";
+
+		if (loadoutPrimaryAttachment == "gl")
+			loadoutPrimaryAttachment = "none";
+	}
+
 
 	if ( level.killstreakRewards )
 	{
