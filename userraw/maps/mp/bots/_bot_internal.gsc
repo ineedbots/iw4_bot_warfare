@@ -991,6 +991,9 @@ onWeaponChange()
 		self waittill( "weapon_change", newWeapon );
 		
 		self.bot.is_cur_full_auto = WeaponIsFullAuto(newWeapon);
+
+		if(level.gameEnded || !gameFlag( "prematch_done" ))
+			continue;
 		
 		switch (newWeapon)
 		{
