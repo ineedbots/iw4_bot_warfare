@@ -2873,9 +2873,9 @@ bot_killstreak_think()
 	for (;;)
 	{
 		if (doFastContinue)
-		{
 			doFastContinue = false;
-
+		else
+		{
 			wait randomIntRange(1, 3);
 		}
 
