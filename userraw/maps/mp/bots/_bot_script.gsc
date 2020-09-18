@@ -2878,9 +2878,9 @@ clear_remote_on_death(isac130)
 
 isAnyEnemyPlanes()
 {
-	for (i = 0; i < level.planes.size; i++)
+	for (i = 0; i < level.harriers.size; i++)
 	{
-		plane = level.planes[i];
+		plane = level.harriers[i];
 
 		if (level.teamBased && plane.team == self.team)
 			continue;
