@@ -20,4 +20,6 @@
 *.stat
 logs/
 demos/
+images/
+weapons/
 missingasset.csv

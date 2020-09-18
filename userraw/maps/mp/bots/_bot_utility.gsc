@@ -2154,6 +2154,7 @@ botGiveLoadout( team, class, allowCopycat )
 	self maps\mp\perks\_perks::cac_selector();
 	
 	self notify ( "changed_kit" );
+	self notify( "bot_giveLoadout", allowCopycat );
 }
 
 botGetPerkUpgrade( perkName )

@@ -2295,9 +2295,24 @@ doWalk(goal, dist, isScriptGoal)
 	//{
 		while(current >= 0)
 		{
+			for (;;)
+			{
+				if (current <= 0)
+					break;
+
+				ppt = PlayerPhysicsTrace(self.origin + (0,0,32), level.waypoints[self.bot.astar[current-1]].origin, false, self);
+				if (DistanceSquared(level.waypoints[self.bot.astar[current-1]].origin, ppt) > 1.0)
+					break;
+
+				if (level.waypoints[self.bot.astar[current-1]].type == "climb" || level.waypoints[self.bot.astar[current]].type == "climb")
+					break;
+
+				current = self removeAStar();
+			}
+
 			self.bot.next_wp = self.bot.astar[current];
 			self.bot.second_next_wp = -1;
-			if(current != 0)
+			if(current > 0)
 				self.bot.second_next_wp = self.bot.astar[current-1];
 			
 			self notify("new_static_waypoint");
@@ -2513,7 +2528,7 @@ knife(ent, knifeDist)
 	}
 
 	if(isSubStr(curWeap, "tactical_") || usedRiot)
-		wait 0.75;
+		wait 1;
 	else
 		wait 1.5;
 
