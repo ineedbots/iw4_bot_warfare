@@ -2868,9 +2868,16 @@ bot_killstreak_think()
 	self endon("death");
 	level endon("game_ended");
 
+	doFastContinue = false;
+
 	for (;;)
 	{
-		wait randomIntRange(1, 3);
+		if (doFastContinue)
+		{
+			doFastContinue = false;
+
+			wait randomIntRange(1, 3);
+		}
 
 		if ( !isDefined( self.pers["killstreaks"][0] ) )
 			continue;
@@ -2937,6 +2944,7 @@ bot_killstreak_think()
 					if (self waittill_any_return("new_goal", "goal", "bad_path") != "new_goal")
 						self ClearScriptGoal();
 
+					doFastContinue = true;
 					continue;
 				}
 			}
