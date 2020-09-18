@@ -2494,7 +2494,7 @@ knife(ent, knifeDist)
 				// check riotshield
 				if (ent.hasRiotShield)
 				{
-					entCone = ent getConeDot(self.origin, ent.origin, ent GetPlayerAngles());
+					entCone = ent getConeDot((self.origin[0], self.origin[1], 0), (ent.origin[0], ent.origin[1], 0), (0, ent GetPlayerAngles()[1], 0));
 					if ((entCone > 0.65 && ent.hasRiotShieldEquipped) || (entCone < -0.65 && !ent.hasRiotShieldEquipped))
 					{
 						// play riot shield hitting knife sound
