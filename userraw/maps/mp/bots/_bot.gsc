@@ -216,7 +216,8 @@ onPlayerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 */
 hook_callbacks()
 {
-	wait 0.05;
+	level waittill( "prematch_over" ); // iw4madmin waits this long for some reason...
+	wait 0.05; // so we need to be one frame after it sets up its callbacks.
 	level.prevCallbackPlayerDamage = level.callbackPlayerDamage;
 	level.callbackPlayerDamage = ::onPlayerDamage;
 	
