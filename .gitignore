@@ -23,3 +23,5 @@ demos/
 images/
 weapons/
 missingasset.csv
+userraw/scripts/_commands.gsc
+userraw/scripts/_customcallbacks.gsc
