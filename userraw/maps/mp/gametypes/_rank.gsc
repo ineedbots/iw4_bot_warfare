@@ -11,8 +11,8 @@ init()
 	// if ( level.xpScale > 4 || level.xpScale < 0)
 	// 	exitLevel( false );
 
-	level.xpScale = min( level.xpScale, 4 );
-	level.xpScale = max( level.xpScale, 0 );
+	// level.xpScale = min( level.xpScale, 4 );
+	// level.xpScale = max( level.xpScale, 0 );
 
 	level.rankTable = [];
 
