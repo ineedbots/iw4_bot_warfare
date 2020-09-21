@@ -178,8 +178,11 @@ init()
 	level.perkSetFuncs["specialty_tacticalinsertion"] = ::setTacticalInsertion;
 	level.perkUnsetFuncs["specialty_tacticalinsertion"] = ::unsetTacticalInsertion;
 
-	setDvarIfUninitialized( "combathighIsJuiced", false );
+	setDvarIfUninitialized( "combathighIsJuiced", true );
 	level.combathighIsJuiced = getDvarInt( "combathighIsJuiced" );
+
+	setDvarIfUninitialized( "onemanarmyRefillsTubes", false );
+	level.onemanarmyRefillsTubes = getDvarInt( "onemanarmyRefillsTubes" );
 
 	initPerkDvars();
 
