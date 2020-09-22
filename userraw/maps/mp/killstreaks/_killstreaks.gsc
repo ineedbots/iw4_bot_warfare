@@ -37,7 +37,7 @@ init()
 	level.killstreakRoundDelay = getIntProperty( "scr_game_killstreakdelay", 8 );
 
 	setDvarIfUninitialized( "scr_killstreaksRollover", false );
-	setDvarIfUninitialized( "scr_killstreakHud", 0 );
+	setDvarIfUninitialized( "scr_killstreakHud", false );
 	level.killstreaksRollOver = getDvarInt("scr_killstreaksRollover");
 	level.killstreakHud = getDvarInt("scr_killstreaksRollover");
 	
@@ -129,6 +129,9 @@ onPlayerSpawned()
 		self thread killstreakUseWaiter();
 		self thread waitForChangeTeam();
 		
+		if (level.killstreakHud)
+			self thread initKillstreakHud( 145 );
+
 		self giveOwnedKillstreakItem( true );
 	}
 }
@@ -465,7 +468,7 @@ checkKillstreakReward( streakCount )
 
 		if ( isSubStr( streakName, "-rollover" ) )
 		{
-			if(!level.killstreaksRollover)
+			if (!level.killstreaksRollover || (level.killstreaksRollover == 2 && !self _hasPerk("specialty_rollover")))
 				continue;
 			else
 			{
@@ -718,4 +721,99 @@ clearRideIntro( delay )
 		self VisionSetNakedForPlayer( getDvar( "mapname" ), 0 );
 }
 
+destroyOnEvents(elem)
+{
+	self waittill_either("disconnect", "spawned_player");
+	elem destroy();
+}
 
+initKillstreakHud(inity)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+
+	streakVals = GetArrayKeys(self.killStreaks);
+	hasHardline = self _hasPerk("specialty_hardline");
+
+	self.killStreakHudElems = [];
+
+	// the killstreak counter
+	index = self.killStreakHudElems.size;
+	self.killStreakHudElems[index] = self createFontString( "objective", 2 );
+	self.killStreakHudElems[index].foreground = false;
+	self.killStreakHudElems[index].hideWhenInMenu = true;
+	self.killStreakHudElems[index].fontScale = 0.60;
+	self.killStreakHudElems[index].font = "hudbig";
+	self.killStreakHudElems[index].alpha = 1;
+	self.killStreakHudElems[index].glow = 1;
+	self.killStreakHudElems[index].glowColor = ( 0, 0, 1 );
+	self.killStreakHudElems[index].glowAlpha = 1;
+	self.killStreakHudElems[index].color = ( 1.0, 1.0, 1.0 );
+	self thread destroyOnEvents(self.killStreakHudElems[index]);
+	highestStreak = -1;
+
+	for (i = 0; i < streakVals.size; i++)
+	{
+		streakVal = streakVals[i];
+		streakName = self.killStreaks[streakVal];
+
+		if (isSubStr(streakName, "-rollover"))
+			continue;
+
+		streakShader = maps\mp\killstreaks\_killstreaks::getKillstreakIcon( streakName );
+		streakCost = maps\mp\killstreaks\_killstreaks::getStreakCost( streakName );
+		if (hasHardline)
+			streakCost--;
+
+		// each killstreak icon
+		index = self.killStreakHudElems.size;
+		self.killStreakHudElems[index] = self createFontString( "objective", 2 );
+		self.killStreakHudElems[index].foreground = false;
+		self.killStreakHudElems[index].hideWhenInMenu = true;
+		self.killStreakHudElems[index].fontScale = 0.60;
+		self.killStreakHudElems[index].font = "hudbig";
+		self.killStreakHudElems[index].alpha = 1;
+		self.killStreakHudElems[index].glow = 1;
+		self.killStreakHudElems[index].glowColor = ( 0, 0, 1 );
+		self.killStreakHudElems[index].glowAlpha = 1;
+		self.killStreakHudElems[index].color = ( 1.0, 1.0, 1.0 );
+		self.killStreakHudElems[index] setPoint( "RIGHT", "RIGHT", 0, inity - 25 * i );
+		self.killStreakHudElems[index] setShader( streakShader, 20, 20 );
+		self.killStreakHudElems[index].ks_cost = streakCost;
+		self thread destroyOnEvents(self.killStreakHudElems[index]);
+
+		if (streakCost > highestStreak)
+			highestStreak = streakCost;
+	}
+
+	for(first=true;;)
+  {
+		if (first)
+			first = false;
+		else
+			self waittill( "killed_enemy" );
+
+		curStreak = self.pers["cur_kill_streak"];
+		if (level.killstreaksRollover == 1 || (level.killstreaksRollover == 2 && self _hasPerk("specialty_rollover")))
+			curStreak %= highestStreak;
+
+		isUnderAStreak = false;
+
+		for (i = self.killStreakHudElems.size - 1; i >= 1; i--)
+		{
+			streakElem = self.killStreakHudElems[i];
+			if (curStreak < streakElem.ks_cost)
+			{
+				isUnderAStreak = true;
+				self.killStreakHudElems[0] setPoint( "RIGHT", "RIGHT", -25, inity - 25 * (i - 1) );
+				self.killStreakHudElems[0] setText( streakElem.ks_cost - curStreak );
+			}
+		}
+
+		if (!isUnderAStreak)
+		{
+			self.killStreakHudElems[0] setPoint( "RIGHT", "RIGHT", -25, inity - 25 * (self.killStreakHudElems.size - 1 - 1) );
+			self.killStreakHudElems[0] setText( "Done" );
+		}
+	}
+}
