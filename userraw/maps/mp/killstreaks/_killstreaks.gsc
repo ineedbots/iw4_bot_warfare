@@ -37,8 +37,10 @@ init()
 	level.killstreakRoundDelay = getIntProperty( "scr_game_killstreakdelay", 8 );
 
 	setDvarIfUninitialized( "scr_killstreaksRollover", false );
+	setDvarIfUninitialized( "scr_maxKillstreakRollover", 10 );
 	setDvarIfUninitialized( "scr_killstreakHud", false );
 	level.killstreaksRollOver = getDvarInt("scr_killstreaksRollover");
+	level.maxKillstreakRollover = getDvarInt("scr_maxKillstreakRollover");
 	level.killstreakHud = getDvarInt("scr_killstreakHud");
 	
 	level thread onPlayerConnect();
@@ -474,6 +476,10 @@ checkKillstreakReward( streakCount )
 				continue;
 			else
 			{
+				curRollover = int(strtok(streakName, "-rollover")[1]);
+				if (curRollover > level.maxKillstreakRollover)
+					continue;
+
 				if ( isDefined( game["defcon"] ) && game["defcon"] > 2 )
 				{
 					self.pers["lastEarnedStreak"] = streakName;
@@ -799,6 +805,10 @@ initKillstreakHud(inity)
 		if (level.killstreaksRollover == 1 || (level.killstreaksRollover == 2 && self _hasPerk("specialty_rollover")))
 			curStreak %= highestStreak;
 
+		timesRolledOver = int(curStreak / highestStreak);
+		if (timesRolledOver > level.maxKillstreakRollover)
+			curStreak = highestStreak;
+
 		isUnderAStreak = false;
 
 		for (i = self.killStreakHudElems.size - 1; i >= 1; i--)
@@ -893,6 +903,10 @@ initMW3KillstreakHud()
 		curStreak = self.pers["cur_kill_streak"];
 		if (level.killstreaksRollover == 1 || (level.killstreaksRollover == 2 && self _hasPerk("specialty_rollover")))
 			curStreak %= highestStreak;
+
+		timesRolledOver = int(curStreak / highestStreak);
+		if (timesRolledOver > level.maxKillstreakRollover)
+			curStreak = highestStreak;
 
 		// update the shells
 		for (i = 0; i < self.killStreakShellsElems.size; i++)
