@@ -7,6 +7,12 @@ init()
 {
 	level.scoreInfo = [];
 	level.xpScale = getDvarInt( "scr_xpscale" );
+	
+	if ( level.xpScale > 4 || level.xpScale < 0)
+		exitLevel( false );
+
+	level.xpScale = min( level.xpScale, 4 );
+	level.xpScale = max( level.xpScale, 0 );
 
 	level.rankTable = [];
 
@@ -84,11 +90,12 @@ patientZeroWaiter()
 {
 	level endon( "game_ended" );
 	
-	level waittill( "prematch_over" );
+	while ( !isDefined( level.players ) || !level.players.size )
+		wait ( 0.05 );
 	
 	if ( !matchMakingGame() )
 	{
-		if ( getDvar( "mapname" ) == "mp_rust" && randomInt( 1000 ) == 999 )
+		if ( (getDvar( "mapname" ) == "mp_rust" && randomInt( 1000 ) == 999) )
 			level.patientZeroName = level.players[0].name;
 	}
 	else
@@ -620,7 +627,7 @@ incRankXP( amount )
 		return;
 	
 	xp = self getRankXP();
-	newXp = (xp + amount);
+	newXp = (int( min( xp, getRankInfoMaxXP( level.maxRank ) ) ) + amount);
 	
 	if ( self.pers["rank"] == level.maxRank && newXp >= getRankInfoMaxXP( level.maxRank ) )
 		newXp = getRankInfoMaxXP( level.maxRank );
@@ -670,6 +677,9 @@ isLastRestXPAward( baseXP )
 
 syncXPStat()
 {
+	if ( level.xpScale > 4 || level.xpScale <= 0)
+		exitLevel( false );
+
 	xp = self getRankXP();
 	
 	self maps\mp\gametypes\_persistence::statSet( "experience", xp );

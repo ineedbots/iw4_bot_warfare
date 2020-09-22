@@ -337,7 +337,7 @@ unsetSaboteur()
 
 setLightWeight()
 {
-	self.moveSpeedScaler = 1.10;	
+	self.moveSpeedScaler = 1.07;	
 	self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
 }
 
@@ -567,6 +567,8 @@ selectOneManArmyClass()
 	level endon ( "game_ended" );
 	
 	self _disableWeaponSwitch();
+	self _disableOffhandWeapons();
+	self _disableUsability();
 	
 	self openPopupMenu( game["menu_onemanarmy"] );
 	
@@ -575,15 +577,21 @@ selectOneManArmyClass()
 	self waittill ( "menuresponse", menu, className );
 
 	self _enableWeaponSwitch();
+	self _enableOffhandWeapons();
+	self _enableUsability();
 	
 	if ( className == "back" || !isOneManArmyMenu( menu ) || self isUsingRemote() )
 	{
 		if ( self getCurrentWeapon() == "onemanarmy_mp" )
 		{
 			self _disableWeaponSwitch();
+			self _disableOffhandWeapons();
+			self _disableUsability();
 			self switchToWeapon( self getLastWeapon() );
 			self waittill ( "weapon_change" );
 			self _enableWeaponSwitch();
+			self _enableOffhandWeapons();
+			self _enableUsability();
 		}
 		return;
 	}	
@@ -600,6 +608,8 @@ closeOMAMenuOnDeath()
 	self waittill ( "death" );
 
 	self _enableWeaponSwitch();
+	self _enableOffhandWeapons();
+	self _enableUsability();
 
 	self closePopupMenu();
 }
@@ -629,11 +639,14 @@ giveOneManArmyClass( className )
 		
 	self _disableWeapon();
 	self _disableOffhandWeapons();
+	self _disableUsability();
 	
 	wait ( changeDuration );
 
 	self _enableWeapon();
 	self _enableOffhandWeapons();
+	self _enableUsability();
+	
 	self.OMAClassChanged = true;
 
 	self maps\mp\gametypes\_class::giveLoadout( self.pers["team"], className, false );

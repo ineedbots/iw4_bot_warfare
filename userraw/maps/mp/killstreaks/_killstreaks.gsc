@@ -94,6 +94,12 @@ onPlayerConnect()
 		
 		if( !isDefined ( player.pers[ "killstreaks" ] ) )
 			player.pers[ "killstreaks" ] = [];
+
+		if( !isDefined ( player.pers[ "kID" ] ) )
+			player.pers[ "kID" ] = 10;
+
+		if( !isDefined ( player.pers[ "kIDs_valid" ] ) )
+			player.pers[ "kIDs_valid" ] = [];
 		
 		player.lifeId = 0;
 			
@@ -203,6 +209,7 @@ killstreakUsePressed()
 	lifeId = self.pers["killstreaks"][0].lifeId;
 	isEarned = self.pers["killstreaks"][0].earned;
 	awardXp = self.pers["killstreaks"][0].awardXp;
+	kID = self.pers["killstreaks"][0].kID;
 
 	assert( isDefined( streakName ) );
 	assert( isDefined( level.killstreakFuncs[ streakName ] ) );
@@ -245,12 +252,20 @@ killstreakUsePressed()
 	
 	if ( !self isWeaponEnabled() )
 		return ( false );
-	
-	if ( !self [[ level.killstreakFuncs[ streakName ] ]]( lifeId ) )
-		return ( false );
 
+	if ( streakName == "airdrop" || streakName == "airdrop_sentry_minigun" || streakName == "airdrop_mega" )
+	{
+		if ( !self [[ level.killstreakFuncs[ streakName ] ]]( lifeId, kID ) )
+			return ( false );
+	}
+	else
+	{
+		  if ( !self [[ level.killstreakFuncs[ streakName ] ]]( lifeId ) )
+			  return ( false );
+	}
+	
 	self usedKillstreak( streakName, awardXp );
-	self shuffleKillStreaksFILO( streakName );	
+	self shuffleKillStreaksFILO( streakName, kID );	
 	self giveOwnedKillstreakItem();		
 
 	return ( true );
@@ -258,7 +273,7 @@ killstreakUsePressed()
 
 
 //this overwrites killstreak at index 0 and decrements all other killstreaks (FCLS style)
-shuffleKillStreaksFILO( streakName )
+shuffleKillStreaksFILO( streakName, kID )
 {
 	self _setActionSlot( 4, "" );
 
@@ -268,6 +283,9 @@ shuffleKillStreaksFILO( streakName )
 	for ( i = 0; i < arraySize; i++ )
 	{
 		if ( self.pers["killstreaks"][i].streakName != streakName )
+			continue;
+			
+		if ( isDefined( kID ) && self.pers["killstreaks"][i].kID != kID )
 			continue;
 			
 		streakIndex = i;
@@ -333,6 +351,24 @@ clearKillstreaks()
 		self.pers["killstreaks"][index] = undefined;
 }
 
+getFirstPrimaryWeapon()
+{
+	weaponsList = self getWeaponsListPrimaries();
+	
+	assert ( isDefined( weaponsList[0] ) );
+	assert ( !isKillstreakWeapon( weaponsList[0] ) );
+
+	if ( weaponsList[0] == "onemanarmy_mp" )
+	{
+		assert ( isDefined( weaponsList[1] ) );
+		assert ( !isKillstreakWeapon( weaponsList[1] ) );
+		
+		return weaponsList[1];
+	}
+
+	return weaponsList[0];
+}
+
 
 killstreakUseWaiter()
 {
@@ -366,7 +402,12 @@ killstreakUseWaiter()
 
 		//no force switching weapon for ridable killstreaks
 		if ( !isRideKillstreak( streakName ) || !result )
-			self switchToWeapon( self getLastWeapon() );
+		{
+			if ( !self hasWeapon( self getLastWeapon() ) )
+				self switchToWeapon( self getFirstPrimaryWeapon() );			
+			else
+				self switchToWeapon( self getLastWeapon() );
+		}
 
 		// give time to switch to the near weapon; when the weapon is none (such as during a "disableWeapon()" period
 		// re-enabling the weapon immediately does a "weapon_change" to the killstreak weapon we just used.  In the case that 
@@ -385,6 +426,7 @@ killstreakUseWaiter()
 finishDeathWaiter()
 {
 	self endon ( "disconnect" );
+	level endon ( "game_ended" );
 	
 	self waittill ( "death" );
 	wait ( 0.05 );
@@ -494,6 +536,12 @@ giveKillstreak( streakName, isEarned, awardXp, owner )
 	self.pers["killstreaks"][0].earned = isDefined( isEarned ) && isEarned;
 	self.pers["killstreaks"][0].awardxp = isDefined( awardXp ) && awardXp;
 	self.pers["killstreaks"][0].owner = owner;
+
+	self.pers["killstreaks"][0].kID = self.pers["kID"];
+	self.pers["kIDs_valid"][self.pers["kID"]] = true;
+
+	self.pers["kID"]++;
+
 	if ( !self.pers["killstreaks"][0].earned )
 		self.pers["killstreaks"][0].lifeId = -1;
 	else

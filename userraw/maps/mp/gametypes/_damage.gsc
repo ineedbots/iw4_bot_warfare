@@ -2223,7 +2223,7 @@ reviveTriggerThink( team )
 			self.owner clearLowerMessage( "last_stand" );
 			
 			if ( self.owner _hasPerk( "specialty_lightweight" ) )
-				self.owner.moveSpeedScaler = 1.10;
+				self.owner.moveSpeedScaler = 1.07;
 			else
 				self.owner.moveSpeedScaler = 1;
 			
