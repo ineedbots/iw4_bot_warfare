@@ -12,6 +12,8 @@
 #include maps\mp\perks\_perks;
 
 
+
+
 blastshieldUseTracker( perkName, useFunc )
 {
 	self endon ( "death" );
@@ -119,6 +121,8 @@ setCombatHigh()
 	level endon( "end_game" );
 	
 	self.damageBlockedTotal = 0;
+	self.moveSpeedScaler = 1.25;
+	self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
 	//self visionSetNakedForPlayer( "end_game", 1 );
 
 	if ( level.splitscreen )
@@ -145,7 +149,7 @@ setCombatHigh()
 	
 	self.combatHighTimer = createTimer( "hudsmall", 1.0 );
 	self.combatHighTimer setPoint( "CENTER", "CENTER", 0, yOffset );
-	self.combatHighTimer setTimer( 10.0 );
+	self.combatHighTimer setTimer( 7.0 );
 	self.combatHighTimer.color = (.8,.8,0);
 	self.combatHighTimer.archived = false;
 	self.combatHighTimer.foreground = true;
@@ -163,10 +167,10 @@ setCombatHigh()
 	self.combatHighIcon fadeOverTime( 1.0 );
 	self.combatHighOverlay.alpha = 1.0;
 	self.combatHighIcon.alpha = 0.85;
-	
+
 	self thread unsetCombatHighOnDeath();
 	
-	wait( 8 );
+	wait( 5 );
 
 	self.combatHighIcon	fadeOverTime( 2.0 );
 	self.combatHighIcon.alpha = 0.0;
@@ -180,6 +184,15 @@ setCombatHigh()
 	wait( 2 );
 	self.damageBlockedTotal = undefined;
 
+	self.moveSpeedScaler = 1;
+
+	if (self _hasperk( "specialty_lightweight" ))
+	{
+		self.moveSpeedScaler = 1.07;
+	}
+
+	self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
+
 	self _unsetPerk( "specialty_combathigh" );
 }
 
@@ -189,6 +202,13 @@ unsetCombatHighOnDeath()
 	self endon ( "unset_combathigh" );
 	
 	self waittill ( "death" );
+
+	self.moveSpeedScaler = 1;
+
+	if (self _hasperk( "specialty_lightweight" ))
+	{
+		self.moveSpeedScaler = 1.07;
+	}
 	
 	self thread _unsetPerk( "specialty_combathigh" );
 }
@@ -199,6 +219,13 @@ unsetCombatHigh()
 	self.combatHighOverlay destroy();
 	self.combatHighIcon destroy();
 	self.combatHighTimer destroy();
+
+	self.moveSpeedScaler = 1;
+
+	if (self _hasperk( "specialty_lightweight" ))
+	{
+		self.moveSpeedScaler = 1.07;
+	}
 }
 
 setSiege()
@@ -337,7 +364,13 @@ unsetSaboteur()
 
 setLightWeight()
 {
-	self.moveSpeedScaler = 1.07;	
+	self.moveSpeedScaler = 1.07;
+
+	if (self _hasperk( "specialty_combathigh" ))
+	{
+		self.moveSpeedScaler = 1.4;
+	}
+
 	self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
 }
 
@@ -587,6 +620,7 @@ selectOneManArmyClass()
 			self _disableWeaponSwitch();
 			self _disableOffhandWeapons();
 			self _disableUsability();
+
 			self switchToWeapon( self getLastWeapon() );
 			self waittill ( "weapon_change" );
 			self _enableWeaponSwitch();
@@ -634,9 +668,9 @@ giveOneManArmyClass( className )
 		self playSoundToTeam( "foly_onemanarmy_bag6_npc", "allies", self );
 		self playSoundToTeam( "foly_onemanarmy_bag6_npc", "axis", self );
 	}
-		
+
 	self thread omaUseBar( changeDuration );
-		
+
 	self _disableWeapon();
 	self _disableOffhandWeapons();
 	self _disableUsability();
@@ -648,7 +682,7 @@ giveOneManArmyClass( className )
 	self _enableUsability();
 	
 	self.OMAClassChanged = true;
-
+	
 	self maps\mp\gametypes\_class::giveLoadout( self.pers["team"], className, false );
 	
 	// handle the fact that detachAll in giveLoadout removed the CTF flag from our back
@@ -658,6 +692,15 @@ giveOneManArmyClass( className )
 	
 	self notify ( "changed_kit" );
 	level notify ( "changed_kit" );
+
+	weaponNameSize = self getCurrentWeapon().size;
+	
+	if( getSubStr( self getCurrentWeapon(), weaponNameSize - 6, weaponNameSize ) == "_gl_mp" )
+	{	
+		weaponName = "gl_" + getSubStr( self getCurrentWeapon(), 0, weaponNameSize - 6 ) + "_mp";
+		self setWeaponAmmoClip( weaponName, 0 );
+		self setWeaponAmmoStock( weaponName, 0 );
+	}
 }
 
 

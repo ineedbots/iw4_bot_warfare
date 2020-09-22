@@ -323,7 +323,7 @@ cac_modified_damage( victim, attacker, damage, meansofdeath, weapon, impactPoint
 	if ( ( victim.xpScaler == 2 && isDefined( attacker ) ) && ( isPlayer( attacker ) || attacker.classname == "scrip_vehicle" ) )
 		damageAdd += 200;
 	
-	if ( victim _hasperk( "specialty_combathigh" ) )
+	/*if ( victim _hasperk( "specialty_combathigh" ) )
 	{
 		if ( IsDefined( self.damageBlockedTotal ) && (!level.teamBased || (isDefined( attacker ) && isDefined( attacker.team ) && victim.team != attacker.team)) )
 		{
@@ -351,7 +351,7 @@ cac_modified_damage( victim, attacker, damage, meansofdeath, weapon, impactPoint
 					break;
 			}
 		}
-	}	
+	}*/	
 	
 	return int( damage + damageAdd );
 }

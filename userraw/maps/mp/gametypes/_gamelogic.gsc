@@ -530,9 +530,6 @@ updateTieStats( loser )
 
 updateWinLossStats( winner )
 {
-	if ( privateMatch() )
-		return;
-		
 	if ( !wasLastRound() )
 		return;
 		
@@ -608,9 +605,6 @@ freezePlayerForRoundEnd( delay )
 updateMatchBonusScores( winner )
 {
 	if ( !game["timePassed"] )
-		return;
-
-	if ( !matchMakingGame() )
 		return;
 
 	if ( !getTimeLimit() || level.forcedEnd )
@@ -1296,6 +1290,7 @@ Callback_StartGameType()
 
 		precacheShader( "white" );
 		precacheShader( "black" );
+		//precacheMenu("popup_summary");
 			
 		game["strings"]["press_to_spawn"] = &"PLATFORM_PRESS_TO_SPAWN";
 		if ( level.teamBased )
@@ -1847,19 +1842,9 @@ getBetterTeam()
 
 rankedMatchUpdates( winner )
 {
-	if ( matchMakingGame() )
-	{
-		setXenonRanks();
+	setXenonRanks();
 		
-		if ( hostIdledOut() )
-		{
-			level.hostForcedEnd = true;
-			logString( "host idled out" );
-			endLobby();
-		}
-
-		updateMatchBonusScores( winner );
-	}
+	updateMatchBonusScores( winner );
 
 	updateWinLossStats( winner );
 }
@@ -2210,6 +2195,23 @@ endGame( winner, endReasonText, nukeDetonated )
 	else
 	{
 		wait ( min( 10.0, 4.0 + level.postGameNotifies ) );
+	}
+	if (!matchmakingGame())
+	{
+		foreach (player in level.players)
+		{
+			//player openPopupMenu("popup_summary");
+		}
+		
+		intermissionTime = 30.0;
+		
+		if(getDvarInt( "party_host" ))
+		{
+			intermissionTime = 10.0;
+		}
+		
+		thread timeLimitClock_Intermission( intermissionTime );
+		wait intermissionTime;
 	}
 	
 	level notify( "exitLevel_called" );
