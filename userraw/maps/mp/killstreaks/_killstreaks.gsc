@@ -812,7 +812,7 @@ initKillstreakHud(inity)
 			}
 		}
 
-		if (!isUnderAStreak)
+		if (!isUnderAStreak && self.killStreakHudElems.size)
 		{
 			self.killStreakHudElems[0] setPoint( "RIGHT", "RIGHT", -25, inity - 25 * (self.killStreakHudElems.size - 1 - 1) );
 			self.killStreakHudElems[0] setText( "Done" );
