@@ -476,7 +476,7 @@ checkKillstreakReward( streakCount )
 				continue;
 			else
 			{
-				curRollover = int(strtok(streakName, "-rollover")[1]);
+				curRollover = int(strtok(strtok(streakName, "-")[1], "rollover")[0]);
 				if (curRollover > level.maxKillstreakRollover)
 					continue;
 
@@ -802,10 +802,10 @@ initKillstreakHud(inity)
 			self waittill( "killed_enemy" );
 
 		curStreak = self.pers["cur_kill_streak"];
+		timesRolledOver = int(curStreak / highestStreak);
 		if (level.killstreaksRollover == 1 || (level.killstreaksRollover == 2 && self _hasPerk("specialty_rollover")))
 			curStreak %= highestStreak;
 
-		timesRolledOver = int(curStreak / highestStreak);
 		if (timesRolledOver > level.maxKillstreakRollover)
 			curStreak = highestStreak;
 
@@ -901,10 +901,10 @@ initMW3KillstreakHud()
 			self waittill( "killed_enemy" );
 
 		curStreak = self.pers["cur_kill_streak"];
+		timesRolledOver = int(curStreak / highestStreak);
 		if (level.killstreaksRollover == 1 || (level.killstreaksRollover == 2 && self _hasPerk("specialty_rollover")))
 			curStreak %= highestStreak;
 
-		timesRolledOver = int(curStreak / highestStreak);
 		if (timesRolledOver > level.maxKillstreakRollover)
 			curStreak = highestStreak;
 
