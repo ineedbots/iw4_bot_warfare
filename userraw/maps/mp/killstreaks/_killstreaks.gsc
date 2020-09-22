@@ -39,7 +39,7 @@ init()
 	setDvarIfUninitialized( "scr_killstreaksRollover", false );
 	setDvarIfUninitialized( "scr_killstreakHud", false );
 	level.killstreaksRollOver = getDvarInt("scr_killstreaksRollover");
-	level.killstreakHud = getDvarInt("scr_killstreaksRollover");
+	level.killstreakHud = getDvarInt("scr_killstreakHud");
 	
 	level thread onPlayerConnect();
 }
@@ -129,8 +129,10 @@ onPlayerSpawned()
 		self thread killstreakUseWaiter();
 		self thread waitForChangeTeam();
 		
-		if (level.killstreakHud)
+		if (level.killstreakHud == 1)
 			self thread initKillstreakHud( 145 );
+		else if (level.killstreakHud == 2)
+			self thread initMW3KillstreakHud();
 
 		self giveOwnedKillstreakItem( true );
 	}
@@ -814,6 +816,103 @@ initKillstreakHud(inity)
 		{
 			self.killStreakHudElems[0] setPoint( "RIGHT", "RIGHT", -25, inity - 25 * (self.killStreakHudElems.size - 1 - 1) );
 			self.killStreakHudElems[0] setText( "Done" );
+		}
+	}
+}
+
+initMW3KillstreakHud()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+
+	streakVals = GetArrayKeys(self.killStreaks);
+	hasHardline = self _hasPerk("specialty_hardline");
+
+	self.killStreakHudElems = [];
+	self.killStreakShellsElems = [];
+	highestStreak = -1;
+
+	for (i = 0; i < streakVals.size; i++)
+	{
+		streakVal = streakVals[i];
+		streakName = self.killStreaks[streakVal];
+
+		if (isSubStr(streakName, "-rollover"))
+			continue;
+
+		streakShader = maps\mp\killstreaks\_killstreaks::getKillstreakIcon( streakName );
+		streakCost = maps\mp\killstreaks\_killstreaks::getStreakCost( streakName );
+		if (hasHardline)
+			streakCost--;
+
+		if (streakCost > highestStreak)
+			highestStreak = streakCost;
+
+		// the shader
+		ksIcon = createIcon( streakShader, 20, 20 );
+		ksIcon setPoint( "BOTTOM RIGHT", "BOTTOM RIGHT", -32, -90 + -25 * i );
+		ksIcon.alpha = 0.4;
+		ksIcon.hideWhenInMenu = true;
+		ksIcon.foreground = true;
+		ksIcon.ks_cost = streakCost;
+		self thread destroyOnEvents(ksIcon);
+		self.killStreakHudElems[self.killStreakHudElems.size] = ksIcon;
+	}
+
+	// the shells
+	if (highestStreak > 0)
+	{
+		h = -53;
+		for(i = 0; i < highestStreak; i++)
+		{
+			ksShell = NewClientHudElem( self );
+			ksShell.x = 40;
+			ksShell.y = h;
+			ksShell.alignX = "right";
+			ksShell.alignY = "bottom";
+			ksShell.horzAlign = "right";
+			ksShell.vertAlign = "bottom";
+			ksShell setshader("white", 10, 2);
+			ksShell.alpha = 0.3;
+			ksShell.hideWhenInMenu = true;
+			ksShell.foreground = false;
+			self thread destroyOnEvents(ksShell);
+			self.killStreakShellsElems[i] = ksShell;
+			
+			h -= 4;
+		}
+	}
+
+	for(first=true;;)
+  {
+		if (first)
+			first = false;
+		else
+			self waittill( "killed_enemy" );
+
+		curStreak = self.pers["cur_kill_streak"];
+		if (level.killstreaksRollover == 1 || (level.killstreaksRollover == 2 && self _hasPerk("specialty_rollover")))
+			curStreak %= highestStreak;
+
+		// update the shells
+		for (i = 0; i < self.killStreakShellsElems.size; i++)
+		{
+			elem = self.killStreakShellsElems[i];
+			if (curStreak > i)
+				elem.alpha = 0.85;
+			else
+				elem.alpha = 0.3;
+		}
+
+		// update the ks icons
+		for (i = 0; i < self.killStreakHudElems.size; i++)
+		{
+			elem = self.killStreakHudElems[i];
+
+			if (curStreak >= elem.ks_cost)
+				elem.alpha = 0.9;
+			else
+				elem.alpha = 0.4;
 		}
 	}
 }
