@@ -1,3 +1,24 @@
+/*
+	_nuke modded
+	Author: INeedGames
+	Date: 09/22/2020
+
+	DVARS:
+		- scr_nuke_is_moab <bool>
+			false - (default) if a nuke ends the game or is a mw3 moab
+
+		- scr_nuke_kills_all <bool>
+			true - (default) if a nuke kills all, even friendly fire
+
+		- scr_nuke_emp_duration <float>
+			60.0 - (default) how long to have the emp effect on for the nuked
+
+		- scr_nuke_perm_vision <bool>
+			true - (default) if to never change the vision back to normal after a bomb
+
+	Thanks: H3X1C, Emosewaj
+*/
+
 #include common_scripts\utility;
 #include maps\mp\_utility;
 
@@ -19,13 +40,19 @@ init()
 
 	setDvarIfUninitialized( "scr_nukeTimer", 10 );
 	setDvarIfUninitialized( "scr_nukeCancelMode", 0 );
+
 	setDvarIfUninitialized( "scr_nuke_is_moab", true );
 	setDvarIfUninitialized( "scr_nuke_kills_all", true );
+	setDvarIfUninitialized( "scr_nuke_emp_duration", 60.0 );
+	setDvarIfUninitialized( "scr_nuke_perm_vision", true );
 	
 	level.nukeTimer = getDvarInt( "scr_nukeTimer" );
 	level.cancelMode = getDvarInt( "scr_nukeCancelMode" );
+
 	level.nukeEndsGame = getDvarInt( "scr_nuke_is_moab" );
 	level.nukeKillsAll = getDvarInt( "scr_nuke_kills_all" );
+	level.nukeEmpDuration = getDvarFloat( "scr_nuke_emp_duration" );
+	level.nukePermAftermath = getDvarFloat( "scr_nuke_perm_vision" );
 	
 	/#
 	setDevDvarIfUninitialized( "scr_nukeDistance", 5000 );
@@ -153,14 +180,15 @@ doNuke( allowCancel )
 		wait( 1.0 );
 	}
 	
-	clockObject notify("death");
 	clockObject delete();
 }
 
 killClockObjectOnEndOn(clockObject)
 {
 	clockObject endon("death");
+
 	level waittill( "nuke_cancelled" );
+
 	clockObject delete();
 }
 
@@ -173,7 +201,6 @@ cancelNukeOnDeath( player )
 		player thread maps\mp\killstreaks\_emp::EMP_Use( 0, 0 );
 	
 	level.nukeIncoming = undefined;
-	
 	level.nukeDetonated = undefined;
 	
 	maps\mp\gametypes\_gamelogic::resumeTimer();
@@ -221,7 +248,8 @@ nukeEffects()
 	{
 		if ( level.teamBased )
 		{
-			level thread maps\mp\killstreaks\_emp::EMP_JamTeam(level.otherTeam[level.nukeInfo.team], 60, 5, level.nukeInfo.player, true);
+			if (level.nukeEmpDuration != 0)
+				level thread maps\mp\killstreaks\_emp::EMP_JamTeam(level.otherTeam[level.nukeInfo.team], level.nukeEmpDuration, 5, level.nukeInfo.player, true);
 			
 			foreach (player in level.players)
 			{
@@ -234,7 +262,9 @@ nukeEffects()
 		}
 		else
 		{
-			level thread maps\mp\killstreaks\_emp::EMP_JamPlayers(level.nukeInfo.player, 60, 5, true);
+			if (level.nukeEmpDuration != 0)
+				level thread maps\mp\killstreaks\_emp::EMP_JamPlayers(level.nukeInfo.player, level.nukeEmpDuration, 5, true);
+
 			if(isDefined(level.nukeInfo.player))
 			{
 				level.nukeInfo.player.xpScaler = 2;
@@ -277,8 +307,9 @@ killNukeEntOn(nukeEnt)
 {
 	nukeEnt endon("death");
 	level endon ( "nuke_cancelled" );
+
 	level waittill("nuke_death");
-	nukeEnt notify("death");
+
 	nukeEnt delete();
 }
 
@@ -308,20 +339,10 @@ nukeAftermathEffect()
 
 nukeSlowMo()
 {
-	level endon ( "nuke_cancelled" );
-
 	//SetSlowMotion( <startTimescale>, <endTimescale>, <deltaTime> )
 	setSlowMotion( 1.0, 0.25, 0.5 );
-	level waittill( "nuke_death" );
+	level waittill_either( "nuke_death", "nuke_cancelled" );
 	setSlowMotion( 0.25, 1, 2.0 );
-}
-
-fixVisionOnCancel()
-{
-	level waittill ( "nuke_cancelled" );
-	//reset nuke vision
-	visionSetNaked( getDvar( "mapname" ), 2.0 );
-	level.nukeVisionInProgress = undefined;
 }
 
 nukeVision()
@@ -335,9 +356,6 @@ nukeVision()
 
 	visionSetNaked( "mpnuke_aftermath", 5 );
 	
-	level thread fixVisionOnCancel();
-	
-	
 	if( level.NukeEndsGame )
 	{
 		wait 5;
@@ -346,7 +364,14 @@ nukeVision()
 	else
 	{
 		wait 3.5;
-		level notify ( "nuke_cancelled" );
+
+		if (level.nukePermAftermath)
+			visionSetNaked( "aftermath", 1 );
+		else
+		{
+			level.nukeVisionInProgress = undefined;
+			visionSetNaked( getDvar( "mapname" ), 10 );
+		}
 	}
 }
 
