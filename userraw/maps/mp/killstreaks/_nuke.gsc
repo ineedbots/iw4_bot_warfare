@@ -83,6 +83,12 @@ onPlayerSpawned()
 		
 		if(isDefined(level.moabXP[self.team]) || isDefined(level.moabXP[self.guid]))
 			self.xpScaler = 2;
+
+		if (isDefined(level.nukeVisionInProgress) && level.nukePermAftermath)
+		{
+			visionSetNaked( "aftermath", 0 );
+			VisionSetPain("aftermath");
+		}
 	}
 }
 
