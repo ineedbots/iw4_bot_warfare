@@ -1,5 +1,8 @@
 #include maps\mp\bots\_bot_utility;
 
+/*
+	
+*/
 doVersionCheck()
 {
 	remoteVersion = getRemoteVersion();
@@ -21,6 +24,9 @@ doVersionCheck()
 	return true;
 }
 
+/*
+	
+*/
 getRemoteWaypoints(mapname)
 {
   url = "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/" + mapname + "_wp.csv";
@@ -42,6 +48,9 @@ getRemoteWaypoints(mapname)
   }
 }
 
+/*
+	
+*/
 getRemoteVersion()
 {
   request = httpGet( "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/version.txt" );
@@ -54,6 +63,9 @@ getRemoteVersion()
   return strtok(data, "\n")[0];
 }
 
+/*
+	
+*/
 linesToWaypoints(res)
 {
   waypoints = [];
@@ -74,6 +86,9 @@ linesToWaypoints(res)
   return waypoints;
 }
 
+/*
+	
+*/
 getLinesFromUrl(url)
 {
   result = spawnStruct();

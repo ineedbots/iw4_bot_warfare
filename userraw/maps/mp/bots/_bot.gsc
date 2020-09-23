@@ -229,6 +229,9 @@ fixGamemodes()
 	}
 }
 
+/*
+	
+*/
 fixKoth()
 {
 	level.radio = undefined;
@@ -256,6 +259,9 @@ fixKoth()
 	}
 }
 
+/*
+	
+*/
 addNotifyOnAirdrops()
 {
 	for (;;)
@@ -279,6 +285,9 @@ addNotifyOnAirdrops()
 	}
 }
 
+/*
+	
+*/
 doNotifyOnAirdrop()
 {
 	self endon( "death" );
@@ -304,6 +313,9 @@ onPlayerConnect()
 	}
 }
 
+/*
+	
+*/
 watchScrabler()
 {
 	for (;;)
@@ -729,6 +741,9 @@ onGrenadeFire()
 	}
 }
 
+/*
+	
+*/
 AddToFragList(who)
 {
 	grenade = spawnstruct();
@@ -744,6 +759,9 @@ AddToFragList(who)
 	level.bots_fragList ListAdd(grenade);
 }
 
+/*
+	
+*/
 thinkFrag()
 {
 	while(isDefined(self.grenade))

@@ -93,6 +93,9 @@ bot_get_rank()
 	return maps\mp\gametypes\_rank::getRankInfoMinXP( rank );
 }
 
+/*
+	
+*/
 getCardTitles()
 {
 	cards = [];
@@ -113,6 +116,9 @@ getCardTitles()
 	return cards;
 }
 
+/*
+	
+*/
 getCardIcons()
 {
 	cards = [];
@@ -133,6 +139,9 @@ getCardIcons()
 	return cards;
 }
 
+/*
+	
+*/
 isValidAttachmentCombo(att1, att2)
 {
 	colIndex = tableLookupRowNum( "mp/attachmentCombos.csv", 0, att1 );
@@ -143,6 +152,9 @@ isValidAttachmentCombo(att1, att2)
 	return true;
 }
 
+/*
+	
+*/
 getAttachmentsForGun(gun)
 {
 	row = tableLookupRowNum( "mp/statStable.csv", 4, gun );
@@ -164,6 +176,9 @@ getAttachmentsForGun(gun)
 	return attachments;
 }
 
+/*
+	
+*/
 getPrimaries()
 {
 	primaries = [];
@@ -183,6 +198,9 @@ getPrimaries()
 	return primaries;
 }
 
+/*
+	
+*/
 getSecondaries()
 {
 	secondaries = [];
@@ -205,6 +223,9 @@ getSecondaries()
 	return secondaries;
 }
 
+/*
+	
+*/
 getCamos()
 {
 	camos = [];
@@ -222,6 +243,9 @@ getCamos()
 	return camos;
 }
 
+/*
+	
+*/
 getPerks(perktype)
 {
 	perks = [];
@@ -246,11 +270,17 @@ getPerks(perktype)
 	return perks;
 }
 
+/*
+	
+*/
 getKillsNeededForStreak(streak)
 {
 	return int(tableLookup("mp/killstreakTable.csv", 1, streak, 4));
 }
 
+/*
+	
+*/
 getKillstreaks()
 {
 	killstreaks = [];
@@ -275,6 +305,9 @@ getKillstreaks()
 	return killstreaks;
 }
 
+/*
+	
+*/
 chooseRandomPerk(perkkind)
 {
 	perks = getPerks(perkkind);
@@ -307,6 +340,9 @@ chooseRandomPerk(perkkind)
 	}
 }
 
+/*
+	
+*/
 chooseRandomCamo()
 {
 	camos = getCamos();
@@ -322,6 +358,9 @@ chooseRandomCamo()
 	}
 }
 
+/*
+	
+*/
 chooseRandomPrimary()
 {
 	primaries = getPrimaries();
@@ -344,6 +383,9 @@ chooseRandomPrimary()
 	}
 }
 
+/*
+	
+*/
 chooseRandomSecondary(perk1)
 {
 	if (perk1 == "specialty_onemanarmy")
@@ -372,6 +414,9 @@ chooseRandomSecondary(perk1)
 	}
 }
 
+/*
+	
+*/
 chooseRandomAttachmentComboForGun(gun)
 {
 	atts = getAttachmentsForGun(gun);
@@ -399,6 +444,9 @@ chooseRandomAttachmentComboForGun(gun)
 	}
 }
 
+/*
+	
+*/
 chooseRandomTactical()
 {
 	tacts = strTok("flash_grenade,smoke_grenade,concussion_grenade", ",");
@@ -411,6 +459,9 @@ chooseRandomTactical()
 	}
 }
 
+/*
+	
+*/
 setClasses()
 {
 	rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData("experience") );
@@ -450,6 +501,9 @@ setClasses()
 	}
 }
 
+/*
+	
+*/
 isColidingKillstreak(killstreaks, killstreak)
 {
 	ksVal = getKillsNeededForStreak(killstreak);
@@ -478,6 +532,9 @@ isColidingKillstreak(killstreaks, killstreak)
 	return false;
 }
 
+/*
+	
+*/
 setKillstreaks()
 {
 	rankId = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData( "experience" ) ) + 1;
@@ -662,6 +719,9 @@ bot_cry_for_help( attacker )
 	}
 }
 
+/*
+	
+*/
 onKillcam()
 {
 	level endon("game_ended");
@@ -675,6 +735,9 @@ onKillcam()
 	}
 }
 
+/*
+	
+*/
 doKillcamStuff()
 {
 	self endon("disconnect");
@@ -1008,6 +1071,9 @@ onSpawned()
 	}
 }
 
+/*
+	
+*/
 onDeath()
 {
 	self endon("disconnect");
@@ -1020,6 +1086,9 @@ onDeath()
 	}
 }
 
+/*
+	
+*/
 onGiveLoadout()
 {
 	self endon("disconnect");
@@ -1037,6 +1106,9 @@ onGiveLoadout()
 	}
 }
 
+/*
+	
+*/
 bot_inc_bots(obj, unreach)
 {
 	level endon("game_ended");
@@ -1052,6 +1124,9 @@ bot_inc_bots(obj, unreach)
 		obj.bots--;
 }
 
+/*
+	
+*/
 bots_watch_touch_obj(obj)
 {
 	self endon ("death");
@@ -1078,6 +1153,9 @@ bots_watch_touch_obj(obj)
 	}
 }
 
+/*
+	
+*/
 nearAnyOfWaypoints(dist, waypoints)
 {
 	dist *= dist;
@@ -1094,6 +1172,9 @@ nearAnyOfWaypoints(dist, waypoints)
 	return false;
 }
 
+/*
+	
+*/
 getNearestWaypointOfWaypoints(waypoints)
 {
 	answer = undefined;
@@ -1110,6 +1191,9 @@ getNearestWaypointOfWaypoints(waypoints)
 	return answer;
 }
 
+/*
+	
+*/
 bot_escort_obj(obj, carrier)
 {
 	self endon( "death" );
@@ -1132,6 +1216,9 @@ bot_escort_obj(obj, carrier)
 	self notify("goal");
 }
 
+/*
+	
+*/
 bot_get_obj(obj)
 {
 	self endon( "death" );
@@ -1170,6 +1257,9 @@ onBotSpawned()
 	}
 }
 
+/*
+	
+*/
 start_bot_threads()
 {
 	self endon("disconnect");
@@ -1208,6 +1298,9 @@ start_bot_threads()
 	self thread bot_cap();
 }
 
+/*
+	
+*/
 stop_go_target_on_death(tar)
 {
 	self endon( "death" );
@@ -1221,6 +1314,9 @@ stop_go_target_on_death(tar)
 	self ClearScriptGoal();
 }
 
+/*
+	
+*/
 follow_target()
 {
 	self endon( "death" );
@@ -1298,6 +1394,9 @@ bot_think_camp()
 	}
 }
 
+/*
+	
+*/
 killCampAfterTime(time)
 {
 	self endon("death");
@@ -1311,6 +1410,9 @@ killCampAfterTime(time)
 	self notify("kill_camp_bot");
 }
 
+/*
+	
+*/
 killCampAfterEntGone(ent)
 {
 	self endon("death");
@@ -1331,6 +1433,9 @@ killCampAfterEntGone(ent)
 	self notify("kill_camp_bot");
 }
 
+/*
+	
+*/
 CampAtSpot(origin, anglePos)
 {
 	self endon("kill_camp_bot");
@@ -1397,6 +1502,9 @@ bot_think_follow()
 	}
 }
 
+/*
+	
+*/
 watchForFollowNewGoal()
 {
 	self endon("death");
@@ -1415,6 +1523,9 @@ watchForFollowNewGoal()
 	self notify("kill_follow_bot");
 }
 
+/*
+	
+*/
 killFollowAfterTime(time)
 {
 	self endon("death");
@@ -1428,6 +1539,9 @@ killFollowAfterTime(time)
 	self notify("kill_follow_bot");
 }
 
+/*
+	
+*/
 followPlayer(who)
 {
 	self endon("kill_follow_bot");
@@ -1461,6 +1575,9 @@ followPlayer(who)
 	self notify("kill_follow_bot");
 }
 
+/*
+	
+*/
 bot_perk_think()
 {
 	self endon("disconnect");
@@ -1587,6 +1704,9 @@ bot_perk_think()
 	}
 }
 
+/*
+	
+*/
 bot_use_tube_think()
 {
 	self endon("disconnect");
@@ -1717,6 +1837,9 @@ bot_use_tube_think()
 	}
 }
 
+/*
+	
+*/
 fire_current_weapon()
 {
 	self endon("death");
@@ -1731,6 +1854,9 @@ fire_current_weapon()
 	}
 }
 
+/*
+	
+*/
 bot_use_equipment_think()
 {
 	self endon("disconnect");
@@ -1847,6 +1973,9 @@ bot_use_equipment_think()
 	}
 }
 
+/*
+	
+*/
 bot_use_grenade_think()
 {
 	self endon("disconnect");
@@ -1971,6 +2100,9 @@ bot_use_grenade_think()
 	}
 }
 
+/*
+	
+*/
 bot_jav_loc_think()
 {
 	self endon("disconnect");
@@ -2091,6 +2223,9 @@ bot_jav_loc_think()
 	}
 }
 
+/*
+	
+*/
 bot_equipment_kill_think()
 {
 	self endon( "death" );
@@ -2218,6 +2353,9 @@ bot_equipment_kill_think()
 	}
 }
 
+/*
+	
+*/
 bot_equipment_attack(equ)
 {
 	wait_time = RandomIntRange( 7, 10 );
@@ -2233,6 +2371,9 @@ bot_equipment_attack(equ)
 	}
 }
 
+/*
+	
+*/
 bot_listen_to_steps()
 {
 	self endon("disconnect");
@@ -2332,6 +2473,9 @@ bot_listen_to_steps()
 	}
 }
 
+/*
+	
+*/
 bot_uav_think()
 {
 	self endon( "death" );
@@ -2403,6 +2547,9 @@ bot_uav_think()
 	}
 }
 
+/*
+	
+*/
 bot_revenge_think()
 {
 	self endon( "death" );
@@ -2431,6 +2578,9 @@ bot_revenge_think()
 	}
 }
 
+/*
+	
+*/
 turret_death_monitor(turret)
 {
 	self endon ("death");
@@ -2456,6 +2606,9 @@ turret_death_monitor(turret)
 	self notify("bad_path");
 }
 
+/*
+	
+*/
 bot_turret_attack( enemy )
 {
 	wait_time = RandomIntRange( 7, 10 );
@@ -2478,6 +2631,9 @@ bot_turret_attack( enemy )
 	}
 }
 
+/*
+	
+*/
 bot_turret_think()
 {
 	self endon( "death" );
@@ -2571,6 +2727,9 @@ bot_turret_think()
 	}
 }
 
+/*
+	
+*/
 bot_crate_think()
 {
 	self endon( "death" );
@@ -2682,6 +2841,9 @@ bot_crate_think()
 	}
 }
 
+/*
+	
+*/
 bot_weapon_think()
 {
 	self endon("death");
@@ -2782,6 +2944,9 @@ bot_weapon_think()
 	}
 }
 
+/*
+	
+*/
 getRocketAmmo()
 {
 	answer = self getLockonAmmo();
@@ -2795,6 +2960,9 @@ getRocketAmmo()
 	return answer;
 }
 
+/*
+	
+*/
 getLockonAmmo()
 {
 	answer = undefined;
@@ -2811,6 +2979,9 @@ getLockonAmmo()
 	return answer;
 }
 
+/*
+	
+*/
 bot_target_vehicle()
 {
 	self endon("disconnect");
@@ -2873,6 +3044,9 @@ bot_target_vehicle()
 	}
 }
 
+/*
+	
+*/
 bot_attack_vehicle( target )
 {
 	target endon("death");
@@ -2891,6 +3065,9 @@ bot_attack_vehicle( target )
 	}
 }
 
+/*
+	
+*/
 getKillstreakTargetLocation()
 {
 	location = undefined;
@@ -2927,6 +3104,9 @@ getKillstreakTargetLocation()
 	return location;
 }
 
+/*
+	
+*/
 clear_remote_on_death(isac130)
 {
 	self endon("disconnect");
@@ -2940,6 +3120,9 @@ clear_remote_on_death(isac130)
 	self ClearUsingRemote();
 }
 
+/*
+	
+*/
 isAnyEnemyPlanes()
 {
 	for (i = 0; i < level.harriers.size; i++)
@@ -2958,6 +3141,9 @@ isAnyEnemyPlanes()
 	return false;
 }
 
+/*
+	
+*/
 bot_killstreak_think()
 {
 	self endon("disconnect");
@@ -3259,6 +3445,9 @@ bot_killstreak_think()
 	}
 }
 
+/*
+	
+*/
 bot_dom_spawn_kill_think()
 {
 	self endon( "death" );
@@ -3312,6 +3501,9 @@ bot_dom_spawn_kill_think()
 	}
 }
 
+/*
+	
+*/
 bot_dom_watch_flags(count, myTeam)
 {
 	self endon( "death" );
@@ -3331,6 +3523,9 @@ bot_dom_watch_flags(count, myTeam)
 	self notify("bad_path");
 }
 
+/*
+	
+*/
 bot_dom_def_think()
 {
 	self endon( "death" );
@@ -3377,6 +3572,9 @@ bot_dom_def_think()
 	}
 }
 
+/*
+	
+*/
 bot_dom_watch_for_flashing(flag, myTeam)
 {
 	self endon( "death" );
@@ -3399,6 +3597,9 @@ bot_dom_watch_for_flashing(flag, myTeam)
 	self notify("bad_path");
 }
 
+/*
+	
+*/
 bot_dom_cap_think()
 {
 	self endon( "death" );
@@ -3491,6 +3692,9 @@ bot_dom_cap_think()
 	}
 }
 
+/*
+	
+*/
 bot_dom_go_cap_flag(flag, myteam)
 {
 	self endon( "death" );
@@ -3519,6 +3723,9 @@ bot_dom_go_cap_flag(flag, myteam)
 		self notify("goal");
 }
 
+/*
+	
+*/
 bot_hq()
 {
 	self endon( "death" );
@@ -3694,6 +3901,9 @@ bot_hq_watch_flashing(obj, radio)
 	self notify("bad_path");
 }
 
+/*
+	
+*/
 bot_cap()
 {
 	self endon( "death" );
@@ -3836,6 +4046,9 @@ bot_cap()
 	}
 }
 
+/*
+	
+*/
 bot_cap_get_flag(flag)
 {
 	origin = flag.curorigin;
