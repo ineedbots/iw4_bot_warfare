@@ -2092,12 +2092,17 @@ heli_leave()
 
 	// g_getplayervieworigin fix
 	// we hide this helicopter then delete it
-	if (isDefined(self))
-		self hide();
+	if (self.heliType == "minigun")
+	{
+		if (isDefined(self))
+			self hide();
 
-	wait 30;
+		wait 30;
 
-	if (isDefined(self))
+		if (isDefined(self))
+			self delete();
+	}
+	else
 		self delete();
 }
 
