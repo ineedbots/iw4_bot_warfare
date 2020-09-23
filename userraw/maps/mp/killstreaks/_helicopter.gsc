@@ -1,3 +1,24 @@
+/*
+	_helicopter modded
+	Author: INeedGames
+	Date: 09/22/2020
+	
+	DVAR:
+		- scr_helicopter_allowQueue <bool>
+			true - (default) allows a helicopter to be queued when air space is full
+
+		- scr_helicopter_cobra_duration <float>
+			40.0 - (default) the amount in seconds the helicopter will fly around for
+
+		- scr_helicopter_pavelow_duration <float>
+			60.0 - (default) the amount in seconds the helicopter will fly around for
+
+		- scr_helicopter_apache_duration <float>
+			40.0 - (default) the amount in seconds the helicopter will fly around for
+
+	Thanks: H3X1C, Emosewaj
+*/
+
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
@@ -34,8 +55,14 @@ init()
 	level.chopper = undefined;
 
 	setDvarIfUninitialized( "scr_helicopter_allowQueue", true );
+	setDvarIfUninitialized( "scr_helicopter_cobra_duration", 40 );
+	setDvarIfUninitialized( "scr_helicopter_pavelow_duration", 60 );
+	setDvarIfUninitialized( "scr_helicopter_apache_duration", 40 );
 
 	level.helicopter_allowQueue = getDVarInt("scr_helicopter_allowQueue");
+	level.cobra_duration				= getDvarFloat( "scr_helicopter_cobra_duration" );
+	level.pavelow_duration			= getDvarFloat( "scr_helicopter_pavelow_duration" );
+	level.apache_duration				= getDvarFloat( "scr_helicopter_apache_duration" );	
 
 	// array of paths, each element is an array of start nodes that all leads to a single destination node
 	level.heli_start_nodes = getEntArray( "heli_start", "targetname" );
@@ -775,7 +802,7 @@ heli_think( lifeId, owner, startnode, heli_team, heliType )
 		case "minigun":
 			chopper thread heli_targeting();
 			chopper heli_fly_simple_path( startNode );
-			chopper thread heli_leave_on_timeout( 40.0 );
+			chopper thread heli_leave_on_timeout( level.apache_duration );
 			if ( attackAreas.size )
 				chopper thread heli_fly_well( attackAreas );
 			else
@@ -785,14 +812,14 @@ heli_think( lifeId, owner, startnode, heli_team, heliType )
 			chopper thread makeGunShip();
 			thread teamPlayerCardSplash( "used_helicopter_flares", owner );
 			chopper heli_fly_simple_path( startNode );
-			chopper thread heli_leave_on_timeout( 60.0 );
+			chopper thread heli_leave_on_timeout( level.pavelow_duration );
 			chopper thread heli_fly_loop_path( loopNode );
 			break;
 		default:
 			chopper thread attack_targets();
 			chopper thread heli_targeting();
 			chopper heli_fly_simple_path( startNode );
-			chopper thread heli_leave_on_timeout( 60.0 );
+			chopper thread heli_leave_on_timeout( level.cobra_duration );
 			chopper thread heli_fly_loop_path( loopNode );
 			break;
 	}
