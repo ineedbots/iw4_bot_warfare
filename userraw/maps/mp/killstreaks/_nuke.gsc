@@ -19,15 +19,44 @@ init()
 
 	setDvarIfUninitialized( "scr_nukeTimer", 10 );
 	setDvarIfUninitialized( "scr_nukeCancelMode", 0 );
+	setDvarIfUninitialized( "scr_nuke_is_moab", true );
+	setDvarIfUninitialized( "scr_nuke_kills_all", true );
 	
 	level.nukeTimer = getDvarInt( "scr_nukeTimer" );
 	level.cancelMode = getDvarInt( "scr_nukeCancelMode" );
+	level.nukeEndsGame = getDvarInt( "scr_nuke_is_moab" );
+	level.nukeKillsAll = getDvarInt( "scr_nuke_kills_all" );
 	
 	/#
 	setDevDvarIfUninitialized( "scr_nukeDistance", 5000 );
 	setDevDvarIfUninitialized( "scr_nukeEndsGame", true );
 	setDevDvarIfUninitialized( "scr_nukeDebugPosition", false );
 	#/
+	level.moabXP = [];
+	
+	level thread onPlayerConnect();
+}
+
+onPlayerConnect()
+{
+	for(;;)
+	{
+		level waittill("connected", player);
+		player thread onPlayerSpawned();
+	}
+}
+
+onPlayerSpawned()
+{
+	self endon("disconnect");
+
+	for(;;)
+	{
+		self waittill( "spawned_player" );
+		
+		if(isDefined(level.moabXP[self.team]) || isDefined(level.moabXP[self.guid]))
+			self.xpScaler = 2;
+	}
 }
 
 tryUseNuke( lifeId, allowCancel )
@@ -61,6 +90,7 @@ delaythread_nuke( delay, func )
 
 doNuke( allowCancel )
 {
+	level notify ( "nuke_cancelled" );
 	level endon ( "nuke_cancelled" );
 	
 	level.nukeInfo = spawnStruct();
@@ -68,9 +98,12 @@ doNuke( allowCancel )
 	level.nukeInfo.team = self.pers["team"];
 
 	level.nukeIncoming = true;
+
+	if(level.nukeEndsGame)
+		maps\mp\gametypes\_gamelogic::pauseTimer();
 	
-	maps\mp\gametypes\_gamelogic::pauseTimer();
 	level.timeLimitOverride = true;
+	level.scoreLimitOverride = true;
 	setGameEndTime( int( gettime() + (level.nukeTimer * 1000) ) );
 	setDvar( "ui_bomb_timer", 4 ); // Nuke sets '4' to avoid briefcase icon showing
 	
@@ -109,28 +142,48 @@ doNuke( allowCancel )
 	if ( level.cancelMode && allowCancel )
 		level thread cancelNukeOnDeath( self ); 
 
-	// leaks if lots of nukes are called due to endon above.
+	// leaks if lots of nukes are called due to endon above. FIXED
 	clockObject = spawn( "script_origin", (0,0,0) );
 	clockObject hide();
+	level thread killClockObjectOnEndOn(clockObject);
 
 	while ( !isDefined( level.nukeDetonated ) )
 	{
 		clockObject playSound( "ui_mp_nukebomb_timer" );
 		wait( 1.0 );
 	}
+	
+	clockObject notify("death");
+	clockObject delete();
+}
+
+killClockObjectOnEndOn(clockObject)
+{
+	clockObject endon("death");
+	level waittill( "nuke_cancelled" );
+	clockObject delete();
 }
 
 cancelNukeOnDeath( player )
 {
+	level endon ( "nuke_cancelled" );
 	player waittill_any( "death", "disconnect" );
 
 	if ( isDefined( player ) && level.cancelMode == 2 )
 		player thread maps\mp\killstreaks\_emp::EMP_Use( 0, 0 );
-
-
+	
+	level.nukeIncoming = undefined;
+	
+	level.nukeDetonated = undefined;
+	
 	maps\mp\gametypes\_gamelogic::resumeTimer();
 	level.timeLimitOverride = false;
-
+	level.scoreLimitOverride = false;
+	level notify( "update_scorelimit" );
+	
+	foreach(player in level.players)
+		player.nuked = undefined;
+	
 	setDvar( "ui_bomb_timer", 0 ); // Nuke sets '4' to avoid briefcase icon showing
 
 	level notify ( "nuke_cancelled" );
@@ -158,12 +211,39 @@ nukeSoundExplosion()
 nukeEffects()
 {
 	level endon ( "nuke_cancelled" );
-
+	
 	setDvar( "ui_bomb_timer", 0 );
 	setGameEndTime( 0 );
-
+	
 	level.nukeDetonated = true;
-	level maps\mp\killstreaks\_emp::destroyActiveVehicles( level.nukeInfo.player );
+	
+	if ( !level.nukeEndsGame )
+	{
+		if ( level.teamBased )
+		{
+			level thread maps\mp\killstreaks\_emp::EMP_JamTeam(level.otherTeam[level.nukeInfo.team], 60, 5, level.nukeInfo.player, true);
+			
+			foreach (player in level.players)
+			{
+				if(level.nukeInfo.team == player.team)
+				{
+					player.xpScaler = 2;
+				}
+			}
+			level.moabXP[level.nukeInfo.team] = true;
+		}
+		else
+		{
+			level thread maps\mp\killstreaks\_emp::EMP_JamPlayers(level.nukeInfo.player, 60, 5, true);
+			if(isDefined(level.nukeInfo.player))
+			{
+				level.nukeInfo.player.xpScaler = 2;
+				level.moabXP[level.nukeInfo.player.guid] = true;
+			}
+		}
+	}
+	else
+		level maps\mp\killstreaks\_emp::destroyActiveVehicles( level.nukeInfo.player );
 
 	foreach( player in level.players )
 	{
@@ -187,8 +267,19 @@ nukeEffects()
 		#/
 
 		nukeEnt thread nukeEffect( player );
-		player.nuked = true;
+		
+		level thread killClockObjectOnEndOn(nukeEnt);
+		level thread killNukeEntOn(nukeEnt);
 	}
+}
+
+killNukeEntOn(nukeEnt)
+{
+	nukeEnt endon("death");
+	level endon ( "nuke_cancelled" );
+	level waittill("nuke_death");
+	nukeEnt notify("death");
+	nukeEnt delete();
 }
 
 nukeEffect( player )
@@ -225,6 +316,14 @@ nukeSlowMo()
 	setSlowMotion( 0.25, 1, 2.0 );
 }
 
+fixVisionOnCancel()
+{
+	level waittill ( "nuke_cancelled" );
+	//reset nuke vision
+	visionSetNaked( getDvar( "mapname" ), 2.0 );
+	level.nukeVisionInProgress = undefined;
+}
+
 nukeVision()
 {
 	level endon ( "nuke_cancelled" );
@@ -235,8 +334,20 @@ nukeVision()
 	level waittill( "nuke_death" );
 
 	visionSetNaked( "mpnuke_aftermath", 5 );
-	wait 5;
-	level.nukeVisionInProgress = undefined;
+	
+	level thread fixVisionOnCancel();
+	
+	
+	if( level.NukeEndsGame )
+	{
+		wait 5;
+		level.nukeVisionInProgress = undefined;
+	}
+	else
+	{
+		wait 3.5;
+		level notify ( "nuke_cancelled" );
+	}
 }
 
 nukeDeath()
@@ -246,27 +357,58 @@ nukeDeath()
 	level notify( "nuke_death" );
 	
 	maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-	
-	AmbientStop(1);
 
 	foreach( player in level.players )
 	{
+		if(level.teamBased)
+		{
+			if ( !level.nukeKillsAll && level.nukeInfo.team == player.pers["team"] )
+				continue;
+		}
+		else
+		{
+			if ( !level.nukeKillsAll && level.nukeInfo.player == player )
+				continue;	
+		}
+		
+		player.nuked = true;
+		
 		if ( isAlive( player ) )
 			player thread maps\mp\gametypes\_damage::finishPlayerDamageWrapper( level.nukeInfo.player, level.nukeInfo.player, 999999, 0, "MOD_EXPLOSIVE", "nuke_mp", player.origin, player.origin, "none", 0, 0 );
 	}
-
-	level.postRoundTime = 10;
-
-	nukeEndsGame = true;
-
-	if ( level.teamBased )
-		thread maps\mp\gametypes\_gamelogic::endGame( level.nukeInfo.team, game["strings"]["nuclear_strike"], true );
+	
+	if( level.NukeEndsGame )
+	{
+		AmbientStop(1);
+		
+		level.postRoundTime = 10;
+		
+		if ( level.teamBased )
+			thread maps\mp\gametypes\_gamelogic::endGame( level.nukeInfo.team, game["strings"]["nuclear_strike"], true );
+		else
+		{
+			if ( isDefined( level.nukeInfo.player ) )
+				thread maps\mp\gametypes\_gamelogic::endGame( level.nukeInfo.player, game["strings"]["nuclear_strike"], true );
+			else
+				thread maps\mp\gametypes\_gamelogic::endGame( level.nukeInfo, game["strings"]["nuclear_strike"], true );
+		}
+	}
 	else
 	{
-		if ( isDefined( level.nukeInfo.player ) )
-			thread maps\mp\gametypes\_gamelogic::endGame( level.nukeInfo.player, game["strings"]["nuclear_strike"], true );
-		else
-			thread maps\mp\gametypes\_gamelogic::endGame( level.nukeInfo, game["strings"]["nuclear_strike"], true );
+		wait 0.05;
+		
+		maps\mp\gametypes\_gamelogic::resumeTimer();
+		level.timeLimitOverride = false;
+		level.scoreLimitOverride = false;
+		level notify( "update_scorelimit" );
+		
+		//allow next nuke to be called in, reset nuke variables
+		level.nukeIncoming = undefined;
+		level.nukeDetonated = undefined;
+		
+		//allow ridable killstreaks
+		foreach(player in level.players)
+			player.nuked = undefined;
 	}
 }
 
