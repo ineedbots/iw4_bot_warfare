@@ -51,7 +51,7 @@ FPSBooster()
 		self waittill( "toggle_fullbright" );
 		if( level.allowFPSBooster )
 		{
-			self playSound( "claymore_activated" );
+			self playLocalSound( "claymore_activated" );
 			if(self.pers["fpsBooster"])
 			{
 				self SetClientDvar("r_fullbright", 0);

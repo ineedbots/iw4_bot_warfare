@@ -1835,7 +1835,7 @@ printDamage()
 	for(;;)
 	{
 		self waittill("printDamage");
-		self playSound( "semtex_warning" );
+		self playLocalSound( "semtex_warning" );
 		if(self.printDamage)
 		{
 			self iPrintlnBold("^7Print Damage ^1Disabled");
