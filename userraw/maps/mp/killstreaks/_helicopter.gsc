@@ -33,6 +33,10 @@ init()
 	
 	level.chopper = undefined;
 
+	setDvarIfUninitialized( "scr_helicopter_allowQueue", true );
+
+	level.helicopter_allowQueue = getDVarInt("scr_helicopter_allowQueue");
+
 	// array of paths, each element is an array of start nodes that all leads to a single destination node
 	level.heli_start_nodes = getEntArray( "heli_start", "targetname" );
 	assertEx( level.heli_start_nodes.size, "No \"heli_start\" nodes found in map!" );
@@ -219,7 +223,7 @@ tryUseHelicopter( lifeId, heliType )
 		return false;
 	}
 	
-	if ( (!isDefined( heliType ) || heliType == "flares") && isDefined( level.chopper ) )
+	if ( (!isDefined( heliType ) || heliType == "flares") && isDefined( level.chopper ) && level.helicopter_allowQueue )
 	{
 		self iPrintLnBold( &"MP_HELI_IN_QUEUE" );
 		
