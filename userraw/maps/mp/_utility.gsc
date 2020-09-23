@@ -2675,3 +2675,53 @@ setThirdPersonDOF( isEnabled )
 	else
 		self setDepthOfField( 0, 0, 512, 512, 4, 0 );
 }
+
+
+
+killTrigger( pos, radius, height )
+{
+	trig = spawn( "trigger_radius", pos, 0, radius, height );
+	
+	/#
+	if ( getdvar( "scr_killtriggerdebug" ) == "1" )
+		thread killTriggerDebug( pos, radius, height );
+	#/
+	
+	for ( ;; )
+	{
+		/#
+		if ( getdvar( "scr_killtriggerradius" ) != "" )
+			radius = int(getdvar( "scr_killtriggerradius" ));
+		#/
+		
+		trig waittill( "trigger", player );
+		
+		if ( !isPlayer( player ) )
+			continue;
+		
+		player suicide();
+	}
+}
+
+/#
+killTriggerDebug( pos, radius, height )
+{
+	for ( ;; )
+	{
+		for ( i = 0; i < 20; i++ )
+		{
+			angle = i / 20 * 360;
+			nextangle = (i+1) / 20 * 360;
+			
+			linepos = pos + (cos(angle) * radius, sin(angle) * radius, 0);
+			nextlinepos = pos + (cos(nextangle) * radius, sin(nextangle) * radius, 0);
+			
+			line( linepos, nextlinepos );
+			line( linepos + (0,0,height), nextlinepos + (0,0,height) );
+			line( linepos, linepos + (0,0,height) );
+		}
+		wait .05;
+	}
+}
+#/
+
