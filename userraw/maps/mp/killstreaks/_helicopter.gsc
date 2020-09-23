@@ -1414,7 +1414,7 @@ heli_explode( altStyle )
 		if (isDefined(self))
 			self delete();
 	}
-	else
+	else if (isDefined(self))
 		self delete();
 }
 
@@ -2102,7 +2102,7 @@ heli_leave()
 		if (isDefined(self))
 			self delete();
 	}
-	else
+	else if (isDefined(self))
 		self delete();
 }
 
