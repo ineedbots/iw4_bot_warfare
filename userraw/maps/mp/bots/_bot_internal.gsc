@@ -86,6 +86,9 @@ onDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint
 {
 }
 
+/*
+
+*/
 onGiveLoadout()
 {
 	self endon("disconnect");
@@ -97,6 +100,9 @@ onGiveLoadout()
 	}
 }
 
+/*
+	
+*/
 onGameEnded()
 {
 	self endon("disconnect");
@@ -105,6 +111,9 @@ onGameEnded()
 	self botsDeleteFakeAnim();
 }
 
+/*
+	
+*/
 onDisconnected()
 {
 	self waittill("disconnect");
@@ -213,6 +222,9 @@ onPlayerSpawned()
 	}
 }
 
+/*
+	
+*/
 ti_fix()
 {
 	self endon("disconnect");
@@ -229,6 +241,9 @@ ti_fix()
 	}
 }
 
+/*
+	
+*/
 jav_loc_watch()
 {
 	self endon("disconnect");
@@ -258,6 +273,9 @@ jav_loc_watch()
 	}
 }
 
+/*
+	
+*/
 watchJavLock()
 {
 	self endon("bot_kill_lockon_jav");
@@ -281,6 +299,9 @@ watchJavLock()
 	self notify("bot_kill_lockon_jav");
 }
 
+/*
+	
+*/
 watchJavLockHas()
 {
 	self endon("bot_kill_lockon_jav");
@@ -296,6 +317,9 @@ watchJavLockHas()
 	self notify("bot_kill_lockon_jav");
 }
 
+/*
+	
+*/
 watchJavLockEvents()
 {
 	self endon("bot_kill_lockon_jav");
@@ -308,6 +332,9 @@ watchJavLockEvents()
 	self notify("bot_kill_lockon_jav");
 }
 
+/*
+	
+*/
 lockon_watch()
 {
 	self endon("disconnect");
@@ -342,6 +369,9 @@ lockon_watch()
 	}
 }
 
+/*
+	
+*/
 doLockon()
 {
 	self endon("bot_kill_lockon");
@@ -382,6 +412,9 @@ doLockon()
 	self notify("bot_kill_lockon");
 }
 
+/*
+	
+*/
 watchBotLockonTrace()
 {
 	self endon("death");
@@ -394,6 +427,9 @@ watchBotLockonTrace()
 	self notify("bot_kill_lockon");
 }
 
+/*
+	
+*/
 watchBotLockonEvents()
 {
 	self endon("death");
@@ -405,6 +441,9 @@ watchBotLockonEvents()
 	self notify("bot_kill_lockon");
 }
 
+/*
+	
+*/
 doRocketLockingSound()
 {
 	self endon("disconnect");
@@ -430,6 +469,9 @@ doRocketLockingSound()
 	}
 }
 
+/*
+	
+*/
 doRocketLockedSound()
 {
 	self endon("disconnect");
@@ -454,6 +496,9 @@ doRocketLockedSound()
 	}
 }
 
+/*
+	
+*/
 UseRunThink()
 {
 	self endon("death");
@@ -490,6 +535,9 @@ UseRunThink()
 	}
 }
 
+/*
+	
+*/
 doRunDelay()
 {
 	self endon("disconnect");
@@ -505,6 +553,9 @@ doRunDelay()
 	self.bot.runningafter = false;
 }
 
+/*
+	
+*/
 stanceHack()
 {
 	self endon("disconnect");
@@ -528,6 +579,9 @@ stanceHack()
 	}
 }
 
+/*
+	
+*/
 grenade_watch()
 {
 	self endon("disconnect");
@@ -546,6 +600,9 @@ grenade_watch()
 	}
 }
 
+/*
+	
+*/
 doFragAfterThread()
 {
 	self endon("disconnect");
@@ -556,6 +613,9 @@ doFragAfterThread()
 	self.bot.isfraggingafter = false;
 }
 
+/*
+	
+*/
 emptyClipShoot()
 {
 	self endon("disconnect");
@@ -577,6 +637,9 @@ emptyClipShoot()
 	}
 }
 
+/*
+	
+*/
 checkShouldHideAnim(shouldHideAnim)
 {
 	isHidden = self isFakeAnimHidden();
@@ -593,6 +656,9 @@ checkShouldHideAnim(shouldHideAnim)
 		self hideFakeAnim();
 }
 
+/*
+	
+*/
 moveHack()
 {
 	self endon("disconnect");
@@ -881,6 +947,9 @@ moveHack()
 	}
 }
 
+/*
+	
+*/
 fireHack()
 {
 	self endon("disconnect");
@@ -924,6 +993,9 @@ fireHack()
 	}
 }
 
+/*
+	
+*/
 adsHack()
 {
 	self endon("disconnect");
@@ -1008,6 +1080,9 @@ onWeaponChange()
 	}
 }
 
+/*
+	
+*/
 doNoneSwitch()
 {
 	self endon("disconnect");
@@ -1029,6 +1104,9 @@ doNoneSwitch()
 	self SetSpawnWeapon(weap);
 }
 
+/*
+	
+*/
 doSwitch(newWeapon)
 {
 	self endon("disconnect");
@@ -1070,6 +1148,9 @@ reload_watch()
 	}
 }
 
+/*
+	
+*/
 onLastStand()
 {
 	self endon("disconnect");
@@ -1103,6 +1184,9 @@ onLastStand()
 	}
 }
 
+/*
+	
+*/
 watchUsingRemote()
 {
 	self endon("disconnect");
@@ -1143,6 +1227,9 @@ watchUsingRemote()
 	}
 }
 
+/*
+	
+*/
 watchUsingMinigun()
 {
 	self endon("heliPlayer_removed");
@@ -1161,6 +1248,9 @@ watchUsingMinigun()
 	}
 }
 
+/*
+	
+*/
 watchAc130Weapon()
 {
 	self endon("ac130player_removed");
@@ -1181,6 +1271,9 @@ watchAc130Weapon()
 	}
 }
 
+/*
+	
+*/
 watchUsingAc130()
 {
 	self endon("ac130player_removed");
@@ -1220,6 +1313,9 @@ spawned()
 	self notify("bot_spawned");
 }
 
+/*
+	
+*/
 grenade_danager()
 {
 	self endon("disconnect");
@@ -1288,6 +1384,9 @@ grenade_danager()
 	}
 }
 
+/*
+	
+*/
 watchThrowback(frag)
 {
 	self endon("bot_kill_throwback");
@@ -2047,6 +2146,9 @@ isInRange(dist, curweap)
 	return true;
 }
 
+/*
+	
+*/
 killWalkCauseNoWaypoints()
 {
 	self endon("disconnect");
@@ -2567,6 +2669,9 @@ reload()
 	// the script should reload for us.
 }
 
+/*
+	
+*/
 botThrowGrenade(grenName, grenTime)
 {
 	self endon("death");
@@ -2622,6 +2727,9 @@ botThrowGrenade(grenName, grenTime)
 	return ret;
 }
 
+/*
+	
+*/
 pressAds(time)
 {
 	self endon("death");
@@ -2640,11 +2748,17 @@ pressAds(time)
 	self ads(false);
 }
 
+/*
+	
+*/
 ads(what)
 {
 	self.bot.ads_pressed = what;
 }
 
+/*
+	
+*/
 pressFire(time)
 {
 	self endon("death");
@@ -2663,6 +2777,9 @@ pressFire(time)
 	self fire(false);
 }
 
+/*
+	
+*/
 fire(what)
 {
 	self.bot.fire_pressed = what;
@@ -2740,11 +2857,17 @@ prone()
 	self.bot.stance = "prone";
 }
 
+/*
+	
+*/
 botMoveTo(to)
 {
 	self.bot.moveTo = to;
 }
 
+/*
+	
+*/
 sprint()
 {
 	if (self.bot.run_time < 2.0)
@@ -2754,6 +2877,9 @@ sprint()
 	self.bot.runningafter = true;
 }
 
+/*
+	
+*/
 bot_lookat(pos, time)
 {
 	self notify("bots_aim_overlap");
@@ -2799,6 +2925,9 @@ bot_lookat(pos, time)
 	}
 }
 
+/*
+	
+*/
 isInActiveAnim()
 {
 	if (!isDefined(self.bot_anim))
@@ -2807,6 +2936,9 @@ isInActiveAnim()
 	return (self.bot_anim.inActiveAnim);
 }
 
+/*
+	
+*/
 botDoingAnim(animName)
 {
 	if (!isDefined(self.bot_anim))
@@ -2815,6 +2947,9 @@ botDoingAnim(animName)
 	return (self.bot_anim.animation == animName);
 }
 
+/*
+	
+*/
 botDoAnim(animName, time, isActiveAnim)
 {
 	self endon("death");
@@ -2841,6 +2976,9 @@ botDoAnim(animName, time, isActiveAnim)
 	self.bot_anim.inActiveAnim = false;
 }
 
+/*
+	
+*/
 makeFakeAnim()
 {
 	if(isDefined(self.bot_anim))
@@ -2863,6 +3001,9 @@ makeFakeAnim()
 	self showFakeAnim();
 }
 
+/*
+	
+*/
 botsDeleteFakeAnim()
 {
 	if(!isDefined(self.bot_anim))
@@ -2878,6 +3019,9 @@ botsDeleteFakeAnim()
 	self.bot_anim = undefined;
 }
 
+/*
+	
+*/
 isFakeAnimHidden()
 {
 	if (!isDefined(self.bot_anim))
@@ -2886,6 +3030,9 @@ isFakeAnimHidden()
 	return (self.bot_anim.hidden);
 }
 
+/*
+	
+*/
 showFakeAnim()
 {
 	if(isDefined(self))
@@ -2902,6 +3049,9 @@ showFakeAnim()
 	self.bot_anim.headmodel show();
 }
 
+/*
+	
+*/
 hideFakeAnim()
 {
 	if(isDefined(self))
@@ -2918,6 +3068,9 @@ hideFakeAnim()
 	self.bot_anim.headmodel hide();
 }
 
+/*
+	
+*/
 botHideParts()
 {
 	//hideallparts
@@ -2929,6 +3082,9 @@ botHideParts()
 	self hidepart("j_clavicle_le");
 }
 
+/*
+	
+*/
 botShowParts()
 {
 	self showpart("j_ankle_le");
