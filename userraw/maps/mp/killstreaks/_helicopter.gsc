@@ -421,6 +421,7 @@ heliRide( lifeId, chopper )
 	chopper VehicleTurretControlOn( self );
 	
 	self PlayerLinkWeaponviewToDelta( chopper, "tag_player", 1.0, 180, 180, 0, 180, true );
+	self setPlayerAngles( level.ac130 getTagAngles( "tag_player" ) );	
 	
 	chopper.gunner = self;	
 
@@ -1399,7 +1400,22 @@ heli_explode( altStyle )
 
 	// give "death" notify time to process
 	wait ( 0.05 );
-	self delete();
+
+	// g_getplayervieworigin fix
+	// we hide this helicopter then delete it
+
+	if (self.heliType == "minigun")
+	{
+		if (isDefined(self))
+			self hide();
+
+		wait 30;
+
+		if (isDefined(self))
+			self delete();
+	}
+	else
+		self delete();
 }
 
 
@@ -2073,7 +2089,16 @@ heli_leave()
 	
 	// give "death" notify time to process
 	wait ( 0.05 );
-	self delete();
+
+	// g_getplayervieworigin fix
+	// we hide this helicopter then delete it
+	if (isDefined(self))
+		self hide();
+
+	wait 30;
+
+	if (isDefined(self))
+		self delete();
 }
 
 
