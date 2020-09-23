@@ -86,8 +86,7 @@ onPlayerSpawned()
 
 		if (isDefined(level.nukeVisionInProgress) && level.nukePermAftermath)
 		{
-			visionSetNaked( "aftermath", 0 );
-			VisionSetPain("aftermath");
+			self visionSetNakedForPlayer( "aftermath", 0 );
 		}
 	}
 }
