@@ -41,7 +41,7 @@ init()
 	setDvarIfUninitialized( "scr_nukeTimer", 10 );
 	setDvarIfUninitialized( "scr_nukeCancelMode", 0 );
 
-	setDvarIfUninitialized( "scr_nuke_is_moab", true );
+	setDvarIfUninitialized( "scr_nuke_is_moab", false );
 	setDvarIfUninitialized( "scr_nuke_kills_all", true );
 	setDvarIfUninitialized( "scr_nuke_emp_duration", 60.0 );
 	setDvarIfUninitialized( "scr_nuke_perm_vision", true );
@@ -49,7 +49,7 @@ init()
 	level.nukeTimer = getDvarInt( "scr_nukeTimer" );
 	level.cancelMode = getDvarInt( "scr_nukeCancelMode" );
 
-	level.nukeEndsGame = getDvarInt( "scr_nuke_is_moab" );
+	level.nukeEndsGame = !getDvarInt( "scr_nuke_is_moab" );
 	level.nukeKillsAll = getDvarInt( "scr_nuke_kills_all" );
 	level.nukeEmpDuration = getDvarFloat( "scr_nuke_emp_duration" );
 	level.nukePermAftermath = getDvarFloat( "scr_nuke_perm_vision" );
