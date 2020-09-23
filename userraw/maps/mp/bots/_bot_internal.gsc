@@ -87,7 +87,7 @@ onDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint
 }
 
 /*
-
+	The giveloadout watcher
 */
 onGiveLoadout()
 {
@@ -101,7 +101,7 @@ onGiveLoadout()
 }
 
 /*
-	
+	Watches for the game to end
 */
 onGameEnded()
 {
@@ -112,7 +112,7 @@ onGameEnded()
 }
 
 /*
-	
+	Watches for when we disconnect
 */
 onDisconnected()
 {
@@ -223,7 +223,7 @@ onPlayerSpawned()
 }
 
 /*
-	
+	Fixes the ti script, because IsOnGround is always false when freezecontrols(true)
 */
 ti_fix()
 {
@@ -242,7 +242,7 @@ ti_fix()
 }
 
 /*
-	
+	Watches and handles javelin location lock on.
 */
 jav_loc_watch()
 {
@@ -274,7 +274,7 @@ jav_loc_watch()
 }
 
 /*
-	
+	Does the javelin lock on
 */
 watchJavLock()
 {
@@ -300,7 +300,7 @@ watchJavLock()
 }
 
 /*
-	
+	Watches while we have a location to lock on
 */
 watchJavLockHas()
 {
@@ -318,7 +318,7 @@ watchJavLockHas()
 }
 
 /*
-	
+	Watches when to kill the javelin lock on
 */
 watchJavLockEvents()
 {
@@ -333,7 +333,7 @@ watchJavLockEvents()
 }
 
 /*
-	
+	Watches and does the vehicle lockon
 */
 lockon_watch()
 {
@@ -370,7 +370,7 @@ lockon_watch()
 }
 
 /*
-	
+	Does the lock on
 */
 doLockon()
 {
@@ -413,7 +413,7 @@ doLockon()
 }
 
 /*
-	
+	Makes sure we have sight on the vehicle
 */
 watchBotLockonTrace()
 {
@@ -428,7 +428,7 @@ watchBotLockonTrace()
 }
 
 /*
-	
+	Stops the lock on when an event happens
 */
 watchBotLockonEvents()
 {
@@ -442,7 +442,7 @@ watchBotLockonEvents()
 }
 
 /*
-	
+	Plays the beeps
 */
 doRocketLockingSound()
 {
@@ -470,7 +470,7 @@ doRocketLockingSound()
 }
 
 /*
-	
+	Plays the beeps
 */
 doRocketLockedSound()
 {
@@ -497,7 +497,7 @@ doRocketLockedSound()
 }
 
 /*
-	
+	Handles when the bot is to stop running and how much run time it has
 */
 UseRunThink()
 {
@@ -536,7 +536,7 @@ UseRunThink()
 }
 
 /*
-	
+	Adds a delay after running (simulates pulling up the gun from a sprint)
 */
 doRunDelay()
 {
@@ -554,7 +554,7 @@ doRunDelay()
 }
 
 /*
-	
+	Sets our stance, because the executable is always setting the bot's stance to the dvar
 */
 stanceHack()
 {
@@ -580,7 +580,7 @@ stanceHack()
 }
 
 /*
-	
+	Watches when we pull back a grenade
 */
 grenade_watch()
 {
@@ -593,7 +593,7 @@ grenade_watch()
 		self.bot.isfragging = true;
 		self.bot.isfraggingafter = true;
 
-		self waittill_any_timeout( 5, "grenade_fire", "weapon_change", "offhand_end" );
+		self waittill_any_timeout( 10, "grenade_fire", "weapon_change", "offhand_end" );
 
 		self.bot.isfragging = false;
 		self thread doFragAfterThread();
@@ -601,7 +601,7 @@ grenade_watch()
 }
 
 /*
-	
+	Wait a bit to stop the frag
 */
 doFragAfterThread()
 {
@@ -614,7 +614,7 @@ doFragAfterThread()
 }
 
 /*
-	
+	Basically unfreezes the bot when its clip is empty so it can reload
 */
 emptyClipShoot()
 {
@@ -638,7 +638,7 @@ emptyClipShoot()
 }
 
 /*
-	
+	Hides the animator script model when it needs too
 */
 checkShouldHideAnim(shouldHideAnim)
 {
@@ -657,7 +657,7 @@ checkShouldHideAnim(shouldHideAnim)
 }
 
 /*
-	
+	Does the movement for the bot, as well as telling what passive animation to play, and foot sounds
 */
 moveHack()
 {
@@ -948,7 +948,8 @@ moveHack()
 }
 
 /*
-	
+	Freezes and unfreezes the bot when told too,
+	Bots are always wanting to fire, so we freeze to stop firing, and unfreeze to fire
 */
 fireHack()
 {
@@ -994,7 +995,8 @@ fireHack()
 }
 
 /*
-	
+	When the bot is told to ads.
+	We use a smaller crosshair when we want to ads
 */
 adsHack()
 {
@@ -1081,7 +1083,7 @@ onWeaponChange()
 }
 
 /*
-	
+	When the bot switches to a none weapon, we fix it
 */
 doNoneSwitch()
 {
@@ -1105,7 +1107,7 @@ doNoneSwitch()
 }
 
 /*
-	
+	When the bot switches to a weapon, we play the active animation, and shoot delay
 */
 doSwitch(newWeapon)
 {
@@ -1149,7 +1151,7 @@ reload_watch()
 }
 
 /*
-	
+	When the bot enters laststand, we fix the weapons
 */
 onLastStand()
 {
@@ -1185,7 +1187,7 @@ onLastStand()
 }
 
 /*
-	
+	When the bot uses a remote killstreak
 */
 watchUsingRemote()
 {
@@ -1228,7 +1230,7 @@ watchUsingRemote()
 }
 
 /*
-	
+	WHen it uses the helicopter minigun
 */
 watchUsingMinigun()
 {
@@ -1249,7 +1251,7 @@ watchUsingMinigun()
 }
 
 /*
-	
+	When it uses the ac130
 */
 watchAc130Weapon()
 {
@@ -1272,7 +1274,7 @@ watchAc130Weapon()
 }
 
 /*
-	
+	Swap between the ac130 weapons while in it
 */
 watchUsingAc130()
 {
@@ -1314,7 +1316,9 @@ spawned()
 }
 
 /*
-	
+	Throws back frag grenades
+	Does this by a hack
+	Basically it'll throw its own frag grenade and delete the original frag
 */
 grenade_danager()
 {
@@ -1385,7 +1389,7 @@ grenade_danager()
 }
 
 /*
-	
+	Watches if the throw was successful, and deletes the original
 */
 watchThrowback(frag)
 {
@@ -2147,7 +2151,7 @@ isInRange(dist, curweap)
 }
 
 /*
-	
+	Will kill the walk threads and do it again after a time
 */
 killWalkCauseNoWaypoints()
 {
@@ -2368,6 +2372,9 @@ killWalkOnEvents()
 	self notify("kill_goal");
 }
 
+/*
+	Does the notify for goal completion for outside scripts
+*/
 doWalkScriptNotify()
 {
 	self endon("disconnect");
@@ -2670,7 +2677,7 @@ reload()
 }
 
 /*
-	
+	Bot will throw the grenade and cook it
 */
 botThrowGrenade(grenName, grenTime)
 {
@@ -2728,7 +2735,7 @@ botThrowGrenade(grenName, grenTime)
 }
 
 /*
-	
+	Bots will press the ads for a time
 */
 pressAds(time)
 {
@@ -2749,7 +2756,7 @@ pressAds(time)
 }
 
 /*
-	
+	Bots will hold the ads
 */
 ads(what)
 {
@@ -2757,7 +2764,7 @@ ads(what)
 }
 
 /*
-	
+	Bots will press the fire for a time
 */
 pressFire(time)
 {
@@ -2778,7 +2785,7 @@ pressFire(time)
 }
 
 /*
-	
+	Bots will hold the fire
 */
 fire(what)
 {
@@ -2858,7 +2865,7 @@ prone()
 }
 
 /*
-	
+	Tells the moveHack where to move
 */
 botMoveTo(to)
 {
@@ -2866,7 +2873,7 @@ botMoveTo(to)
 }
 
 /*
-	
+	Bots will start to sprint
 */
 sprint()
 {
@@ -2878,7 +2885,7 @@ sprint()
 }
 
 /*
-	
+	Bots will look at the pos
 */
 bot_lookat(pos, time)
 {
@@ -2926,7 +2933,7 @@ bot_lookat(pos, time)
 }
 
 /*
-	
+	Returns if the bot is doing an active animation
 */
 isInActiveAnim()
 {
@@ -2937,7 +2944,7 @@ isInActiveAnim()
 }
 
 /*
-	
+	returns if the bot is doing the given anim
 */
 botDoingAnim(animName)
 {
@@ -2948,7 +2955,7 @@ botDoingAnim(animName)
 }
 
 /*
-	
+	Bot plays the anim
 */
 botDoAnim(animName, time, isActiveAnim)
 {
@@ -2977,7 +2984,7 @@ botDoAnim(animName, time, isActiveAnim)
 }
 
 /*
-	
+	Creates the anim script model
 */
 makeFakeAnim()
 {
@@ -3002,7 +3009,7 @@ makeFakeAnim()
 }
 
 /*
-	
+	Deletes the anim script model
 */
 botsDeleteFakeAnim()
 {
@@ -3020,7 +3027,7 @@ botsDeleteFakeAnim()
 }
 
 /*
-	
+	Returns if the script model is hidden
 */
 isFakeAnimHidden()
 {
@@ -3031,7 +3038,7 @@ isFakeAnimHidden()
 }
 
 /*
-	
+	Shows the anim model
 */
 showFakeAnim()
 {
@@ -3050,7 +3057,7 @@ showFakeAnim()
 }
 
 /*
-	
+	Hides the anim model
 */
 hideFakeAnim()
 {
@@ -3069,7 +3076,7 @@ hideFakeAnim()
 }
 
 /*
-	
+	Hides the bot's model
 */
 botHideParts()
 {
@@ -3083,7 +3090,7 @@ botHideParts()
 }
 
 /*
-	
+	Shows the bot's model
 */
 botShowParts()
 {
