@@ -635,7 +635,8 @@ moveHack()
 			self.bot.climbing = (abs(moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64);
 		}
 
-		if (inLastStand || usingRemote || self.bot.jumpingafter)
+		// only climb if we are not inlaststand, not using a remote, not jumping, and on a waypoint path
+		if (inLastStand || usingRemote || self.bot.jumpingafter || self.bot.next_wp == -1)
 			self.bot.climbing = false;
 
 		if (usingRemote)
@@ -2294,11 +2295,13 @@ doWalk(goal, dist, isScriptGoal)
 	self thread watchOnGoal(goal, distsq);
 	
 	current = self initAStar(goal);
+	// if a waypoint is closer than the goal
 	//if (current >= 0 && DistanceSquared(self.origin, level.waypoints[self.bot.astar[current]].origin) < DistanceSquared(self.origin, goal))
 	//{
 		while(current >= 0)
 		{
-			for (;;)
+			// skip down the line of waypoints and go to the waypoint we have a direct path too
+			/*for (;;)
 			{
 				if (current <= 0)
 					break;
@@ -2311,7 +2314,7 @@ doWalk(goal, dist, isScriptGoal)
 					break;
 
 				current = self removeAStar();
-			}
+			}*/
 
 			self.bot.next_wp = self.bot.astar[current];
 			self.bot.second_next_wp = -1;
