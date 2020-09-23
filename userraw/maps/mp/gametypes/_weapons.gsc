@@ -1,3 +1,33 @@
+/*
+	_weapons modded
+	Author: INeedGames
+	Date: 09/22/2020
+	Adds dropping weapon, picking up equipment and friendly fire grenade team switching exploit fix.
+	Fixes the semtex 'STUCK' challenge when the thrower dies.
+	Fixes claymores from tripping when the victim is elevated from the claymore.
+	Fixes stuns and flashes friendly fire on claymores and c4s.
+	Fixes direct impact stun stunning the victim.
+
+	DVARS:
+		- scr_allowDropWeaponOnCommand <bool>
+			false - (default) allows the player to drop their weapon
+
+		- scr_allowPickUpEquipment <bool>
+			false - (default) allows the player to pick up their equipment once placed
+
+		- scr_allowDropWeaponOnDeath <bool>
+			true - (default) allows player dropping their weapon on death
+
+		- scr_allowClaymoreBounces <bool>
+			true - (default) allows players to use claymores from an elevated area, and the claymore will be placed far below the player.
+
+		- scr_extraTeamIcons <bool>
+			false - (default) adds team icons to more objects such as grenades
+
+		- scr_deleteNadeOnTeamChange <bool>
+			false - (default) deletes a grenade when it's owner changes team
+*/
+
 #include common_scripts\utility;
 #include maps\mp\_utility;
 
@@ -49,6 +79,20 @@ init()
 			level.scavenger_secondary = false;
 			break;		
 	}
+	
+	setDvarIfUninitialized("scr_allowDropWeaponOnCommand", false);
+	setDvarIfUninitialized("scr_allowPickUpEquipment", false);
+	setDvarIfUninitialized("scr_allowDropWeaponOnDeath", true);
+	setDvarIfUninitialized("scr_allowClaymoreBounces", true);
+	setDvarIfUninitialized("scr_extraTeamIcons", false);
+	setDvarIfUninitialized("scr_deleteNadeOnTeamChange", false);
+	
+	level.allowDropWeaponOnCommand = getDvarInt("scr_allowDropWeaponOnCommand");
+	level.allowDropWeaponOnDeath = getDvarInt("scr_allowDropWeaponOnDeath");
+	level.allowPickUpEquipment = getDvarInt("scr_allowPickUpEquipment");
+	level.allowExtendedClaymoreTrace = getDvarInt("scr_allowClaymoreBounces");
+	level.extraTeamIcons = getDvarInt("scr_extraTeamIcons");
+	level.deleteNadeOnTeamChange = getDvarInt("scr_deleteNadeOnTeamChange");
 	
 	attachmentList = getAttachmentList();	
 	
@@ -216,11 +260,26 @@ init()
 	
 	level thread onPlayerConnect();
 	
+	level thread watchSentryLimit();
+	
 	level.c4explodethisframe = false;
 
 	array_thread( getEntArray( "misc_turret", "classname" ), ::turret_monitorUse );
 	
 //	thread dumpIt();
+}
+
+
+watchSentryLimit()
+{
+	for(;;)
+	{
+		sentries = getentarray( "misc_turret", "classname" );
+		if(sentries.size > 30)
+			sentries[0] delete();
+		
+		wait 0.05;
+	}
 }
 
 
@@ -397,6 +456,7 @@ onPlayerConnect()
 
 		player thread onPlayerSpawned();
 		player thread bombSquadWaiter();
+		player thread monitorSemtex();
 	}
 }
 
@@ -423,6 +483,7 @@ onPlayerSpawned()
 		self thread watchSentryUsage();
 		self thread watchWeaponReload();
 		self thread maps\mp\gametypes\_class::trackRiotShield();
+		self thread watchDropWeaponOnCommand();
 
 		self.lastHitTime = [];
 		
@@ -433,10 +494,85 @@ onPlayerSpawned()
 		
 		self thread updateSavedLastWeapon();
 		
-		if ( self hasWeapon( "semtex_mp" ) )
-			self thread monitorSemtex();
-		
 		self.currentWeaponAtSpawn = undefined;
+	}
+}
+
+watchDropWeaponOnCommand()
+{
+	if( !level.allowDropWeaponOnCommand )
+		return;
+	
+	self endon( "disconnect" );
+	self endon( "death" );
+	
+	self notifyOnPlayerCommand( "drop_weapon_on_cmd", "+actionslot 2" );
+	for(;;)
+	{
+		self waittill( "drop_weapon_on_cmd" );
+		weapon = self GetCurrentWeapon();
+
+		if ( !gameFlag( "prematch_done" ) || !isDefined( weapon ) )
+			continue;
+
+		if( level.gameEnded )
+			continue;
+
+		if( !mayDropWeapon( weapon ) )
+			continue;
+
+		if ( !self hasWeapon( weapon ) )      
+			continue;
+
+		if ( weapon != "riotshield_mp" )
+		{
+			if ( !(self AnyAmmoForWeaponModes( weapon )) )
+			{
+				continue;
+			}
+
+			clipAmmoR = self GetWeaponAmmoClip( weapon, "right" );
+			clipAmmoL = self GetWeaponAmmoClip( weapon, "left" );
+			if ( !clipAmmoR && !clipAmmoL )
+			{
+				continue;
+			}
+
+			stockAmmo = self GetWeaponAmmoStock( weapon );
+			stockMax = WeaponMaxAmmo( weapon );
+			if ( stockAmmo > stockMax )
+				stockAmmo = stockMax;
+
+			item = self dropItem( weapon );
+			item ItemWeaponSetAmmo( clipAmmoR, stockAmmo, clipAmmoL );
+		}
+		else
+		{
+			item = self dropItem( weapon );   
+			if ( !isDefined( item ) )
+				continue;
+			item ItemWeaponSetAmmo( 1, 1, 0 );
+		}
+		item.owner = self;
+
+		item thread maps\mp\gametypes\_weapons::watchPickup();
+
+		//deletes dropped weapon after 30 sec.
+		item thread maps\mp\gametypes\_weapons::deletePickupAfterAWhile();
+
+		detach_model = getWeaponModel( weapon );
+
+		if ( !isDefined( detach_model ) )
+			continue;
+
+		if( isDefined( self.tag_stowed_back ) && detach_model == self.tag_stowed_back )
+			self maps\mp\gametypes\_weapons::detach_back_weapon();
+
+		if ( !isDefined( self.tag_stowed_hip ) )
+			continue;
+
+		if( detach_model == self.tag_stowed_hip )
+			self maps\mp\gametypes\_weapons::detach_hip_weapon();
 	}
 }
 
@@ -598,6 +734,9 @@ mayDropWeapon( weapon )
 
 dropWeaponForDeath( attacker )
 {
+	if( !level.allowDropWeaponOnDeath )
+		return;
+	
 	weapon = self.lastDroppableWeapon;
 	
 	if ( isdefined( self.droppedDeathWeapon ) )
@@ -1106,6 +1245,17 @@ watchGrenadeUsage()
 	}
 }
 
+deleteOnOwnerTeamChange( owner )
+{
+	self endon( "delete_on_team_overlap" );
+	
+	self endon( "death" );
+	
+	owner waittill_any( "disconnect", "joined_team", "joined_spectators" );
+	
+	self delete();
+}
+
 beginGrenadeTracking()
 {
 	self endon( "death" );
@@ -1121,17 +1271,43 @@ beginGrenadeTracking()
 		grenade.isCooked = true;
 
 	self.changingWeapon = undefined;
-
-	if ( weaponName == "frag_grenade_mp" || weaponName == "semtex_mp" )
+	
+	grenade.owner = self;
+	
+	switch( weaponName )
 	{
-		grenade thread maps\mp\gametypes\_shellshock::grenade_earthQuake();
-		grenade.originalOwner = self;
-	}
-
-	if ( weaponName == "flash_grenade_mp" || weaponName == "concussion_grenade_mp" )
-	{
-		grenade.owner = self;
-		grenade thread empExplodeWaiter();
+		case "frag_grenade_mp":
+		case "semtex_mp":
+			grenade thread maps\mp\gametypes\_shellshock::grenade_earthQuake();
+			grenade.originalOwner = self;
+			
+			if ( level.deleteNadeOnTeamChange )
+				grenade thread deleteOnOwnerTeamChange( self );
+			
+			if( level.extraTeamIcons )
+				grenade thread setClaymoreTeamHeadIcon( self.pers[ "team" ] );
+			break;
+		case "flash_grenade_mp":
+		case "concussion_grenade_mp":
+			grenade thread empExplodeWaiter();
+			
+			if ( level.deleteNadeOnTeamChange )
+				grenade thread deleteOnOwnerTeamChange( self );
+			
+			if( level.extraTeamIcons )
+				grenade thread setClaymoreTeamHeadIcon( self.pers[ "team" ] );
+			break;
+		case "smoke_grenade_mp":
+			if( level.extraTeamIcons )
+				grenade thread setClaymoreTeamHeadIcon( self.pers[ "team" ] );
+			break;
+		case "throwingknife_mp":
+			if ( level.deleteNadeOnTeamChange )
+				grenade thread deleteOnOwnerTeamChange( self );
+			
+			if( level.extraTeamIcons )
+				grenade thread setClaymoreTeamHeadIcon( self.pers[ "team" ] );
+			break;
 	}
 }
 
@@ -1193,6 +1369,10 @@ watchMissileUsage()
 			default:
 				break;
 		}
+		if( level.extraTeamIcons && weaponName != "remotemissile_projectile_mp" )
+			missile thread setClaymoreTeamHeadIcon( self.pers[ "team" ] );
+		if ( level.deleteNadeOnTeamChange )
+			missile thread deleteOnOwnerTeamChange( self );
 	}
 }
 
@@ -1262,6 +1442,14 @@ watchForThrowbacks()
 
 		grenade thread maps\mp\gametypes\_shellshock::grenade_earthQuake();
 		grenade.originalOwner = self;
+		
+		if( level.extraTeamIcons )
+			grenade thread setClaymoreTeamHeadIcon( self.pers[ "team" ] );
+		if ( level.deleteNadeOnTeamChange )
+		{
+			grenade notify( "delete_on_team_overlap" );
+			grenade thread deleteOnOwnerTeamChange( self );
+		}
 	}
 }
 
@@ -1302,7 +1490,12 @@ watchC4()
 			c4 thread c4Damage();
 			c4 thread c4EMPDamage();
 			c4 thread c4EMPKillstreakWait();
+			if( level.extraTeamIcons )
+				c4 thread setClaymoreTeamHeadIcon( self.pers[ "team" ] );
 			//c4 thread c4DetectionTrigger( self.pers[ "team" ] );
+			c4 thread c4WatchPickup();
+			if ( level.deleteNadeOnTeamChange )
+				c4 thread deleteOnOwnerTeamChange( self );
 		}
 	}
 }
@@ -1316,6 +1509,9 @@ c4EMPDamage()
 	{
 		self waittill( "emp_damage", attacker, duration );
 
+		if ( isPlayer(attacker) && !friendlyFireCheck( self.owner, attacker ) )
+			continue;
+		
 		playfxOnTag( getfx( "sentry_explode_mp" ), self, "tag_origin" );
 
 		self.disabled = true;
@@ -1350,15 +1546,44 @@ c4EMPKillstreakWait()
 	}
 }
 
+deleteTeamHeadIconOnUndefined(ent, hud)
+{
+	ent endon( "death" );
+	
+	while ( isDefined(ent) )
+		wait 0.05;
+	
+	hud destroy();
+	hud = undefined;
+	ent notify( "kill_entity_headicon_thread" );
+}
 
 setClaymoreTeamHeadIcon( team )
 {
 	self endon( "death" );
-	wait .05;
+	
+	if ( self.weaponname == "claymore_mp" && !level.allowExtendedClaymoreTrace )
+	{
+		self waittill( "missile_stuck" );
+		self waittill( "claymore_trace_fixed" );
+	}
+	else
+		wait 0.05;
+	
+	if ( isDefined( self.entityHeadIcon ) )
+	{
+		self.entityHeadIconTeam = "none";
+		self.entityHeadIcon destroy();
+		self.entityHeadIcon = undefined;
+		self notify( "kill_entity_headicon_thread" );
+	}
+	
 	if ( level.teamBased )
 		self maps\mp\_entityheadicons::setTeamHeadIcon( team, ( 0, 0, 20 ) );
 	else if ( isDefined( self.owner ) )
 		self maps\mp\_entityheadicons::setPlayerHeadIcon( self.owner, (0,0,20) );
+	
+	thread deleteTeamHeadIconOnUndefined(self, self.entityHeadIcon);
 }
 
 
@@ -1367,7 +1592,6 @@ watchClaymores()
 	self endon( "spawned_player" );
 	self endon( "disconnect" );
 
-	self.claymorearray = [];
 	while ( 1 )
 	{
 		self waittill( "grenade_fire", claymore, weapname );
@@ -1389,13 +1613,106 @@ watchClaymores()
 			claymore thread claymoreDetonation();
 			//claymore thread claymoreDetectionTrigger_wait( self.pers[ "team" ] );
 			claymore thread setClaymoreTeamHeadIcon( self.pers[ "team" ] );
-
+			claymore thread c4WatchPickup();
+			claymore thread claymoreWatchTrace();
+			if ( level.deleteNadeOnTeamChange )
+				claymore thread deleteOnOwnerTeamChange( self );
 			 /#
 			if ( getdvarint( "scr_claymoredebug" ) )
 			{
 				claymore thread claymoreDebug();
 			}
 			#/
+		}
+	}
+}
+
+claymoreWatchTrace()
+{
+	if( level.allowExtendedClaymoreTrace )
+		return;
+	
+	self endon( "death" );
+	
+	// need to see if this is being placed far away from the player and not let it do that
+	// this will fix a legacy bug where you can stand on a ledge and plant a claymore down on the ground far below you
+	self Hide();
+	
+	self waittill( "missile_stuck" );
+	wait 0.05;//wait for threads
+	
+	distanceZ = 40;
+	
+	if( distanceZ * distanceZ < DistanceSquared( self.origin, self.owner.origin ) )
+	{
+		secTrace = bulletTrace( self.owner.origin, self.owner.origin - (0, 0, distanceZ), false, self );
+	
+		if( secTrace["fraction"] == 1 )
+		{
+			self.owner SetWeaponAmmoStock( self.weaponname, self.owner GetWeaponAmmoStock( self.weaponname ) + 1 );
+			self delete();
+			return;
+		}
+		self.origin = secTrace["position"];
+	}
+	self Show();
+	self notify( "claymore_trace_fixed" );
+}
+
+_notUsableForJoiningPlayers( owner )
+{
+	self endon ( "death" );
+	level endon ( "game_ended" );
+	owner endon ( "disconnect" );
+
+	// as players join they need to be set to not be able to use this
+	while( true )
+	{
+		level waittill( "player_spawned", player );
+		if( IsDefined( player ) && player != owner )
+		{
+			self disablePlayerUse( player );
+		}
+	}
+}
+
+c4WatchPickup()
+{
+	if( !level.allowPickUpEquipment )
+		return;
+	
+	self endon( "death" );
+	
+	self waittill( "missile_stuck" );
+	if( !level.allowExtendedClaymoreTrace && self.weaponname == "claymore_mp" )
+		self waittill( "claymore_trace_fixed" );
+
+	trigger = spawn( "script_origin", self.origin );
+	self thread deleteOnDeath( trigger );
+	
+	trigger setCursorHint( "HINT_NOICON" );
+
+	if ( self.weaponname == "c4_mp" )
+		trigger setHintString( &"MP_PICKUP_C4" );
+	else if (self.weaponname == "claymore_mp" )
+		trigger setHintString( &"MP_PICKUP_CLAYMORE" );
+
+	trigger setSelfUsable( self.owner );
+	trigger thread _notUsableForJoiningPlayers( self );
+	
+	for ( ;; )
+	{
+		trigger waittillmatch( "trigger", self.owner );
+		usePressTime = getTime();
+		while( self.owner UseButtonPressed() && (getTime() - usePressTime) < 500 )
+			wait .05;
+		
+		if( self.owner UseButtonPressed() )
+		{
+			self.owner playLocalSound( "scavenger_pack_pickup" );
+			self.owner SetWeaponAmmoStock( self.weaponname, self.owner GetWeaponAmmoStock( self.weaponname ) + 1 );
+
+			self delete();
 		}
 	}
 }
@@ -1449,6 +1766,9 @@ claymoreDetonation()
 	self endon( "death" );
 
 	self waittill( "missile_stuck" );
+	
+	if( !level.allowExtendedClaymoreTrace )
+		self waittill( "claymore_trace_fixed" );
 
 	damagearea = spawn( "trigger_radius", self.origin + ( 0, 0, 0 - level.claymoreDetonateRadius ), 0, level.claymoreDetonateRadius, level.claymoreDetonateRadius * 2 );
 	self thread deleteOnDeath( damagearea );
@@ -1465,6 +1785,9 @@ claymoreDetonation()
 				continue;
 		}
 		if ( lengthsquared( player getVelocity() ) < 10 )
+			continue;
+		
+		if ( abs( player.origin[2] - self.origin[2] ) > 128 )
 			continue;
 
 		if ( !player shouldAffectClaymore( self ) )
@@ -1658,7 +1981,7 @@ c4Damage()
 
 	while ( 1 )
 	{
-		self waittill( "damage", damage, attacker, direction_vec, point, type, modelName, tagName, partName, iDFlags );
+		self waittill( "damage", damage, attacker, direction_vec, point, type, modelName, tagName, partName, iDFlags, weapon );
 		if ( !isPlayer( attacker ) )
 			continue;
 
@@ -1666,8 +1989,22 @@ c4Damage()
 		if ( !friendlyFireCheck( self.owner, attacker ) )
 			continue;
 
-		if ( damage < 5 )// ignore concussion grenades
-			continue;
+
+		if( isDefined( weapon ) )
+		{
+			switch( weapon )
+			{
+				case "concussion_grenade_mp":
+				case "flash_grenade_mp":
+				case "smoke_grenade_mp":
+					continue;
+			}
+		}
+		else
+		{
+			if( damage < 5 )
+				continue;
+		}
 
 		break;
 	}
@@ -1691,6 +2028,14 @@ c4Damage()
 		self.wasDamagedFromBulletPenetration = true;
 
 	self.wasDamaged = true;
+	
+	if( isPlayer( attacker ) )
+	{
+		if( isDefined( level.extraDamageFeedback ) && level.extraDamageFeedback )
+			attacker maps\mp\gametypes\_damagefeedback::updateDamageFeedback( "c4" );
+		if( isDefined( level.allowPrintDamage ) && level.allowPrintDamage && attacker.printDamage )
+			attacker iPrintLnBold( damage );
+	}
 
 	if ( level.teamBased )
 	{
@@ -2071,10 +2416,10 @@ damageEnt( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, damagepos, da
 	else
 	{
 		// destructable walls and such can only be damaged in certain ways.
-		if ( self.isADestructable && ( sWeapon == "artillery_mp" || sWeapon == "claymore_mp" ) || sWeapon == "stealth_bomb_mp" )
+		if ( self.isADestructable && ( sWeapon == "artillery_mp" || sWeapon == "claymore_mp" || sWeapon == "stealth_bomb_mp" ) )
 			return;
 
-		self.entity notify( "damage", iDamage, eAttacker, ( 0, 0, 0 ), ( 0, 0, 0 ), "mod_explosive", "", "" );
+		self.entity notify( "damage", iDamage, eAttacker, ( 0, 0, 0 ), ( 0, 0, 0 ), "MOD_EXPLOSIVE", "", "", "", undefined, sWeapon );
 	}
 }
 
@@ -2107,6 +2452,12 @@ onWeaponDamage( eInflictor, sWeapon, meansOfDeath, damage, eAttacker )
 	{
 		case "concussion_grenade_mp":
 			// should match weapon settings in gdt
+			if ( !isDefined( eInflictor ) )//check to ensure inflictor wasnt destroyed.
+				return;
+			
+			if( meansOfDeath == "MOD_IMPACT" ) // do not cause stun effect if it was direct hit
+				return;
+			
 			radius = 512;
 			scale = 1 - ( distance( self.origin, eInflictor.origin ) / radius );
 
@@ -2115,10 +2466,18 @@ onWeaponDamage( eInflictor, sWeapon, meansOfDeath, damage, eAttacker )
 
 			time = 2 + ( 4 * scale );
 			
+			if ( isDefined( self.stunScaler ) )
+				time = time * self.stunScaler;
+			
 			wait( 0.05 );
 			eAttacker notify( "stun_hit" );
+			self notify( "concussed", eAttacker );
+			if( eAttacker != self )
+				eAttacker maps\mp\gametypes\_missions::processChallenge( "ch_alittleconcussed" );
 			self shellShock( "concussion_grenade_mp", time );
 			self.concussionEndTime = getTime() + ( time * 1000 );
+			if( IsDefined( eInflictor.owner ) && eInflictor.owner == eAttacker && isDefined( level.extraDamageFeedback ) && level.extraDamageFeedback )
+				eAttacker thread maps\mp\gametypes\_damagefeedback::updateDamageFeedback( "stun" );
 		break;
 
 		case "weapon_cobra_mk19_mp":
@@ -2649,7 +3008,6 @@ buildWeaponData( filterPerks )
 monitorSemtex()
 {
 	self endon( "disconnect" );
-	self endon( "death" );
 	
 	for( ;; )
 	{
@@ -2676,7 +3034,7 @@ monitorSemtex()
 		
 		self thread maps\mp\gametypes\_hud_message::SplashNotify( "stuck_semtex", 100 );
 		self notify( "process", "ch_bullseye" );
-	}	
+	}
 }
 
 

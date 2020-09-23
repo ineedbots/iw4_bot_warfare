@@ -1,3 +1,21 @@
+/*
+	_emp modded
+	Author: INeedGames
+	Date: 09/22/2020
+	Adds a friendly fire check when destroying killstreaks and a duration dvar.
+	> gets emp'd
+	> hears on an electric radio: WE'VE BEEN EMP'D  ELECTRONICS ARE DOWN!
+
+	DVARS:
+		- scr_emp_duration <int>
+			60 - (default) amount of seconds for an emp to last
+
+		- scr_emp_doesFriendlyFire <bool>
+			true - (default) whether or not if an emp destroies all killstreaks reguardless of friendly fire
+
+	Thanks: H3X1C, Emosewaj
+*/
+
 #include maps\mp\_utility;
 #include common_scripts\utility;
 
@@ -17,8 +35,13 @@ init()
 	
 	level.killstreakFuncs["emp"] = ::EMP_Use;
 	
-	level thread onPlayerConnect();
+	setDvarIfUninitialized( "scr_emp_duration", 60 );
+	setDvarIfUninitialized( "scr_emp_doesFriendlyFire", true );
+
+  level.empduration  = getDvarInt( "scr_emp_duration" ); 
+	level.empDoesFriendlyFire = getDvarInt( "scr_emp_doesFriendlyFire" );
 	
+	level thread onPlayerConnect();
 }
 
 
@@ -58,9 +81,9 @@ EMP_Use( lifeId, delay )
 	otherTeam = level.otherTeam[myTeam];
 	
 	if ( level.teamBased )
-		self thread EMP_JamTeam( otherTeam, 60.0, delay );
+		self thread EMP_JamTeam( otherTeam, level.empduration, delay );
 	else
-		self thread EMP_JamPlayers( self, 60.0, delay );
+		self thread EMP_JamPlayers( self, level.empduration, delay );
 
 	self maps\mp\_matchdata::logKillstreakEvent( "emp", self.origin );
 	self notify( "used_emp" );
@@ -69,7 +92,7 @@ EMP_Use( lifeId, delay )
 }
 
 
-EMP_JamTeam( teamName, duration, delay )
+EMP_JamTeam( teamName, duration, delay, silent )
 {
 	level endon ( "game_ended" );
 	
@@ -77,7 +100,8 @@ EMP_JamTeam( teamName, duration, delay )
 
 	//wait ( delay );
 
-	thread teamPlayerCardSplash( "used_emp", self );
+	if (!isDefined(silent))
+		thread teamPlayerCardSplash( "used_emp", self );
 
 	level notify ( "EMP_JamTeam" + teamName );
 	level endon ( "EMP_JamTeam" + teamName );
@@ -93,21 +117,24 @@ EMP_JamTeam( teamName, duration, delay )
 			player RadarJamOff();
 	}
 	
-	visionSetNaked( "coup_sunblind", 0.1 );
-	thread empEffects();
-	
-	wait ( 0.1 );
-	
-	// resetting the vision set to the same thing won't normally have an effect.
-	// however, if the client receives the previous visionset change in the same packet as this one,
-	// this will force them to lerp from the bright one to the normal one.
-	visionSetNaked( "coup_sunblind", 0 );
-	visionSetNaked( getDvar( "mapname" ), 3.0 );
+	if (!isDefined(silent))
+	{
+		visionSetNaked( "coup_sunblind", 0.1 );
+		thread empEffects();
+		
+		wait ( 0.1 );
+		
+		// resetting the vision set to the same thing won't normally have an effect.
+		// however, if the client receives the previous visionset change in the same packet as this one,
+		// this will force them to lerp from the bright one to the normal one.
+		visionSetNaked( "coup_sunblind", 0 );
+		visionSetNaked( getDvar( "mapname" ), 3.0 );
+	}
 	
 	level.teamEMPed[teamName] = true;
 	level notify ( "emp_update" );
 	
-	level destroyActiveVehicles( self );
+	level destroyActiveVehicles( self, !level.empEffectsAll );
 	
 	maps\mp\gametypes\_hostmigration::waitLongDurationWithHostMigrationPause( duration );
 	
@@ -125,7 +152,7 @@ EMP_JamTeam( teamName, duration, delay )
 	level notify ( "emp_update" );
 }
 
-EMP_JamPlayers( owner, duration, delay )
+EMP_JamPlayers( owner, duration, delay, silent )
 {
 	level notify ( "EMP_JamPlayers" );
 	level endon ( "EMP_JamPlayers" );
@@ -145,22 +172,25 @@ EMP_JamPlayers( owner, duration, delay )
 			player RadarJamOff();
 	}
 	
-	visionSetNaked( "coup_sunblind", 0.1 );
-	thread empEffects();
+	if (!isDefined(silent))
+	{
+		visionSetNaked( "coup_sunblind", 0.1 );
+		thread empEffects();
 
-	wait ( 0.1 );
-	
-	// resetting the vision set to the same thing won't normally have an effect.
-	// however, if the client receives the previous visionset change in the same packet as this one,
-	// this will force them to lerp from the bright one to the normal one.
-	visionSetNaked( "coup_sunblind", 0 );
-	visionSetNaked( getDvar( "mapname" ), 3.0 );
+		wait ( 0.1 );
+		
+		// resetting the vision set to the same thing won't normally have an effect.
+		// however, if the client receives the previous visionset change in the same packet as this one,
+		// this will force them to lerp from the bright one to the normal one.
+		visionSetNaked( "coup_sunblind", 0 );
+		visionSetNaked( getDvar( "mapname" ), 3.0 );
+	}
 	
 	level notify ( "emp_update" );
 	
 	level.empPlayer = owner;
 	level.empPlayer thread empPlayerFFADisconnect();
-	level destroyActiveVehicles( owner );
+	level destroyActiveVehicles( owner, !level.empDoesFriendlyFire );
 	
 	level notify ( "emp_update" );
 	
@@ -254,38 +284,49 @@ EMP_PlayerTracker()
 	}
 }
 
-destroyActiveVehicles( attacker )
+destroyActiveVehicles( attacker, friendlyFireCheck )
 {
+	if (!isDefined(friendlyFireCheck))
+		friendlyFireCheck = false;
+
 	if ( isDefined( attacker ) )
 	{
 		foreach ( heli in level.helis )
-			radiusDamage( heli.origin, 384, 5000, 5000, attacker );
+			if (!friendlyFireCheck || (level.teamBased && heli.team != attacker.team) || (!level.teamBased && (!isDefined(heli.owner) || heli.owner != attacker)))
+				radiusDamage( heli.origin, 384, 5000, 5000, attacker );
 	
 		foreach ( littleBird in level.littleBird )
-			radiusDamage( littleBird.origin, 384, 5000, 5000, attacker );
+			if (!friendlyFireCheck || (level.teamBased && littleBird.team != attacker.team) || (!level.teamBased && (!isDefined(littleBird.owner) || littleBird.owner != attacker)))
+				radiusDamage( littleBird.origin, 384, 5000, 5000, attacker );
 		
 		foreach ( turret in level.turrets )
-			radiusDamage( turret.origin, 16, 5000, 5000, attacker );
+			if (!friendlyFireCheck || (level.teamBased && turret.team != attacker.team) || (!level.teamBased && (!isDefined(turret.owner) || turret.owner != attacker)))
+				radiusDamage( turret.origin, 16, 5000, 5000, attacker );
 	
 		foreach ( rocket in level.rockets )
-			rocket notify ( "death" );
+			if (!friendlyFireCheck || (level.teamBased && rocket.team != attacker.team) || (!level.teamBased && (!isDefined(rocket.owner) || rocket.owner != attacker)))
+				rocket notify ( "death" );
 		
 		if ( level.teamBased )
 		{
 			foreach ( uav in level.uavModels["allies"] )
-				radiusDamage( uav.origin, 384, 5000, 5000, attacker );
+				if (!friendlyFireCheck || uav.team != attacker.team)
+					radiusDamage( uav.origin, 384, 5000, 5000, attacker );
 	
 			foreach ( uav in level.uavModels["axis"] )
-				radiusDamage( uav.origin, 384, 5000, 5000, attacker );
+				if (!friendlyFireCheck || uav.team != attacker.team)
+					radiusDamage( uav.origin, 384, 5000, 5000, attacker );
 		}
 		else
 		{	
 			foreach ( uav in level.uavModels )
-				radiusDamage( uav.origin, 384, 5000, 5000, attacker );
+				if (!friendlyFireCheck || !isDefined(uav.owner) || uav.owner != attacker)
+					radiusDamage( uav.origin, 384, 5000, 5000, attacker );
 		}
 		
 		if ( isDefined( level.ac130player ) )
-			radiusDamage( level.ac130.planeModel.origin+(0,0,10), 1000, 5000, 5000, attacker );
+			if (!friendlyFireCheck || (level.teamBased && level.ac130player.team != attacker.team) || (!level.teamBased && level.ac130player != attacker))
+				radiusDamage( level.ac130.planeModel.origin+(0,0,10), 1000, 5000, 5000, attacker );
 	}
 	else
 	{

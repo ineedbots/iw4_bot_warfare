@@ -1,3 +1,29 @@
+/*
+	_killstreaks modded
+	Author: INeedGames
+	Date: 09/22/2020
+	Adds killstreak rollover and killstreak HUD.origin
+
+	DVARS:
+		- scr_killstreak_rollover <int>
+			0 - (default) killstreaks do not rollover, only get one set of killstreaks
+			1 - killstreaks rollover, earn killstreaks over again without dying
+			2 - killstreaks rollover only with hardline pro
+
+		- scr_maxKillstreakRollover <int>
+			10 - (default) allow to rollover killstreaks <int> times. (remember you are limited to 10 rollovers as defined in _class.gsc)
+
+		- scr_killstreak_mod <int>
+			0 - (default) offsets all killstreaks reward costs by <int> amount
+
+		- scr_killstreakHud <int>
+			0 - (default) no HUD
+			1 - use Puffiamo's killstreak HUD
+			2 - use NoFate's MW3 killstreak HUD
+
+	Thanks: H3X1C, Emosewaj, NoFate, Puffiamo
+*/
+
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
@@ -20,8 +46,6 @@ init()
 	level.killstreakFuncs = [];
 	level.killstreakSetupFuncs = [];
 	level.killstreakWeapons = [];
-	
-	level.killStreakMod = 0;
 
 	thread maps\mp\killstreaks\_ac130::init();
 	thread maps\mp\killstreaks\_remotemissile::init();
@@ -36,6 +60,16 @@ init()
 
 	level.killstreakRoundDelay = getIntProperty( "scr_game_killstreakdelay", 8 );
 
+	setDvarIfUninitialized( "scr_killstreak_rollover", false );
+	setDvarIfUninitialized( "scr_maxKillstreakRollover", 10 );
+	setDvarIfUninitialized( "scr_killstreakHud", false );
+	setDvarIfUninitialized( "scr_killstreak_mod", 0 );
+
+	level.killstreaksRollOver = getDvarInt("scr_killstreak_rollover");
+	level.maxKillstreakRollover = getDvarInt("scr_maxKillstreakRollover");
+	level.killstreakHud = getDvarInt("scr_killstreakHud");
+	level.killStreakMod = getDvarInt( "scr_killstreak_mod" );
+	
 	level thread onPlayerConnect();
 }
 
@@ -124,6 +158,11 @@ onPlayerSpawned()
 		self thread killstreakUseWaiter();
 		self thread waitForChangeTeam();
 		
+		if (level.killstreakHud == 1)
+			self thread initKillstreakHud( 145 );
+		else if (level.killstreakHud == 2)
+			self thread initMW3KillstreakHud();
+
 		self giveOwnedKillstreakItem( true );
 	}
 }
@@ -284,10 +323,10 @@ shuffleKillStreaksFILO( streakName, kID )
 	{
 		if ( self.pers["killstreaks"][i].streakName != streakName )
 			continue;
-			
+		
 		if ( isDefined( kID ) && self.pers["killstreaks"][i].kID != kID )
 			continue;
-			
+
 		streakIndex = i;
 		break;
 	}
@@ -460,16 +499,22 @@ checkKillstreakReward( streakCount )
 
 		if ( isSubStr( streakName, "-rollover" ) )
 		{
-			continue;
-			/*
-			if ( game["defcon"] > 2 )
-			{
-				self.pers["lastEarnedStreak"] = streakName;
+			if (!level.killstreaksRollover || (level.killstreaksRollover == 2 && !self _hasPerk("specialty_rollover")))
 				continue;
+			else
+			{
+				curRollover = int(strtok(strtok(streakName, "-")[1], "rollover")[0]);
+				if (curRollover > level.maxKillstreakRollover)
+					continue;
+
+				if ( isDefined( game["defcon"] ) && game["defcon"] > 2 )
+				{
+					self.pers["lastEarnedStreak"] = streakName;
+					continue;
+				}
+				
+				useStreakName = strTok( streakName, "-" )[0];
 			}
-			
-			useStreakName = strTok( streakName, "-" )[0];
-			*/
 		}
 		else
 		{
@@ -711,4 +756,204 @@ clearRideIntro( delay )
 		self VisionSetNakedForPlayer( getDvar( "mapname" ), 0 );
 }
 
+destroyOnEvents(elem)
+{
+	self waittill_either("disconnect", "spawned_player");
+	elem destroy();
+}
 
+initKillstreakHud(inity)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+
+	streakVals = GetArrayKeys(self.killStreaks);
+	hasHardline = self _hasPerk("specialty_hardline");
+
+	self.killStreakHudElems = [];
+
+	// the killstreak counter
+	index = self.killStreakHudElems.size;
+	self.killStreakHudElems[index] = self createFontString( "objective", 2 );
+	self.killStreakHudElems[index].foreground = false;
+	self.killStreakHudElems[index].hideWhenInMenu = true;
+	self.killStreakHudElems[index].fontScale = 0.60;
+	self.killStreakHudElems[index].font = "hudbig";
+	self.killStreakHudElems[index].alpha = 1;
+	self.killStreakHudElems[index].glow = 1;
+	self.killStreakHudElems[index].glowColor = ( 0, 0, 1 );
+	self.killStreakHudElems[index].glowAlpha = 1;
+	self.killStreakHudElems[index].color = ( 1.0, 1.0, 1.0 );
+	self thread destroyOnEvents(self.killStreakHudElems[index]);
+	highestStreak = -1;
+
+	for (i = 0; i < streakVals.size; i++)
+	{
+		streakVal = streakVals[i];
+		streakName = self.killStreaks[streakVal];
+
+		if (isSubStr(streakName, "-rollover"))
+			continue;
+
+		streakShader = maps\mp\killstreaks\_killstreaks::getKillstreakIcon( streakName );
+		streakCost = maps\mp\killstreaks\_killstreaks::getStreakCost( streakName );
+		if (hasHardline)
+			streakCost--;
+
+		// each killstreak icon
+		index = self.killStreakHudElems.size;
+		self.killStreakHudElems[index] = self createFontString( "objective", 2 );
+		self.killStreakHudElems[index].foreground = false;
+		self.killStreakHudElems[index].hideWhenInMenu = true;
+		self.killStreakHudElems[index].fontScale = 0.60;
+		self.killStreakHudElems[index].font = "hudbig";
+		self.killStreakHudElems[index].alpha = 1;
+		self.killStreakHudElems[index].glow = 1;
+		self.killStreakHudElems[index].glowColor = ( 0, 0, 1 );
+		self.killStreakHudElems[index].glowAlpha = 1;
+		self.killStreakHudElems[index].color = ( 1.0, 1.0, 1.0 );
+		self.killStreakHudElems[index] setPoint( "RIGHT", "RIGHT", 0, inity - 25 * i );
+		self.killStreakHudElems[index] setShader( streakShader, 20, 20 );
+		self.killStreakHudElems[index].ks_cost = streakCost;
+		self thread destroyOnEvents(self.killStreakHudElems[index]);
+
+		if (streakCost > highestStreak)
+			highestStreak = streakCost;
+	}
+
+	for(first=true;;)
+  {
+		if (first)
+			first = false;
+		else
+			self waittill( "killed_enemy" );
+
+		curStreak = self.pers["cur_kill_streak"];
+		timesRolledOver = int(curStreak / highestStreak);
+		if (level.killstreaksRollover == 1 || (level.killstreaksRollover == 2 && self _hasPerk("specialty_rollover")))
+			curStreak %= highestStreak;
+
+		if (timesRolledOver > level.maxKillstreakRollover)
+			curStreak = highestStreak;
+
+		isUnderAStreak = false;
+
+		for (i = self.killStreakHudElems.size - 1; i >= 1; i--)
+		{
+			streakElem = self.killStreakHudElems[i];
+			if (curStreak < streakElem.ks_cost)
+			{
+				isUnderAStreak = true;
+				self.killStreakHudElems[0] setPoint( "RIGHT", "RIGHT", -25, inity - 25 * (i - 1) );
+				self.killStreakHudElems[0] setText( streakElem.ks_cost - curStreak );
+			}
+		}
+
+		if (!isUnderAStreak && self.killStreakHudElems.size)
+		{
+			self.killStreakHudElems[0] setPoint( "RIGHT", "RIGHT", -25, inity - 25 * (self.killStreakHudElems.size - 1 - 1) );
+			self.killStreakHudElems[0] setText( "Done" );
+		}
+	}
+}
+
+initMW3KillstreakHud()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+
+	streakVals = GetArrayKeys(self.killStreaks);
+	hasHardline = self _hasPerk("specialty_hardline");
+
+	self.killStreakHudElems = [];
+	self.killStreakShellsElems = [];
+	highestStreak = -1;
+
+	for (i = 0; i < streakVals.size; i++)
+	{
+		streakVal = streakVals[i];
+		streakName = self.killStreaks[streakVal];
+
+		if (isSubStr(streakName, "-rollover"))
+			continue;
+
+		streakShader = maps\mp\killstreaks\_killstreaks::getKillstreakIcon( streakName );
+		streakCost = maps\mp\killstreaks\_killstreaks::getStreakCost( streakName );
+		if (hasHardline)
+			streakCost--;
+
+		if (streakCost > highestStreak)
+			highestStreak = streakCost;
+
+		// the shader
+		ksIcon = createIcon( streakShader, 20, 20 );
+		ksIcon setPoint( "BOTTOM RIGHT", "BOTTOM RIGHT", -32, -90 + -25 * i );
+		ksIcon.alpha = 0.4;
+		ksIcon.hideWhenInMenu = true;
+		ksIcon.foreground = true;
+		ksIcon.ks_cost = streakCost;
+		self thread destroyOnEvents(ksIcon);
+		self.killStreakHudElems[self.killStreakHudElems.size] = ksIcon;
+	}
+
+	// the shells
+	if (highestStreak > 0)
+	{
+		h = -53;
+		for(i = 0; i < highestStreak; i++)
+		{
+			ksShell = NewClientHudElem( self );
+			ksShell.x = 40;
+			ksShell.y = h;
+			ksShell.alignX = "right";
+			ksShell.alignY = "bottom";
+			ksShell.horzAlign = "right";
+			ksShell.vertAlign = "bottom";
+			ksShell setshader("white", 10, 2);
+			ksShell.alpha = 0.3;
+			ksShell.hideWhenInMenu = true;
+			ksShell.foreground = false;
+			self thread destroyOnEvents(ksShell);
+			self.killStreakShellsElems[i] = ksShell;
+			
+			h -= 4;
+		}
+	}
+
+	for(first=true;;)
+  {
+		if (first)
+			first = false;
+		else
+			self waittill( "killed_enemy" );
+
+		curStreak = self.pers["cur_kill_streak"];
+		timesRolledOver = int(curStreak / highestStreak);
+		if (level.killstreaksRollover == 1 || (level.killstreaksRollover == 2 && self _hasPerk("specialty_rollover")))
+			curStreak %= highestStreak;
+
+		if (timesRolledOver > level.maxKillstreakRollover)
+			curStreak = highestStreak;
+
+		// update the shells
+		for (i = 0; i < self.killStreakShellsElems.size; i++)
+		{
+			elem = self.killStreakShellsElems[i];
+			if (curStreak > i)
+				elem.alpha = 0.85;
+			else
+				elem.alpha = 0.3;
+		}
+
+		// update the ks icons
+		for (i = 0; i < self.killStreakHudElems.size; i++)
+		{
+			elem = self.killStreakHudElems[i];
+
+			if (curStreak >= elem.ks_cost)
+				elem.alpha = 0.9;
+			else
+				elem.alpha = 0.4;
+		}
+	}
+}

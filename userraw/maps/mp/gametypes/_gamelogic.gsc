@@ -1,3 +1,64 @@
+/*
+	_gamelogic modded
+	Author: INeedGames
+	Date: 09/22/2020
+	Adds DVARs for customization.
+
+	DVARS:
+		- scr_extraDamageFeedback <bool>
+			false - (default) players receive hitmarkers for helicopters, hitting equipment, etc.
+
+		- scr_printDamage <bool>
+			false - (default) allows players to receive numbered feedback how much damage they delt
+
+		- scr_disableKnife <bool>
+			false - (default) disables knife damage
+
+		- scr_intermissionTime <float>
+			30.0 - (default) how long to wait in intermission after a match completes
+
+		- scr_forceKillcam <bool>
+			false - (default) show final killcams even if a kill didn't end the game
+
+		- scr_forceKillcam_winnersKill <bool>
+			true - (default) only show the winner's killcam as a final killcam
+
+		- scr_game_allowFinalKillcam <bool>
+			true - (default) allows if a final killcam is shown
+
+		- scr_disableTurret <bool>
+			false - (default) disables mountable turret damage
+
+		- scr_failCam <bool>
+			false - (default) show suicides as killcams
+
+		- scr_voting <bool>
+			false - (default) allow players to vote for a map at the end of a match
+
+		- scr_voting_maps <comma seperate string list>
+			"mp_rust,mp_terminal" - (default) list of maps to be allowed for voting
+
+		- scr_voting_time <bool>
+			26.0 - (default) how long should polls be open for
+
+		- scr_voting_winTime <bool>
+			4.0 - (default) how long to show the winning map for
+
+		- scr_allow_intermission <bool>
+			false - (default) allow an intermission time after a match ends
+
+		- scr_voting_bots <bool>
+			false - (default) bots are allowed to pick a map to vote
+
+		- scr_nuke_increases_streak <bool>
+			true - (default) nukes (if they don't end the game) increase a player's killstreak
+
+		- headshot_detach_head <bool>
+			false - (default) headshots dismember the victim's head
+			
+	Thanks: banz
+*/
+
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
@@ -365,30 +426,65 @@ updateGameEvents()
 
 waittillFinalKillcamDone()
 {
-	if ( !level.showingFinalKillcam )
-		return false;
+	if ( level.forceFinalKillcam )
+	{
+		waittillframeend; // give "round_end_finished" notifies time to process
+		
+		if( level.showingFinalKillcam )
+		{
+			foreach ( player in level.players )
+				player notify( "reset_outcome" );
+
+			level notify( "game_cleanup" );
+			
+			while ( level.showingFinalKillcam )
+				wait ( 0.05 );
+		}
+	}
+	else
+	{
+		if ( !level.showingFinalKillcam )
+			return false;
 	
-	while ( level.showingFinalKillcam )
-		wait ( 0.05 );
-	
-	return true;
+		while ( level.showingFinalKillcam )
+			wait ( 0.05 );
+		
+		return true;
+	}
 }
 
-
-timeLimitClock_Intermission( waitTime )
+timeLimitClock_Intermission( waitTime, clockColor )
 {
-	setGameEndTime( getTime() + int(waitTime*1000) );
+	if( !isDefined( clockColor ) )
+		clockColor = (0, 0, 0);
+	
+	NewWaitTime = waitTime*1000;
+	
+	setGameEndTime( getTime() + int(NewWaitTime) );
 	clockObject = spawn( "script_origin", (0,0,0) );
 	clockObject hide();
 	
-	if ( waitTime >= 10.0 )
-		wait ( waitTime - 10.0 );
-		
-	for ( ;; )
+	matchStartTimer = createServerTimer("objective", 1.4);
+    matchStartTimer setPoint( "TOPRIGHT", "TOPRIGHT", -5, 0 );  //("CENTER", "CENTER", 0, -45);
+    matchStartTimer setTimer( waitTime - 1 );
+    matchStartTimer.sort = 1001;
+    matchStartTimer.foreground = false;
+    matchStartTimer.hideWhenInMenu = false;
+	matchStartTimer.color = clockColor;
+	
+	currentTime = getTime();
+	timeRunning = ( getTime() - currentTime );
+	while ( timeRunning <= NewWaitTime )
 	{
-		clockObject playSound( "ui_mp_timer_countdown" );
-		wait ( 1.0 );
-	}	
+		wait 0.05;
+		if ( (timeRunning - NewWaitTime) >= -10000 && timeRunning%1000 == 0 )
+			clockObject playSound( "ui_mp_timer_countdown" );
+		
+		timeRunning = ( getTime() - currentTime );
+	}
+	
+	clockObject delete();
+	matchStartTimer destroyElem();
 }
 
 
@@ -530,6 +626,9 @@ updateTieStats( loser )
 
 updateWinLossStats( winner )
 {
+	//if ( privateMatch() )
+	//	return;
+		
 	if ( !wasLastRound() )
 		return;
 		
@@ -606,6 +705,9 @@ updateMatchBonusScores( winner )
 {
 	if ( !game["timePassed"] )
 		return;
+
+	//if ( !matchMakingGame() )
+	//	return;
 
 	if ( !getTimeLimit() || level.forcedEnd )
 	{
@@ -1226,6 +1328,36 @@ roundEndDOF( time )
 	self setDepthOfField( 0, 128, 512, 4000, 6, 1.8 );
 }
 
+randomizeMaps()
+{
+	tok = strTok( level.votingMaps, "," );
+	
+	randomArray = [];
+    for( i = 0; i < 9; i++ )
+	{
+		selectedRand = randomint( tok.size );
+        randomArray[ i ] = tok[ selectedRand ];
+        tok = restructMapArray( tok, selectedRand );
+    }
+	
+	return randomArray;
+}
+
+restructMapArray(oldArray, index)
+{
+   restructArray = [];
+
+	for( i=0; i < oldArray.size; i++ )
+	{
+		if( i < index ) 
+			restructArray[ i ] = oldArray[ i ];
+		else if( i > index ) 
+			restructArray[ i - 1 ] = oldArray[ i ];
+	}
+
+	return restructArray;
+}
+
 
 Callback_StartGameType()
 {
@@ -1240,6 +1372,60 @@ Callback_StartGameType()
 	level.postGameNotifies = 0;
 	
 	level.intermission = false;
+	
+	
+	setDvarIfUninitialized( "scr_extraDamageFeedback", false );
+	setDvarIfUninitialized( "scr_printDamage", false );
+	setDvarIfUninitialized( "scr_disableKnife", false );
+	setDvarIfUninitialized( "scr_intermissionTime", 30.0 );
+	setDvarIfUninitialized( "scr_forceKillcam", false );
+	setDvarIfUninitialized( "scr_forceKillcam_winnersKill", true );
+	setDvarIfUninitialized( "scr_game_allowFinalKillcam", true );
+	setDvarIfUninitialized( "scr_disableTurret", false );
+	setDvarIfUninitialized( "scr_failCam", false );
+	setDvarIfUninitialized( "scr_voting", false );
+	setDvarIfUninitialized( "scr_voting_maps", "mp_rust,mp_terminal" );
+	setDvarIfUninitialized( "scr_voting_time", 26.0 );
+	setDvarIfUninitialized( "scr_voting_winTime", 4.0 );
+	setDvarIfUninitialized( "scr_allow_intermission", false );//vanilla as possible
+	setDvarIfUninitialized( "scr_voting_bots", false );
+	setDvarIfUninitialized( "scr_nuke_increases_streak", true );
+	setDvarIfUninitialized( "headshot_detach_head", false );
+	
+	level.extraDamageFeedback = getDvarInt("scr_extraDamageFeedback");
+	level.allowPrintDamage = getDvarInt("scr_printDamage");
+	level.disableKnife = getDvarInt("scr_disableKnife");
+	level.intermissionTime = getDvarFloat("scr_intermissionTime");
+	level.forceFinalKillcam = getDvarInt("scr_forceKillcam");
+	level.forceFinalKillcamWinnersKill = getDvarInt("scr_forceKillcam_winnersKill");
+	level.allowFinalKillcam = getDvarInt("scr_game_allowFinalKillcam");
+	level.disableTurret = getDvarInt( "scr_disableTurret" );
+	level.failCam = getDvarInt( "scr_failCam" );
+	level.voting = getDvarInt( "scr_voting" );
+	level.votingMaps = getDvar( "scr_voting_maps" );
+	level.voteWinTime = getDvarInt( "scr_voting_winTime" );
+	level.voteTime = getDvarInt( "scr_voting_time" );
+	level.allowIntermission = getDvarInt( "scr_allow_intermission" );
+	level.botsVote = getDvarInt( "scr_voting_bots" );
+	level.headShotDetachHead = getDvarInt("headshot_detach_head");
+	level.nukeIncreasesStreak = getDvarInt( "scr_nuke_increases_streak" );
+	
+	if ( level.voting )
+		level.votingMapsTok = randomizeMaps();
+	else
+		level.votingMapsTok = strTok( level.votingMaps, "," );
+	
+	level.scriptIncKillstreak = false;
+	
+	level.mapVotes = [];
+	for( i=0; i < level.votingMapsTok.size; i++ ) 
+		level.mapVotes[ i ] = 0;
+	
+	level.inVoting = false;
+	level.inShowingWinner = false;
+	level.inIntermission = false;
+	level.highestVotedMap = -1;
+	
 	
 	makeDvarServerInfo( "cg_thirdPersonAngle", 356 );
 
@@ -1290,8 +1476,17 @@ Callback_StartGameType()
 
 		precacheShader( "white" );
 		precacheShader( "black" );
-		//precacheMenu("popup_summary");
-			
+		
+		game["menu_vote"] = "vote";
+		
+		if ( level.voting && level.voteTime > 0.0 && level.votingMapsTok.size )
+			precacheMenu( game["menu_vote"] );
+		
+		game["menu_popup_summary"] = "popup_summary";
+		
+		if ( level.allowIntermission && level.intermissionTime > 0.0 )
+			precacheMenu( game["menu_popup_summary"] );
+		
 		game["strings"]["press_to_spawn"] = &"PLATFORM_PRESS_TO_SPAWN";
 		if ( level.teamBased )
 		{
@@ -1473,6 +1668,8 @@ Callback_StartGameType()
 	thread maps\mp\_events::init();
 	thread maps\mp\_defcon::init();
 	
+	level thread onPlayerConnect();
+	
 	if ( level.teamBased )
 		thread maps\mp\gametypes\_friendicons::init();
 		
@@ -1557,6 +1754,99 @@ Callback_StartGameType()
 
 	level thread updateWatchedDvars();
 	level thread timeLimitThread();
+	
+	level thread doFinalKillcam();
+}
+
+onPlayerConnect()
+{
+	for(;;)
+	{
+		level waittill( "connected", player );
+		
+		player thread onPlayerSpawned();
+		
+		player thread watchIntermissionAfterConnect();
+	}
+}
+
+watchIntermissionAfterConnect()
+{
+	self endon("disconnect");
+	
+	wait 0.05;
+	
+	self notify("kill_menus_on_connect");
+	if(level.inVoting || level.inShowingWinner)
+	{
+		self.sessionstate = "spectator";//allow player to leave while in intermission and make voting options
+		self thread watchVoting();
+		
+		if(level.inVoting)
+		{
+			self setClientDvars( "hud_ShowWinner", "0",
+								   "hud_voteText", "^3Vote for new map:",
+								   "vote_map", "" );
+		}
+		else if(level.inShowingWinner)
+		{
+			self setClientDvars( "hud_WinningName", "preview_" + level.votingMapsTok[ level.highestVotedMap ],
+								   "hud_WinningMap", consoleMapNameToMapName( level.votingMapsTok[ level.highestVotedMap ] ),
+								   "hud_voteText", "^3Next Map:",
+								   "hud_ShowWinner", "1" );
+		}
+		
+		self openPopupMenu( game["menu_vote"] );
+	}
+	else if(level.inIntermission)
+	{
+		self.sessionstate = "spectator";//allow player to leave while in intermission
+		self thread openSummaryOnMenuClose();
+		self openPopupMenu( game["menu_popup_summary"] );
+	}
+}
+
+onPlayerSpawned()
+{
+	self endon("disconnect");
+	self.printDamage = false;
+	firstTime = false;
+	for(;;)
+	{
+		self waittill("spawned_player");
+		if( !firstTime && level.allowPrintDamage )
+		{
+			firstTime = true;
+			self iPrintlnBold( "^7Press ^3[{+actionslot 2}] ^7to toggle ^3Print Damage" );
+		}
+		self thread printDamage();
+	}
+}
+
+printDamage()
+{
+	if( !level.allowPrintDamage )
+		return;
+	
+	self endon("disconnect");
+	self endon("death");
+	
+	self notifyOnPlayerCommand("printDamage", "+actionslot 2");
+	for(;;)
+	{
+		self waittill("printDamage");
+		self playSound( "semtex_warning" );
+		if(self.printDamage)
+		{
+			self iPrintlnBold("^7Print Damage ^1Disabled");
+			self.printDamage = false;
+		}
+		else
+		{
+			self iPrintlnBold("^7Print Damage ^1Enabled");
+			self.printDamage = true;
+		}
+	}
 }
 
 
@@ -1842,9 +2132,19 @@ getBetterTeam()
 
 rankedMatchUpdates( winner )
 {
-	setXenonRanks();
+	//if ( matchMakingGame() )
+	//{
+		setXenonRanks();
 		
-	updateMatchBonusScores( winner );
+		//if ( hostIdledOut() )
+		//{
+		//	level.hostForcedEnd = true;
+		//	logString( "host idled out" );
+		//	endLobby();
+		//}
+
+		updateMatchBonusScores( winner );
+	//}
 
 	updateWinLossStats( winner );
 }
@@ -1934,6 +2234,8 @@ displayRoundSwitch()
 
 endGameOvertime( winner, endReasonText )
 {
+	visionSetNaked( "mpOutro", 0.5 );		
+	setDvar( "scr_gameended", 2 );
 	// freeze players
 	foreach ( player in level.players )
 	{
@@ -1965,6 +2267,9 @@ endGameOvertime( winner, endReasonText )
 	}
 	
 	roundEndWait( level.roundEndDelay, false );
+	
+	if ( level.forceFinalKillcam )
+		waittillFinalKillcamDone();
 
 	game["status"] = "overtime";
 	level notify ( "restarting" );
@@ -2011,6 +2316,9 @@ endGameHalfTime()
 	}
 	
 	roundEndWait( level.roundEndDelay, false );
+	
+	if ( level.forceFinalKillcam )
+		waittillFinalKillcamDone();
 
 	game["status"] = "halftime";
 	level notify ( "restarting" );
@@ -2021,6 +2329,11 @@ endGameHalfTime()
 
 endGame( winner, endReasonText, nukeDetonated )
 {
+	if( !level.forceFinalKillcamWinnersKill || !isDefined( winner ) || !isString( winner ) || ( winner != "axis" && winner != "allies" ) )
+		level.finalKillCam_winner = "none";
+	else
+		level.finalKillCam_winner = winner;
+	
 	if ( !isDefined(nukeDetonated) )
 		nukeDetonated = false;
 	
@@ -2109,14 +2422,21 @@ endGame( winner, endReasonText, nukeDetonated )
 	
 		displayRoundEnd( winner, endReasonText );
 
-		if ( level.showingFinalKillcam )
+		if ( level.forceFinalKillcam )
 		{
-			foreach ( player in level.players )
-				player notify ( "reset_outcome" );
-
-			level notify ( "game_cleanup" );
-
 			waittillFinalKillcamDone();
+		}
+		else
+		{
+			if ( level.showingFinalKillcam )
+			{
+				foreach ( player in level.players )
+					player notify ( "reset_outcome" );
+
+				level notify ( "game_cleanup" );
+
+				waittillFinalKillcamDone();
+			}
 		}
 				
 		if ( !wasLastRound() )
@@ -2148,17 +2468,30 @@ endGame( winner, endReasonText, nukeDetonated )
 
 	maps\mp\gametypes\_missions::roundEnd( winner );
 
+	if( isRoundBased() )    
+        winner = getWinningTeam();
+
 	displayGameEnd( winner, endReasonText );
 
-	if ( level.showingFinalKillcam && wasOnlyRound() )
+	if( wasOnlyRound() )
 	{
-		foreach ( player in level.players )
-			player notify ( "reset_outcome" );
+		if ( level.forceFinalKillcam )
+		{
+			waittillFinalKillcamDone();
+		}
+		else
+		{
+			if ( level.showingFinalKillcam )
+			{
+				foreach ( player in level.players )
+					player notify ( "reset_outcome" );
 
-		level notify ( "game_cleanup" );
+				level notify ( "game_cleanup" );
 
-		waittillFinalKillcamDone();
-	}				
+				waittillFinalKillcamDone();
+			}
+		}
+	}
 
 	levelFlagClear( "block_notifies" );
 
@@ -2196,26 +2529,405 @@ endGame( winner, endReasonText, nukeDetonated )
 	{
 		wait ( min( 10.0, 4.0 + level.postGameNotifies ) );
 	}
-	if (!matchmakingGame())
+	
+	if ( level.voting && level.voteTime > 0.0 && level.votingMapsTok.size )
 	{
+		level.inVoting = true;
 		foreach (player in level.players)
 		{
-			//player openPopupMenu("popup_summary");
+			player.sessionstate = "spectator";//allow player to leave while in intermission and make voting options
+			player thread watchVoting();
+			
+			player setClientDvars( "hud_ShowWinner", "0",
+								   "hud_voteText", "^3Vote for new map:",
+								   "vote_map", "" );
+			
+			player openPopupMenu( game["menu_vote"] );
 		}
+
+		level thread doBotVoting();
+		thread timeLimitClock_Intermission( level.voteTime, (84.7, 100, 0) );
+		wait level.voteTime;
+		level.inVoting = false;
 		
-		intermissionTime = 30.0;
+		level.highestVotedMap = getHighestVotedMap();
 		
-		if(getDvarInt( "party_host" ))
+		if ( level.voteWinTime > 0.0 )
 		{
-			intermissionTime = 10.0;
+			level.inShowingWinner = true;
+			foreach (player in level.players)
+			{
+				player setClientDvars( "hud_WinningName", "preview_" + level.votingMapsTok[ level.highestVotedMap ],
+									   "hud_WinningMap", consoleMapNameToMapName( level.votingMapsTok[ level.highestVotedMap ] ),
+									   "hud_voteText", "^3Next Map:",
+									   "hud_ShowWinner", "1" );
+			}
+			
+			thread timeLimitClock_Intermission( level.voteWinTime, (84.7, 100, 0) );
+			wait level.voteWinTime;
+			level.inShowingWinner = false;
 		}
 		
-		thread timeLimitClock_Intermission( intermissionTime );
-		wait intermissionTime;
+		foreach (player in level.players)
+			player closeMenu( game["menu_vote"] );
+			
+		level notify( "voting_finished" );
+		
+		level setVoteVars( level.highestVotedMap );
+	}
+	
+	if ( level.allowIntermission && level.intermissionTime > 0.0 )
+	{
+		level.inIntermission = true;
+		foreach (player in level.players)
+		{
+			player.sessionstate = "spectator";//allow player to leave while in intermission
+			player thread openSummaryOnMenuClose();
+			player openPopupMenu( game["menu_popup_summary"] );
+		}
+		
+		thread timeLimitClock_Intermission( level.intermissionTime );
+		wait level.intermissionTime;
+		level.inIntermission = false;
+		
+		level notify( "intermission_finished" );
 	}
 	
 	level notify( "exitLevel_called" );
 	exitLevel( false );
+}
+
+setVoteVars( highestVotedMap )
+{
+	setDvar( "sv_maprotation", "map " + level.votingMapsTok[ highestVotedMap ] );
+	setDvar( "sv_maprotationCurrent", "map " + level.votingMapsTok[ highestVotedMap ] );
+}
+
+getHighestVotedMap()
+{
+	highest = 0;
+	for( i = 0; i < level.mapVotes.size; i++ )
+		if( level.mapVotes[ i ] > highest && i < 9 )
+			highest = level.mapVotes[ i ];
+	
+	votes = [];
+	for( i = 0; i < level.mapVotes.size; i++ )
+		if( level.mapVotes[ i ] == highest && i < 9 )
+			votes[votes.size] = i;
+	
+	if ( votes.size )
+		return votes[ randomInt( votes.size ) ];
+	else if ( level.mapVotes.size > 9 )
+		return randomIntRange( 0, 8 );
+	else
+		return randomInt( level.mapVotes.size );
+}
+
+doBotVoting()
+{
+	if(!level.botsVote)
+		return;
+	
+	level endon("voting_finished");
+	
+	bots = [];
+	
+	foreach(player in level.players)
+	{
+		if(!isDefined(player.pers["isBot"]) || !player.pers["isBot"])
+			continue;
+		
+		player.botWillVoteFor = bots.size;
+		bots[bots.size] = player;
+	}
+	
+	while(bots.size)
+	{
+		wait 0.05;
+		bot = bots[randomInt(bots.size)];
+		if(!bot.hasVoted)
+		{
+			bot castMap(bot.botWillVoteFor);
+			wait randomInt(3);
+		}
+	}
+}
+
+ridVoteOnDisconnect()
+{
+	level endon("voting_finished");
+	
+	self waittill_either( "disconnect", "kill_menus_on_connect" );
+	
+	if ( self.votedNum > -1 ) 
+		level.mapVotes[ self.votedNum ]--;
+}
+
+updateVoteMenu()
+{
+	self endon("disconnect");
+	self endon("kill_menus_on_connect");
+	level endon("voting_finished");
+	
+	for(i = 0; i < 9; i++) 
+	{
+		if( i >= level.votingMapsTok.size )
+		{
+			self setClientDvar( "hud_picName" + i, "white" );
+		}
+		else
+		{
+			self setClientDvars( "hud_mapName" + i, consoleMapNameToMapName( level.votingMapsTok[ i ] ),
+								 "hud_mapVotes" + i, level.mapVotes[ i ],
+								 "hud_picName" + i, "preview_" + level.votingMapsTok[ i ] );
+		}
+	}
+	
+	for(;;)
+	{
+		wait 0.5;
+		
+		for( i = 0; i < level.votingMapsTok.size; i++ )
+			self setClientDvar( "hud_mapVotes" + i, level.mapVotes[ i ] );
+		
+		highestVotedMap = getHighestVotedMap();
+		self setClientDvars( "hud_gamesize", level.players.size,
+							 "hud_mapVotes" + highestVotedMap, "^3" + level.mapVotes[ highestVotedMap ] );
+	}
+}
+
+watchVoting()
+{
+	self endon("disconnect");
+	self endon("kill_menus_on_connect");
+	level endon("voting_finished");
+	
+	self thread ridVoteOnDisconnect();
+	self thread updateVoteMenu();
+	
+	self.hasVoted = false;
+	self.votedNum = -1;
+	
+	for(;;)
+	{
+		self waittill("menuresponse", menu, response);
+		
+		if( menu == game["menu_vote"] )
+		{
+			switch(response)
+			{
+				case "map1":
+					self castMap(0);
+					break;
+				case "map2":
+					self castMap(1);
+					break;
+				case "map3":
+					self castMap(2);
+					break;
+				case "map4":
+					self castMap(3);
+					break;
+				case "map5":
+					self castMap(4);
+					break;
+				case "map6":
+					self castMap(5);
+					break;
+				case "map7":
+					self castMap(6);
+					break;
+				case "map8":
+					self castMap(7);
+					break;
+				case "map9":
+					self castMap(8);
+					break;
+				default:
+					break;
+			}
+		}
+		else if ( response == "back" )
+		{
+			self closepopupMenu();
+			self closeInGameMenu();
+			wait 0.25;
+			self openPopupMenu( game["menu_vote"] );
+			continue;
+		}
+	}
+}
+
+castMap( number )
+{
+	if ( !isDefined( level.votingMapsTok[ number ] ) || level.votingMapsTok[ number ] == "" )
+	{
+		if ( self.hasVoted )
+		{
+			self.hasVoted = false;
+			level.mapVotes[ self.votedNum ]--;
+			self.votedNum = -1;
+		}
+		self iprintln( "Invalid map selection" );
+		return;
+	}
+	
+	if( !self.hasVoted )
+	{
+		self.hasVoted = true;
+		level.mapVotes[ number ]++;
+		self.votedNum = number;
+		self iprintln( "You voted for ^3" + consoleMapNameToMapName( level.votingMapsTok[ number ] ) );
+	}
+	else if( self.votedNum != number )
+	{
+		level.mapVotes[ self.votedNum ]--;
+		level.mapVotes[ number ]++;
+		self.votedNum = number;
+		self iprintln( "You ^3re-voted ^7for ^3" + consoleMapNameToMapName( level.votingMapsTok[ number ] ) );
+	}
+}
+
+consoleMapNameToMapName(mapname)
+{
+  switch(mapname)
+	{
+		case "mp_abandon":
+			return "Carnival";
+		case "mp_rundown":
+			return "Rundown";
+		case "mp_afghan":
+			return "Afghan";
+		case "mp_boneyard":
+			return "Scrapyard";
+		case "mp_brecourt":
+			return "Wasteland";
+		case "mp_cargoship":
+			return "Wetwork";
+		case "mp_checkpoint":
+			return "Karachi";
+		case "mp_compact":
+			return "Salvage";
+		case "mp_complex":
+			return "Bailout";
+		case "mp_crash":
+			return "Crash";
+		case "mp_cross_fire":
+			return "Crossfire";
+		case "mp_derail":
+			return "Derail";
+		case "mp_estate":
+			return "Estate";
+		case "mp_favela":
+			return "Favela";
+		case "mp_fuel2":
+			return "Fuel";
+		case "mp_highrise":
+			return "Highrise";
+		case "mp_invasion":
+			return "Invasion";
+		case "mp_killhouse":
+			return "Killhouse";
+		case "mp_nightshift":
+			return "Skidrow";
+		case "mp_nuked":
+			return "Nuketown";
+		case "oilrig":
+			return "Oilrig";
+		case "mp_quarry":
+			return "Quarry";
+		case "mp_rust":
+			return "Rust";
+		case "mp_storm":
+			return "Storm";
+		case "mp_strike":
+			return "Strike";
+		case "mp_subbase":
+			return "Subbase";
+		case "mp_terminal":
+			return "Terminal";
+		case "mp_trailerpark":
+			return "Trailer Park";
+		case "mp_overgrown":
+			return "Overgrown";
+		case "mp_underpass":
+			return "Underpass";
+		case "mp_vacant":
+			return "Vacant";
+		case "iw4_credits":
+			return "IW4 Test Map";
+		case "airport":
+			return "Airport";
+		case "co_hunted":
+			return "Hunted";
+		case "invasion":
+			return "Burgertown";
+		case "mp_bloc":
+			return "Bloc";
+		case "mp_bog_sh":
+			return "Bog";
+		case "contingency":
+			return "Contingency";
+		case "gulag":
+			return "Gulag";
+		case "so_ghillies":
+			return "Pripyat";
+		case "ending":
+			return "Museum";
+		case "af_chase":
+			return "Afghan Chase";
+		case "af_caves":
+			return "Afghan Caves";
+		case "arcadia":
+			return "Arcadia";
+		case "boneyard":
+			return "Boneyard";
+		case "cliffhanger":
+			return "Cliffhanger";
+		case "dcburning":
+			return "DCBurning";
+		case "dcemp":
+			return "DCEMP";
+		case "downtown":
+			return "Downtown";
+		case "estate":
+			return "EstateSP";
+		case "favela":
+			return "FavelaSP";
+		case "favela_escape":
+			return "Favela Escape";
+		case "roadkill":
+			return "Roadkill";
+		case "trainer":
+			return "TH3 PIT";
+		case "so_bridge":
+			return "Bridge";
+		case "dc_whitehouse":
+			return "Whitehouse";
+		default:
+			return mapname;
+	}
+}
+
+openSummaryOnMenuClose()
+{
+	self endon("disconnect");
+	self endon("kill_menus_on_connect");
+	level endon("intermission_finished");
+	
+	for(;;)
+	{
+		self waittill("menuresponse", menu, response);
+		
+		if ( response == "back" && menu != game["menu_popup_summary"] )
+		{
+			self closepopupMenu();
+			self closeInGameMenu();
+			wait 0.25;
+			self openPopupMenu( game["menu_popup_summary"] );
+			continue;
+		}
+	}
 }
 
 updateEndReasonText( winner )
@@ -2326,4 +3038,106 @@ processLobbyData()
 	maps\mp\_scoreboard::processLobbyScoreboards();
 	
 	sendClientMatchData();
+}
+
+getWinningTeam()
+{
+	if ( game["roundsWon"]["allies"] == game["roundsWon"]["axis"] )
+			winner = "tie";
+	else if ( game["roundsWon"]["axis"] > game["roundsWon"]["allies"] )
+			winner = "axis";
+	else
+			winner = "allies";
+
+	return winner;
+}
+
+doFinalKillCam()
+{	
+	level waittill ( "round_end_finished" );
+
+	winner = level.finalKillCam_winner; // we want to show the winner's final kill cam
+	delay = level.finalKillCam_delay[ winner ];
+	victim = level.finalKillCam_victim[ winner ];
+	attacker = level.finalKillCam_attacker[ winner ];
+	attackerNum = level.finalKillCam_attackerNum[ winner ];
+	killCamEntityIndex = level.finalKillCam_killCamEntityIndex[ winner ];
+	killCamEntityStartTime = level.finalKillCam_killCamEntityStartTime[ winner ];
+	sWeapon = level.finalKillCam_sWeapon[ winner ];
+	deathTimeOffset = level.finalKillCam_deathTimeOffset[ winner ];
+	psOffsetTime = level.finalKillCam_psOffsetTime[ winner ];
+	timeRecorded = level.finalKillCam_timeRecorded[ winner ]/1000;
+	timeGameEnded = level.gameEndTime/1000;
+
+	if( !isDefined( victim ) || !isDefined( attacker ) )
+		return;
+	
+	if( !level.forceFinalKillcam || !level.allowFinalKillcam )
+		return;
+
+	// if the killcam happened longer than 15 seconds ago, don't show it
+	killCamBufferTime = 15;
+	killCamOffsetTime = timeGameEnded - timeRecorded;
+	
+	if( killCamOffsetTime > killCamBufferTime )
+		return;
+	
+	level.showingFinalKillcam = true;
+
+	if ( isDefined( attacker ) )
+	{
+		maps\mp\_awards::addAwardWinner( "finalkill", attacker.clientid );
+		attacker.finalKill = true;
+	}
+
+	postDeathDelay = (( getTime() - victim.deathTime ) / 1000);
+	
+	foreach ( player in level.players )
+	{
+		player closePopupMenu();
+		player closeInGameMenu();
+		
+		if( isDefined( level.nukeDetonated ) )
+			player VisionSetNakedForPlayer( "mpnuke_aftermath", 0 );
+		else
+			player VisionSetNakedForPlayer( getDvar( "mapname" ), 0 );
+		
+		player.killcamentitylookat = victim getEntityNumber();
+		
+		if ( (player != victim || (!isRoundBased() || isLastRound())) && player _hasPerk( "specialty_copycat" ) )
+			player _unsetPerk( "specialty_copycat" );
+		
+		player thread maps\mp\gametypes\_killcam::killcam( attackerNum, killcamentityindex, killcamentitystarttime, sWeapon, postDeathDelay + deathTimeOffset, psOffsetTime, 0, 10000, attacker, victim );
+	}
+
+	wait( 0.1 );
+
+	while ( maps\mp\gametypes\_damage::anyPlayersInKillcam() )
+		wait( 0.05 );
+	
+	level.showingFinalKillcam = false;
+}
+
+recordFinalKillCam( delay, victim, attacker, attackerNum, killCamEntityIndex, killCamEntityStartTime, sWeapon, deathTimeOffset, psOffsetTime )
+{
+	teams[0] = "none"; // none gets filled just in case we need something without a team or this is ffa
+	
+	if( level.teambased && IsDefined( attacker.team ) )
+		teams[1] = attacker.team; // we want to save each team seperately so we can show the winning team's kill when applicable
+	
+	for( i = 0; i < teams.size; i++ )
+	{
+		team = teams[i];
+		
+		level.finalKillCam_delay[ team ]					= delay;
+		level.finalKillCam_victim[ team ]					= victim;
+		level.finalKillCam_attacker[ team ]				    = attacker;
+		level.finalKillCam_attackerNum[ team ]			    = attackerNum;
+		level.finalKillCam_killCamEntityIndex[ team ]		= killCamEntityIndex;
+		level.finalKillCam_killCamEntityStartTime[ team ]	= killCamEntityStartTime;
+		level.finalKillCam_sWeapon[ team ]					= sWeapon;
+		level.finalKillCam_deathTimeOffset[ team ]			= deathTimeOffset;
+		level.finalKillCam_psOffsetTime[ team ]				= psOffsetTime;
+		level.finalKillCam_timeRecorded[ team ]				= getTime();
+	}
 }

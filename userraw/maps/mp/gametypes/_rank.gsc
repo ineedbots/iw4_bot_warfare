@@ -1,3 +1,10 @@
+/*
+	_rank modded
+	Author: INeedGames
+	Date: 09/22/2020
+	Removes the level.xpScale check, good old 2010 infinity ward under a law suite logic here
+*/
+
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
@@ -8,11 +15,11 @@ init()
 	level.scoreInfo = [];
 	level.xpScale = getDvarInt( "scr_xpscale" );
 	
-	if ( level.xpScale > 4 || level.xpScale < 0)
-		exitLevel( false );
+	// if ( level.xpScale > 4 || level.xpScale < 0)
+	// 	exitLevel( false );
 
-	level.xpScale = min( level.xpScale, 4 );
-	level.xpScale = max( level.xpScale, 0 );
+	// level.xpScale = min( level.xpScale, 4 );
+	// level.xpScale = max( level.xpScale, 0 );
 
 	level.rankTable = [];
 
@@ -677,8 +684,8 @@ isLastRestXPAward( baseXP )
 
 syncXPStat()
 {
-	if ( level.xpScale > 4 || level.xpScale <= 0)
-		exitLevel( false );
+	// if ( level.xpScale > 4 || level.xpScale <= 0)
+	// 	exitLevel( false );
 
 	xp = self getRankXP();
 	

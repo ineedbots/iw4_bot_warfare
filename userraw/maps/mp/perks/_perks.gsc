@@ -1,3 +1,19 @@
+/*
+	_perks modded
+	Author: INeedGames
+	Date: 09/22/2020
+	Readds optional painkiller and one man army refills noobtubes.
+
+	DVARS:
+		- combathighIsJuiced <bool>
+			false - painkiller is in the game
+			true - (default) replaces painkiller with juiced from mw3
+
+		- onemanarmyRefillsTubes <bool>
+			false - (default) One Man Army does not refill the gl attachment
+			true - it does
+*/
+
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
@@ -178,6 +194,12 @@ init()
 	level.perkSetFuncs["specialty_tacticalinsertion"] = ::setTacticalInsertion;
 	level.perkUnsetFuncs["specialty_tacticalinsertion"] = ::unsetTacticalInsertion;
 
+	setDvarIfUninitialized( "combathighIsJuiced", true );
+	level.combathighIsJuiced = getDvarInt( "combathighIsJuiced" );
+
+	setDvarIfUninitialized( "onemanarmyRefillsTubes", false );
+	level.onemanarmyRefillsTubes = getDvarInt( "onemanarmyRefillsTubes" );
+
 	initPerkDvars();
 
 	level thread onPlayerConnect();
@@ -320,10 +342,10 @@ cac_modified_damage( victim, attacker, damage, meansofdeath, weapon, impactPoint
 		}	
 	}
 	
-	if ( ( victim.xpScaler == 2 && isDefined( attacker ) ) && ( isPlayer( attacker ) || attacker.classname == "scrip_vehicle" ) )
-		damageAdd += 200;
+	//if ( ( victim.xpScaler == 2 && isDefined( attacker ) ) && ( isPlayer( attacker ) || attacker.classname == "scrip_vehicle" ) )
+	//	damageAdd += 200;
 	
-	/*if ( victim _hasperk( "specialty_combathigh" ) )
+	if ( victim _hasperk( "specialty_combathigh" ) && !level.combathighIsJuiced )
 	{
 		if ( IsDefined( self.damageBlockedTotal ) && (!level.teamBased || (isDefined( attacker ) && isDefined( attacker.team ) && victim.team != attacker.team)) )
 		{
@@ -351,7 +373,7 @@ cac_modified_damage( victim, attacker, damage, meansofdeath, weapon, impactPoint
 					break;
 			}
 		}
-	}*/	
+	}	
 	
 	return int( damage + damageAdd );
 }

@@ -1,3 +1,12 @@
+/*
+	_gamelogic modded
+	Author: INeedGames
+	Date: 09/22/2020
+	Adds force final killcam, extra hitmarkers, etc.
+			
+	Thanks: banz
+*/
+
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
@@ -202,7 +211,8 @@ handleNormalDeath( lifeId, attacker, eInflictor, sWeapon, sMeansOfDeath )
 		else
 			value = undefined;
 
-		attacker playLocalSound( "bullet_impact_headshot_2" );
+		if( !level.extraDamageFeedback )
+			attacker playLocalSound( "bullet_impact_headshot_2" );
 	}
 	else
 	{
@@ -237,19 +247,19 @@ handleNormalDeath( lifeId, attacker, eInflictor, sWeapon, sMeansOfDeath )
 	if ( isAlive( attacker ) )
 	{
 		// killstreaks only advance from kills earned this life
-		if ( isDefined( level.killStreakSpecialCaseWeapons[sWeapon] ) ) // this is an optimization
+		if ( isDefined( level.killStreakSpecialCaseWeapons[sWeapon] ) || sWeapon == "nuke_mp" ) // this is an optimization
 		{
 			switch ( sWeapon )
 			{
 				case "ac130_105mm_mp":
 				case "ac130_40mm_mp":
 				case "ac130_25mm_mp":
-					if ( attacker.ac130LifeId == attacker.pers["deaths"] )
+					if ( attacker.ac130LifeId == attacker.pers["deaths"] && !level.scriptIncKillstreak )
 						attacker.pers["cur_kill_streak"]++;
 					break;
 				case "cobra_player_minigun_mp":
 				case "weapon_cobra_mk19_mp":
-					if ( attacker.heliRideLifeId == attacker.pers["deaths"] )
+					if ( attacker.heliRideLifeId == attacker.pers["deaths"] && !level.scriptIncKillstreak )
 						attacker.pers["cur_kill_streak"]++;
 					break;
 				case "cobra_20mm_mp":
@@ -259,22 +269,25 @@ handleNormalDeath( lifeId, attacker, eInflictor, sWeapon, sMeansOfDeath )
 				case "sentry_minigun_mp":
 				case "harrier_20mm_mp":
 				case "pavelow_minigun_mp":
+				case "nuke_mp":
 					if ( isDefined( eInflictor ) && isDefined( eInflictor.lifeId ) )
 						killstreakLifeId = eInflictor.lifeId;
 					else
 						killstreakLifeId = attacker.lifeId;
 						
-					if ( killstreakLifeId == attacker.pers["deaths"] )
+					if ( killstreakLifeId == attacker.pers["deaths"] && !level.scriptIncKillstreak && (level.nukeIncreasesStreak || sWeapon != "nuke_mp") )
 						attacker.pers["cur_kill_streak"]++;
 					break;
 				default:
-					attacker.pers["cur_kill_streak"]++;
+					if( !level.scriptIncKillstreak )
+						attacker.pers["cur_kill_streak"]++;
 					break;
 			}
 		}
 		else
 		{
-			attacker.pers["cur_kill_streak"]++;
+			if( !level.scriptIncKillstreak )
+				attacker.pers["cur_kill_streak"]++;
 		}
 
 		attacker setPlayerStatIfGreater( "killstreak", attacker.pers["cur_kill_streak"] );
@@ -321,6 +334,9 @@ handleNormalDeath( lifeId, attacker, eInflictor, sWeapon, sMeansOfDeath )
 
 	if ( isDefined( level.onNormalDeath ) && attacker.pers[ "team" ] != "spectator" )
 		[[ level.onNormalDeath ]]( self, attacker, lifeId );
+	
+	if ( isDefined( level.onNormalDeath2 ) && attacker.pers[ "team" ] != "spectator" )
+		[[ level.onNormalDeath2 ]]( self, attacker, sMeansOfDeath );
 
 	level thread maps\mp\gametypes\_battlechatter_mp::sayLocalSoundDelayed( attacker, "kill", 0.75 );	
 	
@@ -425,7 +441,7 @@ PlayerKilled_internal( eInflictor, attacker, victim, iDamage, sMeansOfDeath, sWe
 			victim.idFlags = 0;
 		else if ( sMeansOfDeath == "MOD_GRENADE" && isSubstr( sWeapon, "frag_grenade" ) && iDamage == 100000 )
 			victim.idFlags = 0;
-		else if ( sWeapon == "nuke_mp" )
+		else if ( sWeapon == "nuke_mp" && !level.forceFinalKillcam )
 			victim.idFlags = 0;
 		else if ( level.friendlyfire >= 2)
 			victim.idFlags = 0;
@@ -543,7 +559,11 @@ PlayerKilled_internal( eInflictor, attacker, victim, iDamage, sMeansOfDeath, sWe
 
 	// override MOD
 	if ( isHeadShot( sWeapon, sHitLoc, sMeansOfDeath, attacker ) )
+	{
 		sMeansOfDeath = "MOD_HEAD_SHOT";
+		if( level.headShotDetachHead )
+			victim detach(victim.headmodel);
+	}
 	else if ( sMeansOfDeath != "MOD_MELEE" && !isDefined( victim.nuked ) )
 		victim playDeathSound();
 	
@@ -634,10 +654,14 @@ PlayerKilled_internal( eInflictor, attacker, victim, iDamage, sMeansOfDeath, sWe
 	else if ( !isPlayer( attacker ) || (isPlayer( attacker ) && sMeansOfDeath == "MOD_FALLING") )
 	{
 		handleWorldDeath( attacker, lifeId, sMeansOfDeath, sHitLoc );
+		if ( level.failCam )
+			doKillcam = true;
 	}
 	else if ( attacker == victim )
 	{
 		handleSuicideDeath( sMeansOfDeath, sHitLoc );
+		if ( level.failCam )
+			doKillcam = true;
 	}
 	else if ( friendlyFire )
 	{
@@ -645,6 +669,8 @@ PlayerKilled_internal( eInflictor, attacker, victim, iDamage, sMeansOfDeath, sWe
 		{
 			handleFriendlyFireDeath( attacker );
 		}
+		if ( level.failCam )
+			doKillcam = true;
 	}
 	else
 	{
@@ -694,12 +720,14 @@ PlayerKilled_internal( eInflictor, attacker, victim, iDamage, sMeansOfDeath, sWe
 
 	// allow per gametype death handling	
 	victim thread [[ level.onPlayerKilled ]]( eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration, lifeId );
-
+	
 	if ( isPlayer( attacker ) )
 		attackerNum = attacker getEntityNumber();
+	else if ( (sMeansOfDeath == "MOD_FALLING" || eInflictor.classname == "trigger_hurt") && level.failCam )//banz
+        attackerNum = victim getEntityNumber();
 	else
 		attackerNum = -1;
-	killcamentity = victim getKillcamEntity( attacker, eInflictor, sWeapon );
+	killcamentity = victim getKillcamEntity( attacker, eInflictor, sWeapon, sMeansOfDeath );
 	killcamentityindex = -1;
 	killcamentitystarttime = 0;
 
@@ -710,24 +738,31 @@ PlayerKilled_internal( eInflictor, attacker, victim, iDamage, sMeansOfDeath, sWe
 		if ( !isdefined( killcamentitystarttime ) )
 			killcamentitystarttime = 0;
 	}
-
+	
 	 /#
 	if ( getDvarInt( "scr_forcekillcam" ) != 0 )
 		doKillcam = true;
 	#/
-
-	if ( isDefined( attacker.finalKill ) )
-		maps\mp\_awards::addAwardWinner( "finalkill", attacker.clientid );
 	
-	//prof_end( " PlayerKilled_5" );
-	//prof_begin( " PlayerKilled_6" );
+	// record the kill cam values for the final kill cam
+	if ( level.forceFinalKillcam && doKillcam )
+		maps\mp\gametypes\_gamelogic::recordFinalKillCam( 5.0, victim, attacker, attackerNum, killcamentityindex, killcamentitystarttime, sWeapon, deathTimeOffset, psOffsetTime );
 	
-	if ( isDefined( attacker.finalKill ) && doKillcam && !isDefined( level.nukeDetonated ) )
+	if ( !level.forceFinalKillcam && level.allowFinalKillcam )
 	{
-		level thread doFinalKillcam( 5.0, victim, attacker, attackerNum, killcamentityindex, killcamentitystarttime, sWeapon, deathTimeOffset, psOffsetTime );
+		if ( isDefined( attacker.finalKill ) )
+			maps\mp\_awards::addAwardWinner( "finalkill", attacker.clientid );
+		
+		//prof_end( " PlayerKilled_5" );
+		//prof_begin( " PlayerKilled_6" );
+		
+		if ( isDefined( attacker.finalKill ) && doKillcam && !isDefined( level.nukeDetonated ) )
+		{
+			level thread doFinalKillcam( 5.0, victim, attacker, attackerNum, killcamentityindex, killcamentitystarttime, sWeapon, deathTimeOffset, psOffsetTime );
 
-		if ( !isFauxDeath )
-			wait ( 1.0 );
+			if ( !isFauxDeath )
+				wait ( 1.0 );
+		}
 	}
 	
 	if ( !isFauxDeath )
@@ -925,10 +960,13 @@ resetPlayerVariables()
 }
 
 
-getKillcamEntity( attacker, eInflictor, sWeapon )
+getKillcamEntity( attacker, eInflictor, sWeapon, sMeansOfDeath )
 {
 	if ( !isDefined( eInflictor ) )
 		return undefined;
+	
+	if( (sMeansOfDeath == "MOD_FALLING" || eInflictor.classname == "trigger_hurt") && level.failCam )
+		return attacker;
 	
 	if ( eInflictor == attacker )
 		return undefined;
@@ -1052,6 +1090,12 @@ giveRecentShieldXP()
 
 Callback_PlayerDamage_internal( eInflictor, eAttacker, victim, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, psOffsetTime )
 {	
+	if( level.disableKnife && sMeansOfDeath == "MOD_MELEE" && sWeapon != "riotshield_mp" )
+		return;
+	
+	if( level.disableTurret && sWeapon == "turret_minigun_mp" )
+		return;
+	
 	if ( !isReallyAlive( victim ) )
 		return;
 	
@@ -1402,6 +1446,8 @@ Callback_PlayerDamage_internal( eInflictor, eAttacker, victim, iDamage, iDFlags,
 
 		if ( attackerIsNPC && isDefined( eAttacker.gunner ) )
 			damager = eAttacker.gunner;
+		else if( level.extraDamageFeedback && isDefined( eAttacker.owner ) )
+			damager = eAttacker.owner;
 		else
 			damager = eAttacker;
 
@@ -1409,7 +1455,7 @@ Callback_PlayerDamage_internal( eInflictor, eAttacker, victim, iDamage, iDFlags,
 		{
 			if ( iDFlags & level.iDFLAGS_STUN )
 				typeHit = "stun";
-			else if ( victim hasPerk( "specialty_armorvest", true ) || (isExplosiveDamage( sMeansOfDeath ) && victim _hasPerk( "_specialty_blastshield" )) )
+			else if ( victim _hasPerk( "specialty_armorvest" ) || (isExplosiveDamage( sMeansOfDeath ) && victim _hasPerk( "_specialty_blastshield" )) )
 				typeHit = "hitBodyArmor";
 			else if ( victim _hasPerk( "specialty_combathigh") )
 				typeHit = "hitEndGame";
@@ -1534,6 +1580,37 @@ Callback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, s
 
 finishPlayerDamageWrapper( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, psOffsetTime, stunFraction )
 {
+	if( level.allowPrintDamage )
+	{
+		if ( isDefined( eAttacker ) && isPlayer( eAttacker ) && eAttacker.printDamage )
+			eAttacker iPrintLnBold( iDamage );
+		else if( isDefined( eAttacker.owner ) && isPlayer( eAttacker.owner ) && eAttacker.owner.printDamage )
+			eAttacker.owner iPrintLnBold( iDamage );
+	}
+	
+	if( level.extraDamageFeedback )
+	{
+		if( sWeapon == "nuke_mp" )
+		{
+			if ( self _hasPerk( "specialty_armorvest" ) || self _hasPerk( "_specialty_blastshield") )
+				typeHit = "hitBodyArmor";
+			else if ( self _hasPerk( "specialty_combathigh") )
+				typeHit = "hitEndGame";
+			else
+				typeHit = "standard";
+				
+			eAttacker thread maps\mp\gametypes\_damagefeedback::updateDamageFeedback( typeHit );
+		}
+
+		if( sHitLoc == "head" || sHitLoc == "helmet" )
+		{
+			if ( isDefined( eAttacker ) && isPlayer( eAttacker ) )
+				eAttacker playLocalSound( "bullet_impact_headshot_2" );
+			else if( isDefined( eAttacker.owner ) && isPlayer( eAttacker.owner ) )
+				eAttacker.owner playLocalSound( "bullet_impact_headshot_2" );
+		}
+	}
+	
 	if ( (self isUsingRemote() ) && (iDamage >= self.health) && !(iDFlags & level.iDFLAGS_STUN) )
 	{
 		if ( !isDefined( vDir ) )

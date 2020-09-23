@@ -1,3 +1,10 @@
+/*
+	_perkfunctions modded
+	Author: INeedGames
+	Date: 09/22/2020
+	Readds optional painkiller and one man army refills noobtubes.
+*/
+
 /******************************************************************* 
 //						_perkfunctions.gsc  
 //	
@@ -121,8 +128,11 @@ setCombatHigh()
 	level endon( "end_game" );
 	
 	self.damageBlockedTotal = 0;
-	self.moveSpeedScaler = 1.25;
-	self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
+	if (level.combathighIsJuiced)
+	{
+		self.moveSpeedScaler = 1.25;
+		self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
+	}
 	//self visionSetNakedForPlayer( "end_game", 1 );
 
 	if ( level.splitscreen )
@@ -149,7 +159,11 @@ setCombatHigh()
 	
 	self.combatHighTimer = createTimer( "hudsmall", 1.0 );
 	self.combatHighTimer setPoint( "CENTER", "CENTER", 0, yOffset );
-	self.combatHighTimer setTimer( 7.0 );
+	if (level.combathighIsJuiced)
+		self.combatHighTimer setTimer( 7.0 );
+	else
+		self.combatHighTimer setTimer( 10.0 );
+	
 	self.combatHighTimer.color = (.8,.8,0);
 	self.combatHighTimer.archived = false;
 	self.combatHighTimer.foreground = true;
@@ -170,7 +184,10 @@ setCombatHigh()
 
 	self thread unsetCombatHighOnDeath();
 	
-	wait( 5 );
+	if (level.combathighIsJuiced)
+		wait( 5 );
+	else
+		wait( 8 );
 
 	self.combatHighIcon	fadeOverTime( 2.0 );
 	self.combatHighIcon.alpha = 0.0;
@@ -184,14 +201,17 @@ setCombatHigh()
 	wait( 2 );
 	self.damageBlockedTotal = undefined;
 
-	self.moveSpeedScaler = 1;
-
-	if (self _hasperk( "specialty_lightweight" ))
+	if (level.combathighIsJuiced)
 	{
-		self.moveSpeedScaler = 1.07;
-	}
+		self.moveSpeedScaler = 1;
 
-	self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
+		if (self _hasperk( "specialty_lightweight" ))
+		{
+			self.moveSpeedScaler = 1.07;
+		}
+
+		self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
+	}
 
 	self _unsetPerk( "specialty_combathigh" );
 }
@@ -203,11 +223,14 @@ unsetCombatHighOnDeath()
 	
 	self waittill ( "death" );
 
-	self.moveSpeedScaler = 1;
-
-	if (self _hasperk( "specialty_lightweight" ))
+	if (level.combathighIsJuiced)
 	{
-		self.moveSpeedScaler = 1.07;
+		self.moveSpeedScaler = 1;
+
+		if (self _hasperk( "specialty_lightweight" ))
+		{
+			self.moveSpeedScaler = 1.07;
+		}
 	}
 	
 	self thread _unsetPerk( "specialty_combathigh" );
@@ -220,11 +243,14 @@ unsetCombatHigh()
 	self.combatHighIcon destroy();
 	self.combatHighTimer destroy();
 
-	self.moveSpeedScaler = 1;
-
-	if (self _hasperk( "specialty_lightweight" ))
+	if (level.combathighIsJuiced)
 	{
-		self.moveSpeedScaler = 1.07;
+		self.moveSpeedScaler = 1;
+
+		if (self _hasperk( "specialty_lightweight" ))
+		{
+			self.moveSpeedScaler = 1.07;
+		}
 	}
 }
 
@@ -366,9 +392,12 @@ setLightWeight()
 {
 	self.moveSpeedScaler = 1.07;
 
-	if (self _hasperk( "specialty_combathigh" ))
+	if (level.combathighIsJuiced)
 	{
-		self.moveSpeedScaler = 1.4;
+		if (self _hasperk( "specialty_combathigh" ))
+		{
+			self.moveSpeedScaler = 1.4;
+		}
 	}
 
 	self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
@@ -692,6 +721,9 @@ giveOneManArmyClass( className )
 	
 	self notify ( "changed_kit" );
 	level notify ( "changed_kit" );
+
+	if (level.onemanarmyRefillsTubes)
+		return;
 
 	weaponNameSize = self getCurrentWeapon().size;
 	
