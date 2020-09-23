@@ -2,11 +2,17 @@
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 
+/*
+
+*/
 is_host()
 {
 	return (isDefined(self.pers["bot_host"]) && self.pers["bot_host"]);
 }
 
+/*
+	
+*/
 doHostCheck()
 {
 	self.pers["bot_host"] = false;
@@ -52,16 +58,25 @@ botAdsAmount()
 	return (1 / (self.bot.ads_highest - self.bot.ads_lowest)) * self.bot.ads_tightness + (1 + (self.bot.ads_highest / (self.bot.ads_lowest - self.bot.ads_highest)));
 }
 
+/*
+	
+*/
 BotPressADS(time)
 {
 	self maps\mp\bots\_bot_internal::pressAds(time);
 }
 
+/*
+	
+*/
 BotPressAttack(time)
 {
 	self maps\mp\bots\_bot_internal::pressFire(time);
 }
 
+/*
+	
+*/
 BotStopMoving(what)
 {
 	self.bot.stop_move = what;
@@ -70,6 +85,9 @@ BotStopMoving(what)
 		self notify("kill_goal");
 }
 
+/*
+	
+*/
 getValidTube()
 {
 	weaps = self getweaponslistall();
@@ -117,6 +135,9 @@ getValidGrenade()
 	return random(possibles);
 }
 
+/*
+	
+*/
 botChangeWeapon(weapon)// intrestingly, this allows the bots to use pullout and pulldown anims and etc, but bugs out when the bot is frozen while midburst of a firerate limited weapon (m16, only shot one shot, or two shots, even though its a 3 round burst) (never switches until unfrozen)
 {
 	self endon("death");
@@ -159,16 +180,25 @@ botChangeWeapon(weapon)// intrestingly, this allows the bots to use pullout and 
 	return true;
 }
 
+/*
+	
+*/
 throwBotGrenade(gname, gtime)
 {
 	return self maps\mp\bots\_bot_internal::botThrowGrenade(gname, gtime);
 }
 
+/*
+	
+*/
 botIsClimbing()
 {
 	return self.bot.climbing;
 }
 
+/*
+	
+*/
 BotGetTargetRandom()
 {
 	if (!isDefined(self.bot.target))
@@ -258,6 +288,9 @@ SetScriptGoal(goal, dist)
 	self notify("new_goal");
 }
 
+/*
+	
+*/
 GetScriptGoal()
 {
 	return self.bot.script_goal;
@@ -271,37 +304,58 @@ ClearScriptGoal()
 	self SetScriptGoal(undefined, 0);
 }
 
+/*
+	
+*/
 HasBotJavelinLocation()
 {
 	return isDefined(self.bot.jav_loc);
 }
 
+/*
+	
+*/
 SetScriptAimPos(pos)
 {
 	self.bot.script_aimpos = pos;
 }
 
+/*
+	
+*/
 ClearScriptAimPos()
 {
 	self SetScriptAimPos(undefined);
 }
 
+/*
+	
+*/
 GetScriptAimPos()
 {
 	return self.bot.script_aimpos;
 }
 
+/*
+	
+*/
 HasScriptAimPos()
 {
 	return isDefined(self GetScriptAimPos());
 }
 
+/*
+	
+*/
 SetBotJavelinLocation(loc)
 {
 	self.bot.jav_loc = loc;
 	self notify("new_enemy");
 }
 
+/*
+	
+*/
 ClearBotJavelinLocation()
 {
 	self SetBotJavelinLocation(undefined);
@@ -351,21 +405,33 @@ HasThreat()
 	return (isDefined(self GetThreat()));
 }
 
+/*
+	
+*/
 IsBotKnifing()
 {
 	return self.bot.knifing;
 }
 
+/*
+	
+*/
 getBotVelocity()
 {
 	return self.bot.velocity;
 }
 
+/*
+	
+*/
 isWeaponPrimary(weap)
 {
 	return (maps\mp\gametypes\_weapons::isPrimaryWeapon(weap) || maps\mp\gametypes\_weapons::isAltModeWeapon(weap));
 }
 
+/*
+	
+*/
 entIsVehicle(ent)
 {
 	return (ent.classname == "script_vehicle" || ent.model == "vehicle_uav_static_mp" || ent.model == "vehicle_ac130_coop");
@@ -384,31 +450,49 @@ WeaponIsFullAuto(weap)
 	return !isDefined(level.bots_nonfullautoguns[weaptoks[0]]);
 }
 
+/*
+	
+*/
 IsDefusing()
 {
 	return (isDefined(self.isDefusing) && self.isDefusing);
 }
 
+/*
+	
+*/
 isPlanting()
 {
 	return (isDefined(self.isPlanting) && self.isPlanting);
 }
 
+/*
+	
+*/
 inLastStand()
 {
 	return (isDefined(self.lastStand) && self.lastStand);
 }
 
+/*
+	
+*/
 inFinalStand()
 {
 	return (isDefined(self.inFinalStand) && self.inFinalStand);
 }
 
+/*
+	
+*/
 isFlagCarrier()
 {
 	return (isDefined(self.carryFlag) && self.carryFlag);
 }
 
+/*
+	
+*/
 isWeaponDroppable(weap)
 {
 	return (maps\mp\gametypes\_weapons::mayDropWeapon(weap));
@@ -430,6 +514,9 @@ isArtShocked()
 	return (isDefined(self.beingArtilleryShellshocked) && self.beingArtilleryShellshocked);
 }
 
+/*
+	
+*/
 getEyeHeight()
 {
 	myEye = self getEye();
@@ -437,6 +524,9 @@ getEyeHeight()
 	return myEye[2] - self.origin[2];
 }
 
+/*
+	
+*/
 notifyAfterDelay(delay, not)
 {
 	wait delay;
@@ -491,6 +581,9 @@ getConeDot(to, from, dir)
     return vectordot(dirToTarget, forward);
 }
 
+/*
+	
+*/
 DistanceSquared2D(to, from)
 {
 	to = (to[0], to[1], 0);
@@ -529,6 +622,9 @@ RoundUp( floatVal )
 		return i;
 }
 
+/*
+	
+*/
 float(num)
 {
 	setdvar("temp_dvar_bot_util", num);
@@ -536,6 +632,9 @@ float(num)
 	return GetDvarFloat("temp_dvar_bot_util");
 }
 
+/*
+	
+*/
 tokenizeLine(line, tok)
 {
   tokens = [];
@@ -559,11 +658,17 @@ tokenizeLine(line, tok)
   return tokens;
 }
 
+/*
+	
+*/
 isStrStart( string1, subStr )
 {
 	return ( getSubStr( string1, 0, subStr.size ) == subStr );
 }
 
+/*
+	
+*/
 parseTokensIntoWaypoint(tokens)
 {
 	waypoint = spawnStruct();
@@ -599,6 +704,9 @@ parseTokensIntoWaypoint(tokens)
 	return waypoint;
 }
 
+/*
+	
+*/
 // https://github.com/leiizko/cod4x_lua_plugin/blob/master/LuaScripts/Rotu-R/waypoints.gsc
 wpsFromCSV(mapname)
 {
@@ -897,6 +1005,9 @@ load_waypoints()
 			level.waypointsJav[level.waypointsJav.size] = level.waypoints[i];
 }
 
+/*
+	
+*/
 getMapName(mapname)
 {
   switch(mapname)
@@ -1794,6 +1905,9 @@ random_normal_distribution( mean, std_deviation, lower_bound, upper_bound )
 	return( number );
 }
 
+/*
+	
+*/
 onUsePlantObjectFix( player )
 {
 	// planted the bomb
@@ -1831,6 +1945,9 @@ onUsePlantObjectFix( player )
 	}
 }
 
+/*
+	
+*/
 bombPlantedFix( destroyedObj, player )
 {
 	maps\mp\gametypes\_gamelogic::pauseTimer();
@@ -1946,6 +2063,9 @@ bombPlantedFix( destroyedObj, player )
 	maps\mp\gametypes\sd::sd_endGame( game["attackers"], game["strings"]["target_destroyed"] );
 }
 
+/*
+	
+*/
 botGiveLoadout( team, class, allowCopycat )
 {
 	self takeAllWeapons();
@@ -2177,6 +2297,9 @@ botGiveLoadout( team, class, allowCopycat )
 	self notify( "bot_giveLoadout", allowCopycat );
 }
 
+/*
+	
+*/
 botGetPerkUpgrade( perkName )
 {
 	perkUpgrade = tablelookup( "mp/perktable.csv", 1, perkName, 8 );
@@ -2190,6 +2313,9 @@ botGetPerkUpgrade( perkName )
 	return ( perkUpgrade );
 }
 
+/*
+	
+*/
 botLoadoutAllPerks( loadoutEquipment, loadoutPerk1, loadoutPerk2, loadoutPerk3 )
 {
 	loadoutEquipment = maps\mp\perks\_perks::validatePerk( 1, loadoutEquipment );
@@ -2224,6 +2350,9 @@ botLoadoutAllPerks( loadoutEquipment, loadoutPerk1, loadoutPerk2, loadoutPerk3 )
 
 }
 
+/*
+	
+*/
 botPlayerModelForWeapon( weapon, secondary )
 {
 	team = self.team;
@@ -2268,6 +2397,9 @@ botPlayerModelForWeapon( weapon, secondary )
 	}
 }
 
+/*
+	
+*/
 claymoreDetonationBotFix()
 {
 	self endon( "death" );
