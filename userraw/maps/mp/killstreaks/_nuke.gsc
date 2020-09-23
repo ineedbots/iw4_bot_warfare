@@ -366,7 +366,10 @@ nukeVision()
 		wait 3.5;
 
 		if (level.nukePermAftermath)
+		{
 			visionSetNaked( "aftermath", 1 );
+			VisionSetPain("aftermath");
+		}
 		else
 		{
 			level.nukeVisionInProgress = undefined;
