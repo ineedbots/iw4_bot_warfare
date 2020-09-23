@@ -1,6 +1,18 @@
 #include common_scripts\utility;
 #include maps\mp\gametypes\_hud_util;
 
+/*
+	Returns the map's current vision, so its overridable.
+*/
+getMapVision()
+{
+	vision = getDvar("mapname");
+	if (isDefined(level.nukeVision))
+		vision = level.nukeVision;
+
+	return vision;
+}
+
 exploder_sound()
 {
 	if ( isdefined( self.script_delay ) )
@@ -47,7 +59,7 @@ loadModel(info)
 ============= 
 ///ScriptDocBegin
 "Name: delayThread( <delay>, <function>, <arg1>, <arg2>, <arg3>, <arg4> )"
-"Summary: Delaythread is cool! It saves you from having to write extra script for once off commands. Note you don’t have to thread it off. Delaythread is that smart!"
+"Summary: Delaythread is cool! It saves you from having to write extra script for once off commands. Note you donï¿½t have to thread it off. Delaythread is that smart!"
 "Module: Utility"
 "MandatoryArg: <delay> : The delay before the function occurs"
 "MandatoryArg: <delay> : The function to run."

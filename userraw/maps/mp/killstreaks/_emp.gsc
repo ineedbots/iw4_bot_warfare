@@ -128,7 +128,7 @@ EMP_JamTeam( teamName, duration, delay, silent )
 		// however, if the client receives the previous visionset change in the same packet as this one,
 		// this will force them to lerp from the bright one to the normal one.
 		visionSetNaked( "coup_sunblind", 0 );
-		visionSetNaked( getDvar( "mapname" ), 3.0 );
+		visionSetNaked( getMapVision(), 3.0 );
 	}
 	
 	level.teamEMPed[teamName] = true;
@@ -183,7 +183,7 @@ EMP_JamPlayers( owner, duration, delay, silent )
 		// however, if the client receives the previous visionset change in the same packet as this one,
 		// this will force them to lerp from the bright one to the normal one.
 		visionSetNaked( "coup_sunblind", 0 );
-		visionSetNaked( getDvar( "mapname" ), 3.0 );
+		visionSetNaked( getMapVision(), 3.0 );
 	}
 	
 	level notify ( "emp_update" );

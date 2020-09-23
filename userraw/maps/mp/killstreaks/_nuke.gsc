@@ -84,10 +84,8 @@ onPlayerSpawned()
 		if(isDefined(level.moabXP[self.team]) || isDefined(level.moabXP[self.guid]))
 			self.xpScaler = 2;
 
-		if (isDefined(level.nukeVisionInProgress) && level.nukePermAftermath)
-		{
-			self visionSetNakedForPlayer( "aftermath", 0 );
-		}
+		if (isDefined(level.nukeVision))
+			self visionSetNakedForPlayer( level.nukeVision, 0 );
 	}
 }
 
@@ -355,11 +353,13 @@ nukeVision()
 	level endon ( "nuke_cancelled" );
 
 	level.nukeVisionInProgress = true;
-	visionSetNaked( "mpnuke", 3 );
+	level.nukeVision = "mpnuke";
+	visionSetNaked( level.nukeVision, 3 );
 
 	level waittill( "nuke_death" );
 
-	visionSetNaked( "mpnuke_aftermath", 5 );
+	level.nukeVision = "mpnuke_aftermath";
+	visionSetNaked( level.nukeVision, 5 );
 	
 	if( level.NukeEndsGame )
 	{
@@ -372,13 +372,17 @@ nukeVision()
 
 		if (level.nukePermAftermath)
 		{
-			visionSetNaked( "aftermath", 1 );
-			VisionSetPain("aftermath");
+			level.nukeVision = "aftermath";
+
+			visionSetNaked( level.nukeVision, 1 );
+			VisionSetPain( level.nukeVision );
 		}
 		else
 		{
+			level.nukeVision = undefined;
 			level.nukeVisionInProgress = undefined;
-			visionSetNaked( getDvar( "mapname" ), 10 );
+
+			visionSetNaked( getMapVision(), 10 );
 		}
 	}
 }

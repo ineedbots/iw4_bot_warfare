@@ -103,7 +103,7 @@ unsetEndGame()
 
 revertVisionSet()
 {
-	self VisionSetNakedForPlayer( getDvar( "mapname" ), 1 );	
+	self VisionSetNakedForPlayer( getMapVision(), 1 );	
 }
 
 endGameDeath( duration )
@@ -773,7 +773,7 @@ toggleBlastShield( isEnabled )
 		self VisionSetNakedForPlayer( "black_bw", 0.15 );
 		wait ( 0.15 );
 		self _setPerk( "_specialty_blastshield" );
-		self VisionSetNakedForPlayer( getDvar( "mapname" ), 0 );
+		self VisionSetNakedForPlayer( getMapVision(), 0 );
 		self playSoundToPlayer( "item_blast_shield_on", self );
 	}
 	else
@@ -781,7 +781,7 @@ toggleBlastShield( isEnabled )
 		self VisionSetNakedForPlayer( "black_bw", 0.15 );
 		wait ( 0.15 );	
 		self _unsetPerk( "_specialty_blastshield" );
-		self VisionSetNakedForPlayer( getDvar( "mapname" ), 0 );
+		self VisionSetNakedForPlayer( getMapVision(), 0 );
 		self playSoundToPlayer( "item_blast_shield_off", self );
 	}
 }

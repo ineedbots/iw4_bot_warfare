@@ -751,9 +751,8 @@ clearRideIntro( delay )
 		wait( delay );
 
 	//self freezeControlsWrapper( false );
-	
-	if ( !isDefined( level.nukeVisionInProgress ) )
-		self VisionSetNakedForPlayer( getDvar( "mapname" ), 0 );
+
+	self VisionSetNakedForPlayer( getMapVision(), 0 );
 }
 
 destroyOnEvents(elem)

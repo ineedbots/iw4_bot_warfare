@@ -1072,7 +1072,7 @@ matchStartTimer_Internal( countTime, matchStartTimer )
 		wait ( matchStartTimer.inFrames * 0.05 );
 		matchStartTimer setValue( countTime );
 		if ( countTime == 2 )
-			visionSetNaked( getDvar( "mapname" ), 3.0 );
+			visionSetNaked( getMapVision(), 3.0 );
 		countTime--;
 		wait ( 1 - (matchStartTimer.inFrames * 0.05) );
 	}
@@ -1105,12 +1105,12 @@ matchStartTimer( type, duration )
 	if ( countTime >= 2 )
 	{
 		matchStartTimer_Internal( countTime, matchStartTimer );
-		visionSetNaked( getDvar( "mapname" ), 3.0 );
+		visionSetNaked( getMapVision(), 3.0 );
 	}
 	else
 	{
 		visionSetNaked( "mpIntro", 0 );
-		visionSetNaked( getDvar( "mapname" ), 1.0 );
+		visionSetNaked( getMapVision(), 1.0 );
 	}
 	
 	matchStartTimer destroyElem();
@@ -1119,7 +1119,7 @@ matchStartTimer( type, duration )
 
 matchStartTimerSkip()
 {
-	visionSetNaked( getDvar( "mapname" ), 0 );
+	visionSetNaked( getMapVision(), 0 );
 }
 
 
@@ -3100,7 +3100,7 @@ doFinalKillCam()
 		if( isDefined( level.nukeDetonated ) )
 			player VisionSetNakedForPlayer( "mpnuke_aftermath", 0 );
 		else
-			player VisionSetNakedForPlayer( getDvar( "mapname" ), 0 );
+			player VisionSetNakedForPlayer( getMapVision(), 0 );
 		
 		player.killcamentitylookat = victim getEntityNumber();
 		

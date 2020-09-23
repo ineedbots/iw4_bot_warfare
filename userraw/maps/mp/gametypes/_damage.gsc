@@ -458,11 +458,11 @@ PlayerKilled_internal( eInflictor, attacker, victim, iDamage, sMeansOfDeath, sWe
 	{
 		if ( isDefined( victim.endGame ) )
 		{
-			victim VisionSetNakedForPlayer( getDvar( "mapname" ), 2 );
+			victim VisionSetNakedForPlayer( getMapVision(), 2 );
 		}
 		else if ( !isDefined( victim.nuked ) )
 		{
-			victim VisionSetNakedForPlayer( getDvar( "mapname" ), 0 );
+			victim VisionSetNakedForPlayer( getMapVision(), 0 );
 			victim ThermalVisionOff();
 		}
 	}
@@ -917,7 +917,7 @@ doFinalKillcam( delay, victim, attacker, attackerNum, killcamentityindex, killca
 	{
 		player closePopupMenu();
 		player closeInGameMenu();
-		player VisionSetNakedForPlayer( getDvar( "mapname" ), 0 );
+		player VisionSetNakedForPlayer( getMapVision(), 0 );
 		player.killcamentitylookat = victim getEntityNumber();
 		
 		if ( (player != victim || (!isRoundBased() || isLastRound())) && player _hasPerk( "specialty_copycat" ) )
