@@ -284,11 +284,10 @@ watchJavLock()
 	self thread watchJavLockHas();
 
 	self thread maps\mp\_javelin::LoopLocalSeekSound( "javelin_clu_aquiring_lock", 0.6 );
-	wait 2;
+	wait 1.5;
 
 	self notify( "stop_lockon_sound" );
 	self PlayLocalSound( "javelin_clu_lock" );
-	wait 1;
 
 	while (isDefined(self.bot.jav_loc))
 	{
@@ -308,9 +307,15 @@ watchJavLockHas()
 	self endon("disconnect");
 	self endon("death");
 
-	while (isDefined(self.bot.jav_loc))
+	for (;;)
 	{
 		wait 0.05;
+
+		if (!isDefined(self.bot.jav_loc))
+			break;
+
+		if (getConeDot(self.bot.jav_loc, self GetEye(), self GetPlayerAngles()) < 0.8)
+			break;
 	}
 
 	self notify( "stop_lockon_sound" );
@@ -377,14 +382,22 @@ doLockon()
 	self endon("bot_kill_lockon");
 	self thread watchBotLockonEvents();
 	self thread watchBotLockonTrace();
+	isJav = (self GetCurrentWeapon() == "javelin_mp");
+	
+	wait 1.5;
 
+	if (isJav)
+		self thread maps\mp\_javelin::LoopLocalSeekSound( "javelin_clu_aquiring_lock", 0.6 );
 	self thread doRocketLockingSound();
-	wait 3;
+
+	wait 1.5;
+	
+	self notify( "stop_lockon_sound" );
 	self notify("bot_kill_lockon_sound");
 
 	self thread doRocketLockedSound();
-	wait 1;
-	self notify("bot_kill_lockon_sound");
+	if (isJav)
+		self PlayLocalSound( "javelin_clu_lock" );
 
 	// fire!
 	weap = self getCurrentWeapon();
@@ -410,6 +423,7 @@ doLockon()
 	}
 
 	self notify("bot_kill_lockon");
+	self notify( "stop_lockon_sound" );
 }
 
 /*
@@ -421,10 +435,22 @@ watchBotLockonTrace()
 	self endon("disconnect");
 	self endon("bot_kill_lockon");
 
-	while (isDefined(self.bot.target) && isDefined(self.bot.target.entity) && self.bot.target.no_trace_time < 500)
+	for (;;)
+	{
 		wait 0.05;
 
+		if(!isDefined(self.bot.target) || !isDefined(self.bot.target.entity))
+			break;
+
+		if (self.bot.target.no_trace_time > 500)
+			break;
+
+		if (getConeDot(self.bot.target.entity.origin, self GetEye(), self GetPlayerAngles()) < 0.8)
+			break;
+	}
+
 	self notify("bot_kill_lockon");
+	self notify( "stop_lockon_sound" );
 }
 
 /*
@@ -439,6 +465,7 @@ watchBotLockonEvents()
 	self waittill_any("flash_rumble_loop", "new_enemy", "weapon_change", "missile_fire");
 
 	self notify("bot_kill_lockon");
+	self notify( "stop_lockon_sound" );
 }
 
 /*
@@ -450,6 +477,7 @@ doRocketLockingSound()
 	self endon("death");
 	self endon("bot_kill_lockon_sound");
 	self endon("bot_kill_lockon");
+	isJav = (self GetCurrentWeapon() == "javelin_mp");
 	
 	for(;;)
 	{
@@ -457,14 +485,17 @@ doRocketLockingSound()
 
 		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity))
 		{
-			if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && self.bot.target.entity == level.chopper )
+			if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && self.bot.target.entity == level.chopper/*.gunner*/ ) // original iw4 script has this bug...
 				level.chopper.gunner playLocalSound( "missile_locking" );
 
 			if ( isDefined( level.ac130player ) && self.bot.target.entity == level.ac130.planeModel )
 				level.ac130player playLocalSound( "missile_locking" );
 			
-			self playLocalSound( "stinger_locking" );
-			self PlayRumbleOnEntity( "ac130_25mm_fire" );
+			if (!isJav)
+			{
+				self playLocalSound( "stinger_locking" );
+				self PlayRumbleOnEntity( "ac130_25mm_fire" );
+			}
 		}
 	}
 }
@@ -478,6 +509,7 @@ doRocketLockedSound()
 	self endon("death");
 	self endon("bot_kill_lockon_sound");
 	self endon("bot_kill_lockon");
+	isJav = (self GetCurrentWeapon() == "javelin_mp");
 	
 	for(;;)
 	{
@@ -489,8 +521,11 @@ doRocketLockedSound()
 			if ( isDefined( level.ac130player ) && self.bot.target.entity == level.ac130.planeModel )
 				level.ac130player playLocalSound( "missile_locking" );
 			
-			self playLocalSound( "stinger_locked" );
-			self PlayRumbleOnEntity( "ac130_25mm_fire" );
+			if (!isJav)
+			{
+				self playLocalSound( "stinger_locked" );
+				self PlayRumbleOnEntity( "ac130_25mm_fire" );
+			}
 		}
 		wait 0.25;
 	}
