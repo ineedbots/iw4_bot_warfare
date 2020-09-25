@@ -230,7 +230,7 @@ fixGamemodes()
 }
 
 /*
-	
+	Fixes the king of the hill headquarters obj
 */
 fixKoth()
 {
@@ -260,7 +260,7 @@ fixKoth()
 }
 
 /*
-	
+	Adds a notify when the airdrop is dropped
 */
 addNotifyOnAirdrops()
 {
@@ -286,7 +286,7 @@ addNotifyOnAirdrops()
 }
 
 /*
-	
+	Does the notify
 */
 doNotifyOnAirdrop()
 {
@@ -314,7 +314,7 @@ onPlayerConnect()
 }
 
 /*
-	
+	Watches players with scrambler perk
 */
 watchScrabler()
 {
@@ -742,7 +742,7 @@ onGrenadeFire()
 }
 
 /*
-	
+	Adds a frag grenade to the list of all frags
 */
 AddToFragList(who)
 {
@@ -760,7 +760,7 @@ AddToFragList(who)
 }
 
 /*
-	
+	Watches while the frag exists
 */
 thinkFrag()
 {

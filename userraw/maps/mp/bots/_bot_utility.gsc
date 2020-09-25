@@ -3,7 +3,7 @@
 #include maps\mp\gametypes\_hud_util;
 
 /*
-
+	Returns if player is the host
 */
 is_host()
 {
@@ -11,7 +11,7 @@ is_host()
 }
 
 /*
-	
+	Setups the host variable on the player
 */
 doHostCheck()
 {
@@ -59,7 +59,7 @@ botAdsAmount()
 }
 
 /*
-	
+	Bot will press the ads button for the time
 */
 BotPressADS(time)
 {
@@ -67,7 +67,7 @@ BotPressADS(time)
 }
 
 /*
-	
+	Bots will press the attack button for a time
 */
 BotPressAttack(time)
 {
@@ -75,7 +75,7 @@ BotPressAttack(time)
 }
 
 /*
-	
+	Bot will stop moving
 */
 BotStopMoving(what)
 {
@@ -86,7 +86,7 @@ BotStopMoving(what)
 }
 
 /*
-	
+	Returns a valid grenade launcher weapon
 */
 getValidTube()
 {
@@ -136,7 +136,8 @@ getValidGrenade()
 }
 
 /*
-	
+	UNUSED cause buggy
+	Bots change weapons, does the anims
 */
 botChangeWeapon(weapon)// intrestingly, this allows the bots to use pullout and pulldown anims and etc, but bugs out when the bot is frozen while midburst of a firerate limited weapon (m16, only shot one shot, or two shots, even though its a 3 round burst) (never switches until unfrozen)
 {
@@ -181,7 +182,7 @@ botChangeWeapon(weapon)// intrestingly, this allows the bots to use pullout and 
 }
 
 /*
-	
+	Bot will throw the grenade
 */
 throwBotGrenade(gname, gtime)
 {
@@ -189,7 +190,7 @@ throwBotGrenade(gname, gtime)
 }
 
 /*
-	
+	If the bot is climbing
 */
 botIsClimbing()
 {
@@ -197,7 +198,7 @@ botIsClimbing()
 }
 
 /*
-	
+	Returns a random number thats different everytime it changes target
 */
 BotGetTargetRandom()
 {
@@ -289,7 +290,7 @@ SetScriptGoal(goal, dist)
 }
 
 /*
-	
+	Returns the pos of the bot's goal
 */
 GetScriptGoal()
 {
@@ -305,7 +306,7 @@ ClearScriptGoal()
 }
 
 /*
-	
+	Returns the location of the bot's javelin target
 */
 HasBotJavelinLocation()
 {
@@ -313,7 +314,7 @@ HasBotJavelinLocation()
 }
 
 /*
-	
+	Sets the aim position of the bot
 */
 SetScriptAimPos(pos)
 {
@@ -321,7 +322,7 @@ SetScriptAimPos(pos)
 }
 
 /*
-	
+	Clears the aim position of the bot
 */
 ClearScriptAimPos()
 {
@@ -329,7 +330,7 @@ ClearScriptAimPos()
 }
 
 /*
-	
+	Returns the aim position of the bot
 */
 GetScriptAimPos()
 {
@@ -337,7 +338,7 @@ GetScriptAimPos()
 }
 
 /*
-	
+	Returns if the bot has a aim pos
 */
 HasScriptAimPos()
 {
@@ -345,7 +346,7 @@ HasScriptAimPos()
 }
 
 /*
-	
+	Sets the bot's javelin target location
 */
 SetBotJavelinLocation(loc)
 {
@@ -354,7 +355,7 @@ SetBotJavelinLocation(loc)
 }
 
 /*
-	
+	Clears the bot's javelin location
 */
 ClearBotJavelinLocation()
 {
@@ -406,7 +407,7 @@ HasThreat()
 }
 
 /*
-	
+	If the bot is doing a knife
 */
 IsBotKnifing()
 {
@@ -414,7 +415,7 @@ IsBotKnifing()
 }
 
 /*
-	
+	Returns the bot's velocity
 */
 getBotVelocity()
 {
@@ -422,7 +423,7 @@ getBotVelocity()
 }
 
 /*
-	
+	If the weapon is not a script weapon (bomb, killstreak, etc, grenades)
 */
 isWeaponPrimary(weap)
 {
@@ -430,7 +431,7 @@ isWeaponPrimary(weap)
 }
 
 /*
-	
+	If the ent is a vehicle
 */
 entIsVehicle(ent)
 {
@@ -451,7 +452,7 @@ WeaponIsFullAuto(weap)
 }
 
 /*
-	
+	If the player is defusing
 */
 IsDefusing()
 {
@@ -459,7 +460,7 @@ IsDefusing()
 }
 
 /*
-	
+	If the play is planting
 */
 isPlanting()
 {
@@ -467,7 +468,7 @@ isPlanting()
 }
 
 /*
-	
+	If the player is in laststand
 */
 inLastStand()
 {
@@ -475,7 +476,7 @@ inLastStand()
 }
 
 /*
-	
+	If the player is in final stand
 */
 inFinalStand()
 {
@@ -483,7 +484,7 @@ inFinalStand()
 }
 
 /*
-	
+	If the player is the flag carrier
 */
 isFlagCarrier()
 {
@@ -491,7 +492,7 @@ isFlagCarrier()
 }
 
 /*
-	
+	If the weapon  is allowed to be dropped
 */
 isWeaponDroppable(weap)
 {
@@ -515,7 +516,7 @@ isArtShocked()
 }
 
 /*
-	
+	Returns the height the viewpos is above the origin
 */
 getEyeHeight()
 {
@@ -525,7 +526,7 @@ getEyeHeight()
 }
 
 /*
-	
+	Does a notify after a delay
 */
 notifyAfterDelay(delay, not)
 {
@@ -582,7 +583,7 @@ getConeDot(to, from, dir)
 }
 
 /*
-	
+	Returns the distance squared in a 2d space
 */
 DistanceSquared2D(to, from)
 {
@@ -623,7 +624,7 @@ RoundUp( floatVal )
 }
 
 /*
-	
+	converts a string into a float
 */
 float(num)
 {
@@ -633,7 +634,7 @@ float(num)
 }
 
 /*
-	
+	Tokenizes a string (strtok has limits...) (only one char tok)
 */
 tokenizeLine(line, tok)
 {
@@ -659,7 +660,7 @@ tokenizeLine(line, tok)
 }
 
 /*
-	
+	If the string starts with
 */
 isStrStart( string1, subStr )
 {
@@ -667,7 +668,7 @@ isStrStart( string1, subStr )
 }
 
 /*
-	
+	Parses tokens into a waypoint obj
 */
 parseTokensIntoWaypoint(tokens)
 {
@@ -705,7 +706,7 @@ parseTokensIntoWaypoint(tokens)
 }
 
 /*
-	
+	Loads waypoints from tables (iw4x will insert csv's into the game's filesystem, no need for them to be in a ff)
 */
 // https://github.com/leiizko/cod4x_lua_plugin/blob/master/LuaScripts/Rotu-R/waypoints.gsc
 wpsFromCSV(mapname)
@@ -1006,7 +1007,7 @@ load_waypoints()
 }
 
 /*
-	
+	Returns the friendly user name for a given map's codename
 */
 getMapName(mapname)
 {
@@ -1906,7 +1907,7 @@ random_normal_distribution( mean, std_deviation, lower_bound, upper_bound )
 }
 
 /*
-	
+	Patches the plant sites so it exposes the defuseObject
 */
 onUsePlantObjectFix( player )
 {
@@ -1946,7 +1947,7 @@ onUsePlantObjectFix( player )
 }
 
 /*
-	
+	Patches the plant sites so it exposes the defuseObject
 */
 bombPlantedFix( destroyedObj, player )
 {
@@ -2064,7 +2065,7 @@ bombPlantedFix( destroyedObj, player )
 }
 
 /*
-	
+	Patches giveLoadout so that it doesn't use IsItemUnlocked
 */
 botGiveLoadout( team, class, allowCopycat )
 {
@@ -2299,7 +2300,7 @@ botGiveLoadout( team, class, allowCopycat )
 }
 
 /*
-	
+	Patches giveLoadout so that it doesn't use IsItemUnlocked
 */
 botGetPerkUpgrade( perkName )
 {
@@ -2315,7 +2316,7 @@ botGetPerkUpgrade( perkName )
 }
 
 /*
-	
+	Patches giveLoadout so that it doesn't use IsItemUnlocked
 */
 botLoadoutAllPerks( loadoutEquipment, loadoutPerk1, loadoutPerk2, loadoutPerk3 )
 {
@@ -2352,7 +2353,7 @@ botLoadoutAllPerks( loadoutEquipment, loadoutPerk1, loadoutPerk2, loadoutPerk3 )
 }
 
 /*
-	
+	Patches giveLoadout so that it doesn't use IsItemUnlocked
 */
 botPlayerModelForWeapon( weapon, secondary )
 {
@@ -2399,7 +2400,7 @@ botPlayerModelForWeapon( weapon, secondary )
 }
 
 /*
-	
+	patches so that it uses the bot's getVelocity func
 */
 claymoreDetonationBotFix()
 {
