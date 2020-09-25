@@ -1,7 +1,7 @@
 #include maps\mp\bots\_bot_utility;
 
 /*
-	
+	Does the version check, if we are up too date
 */
 doVersionCheck()
 {
@@ -25,7 +25,7 @@ doVersionCheck()
 }
 
 /*
-	
+	Will attempt to retreive waypoints from the internet
 */
 getRemoteWaypoints(mapname)
 {
@@ -49,7 +49,7 @@ getRemoteWaypoints(mapname)
 }
 
 /*
-	
+	Returns the version of bot warfare found on the internet
 */
 getRemoteVersion()
 {
@@ -64,7 +64,7 @@ getRemoteVersion()
 }
 
 /*
-	
+	Converts an array of lines coresponding to a csv file into an array of waypoint objs
 */
 linesToWaypoints(res)
 {
@@ -87,7 +87,7 @@ linesToWaypoints(res)
 }
 
 /*
-	
+	Returns an array of each line from the response of the http url request
 */
 getLinesFromUrl(url)
 {
