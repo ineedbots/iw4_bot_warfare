@@ -581,6 +581,9 @@ AddOptions()
 		case 3:
 			_temp = "just bots, adjust to map";
 		break;
+		case 4:
+			_temp = "bots used as team balance";
+		break;
 		default:
 			_temp = "out of range";
 		break;
@@ -885,6 +888,10 @@ man_bots(a, b)
 				case 2:
 					setdvar("bots_manage_fill_mode", 3);
 					self iPrintln("bot_fill will now count only bots, adjusting to map.");
+				break;
+				case 3:
+					setdvar("bots_manage_fill_mode", 4);
+					self iPrintln("bot_fill will now use bots as team balance.");
 				break;
 				default:
 					setdvar("bots_manage_fill_mode", 0);
