@@ -2156,16 +2156,17 @@ botGiveLoadout( team, class, allowCopycat )
 
 	//loadoutSecondaryCamo = "none";
 
+	// stop default class op'ness
 	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
 	if (!allowOp)
 	{
 		loadoutDeathstreak = "specialty_none";
 
-		if (loadoutPrimary == "riotshield_mp")
-			loadoutPrimary = "m4_mp";
+		if (loadoutPrimary == "riotshield")
+			loadoutPrimary = "m4";
 
-		if (loadoutSecondary == "at4_mp")
-			loadoutSecondary = "usp_mp";
+		if (loadoutSecondary == "at4")
+			loadoutSecondary = "usp";
 
 		if (loadoutPrimaryAttachment == "gl")
 			loadoutPrimaryAttachment = "none";

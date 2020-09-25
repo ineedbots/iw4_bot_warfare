@@ -94,7 +94,7 @@ bot_get_rank()
 }
 
 /*
-	
+	returns an array of all card titles
 */
 getCardTitles()
 {
@@ -117,7 +117,7 @@ getCardTitles()
 }
 
 /*
-	
+	returns an array of all card icons
 */
 getCardIcons()
 {
@@ -140,7 +140,7 @@ getCardIcons()
 }
 
 /*
-	
+	returns if attachment is valid with attachment 2
 */
 isValidAttachmentCombo(att1, att2)
 {
@@ -153,7 +153,7 @@ isValidAttachmentCombo(att1, att2)
 }
 
 /*
-	
+	returns all attachments for the given gun
 */
 getAttachmentsForGun(gun)
 {
@@ -177,7 +177,7 @@ getAttachmentsForGun(gun)
 }
 
 /*
-	
+	returns all primaries
 */
 getPrimaries()
 {
@@ -199,7 +199,7 @@ getPrimaries()
 }
 
 /*
-	
+	returns all secondaries
 */
 getSecondaries()
 {
@@ -224,7 +224,7 @@ getSecondaries()
 }
 
 /*
-	
+	returns all camos
 */
 getCamos()
 {
@@ -244,7 +244,7 @@ getCamos()
 }
 
 /*
-	
+	returns all perks for the given type
 */
 getPerks(perktype)
 {
@@ -271,7 +271,7 @@ getPerks(perktype)
 }
 
 /*
-	
+	returns kill cost for a streak
 */
 getKillsNeededForStreak(streak)
 {
@@ -279,7 +279,7 @@ getKillsNeededForStreak(streak)
 }
 
 /*
-	
+	returns all killstreaks
 */
 getKillstreaks()
 {
@@ -306,7 +306,7 @@ getKillstreaks()
 }
 
 /*
-	
+	bots chooses a random perk
 */
 chooseRandomPerk(perkkind)
 {
@@ -341,7 +341,7 @@ chooseRandomPerk(perkkind)
 }
 
 /*
-	
+	choose a random camo
 */
 chooseRandomCamo()
 {
@@ -359,7 +359,7 @@ chooseRandomCamo()
 }
 
 /*
-	
+	choose a random primary
 */
 chooseRandomPrimary()
 {
@@ -384,7 +384,7 @@ chooseRandomPrimary()
 }
 
 /*
-	
+	choose a random secondary
 */
 chooseRandomSecondary(perk1)
 {
@@ -415,7 +415,7 @@ chooseRandomSecondary(perk1)
 }
 
 /*
-	
+	chooses random attachements for a gun
 */
 chooseRandomAttachmentComboForGun(gun)
 {
@@ -445,7 +445,7 @@ chooseRandomAttachmentComboForGun(gun)
 }
 
 /*
-	
+	choose a random tacticle grenade
 */
 chooseRandomTactical()
 {
@@ -460,7 +460,7 @@ chooseRandomTactical()
 }
 
 /*
-	
+	sets up all classes for a bot
 */
 setClasses()
 {
@@ -502,7 +502,7 @@ setClasses()
 }
 
 /*
-	
+	returns if killstreak is going to have the same kill cost
 */
 isColidingKillstreak(killstreaks, killstreak)
 {
@@ -533,7 +533,7 @@ isColidingKillstreak(killstreaks, killstreak)
 }
 
 /*
-	
+	bots set their killstreaks
 */
 setKillstreaks()
 {
@@ -720,7 +720,7 @@ bot_cry_for_help( attacker )
 }
 
 /*
-	
+	watches when the bot enters a killcam
 */
 onKillcam()
 {
@@ -736,7 +736,7 @@ onKillcam()
 }
 
 /*
-	
+	bots use copy cat and skip killcams
 */
 doKillcamStuff()
 {
@@ -1072,7 +1072,8 @@ onSpawned()
 }
 
 /*
-	
+	Allows the bot to spawn when force respawn is disabled
+	Watches when the bot dies
 */
 onDeath()
 {
@@ -1087,7 +1088,7 @@ onDeath()
 }
 
 /*
-	
+	Watches when the bot is given a loadout
 */
 onGiveLoadout()
 {
@@ -1107,7 +1108,8 @@ onGiveLoadout()
 }
 
 /*
-	
+	Increments the number of bots approching the obj, decrements when needed
+	Used for preventing too many bots going to one obj, or unreachable objs
 */
 bot_inc_bots(obj, unreach)
 {
@@ -1125,7 +1127,7 @@ bot_inc_bots(obj, unreach)
 }
 
 /*
-	
+	Watches when the bot is touching the obj and calls 'goal'
 */
 bots_watch_touch_obj(obj)
 {
@@ -1154,7 +1156,7 @@ bots_watch_touch_obj(obj)
 }
 
 /*
-	
+	Is bot near any of the given waypoints
 */
 nearAnyOfWaypoints(dist, waypoints)
 {
@@ -1173,7 +1175,7 @@ nearAnyOfWaypoints(dist, waypoints)
 }
 
 /*
-	
+	Returns nearest waypoint of waypoints
 */
 getNearestWaypointOfWaypoints(waypoints)
 {
@@ -1192,7 +1194,7 @@ getNearestWaypointOfWaypoints(waypoints)
 }
 
 /*
-	
+	Watches while the obj is being carried, calls 'goal' when complete
 */
 bot_escort_obj(obj, carrier)
 {
@@ -1217,7 +1219,7 @@ bot_escort_obj(obj, carrier)
 }
 
 /*
-	
+	Watches while the obj is not being carried, calls 'goal' when complete
 */
 bot_get_obj(obj)
 {
@@ -1258,7 +1260,7 @@ onBotSpawned()
 }
 
 /*
-	
+	Starts all the bot thinking
 */
 start_bot_threads()
 {
@@ -1299,7 +1301,7 @@ start_bot_threads()
 }
 
 /*
-	
+	Clears goal when events death
 */
 stop_go_target_on_death(tar)
 {
@@ -1315,7 +1317,7 @@ stop_go_target_on_death(tar)
 }
 
 /*
-	
+	Goes to the target's location if it had one
 */
 follow_target()
 {
@@ -1395,7 +1397,7 @@ bot_think_camp()
 }
 
 /*
-	
+	Kills the camping thread when time
 */
 killCampAfterTime(time)
 {
@@ -1411,7 +1413,7 @@ killCampAfterTime(time)
 }
 
 /*
-	
+	Kills the camping thread when ent gone
 */
 killCampAfterEntGone(ent)
 {
@@ -1434,7 +1436,7 @@ killCampAfterEntGone(ent)
 }
 
 /*
-	
+	Camps at the spot
 */
 CampAtSpot(origin, anglePos)
 {
@@ -1503,7 +1505,7 @@ bot_think_follow()
 }
 
 /*
-	
+	Kills follow when new goal
 */
 watchForFollowNewGoal()
 {
@@ -1524,7 +1526,7 @@ watchForFollowNewGoal()
 }
 
 /*
-	
+	Kills follow when time
 */
 killFollowAfterTime(time)
 {
@@ -1540,7 +1542,7 @@ killFollowAfterTime(time)
 }
 
 /*
-	
+	Determine bot to follow a player
 */
 followPlayer(who)
 {
@@ -1576,7 +1578,7 @@ followPlayer(who)
 }
 
 /*
-	
+	Bots thinking of using one man army and blast shield
 */
 bot_perk_think()
 {
@@ -1705,7 +1707,7 @@ bot_perk_think()
 }
 
 /*
-	
+	Bots thinking of using a noobtube
 */
 bot_use_tube_think()
 {
@@ -1838,7 +1840,7 @@ bot_use_tube_think()
 }
 
 /*
-	
+	Fires the bots weapon until told to stop
 */
 fire_current_weapon()
 {
@@ -1855,7 +1857,7 @@ fire_current_weapon()
 }
 
 /*
-	
+	Bots thinking of using claymores and TIs
 */
 bot_use_equipment_think()
 {
@@ -1974,7 +1976,7 @@ bot_use_equipment_think()
 }
 
 /*
-	
+	Bots thinking of using grenades
 */
 bot_use_grenade_think()
 {
@@ -2101,7 +2103,7 @@ bot_use_grenade_think()
 }
 
 /*
-	
+	BOts thinking of using javelins
 */
 bot_jav_loc_think()
 {
@@ -2224,7 +2226,7 @@ bot_jav_loc_think()
 }
 
 /*
-	
+	Bots thinking of targeting equipment, c4, claymores and TIs
 */
 bot_equipment_kill_think()
 {
@@ -2354,7 +2356,7 @@ bot_equipment_kill_think()
 }
 
 /*
-	
+	Bots target the equipment for a time then stop
 */
 bot_equipment_attack(equ)
 {
@@ -2372,7 +2374,7 @@ bot_equipment_attack(equ)
 }
 
 /*
-	
+	Bots will listen to foot steps and target nearby targets
 */
 bot_listen_to_steps()
 {
@@ -2474,7 +2476,7 @@ bot_listen_to_steps()
 }
 
 /*
-	
+	Bots will look at the uav and target targets
 */
 bot_uav_think()
 {
@@ -2548,7 +2550,7 @@ bot_uav_think()
 }
 
 /*
-	
+	bots will go to their target's kill location
 */
 bot_revenge_think()
 {
@@ -2579,7 +2581,7 @@ bot_revenge_think()
 }
 
 /*
-	
+	Watches the target's health, calls 'bad_path'
 */
 turret_death_monitor(turret)
 {
@@ -2607,7 +2609,7 @@ turret_death_monitor(turret)
 }
 
 /*
-	
+	Bots will target the turret for a time
 */
 bot_turret_attack( enemy )
 {
@@ -2632,7 +2634,7 @@ bot_turret_attack( enemy )
 }
 
 /*
-	
+	Bots will think when to target a turret
 */
 bot_turret_think()
 {
@@ -2728,7 +2730,7 @@ bot_turret_think()
 }
 
 /*
-	
+	Bots will capture carepackages
 */
 bot_crate_think()
 {
@@ -2842,7 +2844,7 @@ bot_crate_think()
 }
 
 /*
-	
+	Bots will think to switch weapons
 */
 bot_weapon_think()
 {
@@ -2945,7 +2947,7 @@ bot_weapon_think()
 }
 
 /*
-	
+	Returns an weapon thats a rocket with ammo
 */
 getRocketAmmo()
 {
@@ -2961,7 +2963,7 @@ getRocketAmmo()
 }
 
 /*
-	
+	Returns a weapon thats lockon with ammo
 */
 getLockonAmmo()
 {
@@ -2980,7 +2982,7 @@ getLockonAmmo()
 }
 
 /*
-	
+	Bots think when to target vehicles
 */
 bot_target_vehicle()
 {
@@ -3045,7 +3047,7 @@ bot_target_vehicle()
 }
 
 /*
-	
+	Bots target the killstreak for a time and stops
 */
 bot_attack_vehicle( target )
 {
@@ -3066,7 +3068,7 @@ bot_attack_vehicle( target )
 }
 
 /*
-	
+	Returns an origin thats good to use for a kill streak
 */
 getKillstreakTargetLocation()
 {
@@ -3105,23 +3107,24 @@ getKillstreakTargetLocation()
 }
 
 /*
-	
+	Clears remote usage when bot dies
 */
 clear_remote_on_death(isac130)
 {
-	self endon("disconnect");
 	self endon("bot_clear_remote_on_death");
 	level endon("game_ended");
 
-	self waittill("death");
+	self waittill_either("death", "disconnect");
 
 	if (isDefined(isac130) && isac130)
 		level.ac130InUse = false;
-	self ClearUsingRemote();
+
+	if (isDefined(self))
+		self ClearUsingRemote();
 }
 
 /*
-	
+	Returns if any harriers exists that is an enemy
 */
 isAnyEnemyPlanes()
 {
@@ -3142,7 +3145,7 @@ isAnyEnemyPlanes()
 }
 
 /*
-	
+	Bots think to use killstreaks
 */
 bot_killstreak_think()
 {
@@ -3446,7 +3449,7 @@ bot_killstreak_think()
 }
 
 /*
-	
+	Bots hang around the enemy's flag to spawn kill em
 */
 bot_dom_spawn_kill_think()
 {
@@ -3502,7 +3505,7 @@ bot_dom_spawn_kill_think()
 }
 
 /*
-	
+	Calls 'bad_path' when the flag count changes
 */
 bot_dom_watch_flags(count, myTeam)
 {
@@ -3524,7 +3527,7 @@ bot_dom_watch_flags(count, myTeam)
 }
 
 /*
-	
+	Bots watches their own flags and protects them when they are under capture
 */
 bot_dom_def_think()
 {
@@ -3573,7 +3576,7 @@ bot_dom_def_think()
 }
 
 /*
-	
+	Watches while the flag is under capture
 */
 bot_dom_watch_for_flashing(flag, myTeam)
 {
@@ -3598,7 +3601,7 @@ bot_dom_watch_for_flashing(flag, myTeam)
 }
 
 /*
-	
+	Bots capture dom flags
 */
 bot_dom_cap_think()
 {
@@ -3693,7 +3696,7 @@ bot_dom_cap_think()
 }
 
 /*
-	
+	Bot goes to the flag, watching while they don't have the flag
 */
 bot_dom_go_cap_flag(flag, myteam)
 {
@@ -3724,7 +3727,7 @@ bot_dom_go_cap_flag(flag, myteam)
 }
 
 /*
-	
+	Bots play headquarters
 */
 bot_hq()
 {
@@ -3902,7 +3905,7 @@ bot_hq_watch_flashing(obj, radio)
 }
 
 /*
-	
+	Bots play capture the flag
 */
 bot_cap()
 {
@@ -4047,7 +4050,7 @@ bot_cap()
 }
 
 /*
-	
+	Bots go and get the flag
 */
 bot_cap_get_flag(flag)
 {
