@@ -1,0 +1,1581 @@
+#define FSM_VISIBILITY (selecting_location() && NOT_SPECTATING)
+{
+	menuDef
+	{
+		name vote
+		fullscreen 0
+		rect 0 0 640 480
+		style 0
+		border 0
+		ownerdraw 0
+		ownerdrawFlag 0
+		borderSize 0
+		foreColor 1 1 1 1
+		backColor 0 0 0 0
+		borderColor 0 0 0 0
+		outlineColor 0 0 0 0
+		fadeCycle 0
+		fadeClamp 0
+		fadeAmount 0
+		fadeInAmount 0
+		blurWorld 7
+		onOpen
+		{
+		}
+		onClose
+		{
+		}
+		onESC
+		{
+			open class
+		}
+		focusColor 1 1 1 1
+		visible 1
+		
+		itemDef
+		{
+			rect 130 95 272 28 0 0
+			style 0
+			border 0
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 0
+			foreColor 1 1 1 1
+			backColor 0 0 0 0
+			borderColor 0 0 0 0
+			outlineColor 0 0 0 0
+			decoration
+			type 0
+			align 0
+			textAlign 0
+			textAlignX -60
+			textAlignY 0
+			textScale 0.5
+			textStyle 3
+			textFont 9
+			feeder 0
+			visible 1
+			exp text (dvarString(hud_voteText))
+        }	
+		//Map 1
+		itemDef
+		{
+			name map1
+			rect 68 76 162 92 0 0
+			style 3
+			border 1
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 1
+			backColor 1 1 1 0
+			borderColor 0 0 0 1
+			outlineColor 0 0 0 0
+			origin 2 24
+			decoration 
+			type 0
+			align 0
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			exp material (dvarString(hud_picName0))
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName0) != "white")
+		}
+		itemDef
+		{
+			name map1dlc
+			rect 68 76 162 92 0 0
+			style 3
+			border 1
+			borderSize 1
+			foreColor 1 1 1 0.75
+			borderColor 0 0 0 1
+			background mw2_main_background
+			origin 2 24
+			decoration 
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName0) == "white")
+		}
+		itemDef
+		{
+			name map1button
+			rect 70 100 162 92 0 0
+			style 1
+			border 0
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 0
+			foreColor 1 1 1 1
+			backColor 0 0 0 0
+			borderColor 0 0 0 0
+			outlineColor 0 0 0 0
+			group mw2_popup_button
+			type 1
+			align 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+			onFocus
+			{
+				play "mouse_over";
+				setItemColor self "backcolor" 0 1 0 0.25;
+			}
+			leaveFocus
+			{
+				setItemColor self "backcolor" 1 1 1 0;
+			}
+			action
+			{
+				play "mouse_click";
+				exec "set vote_map 1";
+				scriptMenuResponse "map1";
+			}
+		}
+		
+		itemDef
+		{
+			name map1selected
+			rect 70 100 162 92 0 0
+			style 1
+			border 1
+			borderSize 1
+			borderColor 1 1 1 1
+			decoration
+			visible 1
+			backcolor 0 1 0 0.25
+			visible when( dvarString("vote_map") == "1" && dvarString(hud_ShowWinner) != "1");
+			exp backcolor a ( ( ( sin( milliseconds( ) / 500 ) + 0.1 ) * 0.1 ) + 0.2 )
+		}
+		
+		itemDef
+		{
+			name map1textback
+			rect 71 101 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient //gradient_bottom
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map1votesback
+			rect 69 174 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient_fadein
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map1name
+			rect 72.5 115 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapName0))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+
+		itemDef
+		{
+			name map1votes
+			rect 185 175 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 5
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapVotes0) + "/" + dvarString(hud_gamesize))
+			visible when (dvarString("hud_ShowWinner") != "1")
+		}
+		
+		//Map 2
+		itemDef
+		{
+			name map2
+			rect 238 76 162 92 0 0
+			style 3
+			border 1
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 1
+			backColor 1 1 1 0
+			borderColor 0 0 0 1
+			outlineColor 0 0 0 0
+			origin 2 24
+			decoration 
+			type 0
+			align 0
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			exp material (dvarString(hud_picName1))
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName1) != "white")
+		}
+		itemDef
+		{
+			name map2dlc
+			rect 238 76 162 92 0 0
+			style 3
+			border 1
+			borderSize 1
+			foreColor 1 1 1 0.75
+			borderColor 0 0 0 1
+			background mw2_main_background
+			origin 2 24
+			decoration 
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName1) == "white")
+		}
+		itemDef
+		{
+			name map2button
+			rect 240 100 162 92 0 0
+			style 1
+			border 0
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 0
+			foreColor 1 1 1 1
+			backColor 0 0 0 0
+			borderColor 0 0 0 0
+			outlineColor 0 0 0 0
+			group mw2_popup_button
+			type 1
+			align 0
+			feeder 0
+			visible 1
+			visible when (dvarString("hud_ShowWinner") != "1")
+			onFocus
+			{
+				play "mouse_over";
+				setItemColor self "backcolor" 0 1 0 0.25;
+			}
+			leaveFocus
+			{
+				setItemColor self "backcolor" 1 1 1 0;
+			}
+			action
+			{
+				play "mouse_click";
+				exec "set vote_map 2";
+				scriptMenuResponse "map2";
+			}
+		}
+		
+		itemDef
+		{
+			name map2selected
+			rect 240 100 162 92 0 0
+			style 1
+			border 1
+			borderSize 1
+			borderColor 1 1 1 1
+			decoration
+			visible 1
+			backcolor 0 1 0 0.25
+			visible when( dvarString("vote_map") == "2" && dvarString("hud_ShowWinner") != "1")
+			exp backcolor a ( ( ( sin( milliseconds( ) / 500 ) + 0.1 ) * 0.1 ) + 0.2 )
+		}
+		
+		itemDef
+		{
+			name map2textback
+			rect 241 101 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient //gradient_bottom
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map2votesback
+			rect 239 174 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient_fadein
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map2name
+			rect 243.5 115 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapName1))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+
+		itemDef
+		{
+			name map2votes
+			rect 355 175 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 5
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapVotes1) + "/" + dvarString(hud_gamesize))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		//Map 3
+		itemDef
+		{
+			name map3
+			rect 408 76 162 92 0 0
+			style 3
+			border 1
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 1
+			backColor 1 1 1 0
+			borderColor 0 0 0 1
+			outlineColor 0 0 0 0
+			origin 2 24
+			decoration 
+			type 0
+			align 0
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			exp material (dvarString(hud_picName2))
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName2) != "white")
+		}
+		itemDef
+		{
+			name map3dlc
+			rect 408 76 162 92 0 0
+			style 3
+			border 1
+			borderSize 1
+			foreColor 1 1 1 0.75
+			borderColor 0 0 0 1
+			background mw2_main_background
+			origin 2 24
+			decoration 
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName2) == "white")
+		}
+		itemDef
+		{
+			name map3button
+			rect 410 100 162 92 0 0
+			style 1
+			border 0
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 0
+			foreColor 1 1 1 1
+			backColor 0 0 0 0
+			borderColor 0 0 0 0
+			outlineColor 0 0 0 0
+			group mw2_popup_button
+			type 1
+			align 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+			onFocus
+			{
+				play "mouse_over";
+				setItemColor self "backcolor" 0 1 0 0.25;
+			}
+			leaveFocus
+			{
+				setItemColor self "backcolor" 1 1 1 0;
+			}
+			action
+			{
+				play "mouse_click";
+				exec "set vote_map 3";
+				scriptMenuResponse "map3";
+			}
+		}
+		
+		itemDef
+		{
+			name map3selected
+			rect 410 100 162 92 0 0
+			style 1
+			border 1
+			borderSize 1
+			borderColor 1 1 1 1
+			decoration
+			visible 1
+			backcolor 0 1 0 0.25
+			visible when( dvarString("vote_map") == "3" && dvarString("hud_ShowWinner") != "1")
+			exp backcolor a ( ( ( sin( milliseconds( ) / 500 ) + 0.1 ) * 0.1 ) + 0.2 )
+		}
+		
+		itemDef
+		{
+			name map3textback
+			rect 411 101 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient //gradient_bottom
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map3votesback
+			rect 409 174 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient_fadein
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map3name
+			rect 413.5 115 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapName2))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+
+		itemDef
+		{
+			name map3votes
+			rect 525 175 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 5
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapVotes2) + "/" + dvarString(hud_gamesize))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		//Map 4
+		itemDef
+		{
+			name map4
+			rect 68 176 162 92 0 0
+			style 3
+			border 1
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 1
+			backColor 1 1 1 0
+			borderColor 0 0 0 1
+			outlineColor 0 0 0 0
+			origin 2 24
+			decoration 
+			type 0
+			align 0
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			exp material (dvarString(hud_picName3))
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName3) != "white")
+		}
+		itemDef
+		{
+			name map4dlc
+			rect 68 176 162 92 0 0
+			style 3
+			border 1
+			borderSize 1
+			foreColor 1 1 1 0.75
+			borderColor 0 0 0 1
+			background mw2_main_background
+			origin 2 24
+			decoration 
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName3) == "white")
+		}
+		itemDef
+		{
+			name map4button
+			rect 70 200 162 92 0 0
+			style 1
+			border 0
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 0
+			foreColor 1 1 1 1
+			backColor 0 0 0 0
+			borderColor 0 0 0 0
+			outlineColor 0 0 0 0
+			group mw2_popup_button
+			type 1
+			align 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+			onFocus
+			{
+				play "mouse_over";
+				setItemColor self "backcolor" 0 1 0 0.25;
+			}
+			leaveFocus
+			{
+				setItemColor self "backcolor" 1 1 1 0;
+			}
+			action
+			{
+				play "mouse_click";
+				exec "set vote_map 4";
+				scriptMenuResponse "map4";
+			}
+		}
+		
+		itemDef
+		{
+			name map4selected
+			rect 70 200 162 92 0 0
+			style 1
+			border 1
+			borderSize 1
+			borderColor 1 1 1 1
+			decoration
+			visible 1
+			backcolor 0 1 0 0.25
+			visible when( dvarString("vote_map") == "4" && dvarString(hud_ShowWinner) != "1")
+			exp backcolor a ( ( ( sin( milliseconds( ) / 500 ) + 0.1 ) * 0.1 ) + 0.2 )
+		}
+		
+		itemDef
+		{
+			name map4textback
+			rect 71 201 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient //gradient_bottom
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map4votesback
+			rect 69 274 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient_fadein
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map4name
+			rect 72.5 215 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapName3))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+
+		itemDef
+		{
+			name map4votes
+			rect 185 275 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 5
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapVotes3) + "/" + dvarString(hud_gamesize))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		//Map 5
+		itemDef
+		{
+			name map5
+			rect 238 176 162 92 0 0
+			style 3
+			border 1
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 1
+			backColor 1 1 1 0
+			borderColor 0 0 0 1
+			outlineColor 0 0 0 0
+			origin 2 24
+			decoration 
+			type 0
+			align 0
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			exp material (dvarString(hud_picName4))
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName4) != "white")
+		}
+		itemDef
+		{
+			name map5dlc
+			rect 238 176 162 92 0 0
+			style 3
+			border 1
+			borderSize 1
+			foreColor 1 1 1 0.75
+			borderColor 0 0 0 1
+			background mw2_main_background
+			origin 2 24
+			decoration 
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName4) == "white")
+		}
+		itemDef
+		{
+			name map5button
+			rect 240 200 162 92 0 0
+			style 1
+			border 0
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 0
+			foreColor 1 1 1 1
+			backColor 0 0 0 0
+			borderColor 0 0 0 0
+			outlineColor 0 0 0 0
+			group mw2_popup_button
+			type 1
+			align 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+			onFocus
+			{
+				play "mouse_over";
+				setItemColor self "backcolor" 0 1 0 0.25;
+			}
+			leaveFocus
+			{
+				setItemColor self "backcolor" 1 1 1 0;
+			}
+			action
+			{
+				play "mouse_click";
+				exec "set vote_map 5";
+				scriptMenuResponse "map5";
+			}
+		}
+		
+		itemDef
+		{
+			name map5selected
+			rect 240 200 162 92 0 0
+			style 1
+			border 1
+			borderSize 1
+			borderColor 1 1 1 1
+			decoration
+			visible 1
+			backcolor 0 1 0 0.25
+			visible when( dvarString("vote_map") == "5" && dvarString("hud_ShowWinner") != "1")
+			exp backcolor a ( ( ( sin( milliseconds( ) / 500 ) + 0.1 ) * 0.1 ) + 0.2 )
+		}
+		
+		itemDef
+		{
+			name map5textback
+			rect 241 201 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient //gradient_bottom
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map5votesback
+			rect 239 274 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient_fadein
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map5name
+			rect 243.5 215 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapName4))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+
+		itemDef
+		{
+			name map5votes
+			rect 355 275 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 5
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapVotes4) + "/" + dvarString(hud_gamesize))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		//Map 6
+		itemDef
+		{
+			name map6
+			rect 408 176 162 92 0 0
+			style 3
+			border 1
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 1
+			backColor 1 1 1 0
+			borderColor 0 0 0 1
+			outlineColor 0 0 0 0
+			origin 2 24
+			decoration 
+			type 0
+			align 0
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			exp material (dvarString(hud_picName5))
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName5) != "white")
+		}
+		itemDef
+		{
+			name map6dlc
+			rect 408 176 162 92 0 0
+			style 3
+			border 1
+			borderSize 1
+			foreColor 1 1 1 0.75
+			borderColor 0 0 0 1
+			background mw2_main_background
+			origin 2 24
+			decoration 
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName5) == "white")
+		}
+		itemDef
+		{
+			name map6button
+			rect 410 200 162 92 0 0
+			style 1
+			border 0
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 0
+			foreColor 1 1 1 1
+			backColor 0 0 0 0
+			borderColor 0 0 0 0
+			outlineColor 0 0 0 0
+			group mw2_popup_button
+			type 1
+			align 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+			onFocus
+			{
+				play "mouse_over";
+				setItemColor self "backcolor" 0 1 0 0.25;
+			}
+			leaveFocus
+			{
+				setItemColor self "backcolor" 1 1 1 0;
+			}
+			action
+			{
+				play "mouse_click";
+				exec "set vote_map 6";
+				scriptMenuResponse "map6";
+			}
+		}
+		
+		itemDef
+		{
+			name map6selected
+			rect 410 200 162 92 0 0
+			style 1
+			border 1
+			borderSize 1
+			borderColor 1 1 1 1
+			decoration
+			visible 1
+			backcolor 0 1 0 0.25
+			visible when( dvarString("vote_map") == "6" && dvarString(hud_ShowWinner) != "1")
+			exp backcolor a ( ( ( sin( milliseconds( ) / 500 ) + 0.1 ) * 0.1 ) + 0.2 )
+		}
+		
+		itemDef
+		{
+			name map6textback
+			rect 411 201 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient //gradient_bottom
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map6votesback
+			rect 409 274 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient_fadein
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map6name
+			rect 413.5 215 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapName5))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+
+		itemDef
+		{
+			name map6votes
+			rect 525 275 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 5
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapVotes5) + "/" + dvarString(hud_gamesize))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		//Map 7
+		itemDef
+		{
+			name map7
+			rect 68 276 162 92 0 0
+			style 3
+			border 1
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 1
+			backColor 1 1 1 0
+			borderColor 0 0 0 1
+			outlineColor 0 0 0 0
+			origin 2 24
+			decoration 
+			type 0
+			align 0
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			exp material (dvarString(hud_picName6))
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName6) != "white")
+		}
+		itemDef
+		{
+			name map7dlc
+			rect 68 276 162 92 0 0
+			style 3
+			border 1
+			borderSize 1
+			foreColor 1 1 1 0.75
+			borderColor 0 0 0 1
+			background mw2_main_background
+			origin 2 24
+			decoration 
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName6) == "white")
+		}
+		itemDef
+		{
+			name map7button
+			rect 70 300 162 92 0 0
+			style 1
+			border 0
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 0
+			foreColor 1 1 1 1
+			backColor 0 0 0 0
+			borderColor 0 0 0 0
+			outlineColor 0 0 0 0
+			group mw2_popup_button
+			type 1
+			align 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+			onFocus
+			{
+				play "mouse_over";
+				setItemColor self "backcolor" 0 1 0 0.25;
+			}
+			leaveFocus
+			{
+				setItemColor self "backcolor" 1 1 1 0;
+			}
+			action
+			{
+				play "mouse_click";
+				exec "set vote_map 7";
+				scriptMenuResponse "map7";
+			}
+		}
+		
+		itemDef
+		{
+			name map7selected
+			rect 70 300 162 92 0 0
+			style 1
+			border 1
+			borderSize 1
+			borderColor 1 1 1 1
+			decoration
+			visible 1
+			backcolor 0 1 0 0.25
+			visible when( dvarString("vote_map") == "7" && dvarString(hud_ShowWinner) != "1")
+			exp backcolor a ( ( ( sin( milliseconds( ) / 500 ) + 0.1 ) * 0.1 ) + 0.2 )
+		}
+		
+		itemDef
+		{
+			name map7textback
+			rect 71 301 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient //gradient_bottom
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map7votesback
+			rect 69 374 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient_fadein
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map7name
+			rect 72.5 315 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapName6))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+
+		itemDef
+		{
+			name map7votes
+			rect 185 375 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 5
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapVotes6) + "/" + dvarString(hud_gamesize))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		//Map 8
+		itemDef
+		{
+			name map8
+			rect 238 276 162 92 0 0
+			style 3
+			border 1
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 1
+			backColor 1 1 1 0
+			borderColor 0 0 0 1
+			outlineColor 0 0 0 0
+			origin 2 24
+			decoration 
+			type 0
+			align 0
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			exp material (dvarString(hud_picName7))
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName7) != "white")
+		}
+		itemDef
+		{
+			name map8dlc
+			rect 238 276 162 92 0 0
+			style 3
+			border 1
+			borderSize 1
+			foreColor 1 1 1 0.75
+			borderColor 0 0 0 1
+			background mw2_main_background
+			origin 2 24
+			decoration 
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName7) == "white")
+		}
+		itemDef
+		{
+			name map8button
+			rect 240 300 162 92 0 0
+			style 1
+			border 0
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 0
+			foreColor 1 1 1 1
+			backColor 0 0 0 0
+			borderColor 0 0 0 0
+			outlineColor 0 0 0 0
+			group mw2_popup_button
+			type 1
+			align 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+			onFocus
+			{
+				play "mouse_over";
+				setItemColor self "backcolor" 0 1 0 0.25;
+			}
+			leaveFocus
+			{
+				setItemColor self "backcolor" 1 1 1 0;
+			}
+			action
+			{
+				play "mouse_click";
+				exec "set vote_map 8";
+				scriptMenuResponse "map8";
+			}
+		}
+		
+		itemDef
+		{
+			name map8selected
+			rect 240 300 162 92 0 0
+			style 1
+			border 1
+			borderSize 1
+			borderColor 1 1 1 1
+			decoration
+			visible 1
+			backcolor 0 1 0 0.25
+			visible when( dvarString("vote_map") == "8" && dvarString(hud_ShowWinner) != "1")
+			exp backcolor a ( ( ( sin( milliseconds( ) / 500 ) + 0.1 ) * 0.1 ) + 0.2 )
+		}
+		
+		itemDef
+		{
+			name map8textback
+			rect 241 301 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient //gradient_bottom
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map8votesback
+			rect 239 374 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient_fadein
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map8name
+			rect 243.5 315 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapName7))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+
+		itemDef
+		{
+			name map8votes
+			rect 355 375 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 5
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapVotes7) + "/" + dvarString(hud_gamesize))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		//Map 9
+		itemDef
+		{
+			name map9
+			rect 408 276 162 92 0 0
+			style 3
+			border 1
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 1
+			backColor 1 1 1 0
+			borderColor 0 0 0 1
+			outlineColor 0 0 0 0
+			origin 2 24
+			decoration 
+			type 0
+			align 0
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			exp material (dvarString(hud_picName8))
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName8) != "white")
+		}
+		itemDef
+		{
+			name map9dlc
+			rect 408 276 162 92 0 0
+			style 3
+			border 1
+			borderSize 1
+			foreColor 1 1 1 0.75
+			borderColor 0 0 0 1
+			background mw2_main_background
+			origin 2 24
+			decoration 
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1" && dvarString(hud_picName8) == "white")
+		}
+		itemDef
+		{
+			name map9button
+			rect 410 300 162 92 0 0
+			style 1
+			border 0
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 0
+			foreColor 1 1 1 1
+			backColor 0 0 0 0
+			borderColor 0 0 0 0
+			outlineColor 0 0 0 0
+			group mw2_popup_button
+			type 1
+			align 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+			onFocus
+			{
+				play "mouse_over";
+				setItemColor self "backcolor" 0 1 0 0.25;
+			}
+			leaveFocus
+			{
+				setItemColor self "backcolor" 1 1 1 0;
+			}
+			action
+			{
+				play "mouse_click";
+				exec "set vote_map 9";
+				scriptMenuResponse "map9";
+			}
+		}
+		
+		itemDef
+		{
+			name map9selected
+			rect 410 300 162 92 0 0
+			style 1
+			border 1
+			borderSize 1
+			borderColor 1 1 1 1
+			decoration
+			visible 1
+			backcolor 0 1 0 0.25
+			visible when( dvarString("vote_map") == "9" && dvarString(hud_ShowWinner) != "1")
+			exp backcolor a ( ( ( sin( milliseconds( ) / 500 ) + 0.1 ) * 0.1 ) + 0.2 )
+		}
+		
+		itemDef
+		{
+			name map9textback
+			rect 411 301 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient //gradient_bottom
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map9votesback
+			rect 409 374 162 17.5 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient_fadein
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		
+		itemDef
+		{
+			name map9name
+			rect 413.5 315 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapName8))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+
+		itemDef
+		{
+			name map9votes
+			rect 525 375 50 50 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 5
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.3
+			decoration
+			exp text (dvarString(hud_mapVotes8) + "/" + dvarString(hud_gamesize))
+			visible when (dvarString(hud_ShowWinner) != "1")
+		}
+		//Winning Map
+		itemDef
+		{
+			name WinningMap
+			rect 68 76 505 295 0 0
+			style 3
+			border 1
+			ownerdraw 0
+			ownerdrawFlag 0
+			borderSize 1
+			backColor 1 1 1 0
+			borderColor 0 0 0 1
+			outlineColor 0 0 0 0
+			origin 2 24
+			decoration 
+			type 0
+			align 0
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			exp material(dvarString(hud_WinningName))
+			visible when (dvarString(hud_ShowWinner) == "1" && dvarString(hud_WinningName) != "white")
+		}
+		itemDef
+		{
+			name WinningMapDlc
+			rect 68 76 505 295 0 0
+			style 3
+			border 1
+			borderSize 1
+			foreColor 1 1 1 0.75
+			borderColor 0 0 0 1
+			background mw2_main_background
+			origin 2 24
+			decoration 
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textScale 0.55
+			textStyle 0
+			textFont 0
+			feeder 0
+			visible 1
+			visible when (dvarString(hud_ShowWinner) == "1" && dvarString(hud_WinningName) == "white")
+		}
+		itemDef
+		{
+			name WinningMapback
+			rect 71 345 500 50 0 0
+			style 3
+			foreColor 0 0 0 0.9
+			background gradient //gradient_bottom
+			decoration
+			visible 1
+			visible when (dvarString(hud_ShowWinner) == "1")
+		}
+		
+		itemDef
+		{
+			name WinningMapname
+			rect 80 383 150 150 0 0
+			style 1
+			visible 1
+			forecolor 1 1 1 1
+			textAlign 0
+			textAlignX 0
+			textAlignY 0
+			textStyle 0
+			textFont 3
+			textScale 0.6
+			decoration
+			exp text (dvarString(hud_WinningMap))
+			visible when (dvarString(hud_ShowWinner) == "1")
+		}
+	}
+}
