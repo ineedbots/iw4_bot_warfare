@@ -115,7 +115,7 @@ init()
 	addCrateType( "airdrop_mega",	"emp", 						getDvarInt( "scr_airdrop_mega_emp", 0 ),				::killstreakCrateThink );
 	addCrateType( "airdrop_mega",	"nuke", 					getDvarInt( "scr_airdrop_mega_nuke", 0 ),				::killstreakCrateThink );
 
-	addCrateType( "airdrop_sentry_minigun",	"sentry", 			0,			::killstreakCrateThink );
+	addCrateType( "airdrop_sentry_minigun",	"sentry", 			0,			::sentryCrateThink );
 	
 	addCrateType( "nuke_drop",		"nuke", 					100,		::nukeCrateThink );
 
@@ -1334,7 +1334,7 @@ sentryCrateThink( dropType )
 		}		
 	
 		player playLocalSound( "ammo_crate_use" );
-		player thread sentryUseTracker();
+		player thread sentryUseTracker(self.owner);
 		
 		self deleteCrate();
 	}
@@ -1351,10 +1351,10 @@ deleteCrate()
 	self delete();
 }
 
-sentryUseTracker()
+sentryUseTracker(owner)
 {
-	if ( !self maps\mp\killstreaks\_autosentry::giveSentry( "sentry_minigun" ) )
-		self maps\mp\killstreaks\_killstreaks::giveKillstreak( "sentry" );
+	// if ( !self maps\mp\killstreaks\_autosentry::giveSentry( "sentry_minigun" ) )
+		self maps\mp\killstreaks\_killstreaks::giveKillstreak( "sentry", true, true, owner );
 }
 
 

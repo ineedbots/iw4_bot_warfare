@@ -95,6 +95,8 @@ giveSentry( sentryType, lifeId )
 
 	if (level.sentryKillsIncreaseStreak)
 		sentryGun.lifeId = lifeId;
+	else
+		sentryGun.lifeId = -1;
 	
 	self setCarryingSentry( sentryGun, true );
 	
