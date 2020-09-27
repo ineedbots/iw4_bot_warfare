@@ -20,7 +20,7 @@ init()
 	level.classMap["class12"] = 12;
 	level.classMap["class13"] = 13;
 	level.classMap["class14"] = 14;
-	
+
 	level.classMap["custom1"] = 0;
 	level.classMap["custom2"] = 1;
 	level.classMap["custom3"] = 2;
@@ -31,6 +31,11 @@ init()
 	level.classMap["custom8"] = 7;
 	level.classMap["custom9"] = 8;
 	level.classMap["custom10"] = 9;
+	level.classMap["custom11"] = 10;
+	level.classMap["custom12"] = 11;
+	level.classMap["custom13"] = 12;
+	level.classMap["custom14"] = 13;
+	level.classMap["custom15"] = 14;
 	
 	level.classMap["copycat"] = -1;
 	
@@ -429,14 +434,23 @@ giveLoadout( team, class, allowCopycat )
 	if ( loadoutPerk1 != "specialty_onemanarmy" && loadoutSecondary == "onemanarmy" )
 		loadoutSecondary = table_getWeapon( level.classTableName, 10, 1 );
 
-	loadoutSecondaryCamo = "none";
+	//loadoutSecondaryCamo = "none";
 
 
 	if ( level.killstreakRewards )
 	{
-		loadoutKillstreak1 = self getPlayerData( "killstreaks", 0 );
-		loadoutKillstreak2 = self getPlayerData( "killstreaks", 1 );
-		loadoutKillstreak3 = self getPlayerData( "killstreaks", 2 );
+		if ( getDvarInt( "scr_classic" ) == 1 )
+		{
+			loadoutKillstreak1 = "uav";
+			loadoutKillstreak2 = "precision_airstrike";
+			loadoutKillstreak3 = "helicopter";
+		}
+		else
+		{
+			loadoutKillstreak1 = self getPlayerData( "killstreaks", 0 );
+			loadoutKillstreak2 = self getPlayerData( "killstreaks", 1 );
+			loadoutKillstreak3 = self getPlayerData( "killstreaks", 2 );
+		}
 	}
 	else
 	{
@@ -456,8 +470,8 @@ giveLoadout( team, class, allowCopycat )
 	self SetOffhandPrimaryClass( "other" );
 	
 	// Action Slots
-	self _SetActionSlot( 1, "" );
-	//self _SetActionSlot( 1, "nightvision" );
+	//self _SetActionSlot( 1, "" );
+	self _SetActionSlot( 1, "nightvision" );
 	self _SetActionSlot( 3, "altMode" );
 	self _SetActionSlot( 4, "" );
 
@@ -839,7 +853,7 @@ setKillstreaks( streak1, streak2, streak3 )
 {
 	self.killStreaks = [];
 
-	if ( self _hasPerk( "specialty_hardline" ) )
+	if ( self _hasPerk( "specialty_hardline" ) && ( getDvarInt( "scr_classic" ) != 1 ) )
 		modifier = -1;
 	else
 		modifier = 0;
@@ -868,6 +882,12 @@ setKillstreaks( streak1, streak2, streak3 )
 			streakVal = int( tableLookup( "mp/killstreakTable.csv", 1, streak2, 4 ) );
 		//else
 		//	streakVal = int( tableLookup( "mp/killstreakTable.csv", 1, streak2, 5 ) );
+
+		if ( ( getDvarInt( "scr_classic" ) == 1 ) && ( streak2 == "precision_airstrike" ) )
+		{
+			streakVal = ( streakVal - 1 );
+		}
+
 		killStreaks[streakVal + modifier] = streak2;
 	}
 
@@ -1017,6 +1037,11 @@ isValidPrimary( refString )
 		case "mg4":
 		case "m240":
 		case "aug":
+		case "peacekeeper":
+		case "ak47classic":
+		case "ak74u":
+		case "m40a3":
+		case "dragunov":
 			return true;
 		default:
 			assertMsg( "Replacing invalid primary weapon: " + refString );
@@ -1048,6 +1073,7 @@ isValidSecondary( refString )
 		case "m1014":
 		case "spas12":
 		case "onemanarmy":
+		case "deserteaglegold":
 			return true;
 		default:
 			assertMsg( "Replacing invalid secondary weapon: " + refString );
