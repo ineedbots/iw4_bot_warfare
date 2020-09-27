@@ -1,3 +1,14 @@
+/*
+	_airdrop modded
+	Author: INeedGames
+	Date: 09/26/2020
+	Allows sentry airdrops to gain killstreaks.
+
+	DVAR:
+		- scr_airdrop_killstreaksIncreaseStreak <bool>
+			false - (default) killstreaks obtained from airdrops increases our killstreak
+*/
+
 #include maps\mp\_utility;
 #include common_scripts\utility;
 #include maps\mp\gametypes\_hud_util;
@@ -118,6 +129,9 @@ init()
 	addCrateType( "airdrop_sentry_minigun",	"sentry", 			0,			::sentryCrateThink );
 	
 	addCrateType( "nuke_drop",		"nuke", 					100,		::nukeCrateThink );
+
+	setDvarIfUninitialized( "scr_airdrop_killstreaksIncreaseStreak", false );
+  level.airdropKillstreaksIncreaseStreak  = getDvarInt( "scr_airdrop_killstreaksIncreaseStreak" ); 
 
 	
 	// generate the max weighted value
@@ -1271,7 +1285,9 @@ killstreakCrateThink( dropType )
 		}		
 	
 		player playLocalSound( "ammo_crate_use" );
-		player thread maps\mp\killstreaks\_killstreaks::giveKillstreak( self.crateType, false, false, self.owner );
+
+		doesIncreaseKS = level.airdropKillstreaksIncreaseStreak;
+		player thread maps\mp\killstreaks\_killstreaks::giveKillstreak( self.crateType, doesIncreaseKS, doesIncreaseKS, self.owner );
 
 		player maps\mp\gametypes\_hud_message::killstreakSplashNotify( self.crateType, undefined, "pickup" );
 		
