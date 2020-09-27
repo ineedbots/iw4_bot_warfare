@@ -244,50 +244,51 @@ handleNormalDeath( lifeId, attacker, eInflictor, sWeapon, sMeansOfDeath )
 	if ( self _hasPerk( "specialty_copycat" ) )
 		self.pers["copyCatLoadout"] = attacker maps\mp\gametypes\_class::cloneLoadout();
 	
-	if ( isAlive( attacker ) )
+	if ( isAlive( attacker ) && !level.scriptIncKillstreak )
 	{
 		// killstreaks only advance from kills earned this life
 		if ( isDefined( level.killStreakSpecialCaseWeapons[sWeapon] ) || sWeapon == "nuke_mp" ) // this is an optimization
 		{
-			switch ( sWeapon )
+			if (level.killstreaksIncreaseKillstreak)
 			{
-				case "ac130_105mm_mp":
-				case "ac130_40mm_mp":
-				case "ac130_25mm_mp":
-					if ( attacker.ac130LifeId == attacker.pers["deaths"] && !level.scriptIncKillstreak )
+				switch ( sWeapon )
+				{
+					case "ac130_105mm_mp":
+					case "ac130_40mm_mp":
+					case "ac130_25mm_mp":
+						if ( attacker.ac130LifeId == attacker.pers["deaths"] )
+							attacker.pers["cur_kill_streak"]++;
+						break;
+					case "cobra_player_minigun_mp":
+					case "weapon_cobra_mk19_mp":
+						if ( attacker.heliRideLifeId == attacker.pers["deaths"] )
+							attacker.pers["cur_kill_streak"]++;
+						break;
+					case "cobra_20mm_mp":
+					case "artillery_mp":
+					case "stealth_bomb_mp":
+					case "remotemissile_projectile_mp":
+					case "sentry_minigun_mp":
+					case "harrier_20mm_mp":
+					case "pavelow_minigun_mp":
+					case "nuke_mp":
+						if ( isDefined( eInflictor ) && isDefined( eInflictor.lifeId ) )
+							killstreakLifeId = eInflictor.lifeId;
+						else
+							killstreakLifeId = attacker.lifeId;
+							
+						if ( killstreakLifeId == attacker.pers["deaths"] && (level.nukeIncreasesStreak || sWeapon != "nuke_mp") )
+							attacker.pers["cur_kill_streak"]++;
+						break;
+					default:
 						attacker.pers["cur_kill_streak"]++;
-					break;
-				case "cobra_player_minigun_mp":
-				case "weapon_cobra_mk19_mp":
-					if ( attacker.heliRideLifeId == attacker.pers["deaths"] && !level.scriptIncKillstreak )
-						attacker.pers["cur_kill_streak"]++;
-					break;
-				case "cobra_20mm_mp":
-				case "artillery_mp":
-				case "stealth_bomb_mp":
-				case "remotemissile_projectile_mp":
-				case "sentry_minigun_mp":
-				case "harrier_20mm_mp":
-				case "pavelow_minigun_mp":
-				case "nuke_mp":
-					if ( isDefined( eInflictor ) && isDefined( eInflictor.lifeId ) )
-						killstreakLifeId = eInflictor.lifeId;
-					else
-						killstreakLifeId = attacker.lifeId;
-						
-					if ( killstreakLifeId == attacker.pers["deaths"] && !level.scriptIncKillstreak && (level.nukeIncreasesStreak || sWeapon != "nuke_mp") )
-						attacker.pers["cur_kill_streak"]++;
-					break;
-				default:
-					if( !level.scriptIncKillstreak )
-						attacker.pers["cur_kill_streak"]++;
-					break;
+						break;
+				}
 			}
 		}
 		else
 		{
-			if( !level.scriptIncKillstreak )
-				attacker.pers["cur_kill_streak"]++;
+			attacker.pers["cur_kill_streak"]++;
 		}
 
 		attacker setPlayerStatIfGreater( "killstreak", attacker.pers["cur_kill_streak"] );

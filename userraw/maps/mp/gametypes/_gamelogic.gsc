@@ -1391,6 +1391,7 @@ Callback_StartGameType()
 	setDvarIfUninitialized( "scr_voting_bots", false );
 	setDvarIfUninitialized( "scr_nuke_increases_streak", true );
 	setDvarIfUninitialized( "headshot_detach_head", false );
+	setDvarIfUninitialized( "scr_killstreaks_increase_killstreak", true );
 	
 	level.extraDamageFeedback = getDvarInt("scr_extraDamageFeedback");
 	level.allowPrintDamage = getDvarInt("scr_printDamage");
@@ -1409,6 +1410,7 @@ Callback_StartGameType()
 	level.botsVote = getDvarInt( "scr_voting_bots" );
 	level.headShotDetachHead = getDvarInt("headshot_detach_head");
 	level.nukeIncreasesStreak = getDvarInt( "scr_nuke_increases_streak" );
+	level.killstreaksIncreaseKillstreak = getDvarInt( "scr_killstreaks_increase_killstreak" );
 	
 	if ( level.voting )
 		level.votingMapsTok = randomizeMaps();
