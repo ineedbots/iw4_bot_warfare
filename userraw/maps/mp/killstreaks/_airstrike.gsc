@@ -1073,6 +1073,12 @@ selectAirstrikeLocation( lifeId, airStrikeType )
 	self waittill( "confirm_location", location, directionYaw );
 	if ( !chooseDirection )
 		directionYaw = randomint(360);
+	
+	else
+	{
+		if(getdvar("mapname")=="co_hunted")
+		directionYaw += 115;
+	}
 
 	self setblurforplayer( 0, 0.3 );
 

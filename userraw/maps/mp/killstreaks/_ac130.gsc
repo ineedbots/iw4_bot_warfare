@@ -76,18 +76,38 @@ init()
 	//flag_init( "ir_beakons_on" );
 	flag_init( "allow_context_sensative_dialog" );
 	flag_set( "allow_context_sensative_dialog" );
-	minimapOrigins = getEntArray( "minimap_corner", "targetname" );
-	ac130Origin = (0,0,0);
+
+
+	if (getDvar( "mapname" ) == "arcadia" || getDvar( "mapname" ) == "boneyard" || getDvar( "mapname" ) == "roadkill")
+	{
+		ac130OriginEnt = getEntArray("ac130Origin", "targetname" );
+		level.ac130 = ac130OriginEnt[0];
+		level.ac130.owner = undefined;
+		level.ac130 hide();
+	}
+	else
+	{
+		if ( getDvar( "mapname" ) == "contingency" || ( getDvar( "mapname" ) == "co_hunted" && level.gametype != "rush"))
+		{
+			minimapOrigins = getEntArray( "minimap_corner2", "targetname" );
+		}
+		else
+		{
+			minimapOrigins = getEntArray( "minimap_corner", "targetname" );
+		}
+
+		ac130Origin = (0,0,0);
 	
-	if ( miniMapOrigins.size )
-		ac130Origin = maps\mp\gametypes\_spawnlogic::findBoxCenter( miniMapOrigins[0].origin, miniMapOrigins[1].origin );
+		if ( miniMapOrigins.size )
+			ac130Origin = maps\mp\gametypes\_spawnlogic::findBoxCenter( miniMapOrigins[0].origin, miniMapOrigins[1].origin );
 	
-	level.ac130 = spawn( "script_model", ac130Origin );
-	level.ac130 setModel( "c130_zoomrig" );
-	level.ac130.angles = ( 0, 115, 0 );
-	level.ac130.owner = undefined;
+		level.ac130 = spawn( "script_model", ac130Origin );
+		level.ac130 setModel( "c130_zoomrig" );
+		level.ac130.angles = ( 0, 115, 0 );
+		level.ac130.owner = undefined;
 	
-	level.ac130 hide();
+		level.ac130 hide();
+	}
 
 	level.ac130InUse = false;
 	
