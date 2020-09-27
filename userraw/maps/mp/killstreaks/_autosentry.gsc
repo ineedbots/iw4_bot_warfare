@@ -1,3 +1,17 @@
+/*
+	_autosentry modded
+	Author: INeedGames
+	Date: 09/26/2020
+	Adds .lifeId to sentries so that players can get killstreaks
+
+	DVARS:
+		- scr_sentry_duration <int>
+			90 - (default) amount of seconds for an sentry to last
+
+		- scr_sentry_killsIncreaseStreak <bool>
+			false - (default) if kills from a sentry gun increases the user's current streak on that life
+*/
+
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include common_scripts\utility;
@@ -41,6 +55,12 @@ init()
 	level._effect[ "sentry_overheat_mp" ]	= loadfx( "smoke/sentry_turret_overheat_smoke" );
 	level._effect[ "sentry_explode_mp" ]	= loadfx( "explosions/sentry_gun_explosion" );
 	level._effect[ "sentry_smoke_mp" ]		= loadfx( "smoke/car_damage_blacksmoke" );
+
+	setDvarIfUninitialized( "scr_sentry_duration", 90 );
+	setDvarIfUninitialized( "scr_sentry_killsIncreaseStreak", false );
+
+  level.sentryDuration  = getDvarInt( "scr_sentry_duration" ); 
+  level.sentryKillsIncreaseStreak  = getDvarInt( "scr_sentry_killsIncreaseStreak" ); 
 }
 
 /* ============================
@@ -49,7 +69,7 @@ init()
 
 tryUseAutoSentry( lifeId )
 {
-	result = self giveSentry( "sentry_minigun" );
+	result = self giveSentry( "sentry_minigun", lifeId );
 	if ( result )
 		self maps\mp\_matchdata::logKillstreakEvent( "sentry", self.origin );
 	
@@ -59,7 +79,7 @@ tryUseAutoSentry( lifeId )
 
 tryUseAutoGlSentry( lifeId )
 {
-	result = self giveSentry( "sentry_gun" );
+	result = self giveSentry( "sentry_gun", lifeId );
 	if ( result )
 		self maps\mp\_matchdata::logKillstreakEvent( "sentry_gl", self.origin );
 		
@@ -67,11 +87,14 @@ tryUseAutoGlSentry( lifeId )
 }
 
 
-giveSentry( sentryType )
+giveSentry( sentryType, lifeId )
 {
 	self.last_sentry = sentryType;
 
 	sentryGun = createSentryForPlayer( sentryType, self );
+
+	if (level.sentryKillsIncreaseStreak)
+		sentryGun.lifeId = lifeId;
 	
 	self setCarryingSentry( sentryGun, true );
 	
@@ -555,7 +578,7 @@ sentry_timeOut()
 	self endon( "death" );
 	level endon ( "game_ended" );
 	
-	lifeSpan = SENTRY_TIME_OUT;
+	lifeSpan = level.sentryDuration;
 	
 	while ( lifeSpan )
 	{
