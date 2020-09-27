@@ -2,6 +2,8 @@
 
 init()
 {
+	//Intricate - Create DVAR for forcing auto assign, useful for server that would like it.
+	SetDvarIfUninitialized("scr_player_forceautoassign", true);
 	if ( !isDefined( game["gamestarted"] ) )
 	{
 		game["menu_team"] = "team_marinesopfor";
@@ -139,7 +141,10 @@ onMenuResponse()
 		{
 			self closepopupMenu();
 			self closeInGameMenu();
-			self openpopupMenu( game["menu_changeclass_allies"] );
+			if ( getDvar( "g_gametype" ) != "oitc" && getDvar( "g_gametype" ) != "gg" && getDvar( "g_gametype" ) != "ss" && !isDefined(level.customClassCB) )
+			{
+				self openpopupMenu( game["menu_changeclass_allies"] );
+			}
 			continue;
 		}
 
@@ -147,7 +152,10 @@ onMenuResponse()
 		{
 			self closepopupMenu();
 			self closeInGameMenu();
-			self openpopupMenu( game["menu_changeclass_axis"] );
+			if ( getDvar( "g_gametype" ) != "oitc" && getDvar( "g_gametype" ) != "gg" && getDvar( "g_gametype" ) != "ss" && !isDefined(level.customClassCB) )
+			{
+				self openpopupMenu( game["menu_changeclass_axis"] );
+			}
 			continue;
 		}
 
@@ -174,8 +182,14 @@ onMenuResponse()
 
 		if ( response == "endround" )
 		{
+			if ( !self isHost() )
+			{
+				continue;
+			}
+			
 			if ( !level.gameEnded )
 			{
+				setDvar("sv_dontrotate", 1);
 				level thread maps\mp\gametypes\_gamelogic::forceEnd();
 			}
 			else
@@ -309,6 +323,17 @@ menuAutoAssign()
 beginClassChoice( forceNewChoice )
 {
 	assert( self.pers["team"] == "axis" || self.pers["team"] == "allies" );
+
+	if ( getDvar( "g_gametype" ) == "oitc" || getDvar( "g_gametype" ) == "gg" || getDvar( "g_gametype" ) == "ss" || isDefined(level.customClassCB) )
+	{
+		if ( !isAlive( self ) )
+			self thread maps\mp\gametypes\_playerlogic::predictAboutToSpawnPlayerOverTime( 0.1 );
+		
+		self.selectedClass = true;
+		self menuClass( "assault_mp,0" );
+
+		return;
+	}
 	
 	team = self.pers["team"];
 
@@ -323,7 +348,12 @@ beginClassChoice( forceNewChoice )
 
 beginTeamChoice()
 {
-	self openpopupMenu( game["menu_team"] );
+	//Intricate - We put the auto assign where the actual team selection is. Also make sure that a mod isn't loaded, mainly to prevent bugs with them.
+	if( GetDvar("scr_player_forceautoassign") && GetDvar("fs_game") == ""  )
+		self notify("menuresponse", game["menu_team"], "autoassign");
+	else
+		self openpopupMenu( game["menu_team"] );
+	
 }
 
 
@@ -430,7 +460,6 @@ menuSpectator()
 
 	self thread maps\mp\gametypes\_playerlogic::spawnSpectator();
 }
-
 
 menuClass( response )
 {
