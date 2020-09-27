@@ -1,3 +1,11 @@
+/*
+	_bot_internal
+	Author: INeedGames
+	Date: 09/26/2020
+	The interal workings of the bots.
+	Bots will do the basics, aim, move.
+*/
+
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;

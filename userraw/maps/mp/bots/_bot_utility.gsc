@@ -1,3 +1,10 @@
+/*
+	_bot_utility
+	Author: INeedGames
+	Date: 09/26/2020
+	The shared functions for bots
+*/
+
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;

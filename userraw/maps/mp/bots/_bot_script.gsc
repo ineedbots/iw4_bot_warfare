@@ -1,3 +1,11 @@
+/*
+	_bot_script
+	Author: INeedGames
+	Date: 09/26/2020
+	Tells the bots what to do.
+	Similar to t5's _bot
+*/
+
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
