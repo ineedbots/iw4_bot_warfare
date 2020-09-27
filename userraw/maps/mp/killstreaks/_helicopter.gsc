@@ -10,11 +10,29 @@
 		- scr_helicopter_cobra_duration <float>
 			40.0 - (default) the amount in seconds the helicopter will fly around for
 
+		- scr_helicopter_cobra_num_flares <int>
+			0 - (default) the number of flares on this helicopter
+
+		- scr_helicopter_cobra_health <int>
+			1500 - (default) the amount of health on this helicopter
+
 		- scr_helicopter_pavelow_duration <float>
 			60.0 - (default) the amount in seconds the helicopter will fly around for
 
+		- scr_helicopter_pavelow_num_flares <int>
+			1 - (default) the number of flares on this helicopter
+
+		- scr_helicopter_pavelow_health <int>
+			3000 - (default) the amount of health on this helicopter
+
 		- scr_helicopter_apache_duration <float>
 			40.0 - (default) the amount in seconds the helicopter will fly around for
+
+		- scr_helicopter_apache_num_flares <int>
+			1 - (default) the number of flares on this helicopter
+
+		- scr_helicopter_apache_health <int>
+			1500 - (default) the amount of health on this helicopter
 
 	Thanks: H3X1C, Emosewaj
 */
@@ -59,10 +77,24 @@ init()
 	setDvarIfUninitialized( "scr_helicopter_pavelow_duration", 60 );
 	setDvarIfUninitialized( "scr_helicopter_apache_duration", 40 );
 
+	setDvarIfUninitialized( "scr_helicopter_cobra_num_flares", 0 );
+	setDvarIfUninitialized( "scr_helicopter_cobra_health", 1500 );
+	setDvarIfUninitialized( "scr_helicopter_pavelow_num_flares", 1 );
+	setDvarIfUninitialized( "scr_helicopter_pavelow_health", 3000 );
+	setDvarIfUninitialized( "scr_helicopter_apache_num_flares", 1 );
+	setDvarIfUninitialized( "scr_helicopter_apache_health", 1500 );
+
 	level.helicopter_allowQueue = getDVarInt("scr_helicopter_allowQueue");
 	level.cobra_duration				= getDvarFloat( "scr_helicopter_cobra_duration" );
 	level.pavelow_duration			= getDvarFloat( "scr_helicopter_pavelow_duration" );
 	level.apache_duration				= getDvarFloat( "scr_helicopter_apache_duration" );	
+
+	level.cobra_flares = getDVarInt("scr_helicopter_cobra_num_flares");
+	level.cobra_health = getDVarInt("scr_helicopter_cobra_health");
+	level.pavelow_flares = getDVarInt("scr_helicopter_pavelow_num_flares");
+	level.pavelow_health = getDVarInt("scr_helicopter_pavelow_health");
+	level.apache_flares = getDVarInt("scr_helicopter_apache_num_flares");
+	level.apache_health = getDVarInt("scr_helicopter_apache_health");
 
 	// array of paths, each element is an array of start nodes that all leads to a single destination node
 	level.heli_start_nodes = getEntArray( "heli_start", "targetname" );
@@ -759,18 +791,24 @@ heli_think( lifeId, owner, startnode, heli_team, heliType )
 	chopper.owner = owner;
 
 	if ( heliType == "flares" )
-		chopper.maxhealth = level.heli_maxhealth*2;			// max health
+		chopper.maxhealth = level.pavelow_health;
+	else if ( heliType == "minigun" )
+		chopper.maxhealth = level.apache_health;
 	else
-		chopper.maxhealth = level.heli_maxhealth;			// max health
+		chopper.maxhealth = level.cobra_health;
 
 	chopper.targeting_delay = level.heli_targeting_delay;		// delay between per targeting scan - in seconds
 	chopper.primaryTarget = undefined;					// primary target ( player )
 	chopper.secondaryTarget = undefined;				// secondary target ( player )
 	chopper.attacker = undefined;						// last player that shot the helicopter
 	chopper.currentstate = "ok";						// health state
-	
-	if ( heliType == "flares" || heliType == "minigun" )
-		chopper thread heli_flares_monitor();
+
+	if ( heliType == "flares" )
+		chopper thread heli_flares_monitor(level.pavelow_flares);
+	else if ( heliType == "minigun" )
+		chopper thread heli_flares_monitor(level.apache_flares);
+	else
+		chopper thread heli_flares_monitor(level.cobra_flares);
 	
 	// helicopter loop threads
 	chopper thread heli_leave_on_disconnect( owner );
@@ -2220,24 +2258,33 @@ deployFlares()
 }
 
 
-heli_flares_monitor()
+heli_flares_monitor(numFlares)
 {
 	level endon ( "game_ended" );
 	
 	for ( ;; )
 	{
+		if (!numFlares)
+			return;
+
 		level waittill ( "stinger_fired", player, missile, lockTarget );
 		
 		if ( !IsDefined( lockTarget ) || (lockTarget != self) )
 			continue;
 		
-		missile endon ( "death" );
-		
-		self thread playFlareFx();	
-		newTarget = self deployFlares();
-		missile Missile_SetTargetEnt( newTarget );
-		return;
+		numFlares--;
+		self thread misguideRocket(missile);
 	}	
+}
+
+misguideRocket(missile)
+{
+	level endon ( "game_ended" );
+	missile endon ( "death" );
+		
+	self thread playFlareFx();	
+	newTarget = self deployFlares();
+	missile Missile_SetTargetEnt( newTarget );
 }
 
 deleteAfterTime( delay )
