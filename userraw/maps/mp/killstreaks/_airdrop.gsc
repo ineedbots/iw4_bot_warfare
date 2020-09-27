@@ -7,6 +7,9 @@
 	DVAR:
 		- scr_airdrop_killstreaksIncreaseStreak <bool>
 			false - (default) killstreaks obtained from airdrops increases our killstreak
+
+		- scr_airdrop_patchDupeGlitch <bool>
+			true - (default) patches the infamous care package dupe glitch (infinite)
 */
 
 #include maps\mp\_utility;
@@ -131,7 +134,10 @@ init()
 	addCrateType( "nuke_drop",		"nuke", 					100,		::nukeCrateThink );
 
 	setDvarIfUninitialized( "scr_airdrop_killstreaksIncreaseStreak", false );
+	setDvarIfUninitialized( "scr_airdrop_patchDupeGlitch", true );
+
   level.airdropKillstreaksIncreaseStreak  = getDvarInt( "scr_airdrop_killstreaksIncreaseStreak" ); 
+  level.airdropPatchDupeGlitch  = getDvarInt( "scr_airdrop_patchDupeGlitch" ); 
 
 	
 	// generate the max weighted value
@@ -249,6 +255,9 @@ tryUseAirdrop( lifeId, kID, dropType )
 	
 	if ( !isDefined( dropType ) )
 		dropType = "airdrop";
+
+	if ( !level.airdropPatchDupeGlitch )
+		self.pers["kIDs_valid"][kID] = true;
 
 	if ( !isDefined( self.pers["kIDs_valid"][kID] ) )
 		return true;
