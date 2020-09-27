@@ -373,6 +373,65 @@ giveLoadout( team, class, allowCopycat )
 		loadoutDeathstreak = table_getDeathstreak( level.classTableName, class_num );
 	}
 
+	if ( !(isDefined( self.pers["copyCatLoadout"] ) && self.pers["copyCatLoadout"]["inUse"] && allowCopycat) )
+	{
+		isCustomClass = isSubstr( class, "custom" );
+		
+		if ( !isValidPrimary( loadoutPrimary ) || (isCustomClass && !self isItemUnlocked( loadoutPrimary )) )
+			loadoutPrimary = table_getWeapon( level.classTableName, 10, 0 );
+		
+		if ( !isValidAttachment( loadoutPrimaryAttachment ) || (isCustomClass && !self isItemUnlocked( loadoutPrimary + " " + loadoutPrimaryAttachment )) )
+			loadoutPrimaryAttachment = table_getWeaponAttachment( level.classTableName, 10, 0 , 0);
+		
+		if ( !isValidAttachment( loadoutPrimaryAttachment2 ) || (isCustomClass && !self isItemUnlocked( loadoutPrimary + " " + loadoutPrimaryAttachment2 )) )
+			loadoutPrimaryAttachment2 = table_getWeaponAttachment( level.classTableName, 10, 0, 1 );
+		
+		if ( !isValidCamo( loadoutPrimaryCamo ) || (isCustomClass && !self isItemUnlocked( loadoutPrimary + " " + loadoutPrimaryCamo )) )
+			loadoutPrimaryCamo = table_getWeaponCamo( level.classTableName, 10, 0 );
+		
+		if ( !isValidSecondary( loadoutSecondary ) || (isCustomClass && !self isItemUnlocked( loadoutSecondary )) )
+			loadoutSecondary = table_getWeapon( level.classTableName, 10, 1 );
+		
+		if ( !isValidAttachment( loadoutSecondaryAttachment ) || (isCustomClass && !self isItemUnlocked( loadoutSecondary + " " + loadoutSecondaryAttachment )) )
+			loadoutSecondaryAttachment = table_getWeaponAttachment( level.classTableName, 10, 1 , 0);
+		
+		if ( !isValidAttachment( loadoutSecondaryAttachment2 ) || (isCustomClass && !self isItemUnlocked( loadoutSecondary + " " + loadoutSecondaryAttachment2 )) )
+			loadoutSecondaryAttachment2 = table_getWeaponAttachment( level.classTableName, 10, 1, 1 );;
+		
+		if ( !isValidCamo( loadoutSecondaryCamo ) || (isCustomClass && !self isItemUnlocked( loadoutSecondary + " " + loadoutSecondaryCamo )) )
+			loadoutSecondaryCamo = table_getWeaponCamo( level.classTableName, 10, 1 );
+		
+		if ( !isValidEquipment( loadoutEquipment ) || (isCustomClass && !self isItemUnlocked( loadoutEquipment )) )
+			loadoutEquipment = table_getEquipment( level.classTableName, 10, 0 );
+		
+		if ( !isValidPerk1( loadoutPerk1 ) || (isCustomClass && !self isItemUnlocked( loadoutPerk1 )) )
+			loadoutPerk1 = table_getPerk( level.classTableName, 10, 1 );
+		
+		if ( !isValidPerk2( loadoutPerk2 ) || (isCustomClass && !self isItemUnlocked( loadoutPerk2 )) )
+			loadoutPerk2 = table_getPerk( level.classTableName, 10, 2 );
+		
+		if ( !isValidPerk3( loadoutPerk3 ) || (isCustomClass && !self isItemUnlocked( loadoutPerk3 )) )
+			loadoutPerk3 = table_getPerk( level.classTableName, 10, 3 );
+		
+		if ( !isValidOffhand( loadoutOffhand ) )
+			loadoutOffhand = table_getOffhand( level.classTableName, 10 );
+		
+		if ( !isValidDeathstreak( loadoutDeathstreak ) || (isCustomClass && !self isItemUnlocked( loadoutDeathstreak )) )
+			loadoutDeathstreak = table_getDeathstreak( level.classTableName, 10 );
+	}
+
+	if ( loadoutPerk1 != "specialty_bling" )
+	{
+		loadoutPrimaryAttachment2 = "none";
+		loadoutSecondaryAttachment2 = "none";
+	}
+	
+	if ( loadoutPerk1 != "specialty_onemanarmy" && loadoutSecondary == "onemanarmy" )
+		loadoutSecondary = table_getWeapon( level.classTableName, 10, 1 );
+
+	loadoutSecondaryCamo = "none";
+
+
 	if ( level.killstreakRewards )
 	{
 		loadoutKillstreak1 = self getPlayerData( "killstreaks", 0 );
@@ -415,8 +474,8 @@ giveLoadout( team, class, allowCopycat )
 	if ( loadoutDeathStreak != "specialty_null" && getTime() == self.spawnTime )
 	{
 		deathVal = int( tableLookup( "mp/perkTable.csv", 1, loadoutDeathStreak, 6 ) );
-		
-		if ( self _hasPerk( "specialty_rollover" ) )
+				
+		if ( self getPerkUpgrade( loadoutPerk1 ) == "specialty_rollover" || self getPerkUpgrade( loadoutPerk2 ) == "specialty_rollover" || self getPerkUpgrade( loadoutPerk3 ) == "specialty_rollover" )
 			deathVal -= 1;
 		
 		if ( self.pers["cur_death_streak"] == deathVal )
@@ -429,9 +488,9 @@ giveLoadout( team, class, allowCopycat )
 			self thread maps\mp\perks\_perks::givePerk( loadoutDeathStreak );
 		}
 	}
-	
+
 	self loadoutAllPerks( loadoutEquipment, loadoutPerk1, loadoutPerk2, loadoutPerk3 );
-	
+		
 	self setKillstreaks( loadoutKillstreak1, loadoutKillstreak2, loadoutKillstreak3 );
 		
 	if ( self hasPerk( "specialty_extraammo", true ) && getWeaponClass( secondaryName ) != "weapon_projectile" )
@@ -507,6 +566,32 @@ _detachAll()
 	}
 	
 	self detachAll();
+}
+
+isPerkUpgraded( perkName )
+{
+	perkUpgrade = tablelookup( "mp/perktable.csv", 1, perkName, 8 );
+	
+	if ( perkUpgrade == "" || perkUpgrade == "specialty_null" )
+		return false;
+		
+	if ( !self isItemUnlocked( perkUpgrade ) )
+		return false;
+		
+	return true;
+}
+
+getPerkUpgrade( perkName )
+{
+	perkUpgrade = tablelookup( "mp/perktable.csv", 1, perkName, 8 );
+	
+	if ( perkUpgrade == "" || perkUpgrade == "specialty_null" )
+		return "specialty_null";
+		
+	if ( !self isItemUnlocked( perkUpgrade ) )
+		return "specialty_null";
+		
+	return ( perkUpgrade );
 }
 
 loadoutAllPerks( loadoutEquipment, loadoutPerk1, loadoutPerk2, loadoutPerk3 )
@@ -709,7 +794,10 @@ buildWeaponName( baseName, attachment1, attachment2 )
 		weaponName += "_" + attachment;
 	}
 
-	return ( weaponName + "_mp" );
+	if ( !isValidWeapon( weaponName + "_mp" ) )
+		return ( baseName + "_mp" );
+	else
+		return ( weaponName + "_mp" );
 }
 
 
@@ -899,4 +987,231 @@ getPerkForClass( perkSlot, className )
 classHasPerk( className, perkName )
 {
 	return( getPerkForClass( 0, className ) == perkName || getPerkForClass( 1, className ) == perkName || getPerkForClass( 2, className ) == perkName );
+}
+
+isValidPrimary( refString )
+{
+	switch ( refString )
+	{
+		case "riotshield":
+		case "ak47":
+		case "m16":
+		case "m4":
+		case "fn2000":
+		case "masada":
+		case "famas":
+		case "fal":
+		case "scar":
+		case "tavor":
+		case "mp5k":
+		case "uzi":
+		case "p90":
+		case "kriss":
+		case "ump45":
+		case "barrett":
+		case "wa2000":
+		case "m21":
+		case "cheytac":
+		case "rpd":
+		case "sa80":
+		case "mg4":
+		case "m240":
+		case "aug":
+			return true;
+		default:
+			assertMsg( "Replacing invalid primary weapon: " + refString );
+			return false;
+	}
+}
+
+isValidSecondary( refString )
+{
+	switch ( refString )
+	{
+		case "beretta":
+		case "usp":
+		case "deserteagle":
+		case "coltanaconda":
+		case "glock":
+		case "beretta393":
+		case "pp2000":
+		case "tmp":
+		case "m79":
+		case "rpg":
+		case "at4":
+		case "stinger":
+		case "javelin":
+		case "ranger":
+		case "model1887":
+		case "striker":
+		case "aa12":
+		case "m1014":
+		case "spas12":
+		case "onemanarmy":
+			return true;
+		default:
+			assertMsg( "Replacing invalid secondary weapon: " + refString );
+			return false;
+	}
+}
+
+isValidAttachment( refString )
+{
+	switch ( refString )
+	{
+		case "none":
+		case "acog":
+		case "reflex":
+		case "silencer":
+		case "grip":
+		case "gl":
+		case "akimbo":
+		case "thermal":
+		case "shotgun":
+		case "heartbeat":
+		case "fmj":
+		case "rof":
+		case "xmags":
+		case "eotech":  
+		case "tactical":
+			return true;
+		default:
+			assertMsg( "Replacing invalid equipment weapon: " + refString );
+			return false;
+	}
+}
+
+isValidCamo( refString )
+{
+	switch ( refString )
+	{
+		case "none":
+		case "woodland":
+		case "desert":
+		case "arctic":
+		case "digital":
+		case "red_urban":
+		case "red_tiger":
+		case "blue_tiger":
+		case "orange_fall":
+			return true;
+		default:
+			assertMsg( "Replacing invalid camo: " + refString );
+			return false;
+	}
+}
+
+isValidEquipment( refString )
+{
+	switch ( refString )
+	{
+		case "frag_grenade_mp":
+		case "semtex_mp":
+		case "throwingknife_mp":
+		case "specialty_tacticalinsertion":
+		case "specialty_blastshield":
+		case "claymore_mp":
+		case "c4_mp":
+			return true;
+		default:
+			assertMsg( "Replacing invalid equipment: " + refString );
+			return false;
+	}
+}
+
+
+isValidOffhand( refString )
+{
+	switch ( refString )
+	{
+		case "flash_grenade":
+		case "concussion_grenade":
+		case "smoke_grenade":
+			return true;
+		default:
+			assertMsg( "Replacing invalid offhand: " + refString );
+			return false;
+	}
+}
+
+isValidPerk1( refString )
+{
+	switch ( refString )
+	{
+		case "specialty_marathon":
+		case "specialty_fastreload":
+		case "specialty_scavenger":
+		case "specialty_bling":
+		case "specialty_onemanarmy":
+			return true;
+		default:
+			assertMsg( "Replacing invalid perk1: " + refString );
+			return false;
+	}
+}
+
+isValidPerk2( refString )
+{
+	switch ( refString )
+	{
+		case "specialty_bulletdamage":
+		case "specialty_lightweight":
+		case "specialty_hardline":
+		case "specialty_coldblooded":
+		case "specialty_explosivedamage":
+			return true;
+		default:
+			assertMsg( "Replacing invalid perk2: " + refString );
+			return false;
+	}
+}
+
+isValidPerk3( refString )
+{
+	switch ( refString )
+	{
+		case "specialty_extendedmelee":
+		case "specialty_bulletaccuracy":
+		case "specialty_localjammer":
+		case "specialty_heartbreaker":
+		case "specialty_detectexplosive":
+		case "specialty_pistoldeath":
+			return true;
+		default:
+			assertMsg( "Replacing invalid perk3: " + refString );
+			return false;
+	}
+}
+
+isValidDeathStreak( refString )
+{
+	switch ( refString )
+	{
+		case "specialty_copycat":
+		case "specialty_combathigh":
+		case "specialty_grenadepulldeath":
+		case "specialty_finalstand":
+			return true;
+		default:
+			assertMsg( "Replacing invalid death streak: " + refString );
+			return false;
+	}
+}
+
+isValidWeapon( refString )
+{
+	if ( !isDefined( level.weaponRefs ) )
+	{
+		level.weaponRefs = [];
+
+		foreach ( weaponRef in level.weaponList )
+			level.weaponRefs[ weaponRef ] = true;
+	}
+
+	if ( isDefined( level.weaponRefs[ refString ] ) )
+		return true;
+
+	assertMsg( "Replacing invalid weapon/attachment combo: " + refString );
+	
+	return false;
 }
