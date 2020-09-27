@@ -145,7 +145,7 @@ init()
 		}
 	}
 	level.lowSpawn = lowSpawn;
-	
+
 }
 
 addCrateType( dropType, crateType, crateWeight, crateFunc )
@@ -214,27 +214,30 @@ drawLine( start, end, timeSlice )
 *		 Usage functions
 ***********************************************************/
 
-tryUseAirdropPredatorMissile( lifeId )
+tryUseAirdropPredatorMissile( lifeId, kID )
 {
-	return ( self tryUseAirdrop(  lifeId , "airdrop_predator_missile" ) );
+	return ( self tryUseAirdrop(  lifeId, kID, "airdrop_predator_missile" ) );
 }
 
-tryUseAirdropSentryMinigun(  lifeId )
+tryUseAirdropSentryMinigun(  lifeId, kID )
 {
-	return ( self tryUseAirdrop(  lifeId, "airdrop_sentry_minigun" ) );
+	return ( self tryUseAirdrop(  lifeId, kID, "airdrop_sentry_minigun" ) );
 }
 
-tryUseMegaAirdrop( lifeId )
+tryUseMegaAirdrop( lifeId, kID )
 {
-	return ( self tryUseAirdrop(  lifeId, "airdrop_mega" ) );
+	return ( self tryUseAirdrop(  lifeId, kID, "airdrop_mega" ) );
 }
 
-tryUseAirdrop( lifeId, dropType )
+tryUseAirdrop( lifeId, kID, dropType )
 {
 	result = undefined;
 	
 	if ( !isDefined( dropType ) )
 		dropType = "airdrop";
+
+	if ( !isDefined( self.pers["kIDs_valid"][kID] ) )
+		return true;
 		
 	if ( level.littleBirds >= 3 && dropType != "airdrop_mega" )
 	{
@@ -259,14 +262,14 @@ tryUseAirdrop( lifeId, dropType )
 		self thread watchDisconnect();
 	}
 	
-	result = self beginAirdropViaMarker( lifeId, dropType );
+	result = self beginAirdropViaMarker( lifeId, kID, dropType );
 	
-	if ( (!isDefined( result ) || !result) && !isDefined( self.airDropMarker ) )
+	if ( (!isDefined( result ) || !result) && isDefined( self.pers["kIDs_valid"][kID] ) )
 	{
 		self notify( "markerDetermined" );
 		
 		if ( dropType != "airdrop_mega" )
-			level.littleBirds--;
+			decrementLittleBirdCount();
 		
 		return false;
 	}
@@ -283,7 +286,7 @@ watchDisconnect()
 	self endon( "markerDetermined" );
 	
 	self waittill( "disconnect" );
-	level.littleBirds--;
+	decrementLittleBirdCount();
 	return;
 }
 
@@ -292,13 +295,13 @@ watchDisconnect()
 *		 Marker functions
 ***********************************************************/
 
-beginAirdropViaMarker( lifeId, dropType )
+beginAirdropViaMarker( lifeId, kID, dropType )
 {	
 	self endon ( "death" );
 	self endon ( "grenade_fire" );
 	self.airDropMarker = undefined;
 
-	self thread watchAirDropMarkerUsage( dropType );
+	self thread watchAirDropMarkerUsage( dropType, kID );
 
 	while( self isChangingWeapon() )
 		wait ( 0.05 );	
@@ -310,7 +313,7 @@ beginAirdropViaMarker( lifeId, dropType )
 	else
 		airdropMarkerWeapon = undefined;
 		
-	while( isAirdropMarker( currentWeapon ) )
+	while( isAirdropMarker( currentWeapon ) /*|| currentWeapon == "none"*/ )
 	{
 		self waittill( "weapon_change", currentWeapon );
 
@@ -327,7 +330,7 @@ beginAirdropViaMarker( lifeId, dropType )
 }
 
 
-watchAirDropMarkerUsage( dropType )
+watchAirDropMarkerUsage( dropType, kID )
 {
 	self notify( "watchAirDropMarkerUsage" );
 	
@@ -335,7 +338,7 @@ watchAirDropMarkerUsage( dropType )
 	self endon( "watchAirDropMarkerUsage" );
 	self endon( "stopWatchingAirDropMarker" );
 	
-	thread watchAirDropMarker( dropType );
+	thread watchAirDropMarker( dropType, kID );
 	
 	for ( ;; )
 	{
@@ -350,7 +353,7 @@ watchAirDropMarkerUsage( dropType )
 	}
 }
 
-watchAirDropMarker( dropType )
+watchAirDropMarker( dropType, kID )
 {
 	self notify( "watchAirDropMarker" );
 	
@@ -364,6 +367,14 @@ watchAirDropMarker( dropType )
 		
 		if ( !isAirdropMarker( weapname ) )
 			continue;
+	
+		if ( !isDefined( self.pers["kIDs_valid"][kID] ) )
+		{
+			airDropWeapon delete();
+			continue;
+		}
+			
+		self.pers["kIDs_valid"][kID] = undefined;
 
 		airDropWeapon thread airdropDetonateOnStuck();
 			
@@ -371,7 +382,7 @@ watchAirDropMarker( dropType )
 		airDropWeapon.weaponName = weapname;
 		self.airDropMarker = airDropWeapon;
 		
-		airDropWeapon thread airDropMarkerActivate( dropType );
+		airDropWeapon thread airDropMarkerActivate( dropType );		
 	}
 }
 
@@ -822,7 +833,7 @@ doFlyBy( owner, dropSite, dropYaw, dropType, heightAdjustment )
 	chopper waittill ( "goal" );
 	chopper notify( "leaving" );
 	chopper trimActiveBirdList();
-	level.littleBirds--;
+	decrementLittleBirdCount();
 	chopper notify( "delete" );
 	chopper delete();
 }
@@ -1094,7 +1105,7 @@ heliDestroyed()
 		return;
 		
 	self trimActiveBirdList();
-	level.littleBirds--;
+	decrementLittleBirdCount();
 	self Vehicle_SetSpeed( 25, 5 );
 	self thread lbSpin( RandomIntRange(180, 220) );
 	
@@ -1550,4 +1561,12 @@ airdropDetonateOnStuck()
 	self waittill( "missile_stuck" );
 	
 	self detonate();
+}
+
+
+decrementLittleBirdCount()
+{
+	level.littleBirds--;
+	
+	level.littleBirds = int( max( level.littleBirds, 0 ) );
 }
