@@ -351,7 +351,7 @@ watchScrabler()
 				if(level.teamBased && player2.team == player.team)
 					continue;
 
-				if (Distance(player2.origin, player.origin) > 100)
+				if (DistanceSquared(player2.origin, player.origin) > 100*100)
 					continue;
 
 				player.bot_isScrambled = true;

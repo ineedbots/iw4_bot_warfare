@@ -195,6 +195,7 @@ resetBotVars()
 
 	self.bot.knifing = false;
 	self.bot.knifingafter = false;
+	self.bot.knifeteleport = false;
 }
 
 /*
@@ -947,17 +948,18 @@ moveHack()
 			if (!isReallyAlive(player))
 				continue;
 
-			dist = distance(self.origin, player.origin);
-
-			if (dist > level.botPushOutDist)
+			if (distanceSquared(self.origin, player.origin) > level.botPushOutDist*level.botPushOutDist)
 				continue;
 
+			dist = distance(self.origin, player.origin);
+			pushOutDist = level.botPushOutDist;
+
 			pushOutDir = VectorNormalize((self.origin[0], self.origin[1], 0)-(player.origin[0], player.origin[1], 0));
-			trace = bulletTrace(self.origin + (0,0,20), (self.origin + (0,0,20)) + (pushOutDir * ((level.botPushOutDist-dist)+10)), false, self);
+			trace = bulletTrace(self.origin + (0,0,20), (self.origin + (0,0,20)) + (pushOutDir * ((pushOutDist-dist)+10)), false, self);
 			//no collision, so push out
 			if(trace["fraction"] == 1)
 			{
-				pushoutPos = self.origin + (pushOutDir * (level.botPushOutDist-dist));
+				pushoutPos = self.origin + (pushOutDir * (pushOutDist-dist));
 				self SetOrigin((pushoutPos[0], pushoutPos[1], self.origin[2])); 
 			}
 		}
@@ -2221,7 +2223,7 @@ walk()
 		
 		self botMoveTo(self.origin);
 		
-		if(self.bot.isfrozen || self.bot.stop_move)
+		if(self.bot.isfrozen || self.bot.stop_move || self.bot.knifeteleport)
 			continue;
 			
 		if(self maps\mp\_flashgrenades::isFlashbanged() && !self.bot.jumpingafter)
@@ -2265,7 +2267,7 @@ walk()
 			goal = PhysicsTrace(goal + (0, 0, 50), goal + (0, 0, -40), false, self);
 
 			// too small, lets bounce off the wall
-			if (Distance(goal, myOrg) < stepDist - 1 || randomInt(100) < 5)
+			if (DistanceSquared(goal, myOrg) < stepDist*stepDist - 1 || randomInt(100) < 5)
 			{
 				trace = bulletTrace(myOrg, myOrg + forward, false, self);
 
@@ -2535,6 +2537,19 @@ movetowards(goal)
 	self notify("completed_move_to");
 }
 
+dontMoveForABit()
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon ( "game_ended" );
+
+	self.bot.knifeteleport = true;
+
+	wait 0.3;
+
+	self.bot.knifeteleport = false;
+}
+
 /*
 	Bot will knife.
 */
@@ -2566,7 +2581,7 @@ knife(ent, knifeDist)
 
 	isplay = (isDefined(ent) && isPlayer(ent));
 	usedRiot = self.hasRiotShieldEquipped;
-	org = (0, 0, 99999999);
+	org = self.origin;
 	if (isDefined(ent))
 		org = ent.origin;
 	distsq = DistanceSquared(self.origin, org);
@@ -2598,7 +2613,7 @@ knife(ent, knifeDist)
 	}
 	else
 	{
-		if ((distsq / knifeDist) < 0.5)
+		if ((distsq / knifeDist) < 0.75)
 		{
 			self playSound("melee_swing_small");
 			if (stance != "prone")
@@ -2631,7 +2646,13 @@ knife(ent, knifeDist)
 
 	wait 0.15;
 
-	if (isDefined(ent) && isAlive(ent) && randomInt(20)) // 5percent chance of missing
+	allIsStillGood = false;
+	if (isDefined(ent) && isAlive(ent))
+	{
+		allIsStillGood = (getConeDot(ent.origin, self.origin, self GetPlayerAngles()) > 0.85); // make sure that the bot is looking at the target
+	}
+
+	if (allIsStillGood)
 	{
 		if (isplay)
 		{
@@ -2642,14 +2663,18 @@ knife(ent, knifeDist)
 				pushoutPos = self.origin + (pushOutDir * (60-distance(ent.origin,self.origin)));
 				self SetOrigin((pushoutPos[0], pushoutPos[1], ent.origin[2]));
 				self notify("kill_goal");
+				self thread dontMoveForABit();
 			}
 
 			for (;;)
 			{
+				if (!randomInt(20)) // 5 percent chance to miss
+					break;
+
 				// check riotshield
 				if (ent.hasRiotShield)
 				{
-					entCone = ent getConeDot((self.origin[0], self.origin[1], 0), (ent.origin[0], ent.origin[1], 0), (0, ent GetPlayerAngles()[1], 0));
+					entCone = getConeDot((self.origin[0], self.origin[1], 0), (ent.origin[0], ent.origin[1], 0), (0, ent GetPlayerAngles()[1], 0));
 					if ((entCone > 0.65 && ent.hasRiotShieldEquipped) || (entCone < -0.65 && !ent.hasRiotShieldEquipped))
 					{
 						// play riot shield hitting knife sound

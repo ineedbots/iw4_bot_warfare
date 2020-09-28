@@ -1188,14 +1188,17 @@ nearAnyOfWaypoints(dist, waypoints)
 getNearestWaypointOfWaypoints(waypoints)
 {
 	answer = undefined;
+	closestDist = -1;
 	for (i = 0; i < waypoints.size; i++)
 	{
 		waypoint = waypoints[i];
+		thisDist = DistanceSquared(self.origin, waypoint.origin);
 
-		if (isDefined(answer) && closer(self.origin, answer.origin, waypoint.origin))
+		if (isDefined(answer) && thisDist < closestDist)
 			continue;
 
 		answer = waypoint;
+		closestDist = thisDist;
 	}
 
 	return answer;
@@ -1377,9 +1380,10 @@ bot_think_camp()
 			continue;
 
 		campSpots = [];
+		distSq = 1024*1024;
 		for (i = 0; i < level.waypointsCamp.size; i++)
 		{
-			if (Distance(self.origin, level.waypointsCamp[i].origin) > 1024)
+			if (DistanceSquared(self.origin, level.waypointsCamp[i].origin) > distSq)
 				continue;
 
 			campSpots[campSpots.size] = level.waypointsCamp[i];
@@ -1484,6 +1488,7 @@ bot_think_follow()
 			continue;
 
 		follows = [];
+		distSq = self.pers["bots"]["skill"]["help_dist"] * self.pers["bots"]["skill"]["help_dist"];
 		for (i = level.players.size - 1; i >= 0; i--)
 		{
 			player = level.players[i];
@@ -1497,7 +1502,7 @@ bot_think_follow()
 			if (player.team != self.team)
 				continue;
 
-			if (Distance(player.origin, self.origin) > self.pers["bots"]["skill"]["help_dist"])
+			if (DistanceSquared(player.origin, self.origin) > distSq)
 				continue;
 
 			follows[follows.size] = player;
@@ -1568,7 +1573,7 @@ followPlayer(who)
 		self SetScriptAimPos(who.origin + (0, 0, 42));
 		myGoal = self GetScriptGoal();
 
-		if (isDefined(myGoal) && Distance(myGoal, who.origin) < 64)
+		if (isDefined(myGoal) && DistanceSquared(myGoal, who.origin) < 64*64)
 			continue;
 	
 		self.bot_was_follow_script_update = true;
@@ -1775,9 +1780,10 @@ bot_use_tube_think()
 		if (!self nearAnyOfWaypoints(128, level.waypointsTube))
 		{
 			tubeWps = [];
+			distSq = 1024*1024;
 			for (i = 0; i < level.waypointsTube.size; i++)
 			{
-				if (Distance(self.origin, level.waypointsTube[i].origin) > 1024)
+				if (DistanceSquared(self.origin, level.waypointsTube[i].origin) > distSq)
 					continue;
 				
 				tubeWps[tubeWps.size] = level.waypointsTube[i];
@@ -1930,9 +1936,10 @@ bot_use_equipment_think()
 		if (!self nearAnyOfWaypoints(128, level.waypointsClay))
 		{
 			clayWps = [];
+			distSq = 1024*1024;
 			for (i = 0; i < level.waypointsClay.size; i++)
 			{
-				if (Distance(self.origin, level.waypointsClay[i].origin) > 1024)
+				if (DistanceSquared(self.origin, level.waypointsClay[i].origin) > distSq)
 					continue;
 
 				clayWps[clayWps.size] = level.waypointsClay[i];
@@ -2044,9 +2051,10 @@ bot_use_grenade_think()
 		if (!self nearAnyOfWaypoints(128, level.waypointsGren))
 		{
 			nadeWps = [];
+			distSq = 1024*1024;
 			for (i = 0; i < level.waypointsGren.size; i++)
 			{
-				if (Distance(self.origin, level.waypointsGren[i].origin) > 1024)
+				if (DistanceSquared(self.origin, level.waypointsGren[i].origin) > distSq)
 					continue;
 
 				nadeWps[nadeWps.size] = level.waypointsGren[i];
@@ -2172,9 +2180,10 @@ bot_jav_loc_think()
 		if (!self nearAnyOfWaypoints(128, level.waypointsJav))
 		{
 			javWps = [];
+			distSq = 1024*1024;
 			for (i = 0; i < level.waypointsJav.size; i++)
 			{
-				if (Distance(self.origin, level.waypointsJav[i].origin) > 1024)
+				if (DistanceSquared(self.origin, level.waypointsJav[i].origin) > distSq)
 					continue;
 
 				javWps[javWps.size] = level.waypointsJav[i];
@@ -2533,12 +2542,14 @@ bot_uav_think()
 			if(!isReallyAlive(player))
 				continue;
 			
-			if(DistanceSquared(self.origin, player.origin) > dist)
+			distFromPlayer = DistanceSquared(self.origin, player.origin);
+			if(distFromPlayer > dist)
 				continue;
 			
 			if((!isSubStr(player getCurrentWeapon(), "_silencer_") && player.bots_firing) || (hasRadar && !player hasPerk("specialty_coldblooded")))
 			{
-				if (Distance(self.origin, player.origin) < self.pers["bots"]["skill"]["help_dist"] && bulletTracePassed(self getEye(), player getTagOrigin( "j_spineupper" ), false, player))
+				distSq = self.pers["bots"]["skill"]["help_dist"] * self.pers["bots"]["skill"]["help_dist"];
+				if (distFromPlayer < distSq && bulletTracePassed(self getEye(), player getTagOrigin( "j_spineupper" ), false, player))
 				{
 					self SetAttacker(player);
 				}
@@ -2799,7 +2810,7 @@ bot_crate_think()
 			{
 				if (wantsClosest)
 				{
-					if (Distance(crate.origin, self.origin) < Distance(tempCrate.origin, self.origin))
+					if (DistanceSquared(crate.origin, self.origin) < DistanceSquared(tempCrate.origin, self.origin))
 						continue;
 				}
 				else
@@ -3221,9 +3232,10 @@ bot_killstreak_think()
 			if (self.pers["killstreaks"][0].lifeId == self.pers["deaths"] && !self HasScriptGoal() && !self.bot_lock_goal && streakName != "sentry" && !self nearAnyOfWaypoints(128, level.waypointsCamp))
 			{
 				campSpots = [];
+				distSq = 1024*1024;
 				for (i = 0; i < level.waypointsCamp.size; i++)
 				{
-					if (Distance(self.origin, level.waypointsCamp[i].origin) > 1024)
+					if (DistanceSquared(self.origin, level.waypointsCamp[i].origin) > distSq)
 						continue;
 
 					campSpots[campSpots.size] = level.waypointsCamp[i];
@@ -3249,7 +3261,7 @@ bot_killstreak_think()
 
 				forwardTrace = bulletTrace(myEye, myEye + AnglesToForward(angles)*1024, false, self);
 
-				if (Distance(self.origin, forwardTrace["position"]) < 1000 && self.pers["bots"]["skill"]["base"] > 3)
+				if (DistanceSquared(self.origin, forwardTrace["position"]) < 1000*1000 && self.pers["bots"]["skill"]["base"] > 3)
 					continue;
 
 				self BotFreezeControls(true);
@@ -3386,7 +3398,7 @@ bot_killstreak_think()
 
 				forwardTrace = bulletTrace(myEye, myEye + AnglesToForward(angles)*256, false, self);
 
-				if (Distance(self.origin, forwardTrace["position"]) < 96 && self.pers["bots"]["skill"]["base"] > 3)
+				if (DistanceSquared(self.origin, forwardTrace["position"]) < 96*96 && self.pers["bots"]["skill"]["base"] > 3)
 					continue;
 
 				if (!bulletTracePassed(forwardTrace["position"], forwardTrace["position"]+(0,0,2048), false, self) && self.pers["bots"]["skill"]["base"] > 3)
