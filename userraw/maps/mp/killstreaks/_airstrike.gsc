@@ -1,3 +1,13 @@
+/*
+	_airstrike modded
+	Author: INeedGames
+	Date: 09/26/2020
+
+	DVAR:
+		- scr_harrier_duration <int>
+			45 - (default) amount of seconds a harrier sticks around for
+*/
+
 #include maps\mp\_utility;
 #include maps\mp\killstreaks\_harrier;
 #include maps\mp\gametypes\_hud_util;
@@ -25,6 +35,9 @@ init()
 	PrecacheMiniMapIcon( "compass_objpoint_b2_airstrike_enemy" );
 	PrecacheMiniMapIcon( "hud_minimap_harrier_green" );
 	PrecacheMiniMapIcon( "hud_minimap_harrier_red" );
+
+	setDvarIfUninitialized( "scr_harrier_duration", 45 );
+	level.harrierDuration = getDvarInt( "scr_harrier_duration" );
 	
 	
 	level.onfirefx = loadfx ("fire/fire_smoke_trail_L");

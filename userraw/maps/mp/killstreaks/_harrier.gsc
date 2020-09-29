@@ -1,3 +1,10 @@
+/*
+	_harrier modded
+	Author: INeedGames
+	Date: 09/26/2020
+	Uses the harrier duration, and fixes harrier leaving on custom maps.
+*/
+
 #include maps\mp\_utility;
 #include common_scripts\utility;
 
@@ -136,6 +143,15 @@ engageGround()
 	self waittill ( "goal" );
 }
 
+forceLeaveAfterTime(time)
+{
+	self endon( "death" );
+
+	wait time;
+
+	self.force_harrier_leave = true;
+}
+
 harrierLeave()
 {
 	self endon( "death" );
@@ -144,6 +160,8 @@ harrierLeave()
 	self notify( "leaving" );
 	self breakTarget( true );
 	self notify("stopRand");
+
+	self thread forceLeaveAfterTime(5);
 	
 	for ( ;; )
 	{
@@ -152,7 +170,7 @@ harrierLeave()
 		pathGoal += ( 0,0,900);
 		
 		leaveTrace = BulletTrace(self.origin, self.origin+(0,0,900), false, self );
-		if( leaveTrace["surfacetype"] == "none" )
+		if( leaveTrace["surfacetype"] == "none" || isDefined(self.force_harrier_leave) )
 			break;
 		
 		wait( 0.10 );
@@ -183,7 +201,7 @@ harrierTimer()
 {
 	self endon( "death" );
 	
-	maps\mp\gametypes\_hostmigration::waitLongDurationWithHostMigrationPause( 45 );
+	maps\mp\gametypes\_hostmigration::waitLongDurationWithHostMigrationPause( level.harrierDuration );
 	self harrierLeave();
 }
 
