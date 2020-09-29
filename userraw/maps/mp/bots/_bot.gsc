@@ -577,7 +577,12 @@ teamBots()
 						if(player.pers["team"] == toTeam)
 							continue;
 							
-						player notify("menuresponse", game["menu_team"], toTeam);
+						if (toTeam == "allies")
+							self thread [[level.allies]]();
+						else if (toTeam == "axis")
+							self thread [[level.axis]]();
+						else
+							self thread [[level.spectator]]();
 						break;
 					}
 				}
@@ -600,7 +605,7 @@ teamBots()
 				{
 					if(axis > teamAmount)
 					{
-						player notify("menuresponse", game["menu_team"], "allies");
+						self thread [[level.allies]]();
 						break;
 					}
 				}
@@ -608,12 +613,12 @@ teamBots()
 				{
 					if(axis < teamAmount)
 					{
-						player notify("menuresponse", game["menu_team"], "axis");
+						self thread [[level.axis]]();
 						break;
 					}
 					else if(player.pers["team"] != "allies")
 					{
-						player notify("menuresponse", game["menu_team"], "allies");
+						self thread [[level.allies]]();
 						break;
 					}
 				}
