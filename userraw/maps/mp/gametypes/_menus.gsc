@@ -2,8 +2,15 @@
 
 init()
 {
-	//Intricate - Create DVAR for forcing auto assign, useful for server that would like it.
-	SetDvarIfUninitialized("scr_player_forceautoassign", true);
+	SetDvarIfUninitialized("scr_player_startteamselection", "");
+	SetDvarIfUninitialized("scr_player_forceclassselection", "");
+	SetDvarIfUninitialized("scr_player_allowChangeTeam", true);
+
+	level.startteamselection = getDvar("scr_player_startteamselection");
+	level.forceclassselection = getDvar("scr_player_forceclassselection");
+	level.allowChangeTeam = getDvarInt("scr_player_allowChangeTeam");
+	
+
 	if ( !isDefined( game["gamestarted"] ) )
 	{
 		game["menu_team"] = "team_marinesopfor";
@@ -141,10 +148,7 @@ onMenuResponse()
 		{
 			self closepopupMenu();
 			self closeInGameMenu();
-			if ( getDvar( "g_gametype" ) != "oitc" && getDvar( "g_gametype" ) != "gg" && getDvar( "g_gametype" ) != "ss" && !isDefined(level.customClassCB) )
-			{
-				self openpopupMenu( game["menu_changeclass_allies"] );
-			}
+			self openpopupMenu( game["menu_changeclass_allies"] );
 			continue;
 		}
 
@@ -152,10 +156,7 @@ onMenuResponse()
 		{
 			self closepopupMenu();
 			self closeInGameMenu();
-			if ( getDvar( "g_gametype" ) != "oitc" && getDvar( "g_gametype" ) != "gg" && getDvar( "g_gametype" ) != "ss" && !isDefined(level.customClassCB) )
-			{
-				self openpopupMenu( game["menu_changeclass_axis"] );
-			}
+			self openpopupMenu( game["menu_changeclass_axis"] );
 			continue;
 		}
 
@@ -203,6 +204,14 @@ onMenuResponse()
 
 		if(menu == game["menu_team"])
 		{
+			self closeMenus();
+
+			if (!level.allowChangeTeam)
+			{
+				self iPrintLn("Server does not allow players to change team.");
+				continue;
+			}
+	
 			switch(response)
 			{
 			case "allies":
@@ -228,6 +237,12 @@ onMenuResponse()
 		{
 			self closepopupMenu();
 			self closeInGameMenu();
+
+			if (level.forceclassselection != "")
+			{
+				self iPrintLn("Server forcing players to use class: " + level.forceclassselection);
+				continue;
+			}
 
 			self.selectedClass = true;
 			self [[level.class]](response);
@@ -324,14 +339,16 @@ beginClassChoice( forceNewChoice )
 {
 	assert( self.pers["team"] == "axis" || self.pers["team"] == "allies" );
 
-	if ( getDvar( "g_gametype" ) == "oitc" || getDvar( "g_gametype" ) == "gg" || getDvar( "g_gametype" ) == "ss" || isDefined(level.customClassCB) )
+	if ( level.forceclassselection != "" )
 	{
 		if ( !isAlive( self ) )
 			self thread maps\mp\gametypes\_playerlogic::predictAboutToSpawnPlayerOverTime( 0.1 );
+
+		self closepopupMenu();
+		self closeInGameMenu();
 		
 		self.selectedClass = true;
-		self menuClass( "assault_mp,0" );
-
+		self [[level.class]](level.forceclassselection);
 		return;
 	}
 	
@@ -348,12 +365,29 @@ beginClassChoice( forceNewChoice )
 
 beginTeamChoice()
 {
-	//Intricate - We put the auto assign where the actual team selection is. Also make sure that a mod isn't loaded, mainly to prevent bugs with them.
-	if( GetDvar("scr_player_forceautoassign") && GetDvar("fs_game") == ""  )
-		self notify("menuresponse", game["menu_team"], "autoassign");
+	if( level.startteamselection != "" )
+	{
+		switch(level.startteamselection)
+		{
+		case "allies":
+			self [[level.allies]]();
+			break;
+
+		case "axis":
+			self [[level.axis]]();
+			break;
+
+		case "autoassign":
+			self [[level.autoassign]]();
+			break;
+
+		case "spectator":
+			self [[level.spectator]]();
+			break;
+		}
+	}
 	else
 		self openpopupMenu( game["menu_team"] );
-	
 }
 
 
@@ -460,6 +494,7 @@ menuSpectator()
 
 	self thread maps\mp\gametypes\_playerlogic::spawnSpectator();
 }
+
 
 menuClass( response )
 {
