@@ -634,8 +634,6 @@ addBots()
 {
 	level endon("game_ended");
 
-	wait 3;
-	
 	for(;;)
 	{
 		wait 1.5;
