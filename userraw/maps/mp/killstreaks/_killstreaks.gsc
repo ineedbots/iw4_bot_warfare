@@ -75,10 +75,11 @@ init()
 	level.killstreakHud = getDvarInt("scr_killstreakHud");
 	level.killStreakMod = getDvarInt( "scr_killstreak_mod" );
 
-	level.allowSpecialist = getDvarInt( "scr_allow_specialist" );
+	level.allowSpecialist = getDvarInt( "scr_specialist" );
 	level.specialistPerk1 = getDvar("scr_specialist_perks1");
 	level.specialistPerk2 = getDvar("scr_specialist_perks2");
 	level.specialistPerk3 = getDvar("scr_specialist_perks3");
+	level.specialistData = [];
 
 	if (level.allowSpecialist)
 	{
@@ -186,15 +187,8 @@ onPlayerChangeKit()
 		self waittill( "changed_kit" );
 		self giveOwnedKillstreakItem();
 
-		if (level.allowSpecialist)
-		{
-			self startSpecialist();
-		}
-
-		if (level.killstreakHud == 1)
-			self thread initKillstreakHud( 145 );
-		else if (level.killstreakHud == 2)
-			self thread initMW3KillstreakHud();
+		self startSpecialist();
+		self startKSHud();
 	}
 }
 
@@ -567,6 +561,33 @@ killstreakEarned( streakName )
 rewardNotify( streakName, streakVal )
 {
 	self endon( "disconnect" );
+	data = level.specialistData[streakName];
+
+	if (isDefined(data))
+	{
+		perk = streakName;
+		name = data.name;
+		description = data.description;
+		shader = data.shader;
+
+		proPerk = tablelookup( "mp/perktable.csv", 1, perk, 8 );
+		hasProPerk = self isItemUnlocked(proPerk);
+
+		if (hasProPerk)
+			shader = data.shader_pro;
+
+		notifyData = spawnStruct();
+
+		notifyData.glowColor = getGoodColor();
+		notifyData.hideWhenInMenu = false;
+		notifyData.titleText = name;
+		notifyData.notifyText = description;
+		notifyData.iconName = shader;
+		notifyData.sound = "mp_bonus_start";
+
+		self maps\mp\gametypes\_hud_message::notifyMessage( notifyData );
+		return;
+	}
 
 	self maps\mp\gametypes\_hud_message::killstreakSplashNotify( streakName, streakVal );
 }
@@ -614,7 +635,7 @@ giveKillstreak( streakName, isEarned, awardXp, owner )
 	
 	// probably obsolete unless we bring back the autoshotty	
 	if ( isdefined( level.killstreakSetupFuncs[ streakName ] ) )
-		self [[ level.killstreakSetupFuncs[ streakName ] ]]();
+		self [[ level.killstreakSetupFuncs[ streakName ] ]]( streakName );
 		
 	if ( isDefined( isEarned ) && isEarned && isDefined( awardXp ) && awardXp )
 		self notify( "received_earned_killstreak" );
@@ -678,6 +699,20 @@ getKillstreakWeapon( streakName )
 
 getKillstreakIcon( streakName )
 {
+	data = level.specialistData[streakName];
+	if (isDefined(data))
+	{
+		perk = streakName;
+		shader = data.shader;
+		proPerk = tablelookup( "mp/perktable.csv", 1, perk, 8 );
+		hasProPerk = self isItemUnlocked(proPerk);
+
+		if (hasProPerk)
+			shader = data.shader_pro;
+
+		return shader;
+	}
+
 	return tableLookup( KILLSTREAK_STRING_TABLE, 1, streakName, 14 );
 }
 
@@ -777,17 +812,17 @@ clearRideIntro( delay )
 
 destroyOnEvents(elem)
 {
-	self waittill_either("disconnect", "changed_kit");
+	self waittill_either("disconnect", "start_killstreak_hud");
 	elem destroy();
 }
 
 initKillstreakHud(inity)
 {
-	self endon( "changed_kit" );
 	self endon( "disconnect" );
+	self notify( "start_killstreak_hud" );
+	self endon( "start_killstreak_hud" );
 
 	streakVals = GetArrayKeys(self.killStreaks);
-	hasHardline = self _hasPerk("specialty_hardline");
 
 	self.killStreakHudElems = [];
 
@@ -816,8 +851,6 @@ initKillstreakHud(inity)
 
 		streakShader = getKillstreakIcon( streakName );
 		streakCost = streakVal;
-		if (hasHardline)
-			streakCost--;
 
 		// each killstreak icon
 		index = self.killStreakHudElems.size;
@@ -826,7 +859,6 @@ initKillstreakHud(inity)
 		self.killStreakHudElems[index].hideWhenInMenu = true;
 		self.killStreakHudElems[index].fontScale = 0.60;
 		self.killStreakHudElems[index].font = "hudbig";
-		self.killStreakHudElems[index].alpha = 1;
 		self.killStreakHudElems[index].glow = 1;
 		self.killStreakHudElems[index].glowColor = ( 0, 0, 1 );
 		self.killStreakHudElems[index].glowAlpha = 1;
@@ -865,7 +897,10 @@ initKillstreakHud(inity)
 				isUnderAStreak = true;
 				self.killStreakHudElems[0] setPoint( "RIGHT", "RIGHT", -25, inity - 25 * (i - 1) );
 				self.killStreakHudElems[0] setText( streakElem.ks_cost - curStreak );
+				streakElem.alpha = 0.5;
 			}
+			else
+				streakElem.alpha = 1;
 		}
 
 		if (!isUnderAStreak && self.killStreakHudElems.size)
@@ -878,11 +913,11 @@ initKillstreakHud(inity)
 
 initMW3KillstreakHud()
 {
-	self endon( "changed_kit" );
 	self endon( "disconnect" );
+	self notify( "start_killstreak_hud" );
+	self endon( "start_killstreak_hud" );
 
 	streakVals = GetArrayKeys(self.killStreaks);
-	hasHardline = self _hasPerk("specialty_hardline");
 
 	self.killStreakHudElems = [];
 	self.killStreakShellsElems = [];
@@ -898,8 +933,6 @@ initMW3KillstreakHud()
 
 		streakShader = getKillstreakIcon( streakName );
 		streakCost = streakVal;
-		if (hasHardline)
-			streakCost--;
 
 		if (streakCost > highestStreak)
 			highestStreak = streakCost;
@@ -986,25 +1019,28 @@ initMW3KillstreakHud()
 	}
 }
 
-getPerkDescription( perk )
+getGoodColor()
 {
-	//Intricate - Thanks to EMZ for the Black Ops variant, changed for MW2.
-	//Intricate - This function gives the STRING for the PERK DESCRIPTION.
-	return tableLookUpIString( "mp/perkTable.csv", 1, perk, 4 );
+	color = [];
+	//Intricate - This is momo5502's code, rather interesting way too :D.
+	for( i = 0; i < 3; i++ )
+	{
+		color[i] = randomint( 2 );
+	}
+
+	if( color[0] == color[1] && color[1] == color[2] )
+	{
+		rand = randomint(3);
+		color[rand] += 1;
+		color[rand] %= 2;
+	}
+
+	return ( color[0], color[1], color[2] );
 }
 
 getPerkMaterial( perk )
 {
-	//Intricate - Thanks to EMZ for the Black Ops variant, changed for MW2.
-	//Intricate - This function gives the MATERIAL for the PERK. (Most of the time in MW2 the name of the perk = shader but other times it's not.)
 	return tableLookUp( "mp/perkTable.csv", 1, perk, 3 );
-}
-
-getPerkString( perk )
-{
-	//Intricate - Thanks to EMZ for the Black Ops variant, changed for MW2.
-	//Intricate - This function gives the STRING for the PERK.
-	return tableLookUpIString( "mp/perkTable.csv", 1, perk, 2 );
 }
 
 initSpecialist()
@@ -1037,6 +1073,7 @@ initSpecialist()
 	PrecacheShader(getPerkMaterial("specialty_localjammer"));
 	PrecacheShader("specialty_onemanarmy");
 	PrecacheShader("specialty_onemanarmy_upgrade");
+	PrecacheShader("specialty_none");
 	
 	//Strings
 	PrecacheString( &"PERKS_MARATHON" );	
@@ -1071,12 +1108,11 @@ initSpecialist()
 	PrecacheString( &"PERKS_ABILITY_TO_SEEK_OUT_ENEMY" );
 	PrecacheString( &"PERKS_DESC_HEARTBREAKER" );
 
-	level.specialistData = [];
-
 	perks = [];
 	perks[perks.size] = strtok(level.specialistPerk1, ",");
 	perks[perks.size] = strtok(level.specialistPerk2, ",");
 	perks[perks.size] = strtok(level.specialistPerk3, ",");
+	perks[perks.size] = strtok("specialty_none,specialty_onemanarmy", ",");
 
 	for (i = 0; i < perks.size; i++)
 	{
@@ -1085,7 +1121,10 @@ initSpecialist()
 			perk = perks[i][h];
 
 			data = spawnStruct();
-
+			data.shader = getPerkMaterial(perk);
+			data.shader_pro = getPerkMaterial(tablelookup( "mp/perktable.csv", 1, perk, 8 ));
+			data.name = tableLookUpIString( "mp/perkTable.csv", 1, perk, 2 );
+			data.description = tableLookUpIString( "mp/perkTable.csv", 1, perk, 4 );
 
 			level.specialistData[perk] = data;
 			level.killstreakSetupFuncs[perk] = ::onGetPerkStreak;
@@ -1095,11 +1134,68 @@ initSpecialist()
 
 onGetPerkStreak(perk)
 {
-	data = level.specialistData[perk];
+	proPerk = tablelookup( "mp/perktable.csv", 1, perk, 8 );
+	hasProPerk = self isItemUnlocked(proPerk);
+
+	self shuffleKillStreaksFILO( perk );	
+	self giveOwnedKillstreakItem();
+
+	if (perk == "specialty_none")
+	{
+	}
+	else if (perk == "specialty_onemanarmy")
+	{
+		perks = [];
+		perks[perks.size] = strtok(level.specialistPerk1, ",");
+		perks[perks.size] = strtok(level.specialistPerk2, ",");
+		perks[perks.size] = strtok(level.specialistPerk3, ",");
+
+		for (i = 0; i < perks.size; i++)
+		{
+			for (h = 0; h < perks[i].size; h++)
+			{
+				perk = perks[i][h];
+				proPerk = tablelookup( "mp/perktable.csv", 1, perk, 8 );
+
+				self _setPerk(perk);
+				if ( self isItemUnlocked( proPerk ) )
+					self _setPerk(proPerk);
+			}
+		}
+	}
+	else
+	{
+		self _setPerk(perk);
+		if ( hasProPerk )
+			self _setPerk(proPerk);
+	}
+
+	self applySpecialistKillstreaks(); // maybe hardline changes the values
+}
+
+chooseAPerk(perks)
+{
+	perks = strtok(perks, ",");
+
+	while (perks.size)
+	{
+		perk = random(perks);
+		perks = array_remove(perks, perk);
+
+		if (self _hasPerk(perk))
+			continue;
+
+		return perk;
+	}
+
+	return "specialty_none";
 }
 
 startSpecialist()
 {
+	if (!level.allowSpecialist)
+		return;
+
 	// only start if we have only the nuke killstreak
 	shouldDoSpecialist = undefined;
 	streakVals = GetArrayKeys(self.killStreaks);
@@ -1124,10 +1220,76 @@ startSpecialist()
 	if (!isDefined(shouldDoSpecialist) || !shouldDoSpecialist)
 		return;
 
-	if ( self _hasPerk( "specialty_hardline" ) && ( getDvarInt( "scr_classic" ) != 1 ) )
+	if (!isDefined(self.pers["specialist_perks"]))
+		self.pers["specialist_perks"] = [];
+
+	if (!isDefined(self.pers["specialist_perks"][self.class_num]))
+	{
+		self.pers["specialist_perks"][self.class_num] = [];
+		self.pers["specialist_perks"][self.class_num][0] = chooseAPerk(level.specialistPerk1);
+		self.pers["specialist_perks"][self.class_num][1] = chooseAPerk(level.specialistPerk2);
+		self.pers["specialist_perks"][self.class_num][2] = chooseAPerk(level.specialistPerk3);
+	}
+
+	self.startKillStreaks = self.killStreaks;
+	self.startedWithHardline = (self _hasPerk( "specialty_hardline" ));
+	self applySpecialistKillstreaks();
+
+	// check cur_streak for perks
+	curStreak = self.pers["cur_kill_streak"];
+	streakVals = GetArrayKeys(self.killStreaks);
+	for (i = 0; i < streakVals.size; i++)
+	{
+		streakVal = streakVals[i];
+		streakName = self.killStreaks[streakVal];
+
+		if (!isSubStr(streakName, "specialty_"))
+			continue;
+
+		if (curStreak < streakVal)
+			continue;
+
+		self onGetPerkStreak(streakName);
+	}
+}
+
+applySpecialistKillstreaks()
+{
+	if ( self _hasPerk( "specialty_hardline" ) )
 		modifier = -1;
 	else
 		modifier = 0;
 
-	
+	killstreaks = [];
+
+	killstreaks[2 + modifier] = self.pers["specialist_perks"][self.class_num][0];
+	killstreaks[4 + modifier] = self.pers["specialist_perks"][self.class_num][1];
+	killstreaks[6 + modifier] = self.pers["specialist_perks"][self.class_num][2];
+	killstreaks[8 + modifier] = "specialty_onemanarmy";
+
+	streakVals = GetArrayKeys(self.startKillStreaks); // we assume that nuke val is above 8
+
+	for (i = 0; i < streakVals.size; i++)
+	{
+		streakVal = streakVals[i];
+		streakName = self.startKillStreaks[streakVal];
+
+		if (!self.startedWithHardline)
+			streakVal += modifier;
+
+		killstreaks[streakVal] = streakName;
+	}
+
+	self.killStreaks = killstreaks;
+
+	// update the hud incase hardline changed the values
+	self startKSHud();
+}
+
+startKSHud()
+{
+	if (level.killstreakHud == 1)
+		self thread initKillstreakHud( 145 );
+	else if (level.killstreakHud == 2)
+		self thread initMW3KillstreakHud();
 }
