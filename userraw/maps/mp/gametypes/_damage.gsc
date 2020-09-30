@@ -4,7 +4,7 @@
 	Date: 09/22/2020
 	Adds force final killcam, extra hitmarkers, etc.
 			
-	Thanks: banz
+	Thanks: banz, 23Furious
 */
 
 #include maps\mp\_utility;
