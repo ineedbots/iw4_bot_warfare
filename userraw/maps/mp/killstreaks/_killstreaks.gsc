@@ -795,7 +795,7 @@ initKillstreakHud(inity)
 			continue;
 
 		streakShader = maps\mp\killstreaks\_killstreaks::getKillstreakIcon( streakName );
-		streakCost = maps\mp\killstreaks\_killstreaks::getStreakCost( streakName );
+		streakCost = streakVal;
 		if (hasHardline)
 			streakCost--;
 
@@ -877,7 +877,7 @@ initMW3KillstreakHud()
 			continue;
 
 		streakShader = maps\mp\killstreaks\_killstreaks::getKillstreakIcon( streakName );
-		streakCost = maps\mp\killstreaks\_killstreaks::getStreakCost( streakName );
+		streakCost = streakVal;
 		if (hasHardline)
 			streakCost--;
 
@@ -934,16 +934,7 @@ initMW3KillstreakHud()
 		if (timesRolledOver > level.maxKillstreakRollover)
 			curStreak = highestStreak;
 
-		// update the shells
-		for (i = 0; i < self.killStreakShellsElems.size; i++)
-		{
-			elem = self.killStreakShellsElems[i];
-			if (curStreak > i)
-				elem.alpha = 0.85;
-			else
-				elem.alpha = 0.3;
-		}
-
+		nextHighest = 999;
 		// update the ks icons
 		for (i = 0; i < self.killStreakHudElems.size; i++)
 		{
@@ -952,7 +943,25 @@ initMW3KillstreakHud()
 			if (curStreak >= elem.ks_cost)
 				elem.alpha = 0.9;
 			else
+			{
 				elem.alpha = 0.4;
+
+				if (nextHighest > elem.ks_cost)
+					nextHighest = elem.ks_cost;
+			}
+		}
+
+		// update the shells
+		for (i = 0; i < self.killStreakShellsElems.size; i++)
+		{
+			elem = self.killStreakShellsElems[i];
+
+			if (curStreak > i)
+				elem.alpha = 0.85;
+			else if (i >= nextHighest)
+				elem.alpha = 0;
+			else
+				elem.alpha = 0.3;
 		}
 	}
 }

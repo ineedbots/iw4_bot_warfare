@@ -1,3 +1,21 @@
+/*
+	_menus modded
+	Author: INeedGames
+	Date: 09/22/2020
+
+	DVARS:
+		- scr_player_startteamselection <string>
+			"" - (default) disables the server selecting a team for joining players
+			"autoassign" - example
+
+		- scr_player_forceclassselection <string>
+			"" - (default) disables the server forcing a class for players
+			"custom0" - example
+
+		- scr_player_allowChangeTeam <bool>
+			true - (default) allows players to change teams
+*/
+
 #include maps\mp\_utility;
 
 init()
@@ -5,10 +23,14 @@ init()
 	SetDvarIfUninitialized("scr_player_startteamselection", "");
 	SetDvarIfUninitialized("scr_player_forceclassselection", "");
 	SetDvarIfUninitialized("scr_player_allowChangeTeam", true);
+	SetDvarIfUninitialized("scr_player_forceautoassign", 0);
 
 	level.startteamselection = getDvar("scr_player_startteamselection");
 	level.forceclassselection = getDvar("scr_player_forceclassselection");
 	level.allowChangeTeam = getDvarInt("scr_player_allowChangeTeam");
+
+	if (GetDvarInt("scr_player_forceautoassign"))
+		level.startteamselection = "autoassign";
 	
 
 	if ( !isDefined( game["gamestarted"] ) )

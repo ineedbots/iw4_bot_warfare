@@ -1,3 +1,22 @@
+/*
+	_class modded
+	Author: INeedGames
+	Date: 09/22/2020
+
+	Features:
+		- restrict certain killstreaks, deathstreaks, weapons, perks, attachments and weapon-attachment combos by dvars
+		- define your stock killstreaks, deathstreaks weapons, perks which are given, when the player uses loadout which is restricted	
+		- customize the amount of consecutive kills needed to get a certain killstreak by dvar
+
+	dvar syntax to be used in server.cfg:
+	set scr_allow_loadouttorestrict "0"
+
+	e.g.:
+	set scr_allow_gl "0" //to restrict grenade launcher attachment
+
+	Thanks: banz
+*/
+
 #include common_scripts\utility;
 // check if below includes are removable
 #include maps\mp\_utility;
@@ -56,6 +75,78 @@ init()
 	//precacheShader( "waypoint_bombsquad" );
 	precacheShader( "specialty_pistoldeath" );
 	precacheShader( "specialty_finalstand" );
+
+
+	//private match dvars here: (examples)
+	
+	//blocking all ump45's
+	/*setDvar("scr_allow_ump45", 0);
+	setDvar("scr_allow_ak47_gl_mp", 0);
+	//blocking all g18's with akimbo
+	setDvar("scr_allow_glock_akimbo_mp", 0);
+	setDvar("scr_allow_glock_akimbo_fmj_mp", 0);
+	setDvar("scr_allow_glock_akimbo_silencer_mp", 0);
+	setDvar("scr_allow_glock_akimbo_xmags_mp", 0);
+	//blocking all aa12's
+	setDvar("scr_allow_aa12", 0);
+	//remove all thermal attachments
+	setDvar("scr_allow_thermal", 0);
+	//restrict claymore
+	setDvar("scr_allow_claymore_mp", 0);
+	//restrict commando perk
+	setDvar("scr_allow_specialty_extendedmelee", 0);*/
+	
+	
+	/*setDvar("scr_allow_gl", 0);
+	setDvar("scr_allow_harrier_airstrike", 0);
+	setDvar("scr_allow_nuke", 0);
+	setDvar("scr_allow_akimbo", 0);
+	setDvar("scr_streakcount_uav", 4);
+	setDvar("scr_streakcount_emp", 13);
+	setDvar("scr_streakcount_harrier_airstrike", 8);
+	setDvar("scr_streakcount_nuke", 15);
+	setDvar("scr_allow_mp5k_silencer_mp", 0);
+	setDvar("scr_one_flash", 0);
+	setDvar("scr_one_stun", 0);*/
+
+	/*
+	**	Things that will replace restricted ones, if more than one is specified one of those will be chosen 	
+	**	randomly 
+	*/
+	//multiple definitions possible
+	setDvarIfUninitialized( "scr_default_primarys", "m4,famas" );
+	setDvarIfUninitialized( "scr_default_secondarys", "usp" );
+	setDvarIfUninitialized( "scr_default_perks1", "specialty_fastreload,specialty_scavenger" );
+	setDvarIfUninitialized( "scr_default_perks2", "specialty_bulletdamage" );
+	setDvarIfUninitialized( "scr_default_perks3", "specialty_bulletaccuracy,specialty_detectexplosive" );
+	setDvarIfUninitialized( "scr_default_equipment", "frag_grenade_mp" );
+	setDvarIfUninitialized( "scr_default_offhand", "smoke_grenade" );
+	setDvarIfUninitialized( "scr_default_deathstreak", "none" );
+
+	// message
+	setDvarIfUninitialized( "scr_restriction_messages", 0 );
+	setDvarIfUninitialized("scr_one_flash", 0);
+	setDvarIfUninitialized("scr_one_stun", 0);
+
+	/*
+	** Don't touch the definions below!
+	*/
+	level.defaultPrimarys = getDvar("scr_default_primarys");
+	level.defaultSecondarys = getDvar("scr_default_secondarys");
+	level.defaultPerks1 = getDvar("scr_default_perks1");
+	level.defaultPerks2 = getDvar("scr_default_perks2");
+	level.defaultPerks3 = getDvar("scr_default_perks3");
+	
+	level.defaultEquipment = getDvar("scr_default_equipment");
+	level.defaultOffhand = getDvar("scr_default_offhand");
+	level.defaultDeathstreak = getDvar("scr_default_deathstreak");
+
+	level.restrictionMessages = getDvarInt("scr_restriction_messages");
+
+	//only one Flash/Stun grenade
+	level.oneFlash = getDvarInt( "scr_one_flash");
+	level.oneStun = getDvarInt( "scr_one_stun");
+
 
 	level thread onPlayerConnecting();
 }
@@ -299,6 +390,77 @@ cloneLoadout()
 	return ( clonedLoadout );
 }
 
+checkCustomStreakVal(streakname, streakval)
+{
+	if (getDvar("scr_streakcount_" + streakname) == "" || getDvarInt("scr_streakcount_" + streakname) < 2)
+		return streakval;
+
+	return getDvarInt("scr_streakcount_" + streakname);
+}
+
+checkRestrictions( loadout, slot )
+{
+	if ( getDvar( "scr_allow_" + loadout ) == "" || getDvarInt( "scr_allow_" + loadout ) )
+		return loadout;
+
+	if (level.restrictionMessages && !isDefined(self.restrictionMessages[self.class]))
+		self iPrintLnBold("Server does not allow: " + loadout);
+
+	switch ( slot )
+	{
+		case "loadoutPrimary":
+			tokens = strTok( level.defaultPrimarys, "," );
+			return random(tokens);
+
+		case "loadoutSecondary":
+			tokens = strTok( level.defaultSecondarys, "," );
+			return random(tokens);
+			
+		case "loadoutPrimaryAttachment":
+		case "loadoutPrimaryAttachment2":
+		case "loadoutSecondaryAttachment":
+		case "loadoutSecondaryAttachment2":
+			return "none";
+
+		case "loadoutEquipment":
+			tokens = strTok( level.defaultEquipment, "," );
+			return random(tokens);
+
+		case "loadoutPerk1":
+			tokens = strTok( level.defaultPerks1, "," );
+			return random(tokens);
+
+		case "loadoutPerk2":
+			tokens = strTok( level.defaultPerks2, "," );
+			return random(tokens);
+
+		case "loadoutPerk3":
+			tokens = strTok( level.defaultPerks3, "," );
+			return random(tokens);
+
+		case "loadoutDeathstreak":
+			tokens = strTok( level.defaultDeathstreak, "," );
+			return random(tokens);
+
+		case "loadoutOffhand":
+			tokens = strTok( level.defaultOffhand, "," );
+			return random(tokens);
+
+		case "loadoutKillstreak1":
+		case "loadoutKillstreak2":
+		case "loadoutKillstreak3":
+			return "none";
+
+		case "secondaryName":
+			tokens = strTok( level.defaultSecondarys, "," );
+			return random(tokens) + "_mp";
+
+		case "primaryName":
+			tokens = strTok( level.defaultPrimarys, "," );
+			return random(tokens) + "_mp";
+	}
+}
+
 giveLoadout( team, class, allowCopycat )
 {
 	self takeAllWeapons();
@@ -435,6 +597,20 @@ giveLoadout( team, class, allowCopycat )
 		loadoutSecondary = table_getWeapon( level.classTableName, 10, 1 );
 
 	//loadoutSecondaryCamo = "none";
+	
+	// start checking restrictions
+	loadoutPrimary = self checkRestrictions( loadoutPrimary, "loadoutPrimary" );
+	loadoutSecondary = self checkRestrictions( loadoutSecondary, "loadoutSecondary" );
+	loadoutPrimaryAttachment = self checkRestrictions( loadoutPrimaryAttachment, "loadoutPrimaryAttachment" );
+	loadoutPrimaryAttachment2 = self checkRestrictions( loadoutPrimaryAttachment2, "loadoutPrimaryAttachment2" );
+	loadoutSecondaryAttachment = self checkRestrictions( loadoutSecondaryAttachment, "loadoutSecondaryAttachment" );
+	loadoutSecondaryAttachment2 = self checkRestrictions( loadoutSecondaryAttachment2, "loadoutSecondaryAttachment2" );
+	loadoutEquipment = self checkRestrictions( loadoutEquipment, "loadoutEquipment" );
+	loadoutPerk1 = self checkRestrictions( loadoutPerk1, "loadoutPerk1" );
+	loadoutPerk2 = self checkRestrictions( loadoutPerk2, "loadoutPerk2" );
+	loadoutPerk3 = self checkRestrictions( loadoutPerk3, "loadoutPerk3" );
+	loadoutDeathstreak = self checkRestrictions( loadoutDeathstreak, "loadoutDeathstreak" );
+	loadoutOffhand = self checkRestrictions( loadoutOffhand, "loadoutOffhand" );
 
 
 	if ( level.killstreakRewards )
@@ -458,8 +634,15 @@ giveLoadout( team, class, allowCopycat )
 		loadoutKillstreak2 = "none";
 		loadoutKillstreak3 = "none";
 	}
+
+	// restrict killstreaks
+	loadoutKillstreak1 = self checkRestrictions( loadoutKillstreak1, "loadoutKillstreak1" );
+	loadoutKillstreak2 = self checkRestrictions( loadoutKillstreak2, "loadoutKillstreak2" );
+	loadoutKillstreak3 = self checkRestrictions( loadoutKillstreak3, "loadoutKillstreak3" );
 	
 	secondaryName = buildWeaponName( loadoutSecondary, loadoutSecondaryAttachment, loadoutSecondaryAttachment2 );
+	secondaryName = self checkRestrictions( secondaryName, "secondaryName" );
+
 	self _giveWeapon( secondaryName, int(tableLookup( "mp/camoTable.csv", 1, loadoutSecondaryCamo, 0 ) ) );
 
 	self.loadoutPrimaryCamo = int(tableLookup( "mp/camoTable.csv", 1, loadoutPrimaryCamo, 0 ));
@@ -512,6 +695,8 @@ giveLoadout( team, class, allowCopycat )
 
 	// Primary Weapon
 	primaryName = buildWeaponName( loadoutPrimary, loadoutPrimaryAttachment, loadoutPrimaryAttachment2 );
+	primaryName = self checkRestrictions( primaryName, "primaryName" );
+	
 	self _giveWeapon( primaryName, self.loadoutPrimaryCamo );
 	
 	// fix changing from a riotshield class to a riotshield class during grace period not giving a shield
@@ -538,9 +723,9 @@ giveLoadout( team, class, allowCopycat )
 	self giveWeapon( offhandSecondaryWeapon );
 	if( loadOutOffhand == "smoke_grenade" )
 		self setWeaponAmmoClip( offhandSecondaryWeapon, 1 );
-	else if( loadOutOffhand == "flash_grenade" )
+	else if( loadOutOffhand == "flash_grenade" && !level.oneFlash )
 		self setWeaponAmmoClip( offhandSecondaryWeapon, 2 );
-	else if( loadOutOffhand == "concussion_grenade" )
+	else if( loadOutOffhand == "concussion_grenade" && !level.oneStun )
 		self setWeaponAmmoClip( offhandSecondaryWeapon, 2 );
 	else
 		self setWeaponAmmoClip( offhandSecondaryWeapon, 1 );
@@ -557,6 +742,8 @@ giveLoadout( team, class, allowCopycat )
 
 	// cac specialties that require loop threads
 	self maps\mp\perks\_perks::cac_selector();
+
+	self.restrictionMessages[self.class] = true;
 	
 	self notify ( "changed_kit" );
 	self notify ( "giveLoadout" );
@@ -873,6 +1060,8 @@ setKillstreaks( streak1, streak2, streak3 )
 			streakVal = int( tableLookup( "mp/killstreakTable.csv", 1, streak1, 4 ) );
 		//else
 		//	streakVal = int( tableLookup( "mp/killstreakTable.csv", 1, streak1, 5 ) );
+
+		streakVal = self checkCustomStreakVal(streak1, streakVal);
 		killStreaks[streakVal + modifier] = streak1;
 	}
 
@@ -888,6 +1077,7 @@ setKillstreaks( streak1, streak2, streak3 )
 			streakVal = ( streakVal - 1 );
 		}
 
+		streakVal = self checkCustomStreakVal(streak2, streakVal);
 		killStreaks[streakVal + modifier] = streak2;
 	}
 
@@ -897,6 +1087,8 @@ setKillstreaks( streak1, streak2, streak3 )
 			streakVal = int( tableLookup( "mp/killstreakTable.csv", 1, streak3, 4 ) );
 		//else
 		//	streakVal = int( tableLookup( "mp/killstreakTable.csv", 1, streak3, 5 ) );
+
+		streakVal = self checkCustomStreakVal(streak3, streakVal);
 		killStreaks[streakVal + modifier] = streak3;
 	}
 
@@ -975,6 +1167,7 @@ onPlayerConnecting()
 		player.detectExplosives = false;
 		player.bombSquadIcons = [];
 		player.bombSquadIds = [];
+		player.restrictionMessages = [];
 	}
 }
 
