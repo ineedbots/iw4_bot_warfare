@@ -21,6 +21,19 @@
 			1 - use Puffiamo's killstreak HUD
 			2 - use NoFate's MW3 killstreak HUD
 
+		- scr_specialist <bool>
+			false - (default) enable specialist from mw3, a player must only have the nuke selected as their killstreak
+
+		- scr_specialist_perks1 <string>
+			- perks that appear in the first slot (2 killstreak) of specialist
+
+		- scr_specialist_perks2 <string>
+			- perks that appear in the second slot (4 killstreak) of specialist
+
+		- scr_specialist_perks3 <string>
+			- perks that appear in the third slot (6 killstreak) of specialist
+
+
 	Thanks: H3X1C, Emosewaj, NoFate, Puffiamo, Intricate
 */
 
