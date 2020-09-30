@@ -16,18 +16,18 @@ doVersionCheck()
 
 	if (!isDefined(remoteVersion))
 	{
-		println("Error getting remote version of Bot Warfare.");
+		println("Error getting remote version of Bot Warfare.\n");
 		return false;
 	}
 
 	if (level.bw_VERSION != remoteVersion)
 	{
-		println("There is a new version of Bot Warfare!");
-		println("You are on version " + level.bw_VERSION + " but " + remoteVersion + " is available!");
+		println("There is a new version of Bot Warfare!\n");
+		println("You are on version " + level.bw_VERSION + " but " + remoteVersion + " is available!\n");
 		return false;
 	}
 
-	println("You are on the latest version of Bot Warfare!");
+	println("You are on the latest version of Bot Warfare!\n");
 	return true;
 }
 
