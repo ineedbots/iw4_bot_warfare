@@ -56,7 +56,7 @@
 		- headshot_detach_head <bool>
 			false - (default) headshots dismember the victim's head
 			
-	Thanks: banz
+	Thanks: banz, 23Furious
 */
 
 #include maps\mp\_utility;
