@@ -598,6 +598,12 @@ rewardNotify( streakName, streakVal )
 		notifyData.iconName = shader;
 		notifyData.sound = "mp_bonus_start";
 
+		if (perk == "specialty_onemanarmy")
+		{
+			notifyData.titleText = "Specialist Bonus";
+			notifyData.notifyText = "Received all Perks!";
+		}
+
 		self maps\mp\gametypes\_hud_message::notifyMessage( notifyData );
 		return;
 	}
@@ -1151,7 +1157,7 @@ onGetPerkStreak(perk)
 	hasProPerk = self isItemUnlocked(proPerk);
 
 	self shuffleKillStreaksFILO( perk );	
-	self giveOwnedKillstreakItem();
+	self giveOwnedKillstreakItem(true);
 
 	if (perk == "specialty_none")
 	{
@@ -1297,6 +1303,81 @@ applySpecialistKillstreaks()
 
 	// update the hud incase hardline changed the values
 	self startKSHud();
+
+	// give xp every second kill like in mw3
+	waittillframeend;
+	self thread watchSpecialistOnKill();
+}
+
+watchSpecialistOnKill()
+{
+	self endon("disconnect");
+	self notify("watchSpecialistOnKill");
+	self endon("watchSpecialistOnKill");
+
+	lastKs = self.pers["cur_kill_streak"];
+	for (;;)
+	{
+		self waittill( "killed_enemy" );
+		curStreak = self.pers["cur_kill_streak"];
+
+		if (curStreak <= lastKs)
+			continue;
+
+		lastKs = curStreak;
+
+		if (curStreak % 2 == 1)
+			continue;
+
+		self thread maps\mp\gametypes\_rank::giveRankXP( "specialist_bonus", 50 );
+		self thread underScorePopup("Specialist Bonus!", (1, 1, 0.5), 0);
+	}
+}
+
+underScorePopup(string, hudColor, glowAlpha)
+{
+	// Display text under the score popup
+	self endon( "disconnect" );
+
+	if ( string == "" )
+		return;
+
+	self notify( "underScorePopup" );
+	self endon( "underScorePopup" );
+
+	if (!isDefined(self.mw3_scorePopup))
+	{
+		// Create the under score popup element
+		self.mw3_scorePopup = newClientHudElem( self );
+		self.mw3_scorePopup.horzAlign = "center";
+		self.mw3_scorePopup.vertAlign = "middle";
+		self.mw3_scorePopup.alignX = "center";
+		self.mw3_scorePopup.alignY = "middle";
+		self.mw3_scorePopup.x = 35;
+		self.mw3_scorePopup.y = -48;
+		self.mw3_scorePopup.font = "hudbig";
+		self.mw3_scorePopup.fontscale = 0.65;
+		self.mw3_scorePopup.archived = false;
+		self.mw3_scorePopup.color = (0.5, 0.5, 0.5);
+		self.mw3_scorePopup.sort = 10000;
+	}
+
+	self.mw3_scorePopup.color = hudColor;
+	self.mw3_scorePopup.glowColor = hudColor;
+	self.mw3_scorePopup.glowAlpha = glowAlpha;
+
+	self.mw3_scorePopup setText(string);
+	self.mw3_scorePopup.alpha = 0.85;
+
+	wait 1.0;
+
+	self.mw3_scorePopup fadeOverTime( 0.75 );
+	self.mw3_scorePopup.alpha = 0;
+
+	wait 0.75;
+
+	self.mw3_scorePopup destroy();
+	self.mw3_scorePopup = undefined;
 }
 
 startKSHud()
