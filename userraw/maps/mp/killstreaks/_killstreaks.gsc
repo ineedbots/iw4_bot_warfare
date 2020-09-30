@@ -21,7 +21,7 @@
 			1 - use Puffiamo's killstreak HUD
 			2 - use NoFate's MW3 killstreak HUD
 
-	Thanks: H3X1C, Emosewaj, NoFate, Puffiamo
+	Thanks: H3X1C, Emosewaj, NoFate, Puffiamo, Intricate
 */
 
 #include maps\mp\_utility;
@@ -65,10 +65,25 @@ init()
 	setDvarIfUninitialized( "scr_killstreakHud", false );
 	setDvarIfUninitialized( "scr_killstreak_mod", 0 );
 
+	setDvarIfUninitialized( "scr_specialist", true );
+	setDvarIfUninitialized( "scr_specialist_perks1", "specialty_scavenger,specialty_fastreload,specialty_marathon" );
+	setDvarIfUninitialized( "scr_specialist_perks2", "specialty_bulletdamage,specialty_lightweight,specialty_coldblooded,specialty_explosivedamage,specialty_hardline" );
+	setDvarIfUninitialized( "scr_specialist_perks3", "specialty_bulletaccuracy,specialty_heartbreaker,specialty_detectexplosive,specialty_extendedmelee,specialty_localjammer" );
+
 	level.killstreaksRollOver = getDvarInt("scr_killstreak_rollover");
 	level.maxKillstreakRollover = getDvarInt("scr_maxKillstreakRollover");
 	level.killstreakHud = getDvarInt("scr_killstreakHud");
 	level.killStreakMod = getDvarInt( "scr_killstreak_mod" );
+
+	level.allowSpecialist = getDvarInt( "scr_allow_specialist" );
+	level.specialistPerk1 = getDvar("scr_specialist_perks1");
+	level.specialistPerk2 = getDvar("scr_specialist_perks2");
+	level.specialistPerk3 = getDvar("scr_specialist_perks3");
+
+	if (level.allowSpecialist)
+	{
+		initSpecialist();
+	}
 	
 	level thread onPlayerConnect();
 }
@@ -157,11 +172,6 @@ onPlayerSpawned()
 		self waittill( "spawned_player" );
 		self thread killstreakUseWaiter();
 		self thread waitForChangeTeam();
-		
-		if (level.killstreakHud == 1)
-			self thread initKillstreakHud( 145 );
-		else if (level.killstreakHud == 2)
-			self thread initMW3KillstreakHud();
 
 		self giveOwnedKillstreakItem( true );
 	}
@@ -175,6 +185,16 @@ onPlayerChangeKit()
 	{
 		self waittill( "changed_kit" );
 		self giveOwnedKillstreakItem();
+
+		if (level.allowSpecialist)
+		{
+			self startSpecialist();
+		}
+
+		if (level.killstreakHud == 1)
+			self thread initKillstreakHud( 145 );
+		else if (level.killstreakHud == 2)
+			self thread initMW3KillstreakHud();
 	}
 }
 
@@ -757,13 +777,13 @@ clearRideIntro( delay )
 
 destroyOnEvents(elem)
 {
-	self waittill_either("disconnect", "spawned_player");
+	self waittill_either("disconnect", "changed_kit");
 	elem destroy();
 }
 
 initKillstreakHud(inity)
 {
-	self endon( "death" );
+	self endon( "changed_kit" );
 	self endon( "disconnect" );
 
 	streakVals = GetArrayKeys(self.killStreaks);
@@ -794,7 +814,7 @@ initKillstreakHud(inity)
 		if (isSubStr(streakName, "-rollover"))
 			continue;
 
-		streakShader = maps\mp\killstreaks\_killstreaks::getKillstreakIcon( streakName );
+		streakShader = getKillstreakIcon( streakName );
 		streakCost = streakVal;
 		if (hasHardline)
 			streakCost--;
@@ -858,7 +878,7 @@ initKillstreakHud(inity)
 
 initMW3KillstreakHud()
 {
-	self endon( "death" );
+	self endon( "changed_kit" );
 	self endon( "disconnect" );
 
 	streakVals = GetArrayKeys(self.killStreaks);
@@ -876,7 +896,7 @@ initMW3KillstreakHud()
 		if (isSubStr(streakName, "-rollover"))
 			continue;
 
-		streakShader = maps\mp\killstreaks\_killstreaks::getKillstreakIcon( streakName );
+		streakShader = getKillstreakIcon( streakName );
 		streakCost = streakVal;
 		if (hasHardline)
 			streakCost--;
@@ -964,4 +984,150 @@ initMW3KillstreakHud()
 				elem.alpha = 0.3;
 		}
 	}
+}
+
+getPerkDescription( perk )
+{
+	//Intricate - Thanks to EMZ for the Black Ops variant, changed for MW2.
+	//Intricate - This function gives the STRING for the PERK DESCRIPTION.
+	return tableLookUpIString( "mp/perkTable.csv", 1, perk, 4 );
+}
+
+getPerkMaterial( perk )
+{
+	//Intricate - Thanks to EMZ for the Black Ops variant, changed for MW2.
+	//Intricate - This function gives the MATERIAL for the PERK. (Most of the time in MW2 the name of the perk = shader but other times it's not.)
+	return tableLookUp( "mp/perkTable.csv", 1, perk, 3 );
+}
+
+getPerkString( perk )
+{
+	//Intricate - Thanks to EMZ for the Black Ops variant, changed for MW2.
+	//Intricate - This function gives the STRING for the PERK.
+	return tableLookUpIString( "mp/perkTable.csv", 1, perk, 2 );
+}
+
+initSpecialist()
+{
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_scavenger", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_fastreload", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_marathon", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_bulletdamage", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_lightweight", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_coldblooded", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_explosivedamage", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_hardline", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_bulletaccuracy", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_heartbreaker", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_detectexplosive", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_extendedmelee", 8 )));
+	PrecacheShader(getPerkMaterial(tablelookup( "mp/perktable.csv", 1, "specialty_localjammer", 8 )));
+	PrecacheShader(getPerkMaterial("specialty_scavenger"));
+	PrecacheShader(getPerkMaterial("specialty_fastreload"));
+	PrecacheShader(getPerkMaterial("specialty_marathon"));
+	PrecacheShader(getPerkMaterial("specialty_bulletdamage"));
+	PrecacheShader(getPerkMaterial("specialty_lightweight"));
+	PrecacheShader(getPerkMaterial("specialty_coldblooded"));
+	PrecacheShader(getPerkMaterial("specialty_explosivedamage"));
+	PrecacheShader(getPerkMaterial("specialty_hardline"));
+	PrecacheShader(getPerkMaterial("specialty_bulletaccuracy"));
+	PrecacheShader(getPerkMaterial("specialty_heartbreaker"));
+	PrecacheShader(getPerkMaterial("specialty_detectexplosive"));
+	PrecacheShader(getPerkMaterial("specialty_extendedmelee"));
+	PrecacheShader(getPerkMaterial("specialty_localjammer"));
+	PrecacheShader("specialty_onemanarmy");
+	PrecacheShader("specialty_onemanarmy_upgrade");
+	
+	//Strings
+	PrecacheString( &"PERKS_MARATHON" );	
+	PrecacheString( &"PERKS_SLEIGHT_OF_HAND" );	
+	PrecacheString( &"PERKS_SCAVENGER" );	
+	//--
+	PrecacheString( &"PERKS_STOPPING_POWER" );	
+	PrecacheString( &"PERKS_LIGHTWEIGHT" );	
+	PrecacheString( &"PERKS_COLDBLOODED" );	
+	PrecacheString( &"PERKS_DANGERCLOSE" );
+	PrecacheString( &"PERKS_HARDLINE" );	
+	//--
+	PrecacheString( &"PERKS_EXTENDEDMELEE" );	
+	PrecacheString( &"PERKS_STEADY_AIM" );	
+	PrecacheString( &"PERKS_LOCALJAMMER" );	
+	PrecacheString( &"PERKS_BOMB_SQUAD" );	
+	PrecacheString( &"PERKS_NINJA" );
+	//Description
+	PrecacheString( &"PERKS_DESC_MARATHON" );
+	PrecacheString( &"PERKS_FASTER_RELOADING" );
+	PrecacheString( &"PERKS_DESC_SCAVENGER" );
+	//--
+	PrecacheString( &"PERKS_INCREASED_BULLET_DAMAGE" );
+	PrecacheString( &"PERKS_DESC_LIGHTWEIGHT" );
+	PrecacheString( &"PERKS_DESC_COLDBLOODED" );
+	PrecacheString( &"PERKS_HIGHER_EXPLOSIVE_WEAPON" );
+	PrecacheString( &"PERKS_DESC_HARDLINE" );
+	//--
+	PrecacheString( &"PERKS_DESC_EXTENDEDMELEE" );
+	PrecacheString( &"PERKS_INCREASED_HIPFIRE_ACCURACY" );
+	PrecacheString( &"PERKS_DESC_LOCALJAMMER" );
+	PrecacheString( &"PERKS_ABILITY_TO_SEEK_OUT_ENEMY" );
+	PrecacheString( &"PERKS_DESC_HEARTBREAKER" );
+
+	level.specialistData = [];
+
+	perks = [];
+	perks[perks.size] = strtok(level.specialistPerk1, ",");
+	perks[perks.size] = strtok(level.specialistPerk2, ",");
+	perks[perks.size] = strtok(level.specialistPerk3, ",");
+
+	for (i = 0; i < perks.size; i++)
+	{
+		for (h = 0; h < perks[i].size; h++)
+		{
+			perk = perks[i][h];
+
+			data = spawnStruct();
+
+
+			level.specialistData[perk] = data;
+			level.killstreakSetupFuncs[perk] = ::onGetPerkStreak;
+		}
+	}
+}
+
+onGetPerkStreak(perk)
+{
+	data = level.specialistData[perk];
+}
+
+startSpecialist()
+{
+	// only start if we have only the nuke killstreak
+	shouldDoSpecialist = undefined;
+	streakVals = GetArrayKeys(self.killStreaks);
+
+	for (i = 0; i < streakVals.size; i++)
+	{
+		streakVal = streakVals[i];
+		streakName = self.killStreaks[streakVal];
+
+		if (isSubStr(streakName, "-rollover"))
+			continue;
+
+		if (isDefined(shouldDoSpecialist) && !shouldDoSpecialist)
+			break;
+
+		if (streakName == "nuke")
+			shouldDoSpecialist = true;
+		else
+			shouldDoSpecialist = false;
+	}
+
+	if (!isDefined(shouldDoSpecialist) || !shouldDoSpecialist)
+		return;
+
+	if ( self _hasPerk( "specialty_hardline" ) && ( getDvarInt( "scr_classic" ) != 1 ) )
+		modifier = -1;
+	else
+		modifier = 0;
+
+	
 }
