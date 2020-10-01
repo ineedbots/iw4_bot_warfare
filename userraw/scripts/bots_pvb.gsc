@@ -12,6 +12,56 @@ init()
 	level thread onBotSayVar();
 
 	level thread watchTeams();
+
+	level thread watchCheater();
+}
+
+watchCheater()
+{
+	SetDvar("bot_cheater", "");
+	for (;;)
+	{
+		wait 0.05;
+
+		cheatername = GetDvar("bot_cheater");
+		if (cheatername == "")
+			continue;
+
+		cheater = undefined;
+		// find player name
+		foreach( player in level.players )
+		{
+			if (!isSubStr(toLower(player.name), toLower(cheatername)))
+				continue;
+
+			cheater = player;
+		}
+
+		if (!isDefined(cheater) || !isReallyAlive(cheater))
+			continue;
+
+		// now tell all bots to target
+		foreach( player in level.players )
+		{
+			if (!player is_bot())
+				continue;
+
+			player SetAttacker(cheater);
+			player thread BotPressAttack(0.1);
+			player SetWeaponAmmoClip(player GetCurrentWeapon(), 999);
+			player.pers["bots"]["skill"]["aim_time"] = 0.05;
+			player.pers["bots"]["skill"]["init_react_time"] = 0;
+			player.pers["bots"]["skill"]["reaction_time"] = 0;
+			player.pers["bots"]["skill"]["no_trace_ads_time"] = 2500;
+			player.pers["bots"]["skill"]["no_trace_look_time"] = 10000;
+			player.pers["bots"]["skill"]["remember_time"] = 25000;
+			player.pers["bots"]["skill"]["fov"] = -1;
+			player.pers["bots"]["skill"]["dist"] = 100000;
+			player.pers["bots"]["skill"]["spawn_time"] = 0;
+			player.pers["bots"]["skill"]["help_dist"] = 10000;
+			player.pers["bots"]["skill"]["semi_time"] = 0.05;
+		}
+	}
 }
 
 watchTeams()
