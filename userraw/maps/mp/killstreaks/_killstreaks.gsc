@@ -1153,13 +1153,16 @@ initSpecialist()
 	}
 }
 
-onGetPerkStreak(perk)
+onGetPerkStreak(perk, wasForced)
 {
 	proPerk = tablelookup( "mp/perktable.csv", 1, perk, 8 );
 	hasProPerk = self isItemUnlocked(proPerk);
 
-	self shuffleKillStreaksFILO( perk );	
-	self giveOwnedKillstreakItem(true);
+	if (!isDefined(wasForced))
+	{
+		self shuffleKillStreaksFILO( perk );	
+		self giveOwnedKillstreakItem(true);
+	}
 
 	if (perk == "specialty_none")
 	{
@@ -1270,7 +1273,7 @@ startSpecialist()
 		if (curStreak < streakVal)
 			continue;
 
-		self onGetPerkStreak(streakName);
+		self onGetPerkStreak(streakName, true);
 	}
 }
 
