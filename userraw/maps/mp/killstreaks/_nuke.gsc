@@ -97,6 +97,12 @@ tryUseNuke( lifeId, allowCancel )
 		return false;	
 	}
 
+	if (level.nukeEndsGame)
+	{
+		self iPrintLnBold( &"MP_NUKE_ALREADY_INBOUND" );
+		return false;
+	}
+
 	if ( self isUsingRemote() && ( !isDefined( level.gtnw ) || !level.gtnw ) )
 		return false;
 

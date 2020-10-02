@@ -885,6 +885,7 @@ initKillstreakHud(inity)
 		self.killStreakHudElems[index] setPoint( "RIGHT", "RIGHT", 0, inity - 25 * i );
 		self.killStreakHudElems[index] setShader( streakShader, 20, 20 );
 		self.killStreakHudElems[index].ks_cost = streakCost;
+		self.killStreakHudElems[index].ks_name = streakName;
 		self thread destroyOnEvents(self.killStreakHudElems[index]);
 
 		if (streakCost > highestStreak)
@@ -911,15 +912,15 @@ initKillstreakHud(inity)
 		for (i = self.killStreakHudElems.size - 1; i >= 1; i--)
 		{
 			streakElem = self.killStreakHudElems[i];
-			if (curStreak < streakElem.ks_cost)
-			{
+			if (curStreak >= streakElem.ks_cost || (timesRolledOver > 0 && isSubStr(streakElem.ks_name, "specialty_")))
+				streakElem.alpha = 1;
+			else
+			{	
 				isUnderAStreak = true;
 				self.killStreakHudElems[0] setPoint( "RIGHT", "RIGHT", -25, inity - 25 * (i - 1) );
 				self.killStreakHudElems[0] setText( streakElem.ks_cost - curStreak );
 				streakElem.alpha = 0.5;
 			}
-			else
-				streakElem.alpha = 1;
 		}
 
 		if (!isUnderAStreak && self.killStreakHudElems.size)
@@ -963,6 +964,7 @@ initMW3KillstreakHud()
 		ksIcon.hideWhenInMenu = true;
 		ksIcon.foreground = true;
 		ksIcon.ks_cost = streakCost;
+		ksIcon.ks_name = streakName;
 		self thread destroyOnEvents(ksIcon);
 		self.killStreakHudElems[self.killStreakHudElems.size] = ksIcon;
 	}
@@ -1012,7 +1014,7 @@ initMW3KillstreakHud()
 		{
 			elem = self.killStreakHudElems[i];
 
-			if (curStreak >= elem.ks_cost)
+			if (curStreak >= elem.ks_cost || (timesRolledOver > 0 && isSubStr(elem.ks_name, "specialty_")))
 				elem.alpha = 0.9;
 			else
 			{
