@@ -16,7 +16,16 @@
 		- scr_nuke_perm_vision <bool>
 			true - (default) if to never change the vision back to normal after a bomb
 
-	Thanks: H3X1C, Emosewaj
+		- scr_nuke_canCall_whenTimePassed <float>
+			0 - (default) time in seconds that must pass before someone can call in a nuke
+
+		- scr_nuke_canCall_whenScoreLimitClose <float>
+			0 - (default) ratio of current score to the scorelimit before someone can call a nuke in
+
+		- scr_nuke_canCall_whenScoreLimitClose_selfOnly <bool>
+			false - (default) wether or not to take into account just the caller's score, or everyone's score
+
+	Thanks: H3X1C, Emosewaj, RaidMax
 */
 
 #include common_scripts\utility;
@@ -46,6 +55,10 @@ init()
 	setDvarIfUninitialized( "scr_nuke_emp_duration", 60.0 );
 	setDvarIfUninitialized( "scr_nuke_perm_vision", true );
 	
+	setDvarIfUninitialized( "scr_nuke_canCall_whenTimePassed", 0 );
+	setDvarIfUninitialized( "scr_nuke_canCall_whenScoreLimitClose", 0 );
+	setDvarIfUninitialized( "scr_nuke_canCall_whenScoreLimitClose_selfOnly", false );
+	
 	level.nukeTimer = getDvarInt( "scr_nukeTimer" );
 	level.cancelMode = getDvarInt( "scr_nukeCancelMode" );
 
@@ -53,6 +66,10 @@ init()
 	level.nukeKillsAll = getDvarInt( "scr_nuke_kills_all" );
 	level.nukeEmpDuration = getDvarFloat( "scr_nuke_emp_duration" );
 	level.nukePermAftermath = getDvarFloat( "scr_nuke_perm_vision" );
+
+	level.canCallNukeAfter = getDvarFloat( "scr_nuke_canCall_whenTimePassed" );
+	level.canCallNukeCloseScore = getDvarFloat( "scr_nuke_canCall_whenScoreLimitClose" );
+	level.canCallNukeCloseScore_self = getDvarFloat( "scr_nuke_canCall_whenScoreLimitClose_selfOnly" );
 	
 	/#
 	setDevDvarIfUninitialized( "scr_nukeDistance", 5000 );
@@ -97,10 +114,49 @@ tryUseNuke( lifeId, allowCancel )
 		return false;	
 	}
 
-	if (level.nukeEndsGame)
+	secondsPassed = getSecondsPassed();
+	if (level.canCallNukeAfter > 0 && secondsPassed < level.canCallNukeAfter)
 	{
-		self iPrintLnBold( &"MP_NUKE_ALREADY_INBOUND" );
+		self iPrintLnBold( "You can call in the Nuke in " + (level.canCallNukeAfter - secondsPassed) + " seconds." );
 		return false;
+	}
+
+	scoreLimit = getScoreLimit();
+	if (level.canCallNukeCloseScore > 0 && scoreLimit > 0)
+	{
+		// get highest score
+		if (level.teamBased)
+			highestScore = game[ "teamScores" ][ self.team ];
+		else
+			highestScore = self.score;
+
+		if (!level.canCallNukeCloseScore_self)
+		{
+			if (level.teamBased)
+			{
+				highestScore = game[ "teamScores" ][ "allies" ];
+				if (game[ "teamScores" ][ "axis" ] > highestScore)
+					highestScore = game[ "teamScores" ][ "axis" ];
+			}
+			else
+			{
+				for ( i = 0; i < level.players.size; i++ )
+				{
+					player = level.players[ i ];
+					if ( isDefined( player.score ) && player.score > highestScore )
+						highestScore = player.score;
+				}
+			}
+		}
+
+		if ( (highestScore / scoreLimit) < level.canCallNukeCloseScore )
+		{
+			prefix = "Your s";
+			if (!level.canCallNukeCloseScore_self)
+				prefix = "S";
+			self iPrintLnBold( prefix + "core needs to pass " + (level.canCallNukeCloseScore * scoreLimit) + " before you can call the Nuke in." );
+			return false;
+		}
 	}
 
 	if ( self isUsingRemote() && ( !isDefined( level.gtnw ) || !level.gtnw ) )
