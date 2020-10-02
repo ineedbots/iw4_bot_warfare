@@ -77,11 +77,11 @@ onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, 
 		hidden = self isFakeAnimHidden();
 		self botsDeleteFakeAnim();
 
-		if (!hidden)
+		if (!hidden && !isDefined(self.nuked))
 		{
 			if (isDefined(eAttacker) && isDefined(eAttacker.guid) && isDefined(self.attackerData[eAttacker.guid]) && isDefined(self.attackerData[eAttacker.guid].firstTimeDamaged))
 				self.attackerData[eAttacker.guid].firstTimeDamaged += 100; // two frames?? but it works??
-				
+			
 			wait 0.05;
 		}
 	}
