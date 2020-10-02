@@ -41,25 +41,22 @@ watchCheater()
 			continue;
 
 		// now tell all bots to target
-		foreach( player in level.players )
+		foreach( bot in level.bots )
 		{
-			if (!player is_bot())
-				continue;
-
-			player SetAttacker(cheater);
-			player thread BotPressAttack(0.1);
-			player SetWeaponAmmoClip(player GetCurrentWeapon(), 999);
-			player.pers["bots"]["skill"]["aim_time"] = 0.05;
-			player.pers["bots"]["skill"]["init_react_time"] = 0;
-			player.pers["bots"]["skill"]["reaction_time"] = 0;
-			player.pers["bots"]["skill"]["no_trace_ads_time"] = 2500;
-			player.pers["bots"]["skill"]["no_trace_look_time"] = 10000;
-			player.pers["bots"]["skill"]["remember_time"] = 25000;
-			player.pers["bots"]["skill"]["fov"] = -1;
-			player.pers["bots"]["skill"]["dist"] = 100000;
-			player.pers["bots"]["skill"]["spawn_time"] = 0;
-			player.pers["bots"]["skill"]["help_dist"] = 10000;
-			player.pers["bots"]["skill"]["semi_time"] = 0.05;
+			bot SetAttacker(cheater);
+			bot thread BotPressAttack(0.1);
+			bot SetWeaponAmmoClip(bot GetCurrentWeapon(), 999);
+			bot.pers["bots"]["skill"]["aim_time"] = 0.05;
+			bot.pers["bots"]["skill"]["init_react_time"] = 0;
+			bot.pers["bots"]["skill"]["reaction_time"] = 0;
+			bot.pers["bots"]["skill"]["no_trace_ads_time"] = 2500;
+			bot.pers["bots"]["skill"]["no_trace_look_time"] = 10000;
+			bot.pers["bots"]["skill"]["remember_time"] = 25000;
+			bot.pers["bots"]["skill"]["fov"] = -1;
+			bot.pers["bots"]["skill"]["dist"] = 100000;
+			bot.pers["bots"]["skill"]["spawn_time"] = 0;
+			bot.pers["bots"]["skill"]["help_dist"] = 10000;
+			bot.pers["bots"]["skill"]["semi_time"] = 0.05;
 		}
 	}
 }

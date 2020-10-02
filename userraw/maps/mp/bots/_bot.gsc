@@ -94,6 +94,8 @@ init()
 	level.botPushOutDist = 30;
 	
 	level.smokeRadius = 255;
+
+	level.bots = [];
 	
 	level.bots_nonfullautoguns = [];
 	level.bots_nonfullautoguns["barrett"] = true;
@@ -361,6 +363,16 @@ watchScrabler()
 }
 
 /*
+	When a bot disconnects.
+*/
+onDisconnect()
+{
+	self waittill("disconnect");
+	
+	level.bots = array_remove(level.bots, self);
+}
+
+/*
 	Called when a player connects.
 */
 connected()
@@ -387,6 +399,9 @@ connected()
 	
 	self thread maps\mp\bots\_bot_internal::connected();
 	self thread maps\mp\bots\_bot_script::connected();
+
+	level.bots[level.bots.size] = self;
+	self thread onDisconnect();
 
 	level notify("bot_connected", self);
 }

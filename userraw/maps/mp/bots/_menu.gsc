@@ -14,6 +14,9 @@ init()
 {
   if (getDvar("bots_main_menu") == "")
     setDvar("bots_main_menu", true);
+
+	if (!getDvarInt("bots_main_menu"))
+		return;
   
   thread watchPlayers();
 }
@@ -27,9 +30,6 @@ watchPlayers()
     for (i = level.players.size - 1; i >= 0; i--)
     {
       player = level.players[i];
-
-      if (!getDvarInt("bots_main_menu"))
-        continue;
 
       if (!player is_host())
         continue;
@@ -107,8 +107,7 @@ doGreetings()
 	wait 1;
 	self iPrintln("Welcome to Bot Warfare "+self.name+"!");
 	wait 5;
-	if(getDvarInt("bots_main_menu"))
-		self iPrintln("Press [{+actionslot 2}] to open menu!");
+	self iPrintln("Press [{+actionslot 2}] to open menu!");
 }
 
 watchPlayerOpenMenu()
@@ -122,11 +121,8 @@ watchPlayerOpenMenu()
 		self waittill( "bots_open_menu" );
 		if(!self.menuOpen)
 		{
-			if(getdvarint("bots_main_menu"))
-			{
-				self playLocalSound( "mouse_click" );
-				self thread OpenSub(self.SubMenu);
-			}
+			self playLocalSound( "mouse_click" );
+			self thread OpenSub(self.SubMenu);
 		}
 		else
 		{
@@ -154,7 +150,7 @@ MenuSelect()
 	for(;;)
 	{
 		self waittill( "bots_select" );
-		if(self.MenuOpen && getdvarint("bots_main_menu"))
+		if(self.MenuOpen)
 		{
 			self playLocalSound( "mouse_click" );
 			if(self.SubMenu == "Main")
