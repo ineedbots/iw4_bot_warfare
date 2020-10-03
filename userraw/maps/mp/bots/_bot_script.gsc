@@ -397,7 +397,7 @@ chooseRandomPerk(perkkind, primary)
 		if (!self isItemUnlocked(perk))
 			continue;
 
-		if (RandomFloatRange(0, 1) < (rank / level.maxRank))
+		if (RandomFloatRange(0, 1) < ((rank / level.maxRank) + 0.1))
 			self.pers["bots"]["unlocks"]["upgraded_"+perk] = true;
 
 		return perk;
@@ -512,6 +512,7 @@ chooseRandomSecondary(perk1)
 chooseRandomAttachmentComboForGun(gun)
 {
 	atts = getAttachmentsForGun(gun);
+	rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData("experience") );
 	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
 	reasonable = getDvarInt("bots_loadout_reasonable");
 
@@ -519,6 +520,12 @@ chooseRandomAttachmentComboForGun(gun)
 	{
 		att1 = random(atts);
 		att2 = random(atts);
+
+		if (RandomFloatRange(0, 1) >= ((rank / level.maxRank) + 0.1))
+		{
+			att1 = "none";
+			att2 = "none";
+		}
 
 		if (!isValidAttachmentCombo(att1, att2))
 			continue;
@@ -586,7 +593,7 @@ setClasses()
 {
 	rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData("experience") );
 
-	if (RandomFloatRange(0, 1) < (rank / level.maxRank))
+	if (RandomFloatRange(0, 1) < ((rank / level.maxRank) + 0.1))
 		self.pers["bots"]["unlocks"]["ghillie"] = true;
 
 	for (i = 0; i < 5; i++)
