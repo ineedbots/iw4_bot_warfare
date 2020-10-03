@@ -1285,26 +1285,67 @@ applySpecialistKillstreaks()
 		modifier = 0;
 
 	killstreaks = [];
-
 	killstreaks[2 + modifier] = self.pers["specialist_perks"][self.class_num][0];
 	killstreaks[4 + modifier] = self.pers["specialist_perks"][self.class_num][1];
 	killstreaks[6 + modifier] = self.pers["specialist_perks"][self.class_num][2];
 	killstreaks[8 + modifier] = "specialty_onemanarmy";
 
-	streakVals = GetArrayKeys(self.startKillStreaks); // we assume that nuke val is above 8
-
+	maxVal = -1;
+	oldStreaks = [];
+	streakVals = GetArrayKeys(self.startKillStreaks);
 	for (i = 0; i < streakVals.size; i++)
 	{
 		streakVal = streakVals[i];
 		streakName = self.startKillStreaks[streakVal];
 
+		if (isSubStr(streakName, "-rollover"))
+			continue;
+
 		if (!self.startedWithHardline)
 			streakVal += modifier;
 
-		killstreaks[streakVal] = streakName;
+		if (streakVal > maxVal)
+			maxVal = streakVal;
+
+		oldStreaks[streakVal] = streakName;
 	}
 
-	self.killStreaks = killstreaks;
+	if (maxVal < (8 + modifier))
+		maxVal = 8 + modifier;
+
+	// build new killstreaks with merged specialists
+	newKillstreaks = [];
+	for (i = 0; i <= maxVal; i++)
+	{
+		if (isDefined(killstreaks[i]))
+		{
+			newKillstreaks[i] = killstreaks[i];
+			continue;
+		}
+
+		if (isDefined(oldStreaks[i]))
+		{
+			newKillstreaks[i] = oldStreaks[i];
+			continue;
+		}
+	}
+
+	// defcon rollover
+	maxRollOvers = 10;
+	for ( rollOver = 1; rollOver <= maxRollOvers; rollOver++ )
+	{
+		streakVals = GetArrayKeys(oldStreaks);
+
+		for (i = 0; i < streakVals.size; i++)
+		{
+			streakVal = streakVals[i];
+			streakName = oldStreaks[streakVal];
+
+			newKillstreaks[ streakVal + (maxVal*rollOver) ] = streakName + "-rollover" + rollOver;
+		}
+	}
+
+	self.killStreaks = newKillstreaks;
 
 	// update the hud incase hardline changed the values
 	self startKSHud();
