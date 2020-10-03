@@ -1799,8 +1799,9 @@ bot_perk_think()
 				break;
 
 			class = "";
+			reasonable = getDvarInt("bots_loadout_reasonable");
 			rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData( "experience" ) ) + 1;
-			if(rank < 4 || randomInt(100) < 2)
+			if(rank < 4 || (randomInt(100) < 2 && !reasonable))
 			{
 				while(class == "")
 				{
