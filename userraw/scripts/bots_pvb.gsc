@@ -63,9 +63,15 @@ watchCheater()
 
 watchTeams()
 {
+	if(getDvar("bot_pvb_helper") == "")
+		setDvar("bot_pvb_helper", false);
+
 	for (;;)
 	{
 		wait 1;
+		
+		if (!getDvarInt("bot_pvb_helper"))
+			continue;
 
 		foreach (player in level.players)
 		{
