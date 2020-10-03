@@ -55,9 +55,9 @@ onBotGivenLoadout()
 
 		// make into sniper model
 		if ( level.environment != "" )
-			self [[game[team+"_model"]["GHILLIE"]]]();
+			self [[game[self.team+"_model"]["GHILLIE"]]]();
 		else
-			self [[game[team+"_model"]["SNIPER"]]]();
+			self [[game[self.team+"_model"]["SNIPER"]]]();
 		// reset the bot anim model
 		self maps\mp\bots\_bot_internal::botsDeleteFakeAnim();
 	}
