@@ -361,7 +361,7 @@ chooseRandomPerk(perkkind, primary)
 			{
 				if (perk != "specialty_bulletdamage")
 				{
-					if (randomInt(100) < 25)
+					if (randomInt(100) < 35)
 						continue;
 					if (primary == "cheytac")
 						continue;
