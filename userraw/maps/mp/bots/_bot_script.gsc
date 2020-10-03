@@ -316,11 +316,12 @@ getKillstreaks()
 /*
 	bots chooses a random perk
 */
-chooseRandomPerk(perkkind)
+chooseRandomPerk(perkkind, primary)
 {
 	perks = getPerks(perkkind);
 	rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData("experience") );
 	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
+	reasonable = getDvarInt("bots_loadout_reasonable");
 
 	while (true)
 	{
@@ -333,6 +334,59 @@ chooseRandomPerk(perkkind)
 
 			if (perk == "specialty_pistoldeath")
 				continue;
+		}
+
+		if (reasonable)
+		{
+			if (perk == "specialty_onemanarmy")
+				continue;
+			if (perk == "specialty_bling")
+				continue;
+			if (perk == "specialty_explosivedamage")
+				continue;
+			if (perk == "specialty_localjammer")
+				continue;
+			if (perk == "throwingknife_mp")
+				continue;
+			if (perk == "specialty_blastshield")
+				continue;
+			if (perk == "c4_mp")
+				continue;
+			if (perk == "frag_grenade_mp")
+				continue;
+			if (perk == "specialty_copycat")
+				continue;
+
+			if (perkkind == "perk2")
+			{
+				if (perk != "specialty_bulletdamage")
+				{
+					if (primary == "cheytac")
+						continue;
+					if (primary == "rpd")
+						continue;
+					if (primary == "ak47" && randomInt(100) < 80)
+						continue;
+					if (primary == "aug")
+						continue;
+					if (primary == "barrett" && randomInt(100) < 80)
+						continue;
+					if (primary == "tavor" && randomInt(100) < 80)
+						continue;
+					if (primary == "scar")
+						continue;
+					if (primary == "masada" && randomInt(100) < 60)
+						continue;
+					if (primary == "m4" && randomInt(100) < 80)
+						continue;
+					if (primary == "m16")
+						continue;
+					if (primary == "fal")
+						continue;
+					if (primary == "famas")
+						continue;
+				}
+			}
 		}
 
 		if (perk == "specialty_null")
@@ -373,6 +427,7 @@ chooseRandomPrimary()
 {
 	primaries = getPrimaries();
 	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
+	reasonable = getDvarInt("bots_loadout_reasonable");
 
 	while (true)
 	{
@@ -382,6 +437,24 @@ chooseRandomPrimary()
 		{
 			if (primary == "riotshield")
 				continue;	
+		}
+
+		if (reasonable)
+		{
+			if (primary == "riotshield")
+				continue;
+			if (primary == "wa2000")
+				continue;
+			if (primary == "uzi")
+				continue;
+			if (primary == "sa80")
+				continue;
+			if (primary == "fn2000")
+				continue;
+			if (primary == "m240")
+				continue;
+			if (primary == "mg4")
+				continue;
 		}
 
 		if (!self isItemUnlocked(primary))
@@ -401,6 +474,7 @@ chooseRandomSecondary(perk1)
 
 	secondaries = getSecondaries();
 	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
+	reasonable = getDvarInt("bots_loadout_reasonable");
 
 	while (true)
 	{
@@ -409,6 +483,14 @@ chooseRandomSecondary(perk1)
 		if (!allowOp)
 		{
 			if (secondary == "at4" || secondary == "rpg" || secondary == "m79")
+				continue;
+		}
+
+		if (reasonable)
+		{
+			if (secondary == "ranger")
+				continue;
+			if (secondary == "model1887")
 				continue;
 		}
 
@@ -429,6 +511,7 @@ chooseRandomAttachmentComboForGun(gun)
 {
 	atts = getAttachmentsForGun(gun);
 	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
+	reasonable = getDvarInt("bots_loadout_reasonable");
 
 	while (true)
 	{
@@ -442,6 +525,26 @@ chooseRandomAttachmentComboForGun(gun)
 		{
 			if (att1 == "gl" || att2 == "gl")
 				continue;
+		}
+
+		if (reasonable)
+		{
+			if (att1 == "shotgun" || att2 == "shotgun")
+				continue;
+			if ((att1 == "akimbo" || att2 == "akimbo") && gun != "ranger" && gun != "model1887")
+				continue;
+			if (att1 == "acog" || att2 == "acog")
+				continue;
+			if (att1 == "thermal" || att2 == "thermal")
+				continue;
+			if (att1 == "rof" || att2 == "rof")
+				continue;
+
+			if (att1 == "silencer" || att2 == "silencer")
+			{
+				if (gun == "spas12" || gun == "aa12" || gun == "striker" || gun == "rpd" || gun == "m1014" || gun == "cheytac" || gun == "barrett" || gun == "aug" || gun == "m240" || gun == "mg4" || gun == "sa80" || gun == "wa2000")
+					continue;
+			}
 		}
 
 		retAtts = [];
@@ -458,10 +561,17 @@ chooseRandomAttachmentComboForGun(gun)
 chooseRandomTactical()
 {
 	tacts = strTok("flash_grenade,smoke_grenade,concussion_grenade", ",");
+	reasonable = getDvarInt("bots_loadout_reasonable");
 
 	while (true)
 	{
 		tact = random(tacts);
+
+		if (reasonable)
+		{
+			if (tact == "smoke_grenade")
+				continue;
+		}
 
 		return tact;
 	}
@@ -481,11 +591,11 @@ setClasses()
 	{
 		equipment = chooseRandomPerk("equipment");
 		perk1 = chooseRandomPerk("perk1");
-		perk2 = chooseRandomPerk("perk2");
 		perk3 = chooseRandomPerk("perk3");
 		deathstreak = chooseRandomPerk("perk4");
 		tactical = chooseRandomTactical();
 		primary = chooseRandomPrimary();
+		perk2 = chooseRandomPerk("perk2", primary);
 		primaryAtts = chooseRandomAttachmentComboForGun(primary);
 		primaryCamo = chooseRandomCamo();
 		secondary = chooseRandomSecondary(perk1);
@@ -562,6 +672,8 @@ setKillstreaks()
 	if (rankId >= 22)
 		chooseableStreaks++;
 
+	reasonable = getDvarInt("bots_loadout_reasonable");
+
 	i = 0;
 	while (i < chooseableStreaks)
 	{
@@ -574,6 +686,24 @@ setKillstreaks()
 
 		if (isColidingKillstreak(killstreaks, streak))
 			continue;
+
+		if (reasonable)
+		{
+			if (streak == "stealth_airstrike")
+				continue;
+			if (streak == "airdrop_mega")
+				continue;
+			if (streak == "emp")
+				continue;
+			if (streak == "airdrop_sentry_minigun")
+				continue;
+			if (streak == "airdrop")
+				continue;
+			if (streak == "precision_airstrike")
+				continue;
+			if (streak == "helicopter")
+				continue;
+		}
 
 		killstreaks[slot] = streak;
 		i++;
@@ -775,9 +905,10 @@ classWatch()
 			
 		wait 0.5;
 		
+		reasonable = getDvarInt("bots_loadout_reasonable");
 		class = "";
 		rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData( "experience" ) ) + 1;
-		if(rank < 4 || randomInt(100) < 2)
+		if(rank < 4 || (randomInt(100) < 2 && !reasonable))
 		{
 			while(class == "")
 			{
