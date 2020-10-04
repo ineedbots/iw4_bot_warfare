@@ -97,6 +97,7 @@ StartDev()
 	self thread watchUnlinkWaypointCommand();
 	self thread watchAutoLinkCommand();
 	self thread updateWaypointsStats();
+	self thread watchAstarCommand();
 	
 	self thread sayExtras();
 }
@@ -115,6 +116,31 @@ sayExtras()
 	self iprintln("Else the waypoint will be your stance.");
 	self iprintln("Making a crouch waypoint with only one link...");
 	self iprintln("Makes a camping waypoint.");
+}
+
+watchAstarCommand()
+{
+	self endon("disconnect");
+	self endon("death");
+
+	self notifyOnPlayerCommand("astar", "+gostand");
+	for (;;)
+	{
+		self waittill("astar");
+		self iprintln("Start AStar");
+		self.astar = undefined;
+		astar = spawnStruct();
+		astar.start = self.origin;
+
+		self waittill("astar");
+		self iprintln("End AStar");
+		astar.goal = self.origin;
+
+		astar.nodes = AStarSearch(astar.start, astar.goal, self.team, false);
+		self iprintln("AStar size: " + astar.nodes.size);
+
+		self.astar = astar;
+	}
 }
 
 updateWaypointsStats()
@@ -188,6 +214,25 @@ updateWaypointsStats()
       time = 0;
       self iPrintLnBold(self.nearest + " children:  " + buildChildString(self.nearest));
     }
+
+		if (isDefined(self.astar))
+		{
+			print3d(self.astar.start + (0, 0, 35), "start", (0,0,1), 2);
+			print3d(self.astar.goal + (0, 0, 35), "goal", (0,0,1), 2);
+
+			prev = self.astar.start + (0, 0, 35);
+
+			for (i = self.astar.nodes.size - 1; i >= 0; i--)
+			{
+				node = self.astar.nodes[i];
+
+				line(prev, level.waypoints[node].origin + (0, 0, 35), (0,1,1));
+				
+				prev = level.waypoints[node].origin + (0, 0, 35);
+			}
+
+			line(prev, self.astar.goal + (0, 0, 35), (0,1,1));
+		}
 	}
 }
 
