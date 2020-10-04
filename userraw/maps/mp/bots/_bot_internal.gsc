@@ -800,6 +800,8 @@ moveHack()
 		if (self _hasPerk("specialty_lightweight"))
 			moveSpeed *= 1.07;
 
+		// speed according to forward, left, right, back components?
+
 		moveSpeed *= (getdvarfloat("g_speed")/190.0);
 		moveSpeed *= self.moveSpeedScaler;
 
