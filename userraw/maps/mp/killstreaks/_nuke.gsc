@@ -25,6 +25,9 @@
 		- scr_nuke_canCall_whenScoreLimitClose_selfOnly <bool>
 			false - (default) wether or not to take into account just the caller's score, or everyone's score
 
+		- scr_nuke_doSlowmo <bool>
+			true - (default) should do a slowmo effect when nuke
+
 	Thanks: H3X1C, Emosewaj, RaidMax
 */
 
@@ -64,7 +67,7 @@ init()
 	level.cancelMode = getDvarInt( "scr_nukeCancelMode" );
 
 	level.nukeEndsGame = !getDvarInt( "scr_nuke_is_moab" );
-	level.nukeDoSlowmo = !getDvarInt( "scr_nuke_doSlowmo" );
+	level.nukeDoSlowmo = getDvarInt( "scr_nuke_doSlowmo" );
 	level.nukeKillsAll = getDvarInt( "scr_nuke_kills_all" );
 	level.nukeEmpDuration = getDvarFloat( "scr_nuke_emp_duration" );
 	level.nukePermAftermath = getDvarFloat( "scr_nuke_perm_vision" );

@@ -1,3 +1,13 @@
+/*
+	_nuke modded
+	Author: INeedGames
+	Date: 09/22/2020
+
+	DVARS:
+		- scr_killcam_doSlowmo <bool>
+			true - (default) should do a slowmo effect when final killcam
+*/
+
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 
@@ -9,6 +19,9 @@ init()
 	precacheShader("specialty_copycat");
 	
 	level.killcam = maps\mp\gametypes\_tweakables::getTweakableValue( "game", "allowkillcam" );
+
+	setDvarIfUninitialized( "scr_killcam_doSlowmo", true );
+	level.killcam_doSlowmo = getDVarInt("scr_killcam_doSlowmo");
 }
 
 killcam(
@@ -232,9 +245,13 @@ doFinalKillCamFX( camTime )
 		wait( camTime - 1.0 );
 	}
 	
-	//setSlowMotion( 1.0, 0.25, intoSlowMoTime ); // start timescale, end timescale, lerp duration
+	if (level.killcam_doSlowmo)
+		setSlowMotion( 1.0, 0.25, intoSlowMoTime ); // start timescale, end timescale, lerp duration
+
 	wait( intoSlowMoTime + .5 );
-	//setSlowMotion( 0.25, 1, 1.0 );
+
+	if (level.killcam_doSlowmo)
+		setSlowMotion( 0.25, 1, 1.0 );
 	
 	level.doingFinalKillcamFx = undefined;
 }
