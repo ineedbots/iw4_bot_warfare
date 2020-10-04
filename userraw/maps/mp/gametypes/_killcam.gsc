@@ -232,9 +232,9 @@ doFinalKillCamFX( camTime )
 		wait( camTime - 1.0 );
 	}
 	
-	setSlowMotion( 1.0, 0.25, intoSlowMoTime ); // start timescale, end timescale, lerp duration
+	//setSlowMotion( 1.0, 0.25, intoSlowMoTime ); // start timescale, end timescale, lerp duration
 	wait( intoSlowMoTime + .5 );
-	setSlowMotion( 0.25, 1, 1.0 );
+	//setSlowMotion( 0.25, 1, 1.0 );
 	
 	level.doingFinalKillcamFx = undefined;
 }
