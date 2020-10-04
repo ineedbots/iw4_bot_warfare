@@ -20,6 +20,7 @@
 *.stat
 logs/
 demos/
+images/
 missingasset.csv
 userraw/scripts/_commands.gsc
 userraw/scripts/_customcallbacks.gsc

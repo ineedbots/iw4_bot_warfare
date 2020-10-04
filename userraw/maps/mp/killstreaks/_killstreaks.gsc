@@ -1277,6 +1277,15 @@ startSpecialist()
 	}
 }
 
+getSpecialistKillstreakCount(slot, count)
+{
+	dvarAmount = getDVarInt("scr_specialist_killCount_" + slot);
+	if (dvarAmount < 2)
+		return count;
+
+	return dvarAmount;
+}
+
 applySpecialistKillstreaks()
 {
 	if ( self _hasPerk( "specialty_hardline" ) )
@@ -1285,10 +1294,10 @@ applySpecialistKillstreaks()
 		modifier = 0;
 
 	killstreaks = [];
-	killstreaks[2 + modifier] = self.pers["specialist_perks"][self.class_num][0];
-	killstreaks[4 + modifier] = self.pers["specialist_perks"][self.class_num][1];
-	killstreaks[6 + modifier] = self.pers["specialist_perks"][self.class_num][2];
-	killstreaks[8 + modifier] = "specialty_onemanarmy";
+	killstreaks[getSpecialistKillstreakCount(0, 2) + modifier] = self.pers["specialist_perks"][self.class_num][0];
+	killstreaks[getSpecialistKillstreakCount(1, 4) + modifier] = self.pers["specialist_perks"][self.class_num][1];
+	killstreaks[getSpecialistKillstreakCount(2, 6) + modifier] = self.pers["specialist_perks"][self.class_num][2];
+	killstreaks[getSpecialistKillstreakCount(3, 8) + modifier] = "specialty_onemanarmy";
 
 	maxVal = -1;
 	oldStreaks = [];
@@ -1351,13 +1360,15 @@ applySpecialistKillstreaks()
 	self startKSHud();
 
 	// give xp every second kill like in mw3
-	waittillframeend;
 	self thread watchSpecialistOnKill();
 }
 
 watchSpecialistOnKill()
 {
 	self endon("disconnect");
+	
+	waittillframeend;
+	
 	self notify("watchSpecialistOnKill");
 	self endon("watchSpecialistOnKill");
 

@@ -4,6 +4,5 @@ unreleased gamemodes
 
 _other:
 dvars, loadout, behaviour, menu
-fun menu
 documentation and tutorials
 modules (iw4x (http), iw4m1)
