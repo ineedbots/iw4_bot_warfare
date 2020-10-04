@@ -51,6 +51,7 @@ init()
 	setDvarIfUninitialized( "scr_nukeCancelMode", 0 );
 
 	setDvarIfUninitialized( "scr_nuke_is_moab", false );
+	setDvarIfUninitialized( "scr_nuke_doSlowmo", true );
 	setDvarIfUninitialized( "scr_nuke_kills_all", true );
 	setDvarIfUninitialized( "scr_nuke_emp_duration", 60.0 );
 	setDvarIfUninitialized( "scr_nuke_perm_vision", true );
@@ -63,6 +64,7 @@ init()
 	level.cancelMode = getDvarInt( "scr_nukeCancelMode" );
 
 	level.nukeEndsGame = !getDvarInt( "scr_nuke_is_moab" );
+	level.nukeDoSlowmo = !getDvarInt( "scr_nuke_doSlowmo" );
 	level.nukeKillsAll = getDvarInt( "scr_nuke_kills_all" );
 	level.nukeEmpDuration = getDvarFloat( "scr_nuke_emp_duration" );
 	level.nukePermAftermath = getDvarFloat( "scr_nuke_perm_vision" );
@@ -404,6 +406,9 @@ nukeAftermathEffect()
 
 nukeSlowMo()
 {
+	if (!level.nukeDoSlowmo)
+		return;
+
 	//SetSlowMotion( <startTimescale>, <endTimescale>, <deltaTime> )
 	setSlowMotion( 1.0, 0.25, 0.5 );
 	level waittill_either( "nuke_death", "nuke_cancelled" );
