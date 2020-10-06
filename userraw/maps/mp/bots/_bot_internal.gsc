@@ -567,7 +567,6 @@ UseRunThink()
 			lengthsquared(self.bot.velocity) <= 25 ||
 			self IsStunned() || self isArtShocked() || self maps\mp\_flashgrenades::isFlashbanged())
 			{
-				self.bot.running = false;
 				self thread doRunDelay();
 			}
 		}
@@ -586,8 +585,14 @@ doRunDelay()
 {
 	self endon("disconnect");
 	self endon("death");
+
+	if (!self.bot.running)
+		return;
+
 	self notify("bot_run_delay");
 	self endon("bot_run_delay");
+
+	self.bot.running = false;
 
 	if (self _hasPerk("specialty_fastsprintrecovery"))
 		wait 0.5;
@@ -790,6 +795,9 @@ moveHack()
 			else
 				moveSpeed *= (((1 - strafeMultiplier) * botForwardMoveCone) + strafeMultiplier);
 		}
+
+		if (self.bot.running && botForwardMoveCone < 0.5)
+			self thread doRunDelay();
 
 		if (self.bot.climbing)
 		{
@@ -2969,6 +2977,7 @@ sprint()
 	if (self.bot.run_time < 2.0)
 		return;
 
+	self notify("bot_run_delay");
 	self.bot.running = true;
 	self.bot.runningafter = true;
 }
