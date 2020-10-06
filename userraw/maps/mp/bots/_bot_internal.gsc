@@ -2566,6 +2566,9 @@ movetowards(goal)
 	self notify("completed_move_to");
 }
 
+/*
+	Bot will not move for a small amount of time
+*/
 dontMoveForABit()
 {
 	self endon("disconnect");
