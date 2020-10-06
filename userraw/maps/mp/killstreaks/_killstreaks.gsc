@@ -78,7 +78,7 @@ init()
 	setDvarIfUninitialized( "scr_killstreakHud", false );
 	setDvarIfUninitialized( "scr_killstreak_mod", 0 );
 
-	setDvarIfUninitialized( "scr_specialist", true );
+	setDvarIfUninitialized( "scr_specialist", false );
 	setDvarIfUninitialized( "scr_specialist_perks1", "specialty_scavenger,specialty_fastreload,specialty_marathon" );
 	setDvarIfUninitialized( "scr_specialist_perks2", "specialty_bulletdamage,specialty_lightweight,specialty_coldblooded,specialty_explosivedamage,specialty_hardline" );
 	setDvarIfUninitialized( "scr_specialist_perks3", "specialty_bulletaccuracy,specialty_heartbreaker,specialty_detectexplosive,specialty_extendedmelee,specialty_localjammer" );
