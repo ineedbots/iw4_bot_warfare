@@ -770,6 +770,27 @@ moveHack()
 				moveSpeed *= 0.2;
 		}
 
+		myOrg = self.origin;
+		myOrg = (myOrg[0], myOrg[1], 0);
+		myAngles = self GetPlayerAngles();
+		myAngles = (0, myAngles[1], 0);
+		myVelocity = self.bot.velocity;
+		myVelocity = (myVelocity[0], myVelocity[1], 0);
+
+		// 1 is totally forward, 0 is left or right, -1 is backward
+		botForwardMoveCone = GetConeDot(myOrg + myVelocity, myOrg, myAngles);
+
+		// apply strafe slowness
+		if (botForwardMoveCone < 0.95)
+		{
+			strafeMultiplier = 0.667;
+
+			if (botForwardMoveCone < 0)
+				moveSpeed *= strafeMultiplier;
+			else
+				moveSpeed *= (((1 - strafeMultiplier) * botForwardMoveCone) + strafeMultiplier);
+		}
+
 		if (self.bot.climbing)
 		{
 			if (self _hasPerk("specialty_fastmantle"))
@@ -799,8 +820,6 @@ moveHack()
 
 		if (self _hasPerk("specialty_lightweight"))
 			moveSpeed *= 1.07;
-
-		// speed according to forward, left, right, back components?
 
 		moveSpeed *= (getdvarfloat("g_speed")/190.0);
 		moveSpeed *= self.moveSpeedScaler;
