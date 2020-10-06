@@ -1328,13 +1328,13 @@ nearAnyOfWaypoints(dist, waypoints)
 getNearestWaypointOfWaypoints(waypoints)
 {
 	answer = undefined;
-	closestDist = -1;
+	closestDist = 999999999999;
 	for (i = 0; i < waypoints.size; i++)
 	{
 		waypoint = waypoints[i];
 		thisDist = DistanceSquared(self.origin, waypoint.origin);
 
-		if (isDefined(answer) && thisDist < closestDist)
+		if (thisDist > closestDist)
 			continue;
 
 		answer = waypoint;
