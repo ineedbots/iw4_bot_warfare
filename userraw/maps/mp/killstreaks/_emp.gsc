@@ -134,7 +134,7 @@ EMP_JamTeam( teamName, duration, delay, silent )
 	level.teamEMPed[teamName] = true;
 	level notify ( "emp_update" );
 	
-	level destroyActiveVehicles( self, !level.empEffectsAll );
+	level destroyActiveVehicles( self, !level.empDoesFriendlyFire );
 	
 	maps\mp\gametypes\_hostmigration::waitLongDurationWithHostMigrationPause( duration );
 	
