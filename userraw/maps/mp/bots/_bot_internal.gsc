@@ -2139,12 +2139,6 @@ aim()
 			nadeAimOffset = 0;
 			last_pos = self.bot.after_target.last_pos;
 			dist = DistanceSquared(self.origin, last_pos);
-			aimpos = last_pos + (0, 0, self getEyeHeight() + nadeAimOffset);
-
-			if (usingRemote)
-				aimpos = last_pos;
-
-			conedot = getConeDot(aimpos, eyePos, angles);
 
 			if(weaponClass(curweap) == "grenade" || curweap == "throwingknife_mp")
 			{
@@ -2153,6 +2147,11 @@ aim()
 				else
 					nadeAimOffset = dist/3000;
 			}
+
+			aimpos = last_pos + (0, 0, self getEyeHeight() + nadeAimOffset);
+			if (usingRemote)
+				aimpos = last_pos;
+			conedot = getConeDot(aimpos, eyePos, angles);
 
 			self thread bot_lookat(aimpos, aimspeed);
 
