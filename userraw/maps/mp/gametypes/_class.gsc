@@ -106,8 +106,8 @@ init()
 	setDvar("scr_streakcount_harrier_airstrike", 8);
 	setDvar("scr_streakcount_nuke", 15);
 	setDvar("scr_allow_mp5k_silencer_mp", 0);
-	setDvar("scr_one_flash", 0);
-	setDvar("scr_one_stun", 0);*/
+	setDvar("scr_num_flash", 0);
+	setDvar("scr_num_stun", 0);*/
 
 	/*
 	**	Things that will replace restricted ones, if more than one is specified one of those will be chosen 	
@@ -125,8 +125,8 @@ init()
 
 	// message
 	setDvarIfUninitialized( "scr_restriction_messages", 0 );
-	setDvarIfUninitialized("scr_one_flash", 0);
-	setDvarIfUninitialized("scr_one_stun", 0);
+	setDvarIfUninitialized("scr_num_flash", 2);
+	setDvarIfUninitialized("scr_num_stun", 2);
 
 	/*
 	** Don't touch the definions below!
@@ -144,8 +144,8 @@ init()
 	level.restrictionMessages = getDvarInt("scr_restriction_messages");
 
 	//only one Flash/Stun grenade
-	level.oneFlash = getDvarInt( "scr_one_flash");
-	level.oneStun = getDvarInt( "scr_one_stun");
+	level.numFlash = getDvarInt( "scr_num_flash");
+	level.numStun = getDvarInt( "scr_num_stun");
 
 
 	level thread onPlayerConnecting();
@@ -723,10 +723,10 @@ giveLoadout( team, class, allowCopycat )
 	self giveWeapon( offhandSecondaryWeapon );
 	if( loadOutOffhand == "smoke_grenade" )
 		self setWeaponAmmoClip( offhandSecondaryWeapon, 1 );
-	else if( loadOutOffhand == "flash_grenade" && !level.oneFlash )
-		self setWeaponAmmoClip( offhandSecondaryWeapon, 2 );
-	else if( loadOutOffhand == "concussion_grenade" && !level.oneStun )
-		self setWeaponAmmoClip( offhandSecondaryWeapon, 2 );
+	else if( loadOutOffhand == "flash_grenade" )
+		self setWeaponAmmoClip( offhandSecondaryWeapon, level.numFlash );
+	else if( loadOutOffhand == "concussion_grenade" )
+		self setWeaponAmmoClip( offhandSecondaryWeapon, level.numStun );
 	else
 		self setWeaponAmmoClip( offhandSecondaryWeapon, 1 );
 	
