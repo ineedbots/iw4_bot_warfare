@@ -914,39 +914,7 @@ classWatch()
 			
 		wait 0.5;
 		
-		reasonable = getDvarInt("bots_loadout_reasonable");
-		class = "";
-		rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData( "experience" ) ) + 1;
-		if(rank < 4 || (randomInt(100) < 2 && !reasonable))
-		{
-			while(class == "")
-			{
-				switch(randomInt(5))
-				{
-					case 0:
-						class = "class0";
-						break;
-					case 1:
-						class = "class1";
-						break;
-					case 2:
-						class = "class2";
-						break;
-					case 3:
-						if(rank >= 2)
-							class = "class3";
-						break;
-					case 4:
-						if(rank >= 3)
-							class = "class4";
-						break;
-				}
-			}
-		}
-		else
-		{
-			class = "custom"+(randomInt(5)+1);
-		}
+		class = self chooseRandomClass();
 		
 		self notify("menuresponse", game["menu_changeclass"], class);
 		self.bot_change_class = true;
@@ -954,6 +922,48 @@ classWatch()
 		while(isdefined(self.pers["team"]) && isdefined(self.pers["class"]) && isDefined(self.bot_change_class))
 			wait .05;
 	}
+}
+
+/*
+	Chooses a random class
+*/
+chooseRandomClass()
+{
+	reasonable = getDvarInt("bots_loadout_reasonable");
+	class = "";
+	rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData( "experience" ) ) + 1;
+	if(rank < 4 || (randomInt(100) < 2 && !reasonable))
+	{
+		while(class == "")
+		{
+			switch(randomInt(5))
+			{
+				case 0:
+					class = "class0";
+					break;
+				case 1:
+					class = "class1";
+					break;
+				case 2:
+					class = "class2";
+					break;
+				case 3:
+					if(rank >= 2)
+						class = "class3";
+					break;
+				case 4:
+					if(rank >= 3)
+						class = "class4";
+					break;
+			}
+		}
+	}
+	else
+	{
+		class = "custom"+(randomInt(5)+1);
+	}
+
+	return class;
 }
 
 /*
@@ -1813,44 +1823,10 @@ bot_perk_think()
 			if ((!anyWeapout && randomInt(100) < 90) || randomInt(100) < 10)
 				break;
 
-			class = "";
-			reasonable = getDvarInt("bots_loadout_reasonable");
-			rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData( "experience" ) ) + 1;
-			if(rank < 4 || (randomInt(100) < 2 && !reasonable))
-			{
-				while(class == "")
-				{
-					switch(randomInt(5))
-					{
-						case 0:
-							class = "class0";
-							break;
-						case 1:
-							class = "class1";
-							break;
-						case 2:
-							class = "class2";
-							break;
-						case 3:
-							if(rank >= 2)
-								class = "class3";
-							break;
-						case 4:
-							if(rank >= 3)
-								class = "class4";
-							break;
-					}
-				}
-			}
-			else
-			{
-				class = "custom"+(randomInt(5)+1);
-			}
+			class = self chooseRandomClass();
 			self.bot_oma_class = class;
-			self notify("bot_force_check_switch");
-			wait 0.1;
 
-			if (self GetCurrentWeapon() != "onemanarmy_mp")
+			if (!self changeToWeapon("onemanarmy_mp"))
 			{
 				self.bot_oma_class = undefined;
 				break;
@@ -1986,11 +1962,7 @@ bot_use_tube_think()
 		self BotStopMoving(true);
 		wait 1;
 
-		self.bot_perf_switch_weapon = tube;
-		self notify("bot_force_check_switch");
-		wait 0.1;
-
-		if (self GetCurrentWeapon() == tube)
+		if (self changeToWeapon(tube))
 		{
 			self thread fire_current_weapon();
 			self waittill_any_timeout(5, "missile_fire", "weapon_change");
@@ -2267,6 +2239,28 @@ bot_use_grenade_think()
 	}
 }
 
+changeToWeapon(weap)
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon("game_ended");
+
+	if (!self HasWeapon(weap))
+		return false;
+
+	if (self GetCurrentWeapon() == weap)
+		return true;
+
+	self.bot_perf_switch_weapon = weap;
+	self notify("bot_force_check_switch");
+
+	self waittill_any_timeout(5, "weapon_change");
+
+	self.bot_perf_switch_weapon = undefined;
+
+	return (self GetCurrentWeapon() == weap);
+}
+
 /*
 	BOts thinking of using javelins
 */
@@ -2381,11 +2375,11 @@ bot_jav_loc_think()
 			continue;
 
 		self SetBotJavelinLocation(loc);
-		self notify("bot_force_check_switch");
 
-		wait 0.1;
-		if (self GetCurrentWeapon() == "javelin_mp")
+		if (self changeToWeapon("javelin_mp"))
+		{
 			self waittill_any_timeout(10, "missile_fire", "weapon_change");
+		}
 			
 		self ClearBotJavelinLocation();
 	}
