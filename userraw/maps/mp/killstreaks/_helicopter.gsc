@@ -2261,6 +2261,7 @@ deployFlares()
 heli_flares_monitor(numFlares)
 {
 	level endon ( "game_ended" );
+	self endon ( "death" );
 	
 	for ( ;; )
 	{
