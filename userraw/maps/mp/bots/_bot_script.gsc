@@ -2239,6 +2239,9 @@ bot_use_grenade_think()
 	}
 }
 
+/*
+	Changes to the weap
+*/
 changeToWeapon(weap)
 {
 	self endon("disconnect");
