@@ -73,20 +73,29 @@ watchCheater()
 
 watchTeams()
 {
-	if(getDvar("bot_pvb_helper") == "")
-		setDvar("bot_pvb_helper", false);
+	if(getDvar("bot_pvb_helper_noPlayersOnTeam") == "")
+		setDvar("bot_pvb_helper_noPlayersOnTeam", "");
 
 	for (;;)
 	{
 		wait 1;
 		
-		if (!getDvarInt("bot_pvb_helper"))
+		if (getDvar("bot_pvb_helper_noPlayersOnTeam") == "")
 			continue;
 
+		team = getDvar("bot_pvb_helper_noPlayersOnTeam");
 		foreach (player in level.players)
 		{
-			if (player.team == "axis" && !player is_bot())
+			if (player is_bot())
+				continue;
+
+			if (player.team != team)
+				continue;
+
+			if (team == "axis")
 				player [[level.allies]]();
+			else
+				player [[level.axis]]();
 		}
 	}
 }
