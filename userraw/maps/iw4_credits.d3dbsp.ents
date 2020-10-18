@@ -472,3 +472,182 @@
 "targetname" "airstrikeheight"
 "origin" "0 0 600"
 }
+
+{
+"origin" "630.0 0.0 0.0"
+"angles" "0 180 0"
+"classname" "mp_dom_spawn"
+}
+{
+"origin" "-630.0 0.0 0.0"
+"angles" "0 0 0"
+"classname" "mp_dom_spawn"
+}
+{
+"origin" "0.0 500.0 0.0"
+"angles" "0 270 0"
+"classname" "mp_dom_spawn"
+}
+{
+"origin" "0.0 -500.0 0.0"
+"angles" "0 90 0"
+"classname" "mp_dom_spawn"
+}
+{
+"origin" "600.0 500.0 0.0"
+"angles" "0 210 0"
+"classname" "mp_dom_spawn"
+}
+{
+"origin" "-600.0 -500.0 0.0"
+"angles" "0 45 0"
+"classname" "mp_dom_spawn"
+}
+
+
+{
+"classname" "mp_dom_spawn_axis_start"
+"origin" "630.0 0.0 0.0"
+"angles" "0 180 0"
+}
+{
+"classname" "mp_dom_spawn_axis_start"
+"origin" "620.0 0.0 0.0"
+"angles" "0 180 0"
+}
+{
+"classname" "mp_dom_spawn_axis_start"
+"origin" "610.0 0.0 0.0"
+"angles" "0 180 0"
+}
+{
+"classname" "mp_dom_spawn_axis_start"
+"origin" "600.0 0.0 0.0"
+"angles" "0 180 0"
+}
+{
+"classname" "mp_dom_spawn_axis_start"
+"origin" "640.0 0.0 0.0"
+"angles" "0 180 0"
+}
+{
+"classname" "mp_dom_spawn_axis_start"
+"origin" "650.0 0.0 0.0"
+"angles" "0 180 0"
+}
+{
+"classname" "mp_dom_spawn_axis_start"
+"origin" "660.0 0.0 0.0"
+"angles" "0 180 0"
+}
+{
+"classname" "mp_dom_spawn_axis_start"
+"origin" "670.0 0.0 0.0"
+"angles" "0 180 0"
+}
+{
+"classname" "mp_dom_spawn_axis_start"
+"origin" "680.0 0.0 0.0"
+"angles" "0 180 0"
+}
+
+{
+"angles" "0 0 0"
+"origin" "-630.0 0.0 0.0"
+"classname" "mp_dom_spawn_allies_start"
+}
+{
+"angles" "0 0 0"
+"origin" "-620.0 0.0 0.0"
+"classname" "mp_dom_spawn_allies_start"
+}
+{
+"angles" "0 0 0"
+"origin" "-610.0 0.0 0.0"
+"classname" "mp_dom_spawn_allies_start"
+}
+{
+"angles" "0 0 0"
+"origin" "-600.0 0.0 0.0"
+"classname" "mp_dom_spawn_allies_start"
+}
+{
+"angles" "0 0 0"
+"origin" "-640.0 0.0 0.0"
+"classname" "mp_dom_spawn_allies_start"
+}
+{
+"angles" "0 0 0"
+"origin" "-650.0 0.0 0.0"
+"classname" "mp_dom_spawn_allies_start"
+}
+{
+"angles" "0 0 0"
+"origin" "-660.0 0.0 0.0"
+"classname" "mp_dom_spawn_allies_start"
+}
+{
+"angles" "0 0 0"
+"origin" "-670.0 0.0 0.0"
+"classname" "mp_dom_spawn_allies_start"
+}
+{
+"angles" "0 0 0"
+"origin" "-680.0 0.0 0.0"
+"classname" "mp_dom_spawn_allies_start"
+}
+
+
+
+{
+"targetname" "flag_descriptor"
+"origin" "0.0 0.0 0.0"
+"script_linkto" "flag1 flag3"
+"script_linkname" "flag2"
+"classname" "script_origin"
+}
+{
+"targetname" "flag_descriptor"
+"origin" "-500.0 400.0 0.0"
+"script_linkto" "flag2 flag1"
+"script_linkname" "flag3"
+"classname" "script_origin"
+}
+{
+"targetname" "flag_descriptor"
+"origin" "500.0 -400 0.0"
+"script_linkto" "flag2 flag3"
+"script_linkname" "flag1"
+"classname" "script_origin"
+}
+{
+"classname" "trigger_radius"
+"radius" "160"
+"height" "128"
+"targetname" "flag_primary"
+"origin" "500.0 -400 -50.0"
+"script_gameobjectname" "dom onslaught"
+"model" "prop_flag_neutral"
+"script_label" "_a"
+}
+{
+"script_label" "_b"
+"model" "prop_flag_neutral"
+"script_gameobjectname" "dom onslaught"
+"origin" "0.0 0.0 -50.0"
+"targetname" "flag_primary"
+"height" "128"
+"radius" "160"
+"classname" "trigger_radius"
+"angles" "0 270 0"
+}
+{
+"script_label" "_c"
+"model" "prop_flag_neutral"
+"script_gameobjectname" "dom onslaught"
+"origin" "-500.0 400.0 -50.0"
+"targetname" "flag_primary"
+"height" "128"
+"radius" "160"
+"classname" "trigger_radius"
+}
