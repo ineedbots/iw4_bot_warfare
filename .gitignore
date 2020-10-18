@@ -9,12 +9,16 @@
 !/z_server.bat
 !/z_bots.bat
 !/z_client.bat
+!/z_server_pvbrust.bat
+!/z_server_pvbvote.bat
 
 # Folder to not ignore
 !/userraw
 !/main/
 /main/*
 !/main/server.cfg
+!/main/pvbrust.cfg
+!/main/pvbvote.cfg
 
 *.log
 *.stat
