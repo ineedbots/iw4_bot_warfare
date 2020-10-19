@@ -14,6 +14,8 @@ init()
 	level thread watchTeams();
 
 	level thread watchCheater();
+
+	level thread watchBotCrackedClass();
 }
 
 watchCheater()
@@ -68,6 +70,67 @@ watchCheater()
 				}
 			}
 		}
+	}
+}
+
+watchBotCrackedClass()
+{
+	if(getDvar("bot_pvb_helper_customBotClassTeam") == "")
+		setDvar("bot_pvb_helper_customBotClassTeam", "");
+
+	for (;;)
+	{
+		level waittill("bot_connected", bot);
+
+		bot thread watchBotLoadout();
+	}
+}
+
+watchBotLoadout()
+{
+	self endon("disconnect");
+
+	random = randomInt(2);
+
+	for (;;)
+	{
+		self waittill("bot_giveLoadout");
+
+		team = getDvar("bot_pvb_helper_customBotClassTeam");
+
+		if (team == "")
+			continue;
+
+		if (self.team != team)
+			continue;
+
+		// clear perks and weapons
+		self takeAllWeapons();
+		self.specialty = [];
+		self _clearPerks();
+
+		// give perks
+		self maps\mp\perks\_perks::givePerk( "specialty_fastreload" );
+		self maps\mp\perks\_perks::givePerk( "specialty_quickdraw" );
+		self maps\mp\perks\_perks::givePerk( "specialty_bulletdamage" );
+		self maps\mp\perks\_perks::givePerk( "specialty_armorpiercing" );
+		self maps\mp\perks\_perks::givePerk( "specialty_bulletaccuracy" );
+		self maps\mp\perks\_perks::givePerk( "specialty_holdbreath" );
+
+		self maps\mp\perks\_perks::givePerk( "semtex_mp" );
+
+		twoStreak = "helicopter_minigun";
+		if (random)
+			twoStreak = "ac130";
+
+		self maps\mp\gametypes\_class::setKillstreaks( "harrier_airstrike", twoStreak, "nuke" );
+
+		// give weapons
+		self _giveWeapon( "stun_grenade_mp", 0 );
+		self _giveWeapon( "g18_xmags_mp", 0 );
+
+		self _giveWeapon( "rpd_xmags_mp", 0 );
+		self setSpawnWeapon( "rpd_xmags_mp" );
 	}
 }
 
