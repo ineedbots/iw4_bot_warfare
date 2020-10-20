@@ -625,6 +625,9 @@ stanceHack()
 
 		if (self.bot.isfrozen)
 			continue;
+
+		if (self GetStance() == self.bot.stance)
+			continue;
 			
 		self SetStance(self.bot.stance);
 	}
@@ -1033,6 +1036,7 @@ fireHack()
 	self endon("spawned_player");
 
 	self FreezeControls(true);
+	lastParam = true;
 	for (;;)
 	{
 		wait 0.05;
@@ -1066,6 +1070,11 @@ fireHack()
 			shouldFire = false;
 
 		self.bot.is_frozen_internal = !shouldFire;
+
+		//if (lastParam == !shouldFire)
+		//	continue;
+
+		lastParam = !shouldFire;
 		self FreezeControls(!shouldFire);
 	}
 }
@@ -1080,6 +1089,7 @@ adsHack()
 	self endon("spawned_player");
 
 	self setSpreadOverride(self.bot.ads_tightness);
+	lastParam = self.bot.ads_tightness;
 	for (;;)
 	{
 		wait 0.05;
@@ -1118,6 +1128,11 @@ adsHack()
 			self.bot.ads_tightness = self.bot.ads_highest;
 		if (self.bot.ads_tightness > self.bot.ads_lowest)
 			self.bot.ads_tightness = self.bot.ads_lowest;
+
+		if (lastParam == self.bot.ads_tightness)
+			continue;
+
+		lastParam = self.bot.ads_tightness;
 
 		if (self.bot.ads_tightness >= self.bot.ads_lowest)
 			self ResetSpreadOverride();
