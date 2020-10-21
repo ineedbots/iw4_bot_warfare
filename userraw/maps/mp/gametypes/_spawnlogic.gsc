@@ -643,9 +643,9 @@ getSpawnpoint_NearTeam( spawnpoints, favoredspawnpoints )
 	}
 	//prof_end(" spawn_basicsumdists");
 
-	favor_weight = getDVarInt("scr_spawnpointfavorweight");
-	if (favor_weight == 0)
-		favor_weight = 50000;
+	favor_weight = 50000;
+	if (getDVar("scr_spawnpointfavorweight") != "")
+		favor_weight = getDVarInt("scr_spawnpointfavorweight");
 	
 	if ( isdefined( favoredspawnpoints ) )
 	{
