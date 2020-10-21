@@ -599,10 +599,8 @@ getSpawnpoint_NearTeam( spawnpoints, favoredspawnpoints )
 		
 	prof_begin("spawn_basiclogic");
 	
-	/#
 	if ( getdvarint("scr_spawnsimple") > 0 )
 		return getSpawnpoint_Random( spawnpoints );
-	#/
 	
 	Spawnlogic_Begin();
 	
@@ -644,12 +642,16 @@ getSpawnpoint_NearTeam( spawnpoints, favoredspawnpoints )
 			spawnpoint.weight -= 500000;
 	}
 	//prof_end(" spawn_basicsumdists");
+
+	favor_weight = getDVarInt("scr_spawnpointfavorweight");
+	if (favor_weight == 0)
+		favor_weight = 50000;
 	
 	if ( isdefined( favoredspawnpoints ) )
 	{
 		for (i = 0; i < favoredspawnpoints.size; i++)
 		{
-			favoredspawnpoints[i].weight += 50000;
+			favoredspawnpoints[i].weight += favor_weight;
 			/#
 			favoredspawnpoints[i].spawnData[favoredspawnpoints[i].spawnData.size] = "Favored: 50000";
 			#/
@@ -1425,7 +1427,7 @@ avoidWeaponDamage(spawnpoints)
 	//prof_begin(" spawn_complexgrenade");
 
 	weaponDamagePenalty = 100000;
-	if (getdvar("scr_spawnpointweaponpenalty") != "" && getdvar("scr_spawnpointweaponpenalty") != "0")
+	if (getdvar("scr_spawnpointweaponpenalty") != "")
 		weaponDamagePenalty = getdvarfloat("scr_spawnpointweaponpenalty");
 
 	mingrenadedistsquared = 250*250; // (actual grenade radius is 220, 250 includes a safety area of 30 units)
@@ -1739,8 +1741,8 @@ spawnPointUpdate( spawnpoint )
 	
 	// Disabled to see if removal of the red boxes upon spawn is sufficient
 	// (helicopter traces also intentionally disabled)
-	/*
-	if ( spawnpoint.outside )
+	
+	if ( spawnpoint.outside && getDvarInt("scr_spawnpointdooutsidecheck") )
 	{
 		foreach ( heli in level.helis )
 		{
@@ -1790,7 +1792,6 @@ spawnPointUpdate( spawnpoint )
 				spawnpoint.sights++;
 		}
 	}
-	*/
 	
 	prof_end( " spawn_update_other" );
 }
@@ -1812,7 +1813,7 @@ spawnpointDebugLOS( point )
 
 getLosPenalty()
 {
-	if (getdvar("scr_spawnpointlospenalty") != "" && getdvar("scr_spawnpointlospenalty") != "0")
+	if (getdvar("scr_spawnpointlospenalty") != "")
 		return getdvarfloat("scr_spawnpointlospenalty");
 	return 100000;
 }
