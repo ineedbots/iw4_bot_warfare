@@ -6527,3 +6527,33 @@
 "targetname" "air_support_height"
 "classname" "script_struct"
 }
+
+//Dasfonia's Additions/ Fixes.
+
+{
+"script_gameobjectname" "gtnw"
+"targetname" "gtnw_zone"
+"origin" "56 -26 -65.1"
+"height" "128"
+"radius" "80"
+"classname" "trigger_radius"
+}
+{
+"script_gameobjectname" "gtnw"
+"classname" "script_brushmodel"
+"origin" "57 -26 -41"
+//"angles" "0 -195 0"
+//"angles" "0 162.5 0"
+"angles" "0 345 0"
+"model" "*53"
+}
+{
+"ltOrigin" "56.12 -26.28 -36.223"
+"spawnflags" "4"
+"classname" "script_model"
+"model" "com_bomb_objective"
+"angles" "0 270 0"
+"origin" "56 -26 -71"
+"script_exploder" "pf812_1"
+"script_gameobjectname" "gtnw"
+}
