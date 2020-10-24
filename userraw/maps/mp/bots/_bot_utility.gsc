@@ -2178,6 +2178,9 @@ botGiveLoadout( team, class, allowCopycat )
 
 		if (loadoutPrimaryAttachment == "gl")
 			loadoutPrimaryAttachment = "none";
+
+		if (loadoutPerk2 == "specialty_coldblooded")
+			loadoutPerk2 = "specialty_none";
 	}
 
 

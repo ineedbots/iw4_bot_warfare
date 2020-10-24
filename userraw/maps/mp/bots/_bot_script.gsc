@@ -334,6 +334,9 @@ chooseRandomPerk(perkkind, primary)
 
 			if (perk == "specialty_pistoldeath")
 				continue;
+
+			if (perk == "specialty_coldblooded")
+				continue;
 		}
 
 		if (reasonable)
