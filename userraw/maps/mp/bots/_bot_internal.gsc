@@ -1777,10 +1777,16 @@ target()
 			}
 			else
 			{
-				canTargetPlayer = (bulletTracePassed(myEye, player getTagOrigin( "j_head" ), false, player) ||
-								bulletTracePassed(myEye, player getTagOrigin( "j_ankle_le" ), false, player) ||
-								bulletTracePassed(myEye, player getTagOrigin( "j_ankle_ri" ), false, player))
-								&& (distanceSquared(PhysicsTrace( player getTagOrigin( "j_spine4" ), myEye ), myEye) <= 0.0)
+				targetHead = player getTagOrigin( "j_head" );
+				targetAnkleLeft = player getTagOrigin( "j_ankle_le" );
+				targetAnkleRight = player getTagOrigin( "j_ankle_ri" );
+
+				canTargetPlayer = (bulletTracePassed(myEye, targetHead, true, player) ||
+								bulletTracePassed(myEye, targetAnkleLeft, true, player) ||
+								bulletTracePassed(myEye, targetAnkleRight, true, player))
+								&& (distanceSquared(PhysicsTrace( targetHead, myEye ), myEye) <= 1.0 ||
+								distanceSquared(PhysicsTrace( targetAnkleLeft, myEye ), myEye) <= 1.0 ||
+								distanceSquared(PhysicsTrace( targetAnkleRight, myEye ), myEye) <= 1.0)
 								&& (SmokeTrace(myEye, player.origin, level.smokeRadius) ||
 									daDist < level.bots_maxKnifeDistance*4)
 								&& (getConeDot(player.origin, self.origin, myAngles) >= myFov ||
