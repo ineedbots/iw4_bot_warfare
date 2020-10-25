@@ -1015,7 +1015,7 @@ moveHack()
 				}
 				else
 				{
-					self SetOrigin(physicsTrace(self.origin + (0,0,5), self.origin - (0,0,5), false, undefined));
+					self SetOrigin(playerPhysicsTrace(self.origin + (0,0,5), self.origin - (0,0,5), false, undefined));
 				}
 			}
 
@@ -1781,16 +1781,19 @@ target()
 				targetAnkleLeft = player getTagOrigin( "j_ankle_le" );
 				targetAnkleRight = player getTagOrigin( "j_ankle_ri" );
 
-				canTargetPlayer = (bulletTracePassed(myEye, targetHead, true, player) ||
-								bulletTracePassed(myEye, targetAnkleLeft, true, player) ||
-								bulletTracePassed(myEye, targetAnkleRight, true, player))
-								&& (distanceSquared(PhysicsTrace( targetHead, myEye ), myEye) <= 1.0 ||
-								distanceSquared(PhysicsTrace( targetAnkleLeft, myEye ), myEye) <= 1.0 ||
-								distanceSquared(PhysicsTrace( targetAnkleRight, myEye ), myEye) <= 1.0)
+				canTargetPlayer = ((distanceSquared(BulletTrace(myEye, targetHead, true, self)["position"], targetHead) <= 1.0 ||
+									distanceSquared(BulletTrace(myEye, targetAnkleLeft, true, self)["position"], targetAnkleLeft) <= 1.0 ||
+									distanceSquared(BulletTrace(myEye, targetAnkleRight, true, self)["position"], targetAnkleRight) <= 1.0)
+
+								&& (distanceSquared(PhysicsTrace( myEye, targetHead, false, self ), targetHead) <= 1.0 ||
+									distanceSquared(PhysicsTrace( myEye, targetAnkleLeft, false, self ), targetAnkleLeft) <= 1.0 ||
+									distanceSquared(PhysicsTrace( myEye, targetAnkleRight, false, self ), targetAnkleRight) <= 1.0)
+
 								&& (SmokeTrace(myEye, player.origin, level.smokeRadius) ||
 									daDist < level.bots_maxKnifeDistance*4)
+
 								&& (getConeDot(player.origin, self.origin, myAngles) >= myFov ||
-								(isObjDef && obj.trace_time));
+								(isObjDef && obj.trace_time)));
 			}
 			
 			if(canTargetPlayer)
