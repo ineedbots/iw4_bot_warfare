@@ -3182,12 +3182,14 @@ makeFakeAnim()
 	self.bot_anim setModel(self.model);
 	self.bot_anim LinkTo(self, "tag_origin", (0, 0, 0), (0, 0, 0));
 	self.bot_anim notsolid();
+	self.bot_anim setContents( 0 );
 	
 	self.bot_anim.headmodel = spawn( "script_model", self.bot_anim getTagOrigin( "j_spine4" ));
 	self.bot_anim.headmodel setModel(self.headmodel);
 	self.bot_anim.headmodel.angles = (270, 0, 270);
 	self.bot_anim.headmodel linkto( self.bot_anim, "j_spine4" );
 	self.bot_anim.headmodel notsolid();
+	self.bot_anim.headmodel setContents( 0 );
 
 	self.bot_anim.animation = undefined;
 	self.bot_anim.inActiveAnim = false;
