@@ -1781,9 +1781,9 @@ target()
 				targetAnkleLeft = player getTagOrigin( "j_ankle_le" );
 				targetAnkleRight = player getTagOrigin( "j_ankle_ri" );
 
-				canTargetPlayer = ((distanceSquared(BulletTrace(myEye, targetHead, true, self)["position"], targetHead) <= 1.0 ||
-									distanceSquared(BulletTrace(myEye, targetAnkleLeft, true, self)["position"], targetAnkleLeft) <= 1.0 ||
-									distanceSquared(BulletTrace(myEye, targetAnkleRight, true, self)["position"], targetAnkleRight) <= 1.0)
+				canTargetPlayer = ((distanceSquared(BulletTrace(myEye, targetHead, false, self)["position"], targetHead) <= 1.0 ||
+									distanceSquared(BulletTrace(myEye, targetAnkleLeft, false, self)["position"], targetAnkleLeft) <= 1.0 ||
+									distanceSquared(BulletTrace(myEye, targetAnkleRight, false, self)["position"], targetAnkleRight) <= 1.0)
 
 								&& (distanceSquared(PhysicsTrace( myEye, targetHead, false, self ), targetHead) <= 1.0 ||
 									distanceSquared(PhysicsTrace( myEye, targetAnkleLeft, false, self ), targetAnkleLeft) <= 1.0 ||
