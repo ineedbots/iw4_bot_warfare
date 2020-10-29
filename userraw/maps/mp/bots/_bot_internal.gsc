@@ -1671,6 +1671,8 @@ target()
 						obj.didlook = false;
 						obj.isplay = isPlayer(ent);
 						obj.offset = self.bot.script_target_offset;
+						obj.bone = undefined;
+						obj.aim_offset = undefined;
 						
 						self.bot.targets[key] = obj;
 					}
@@ -1735,6 +1737,8 @@ target()
 				obj.didlook = false;
 				obj.isplay = isPlayer(player);
 				obj.offset = undefined;
+				obj.bone = undefined;
+				obj.aim_offset = undefined;
 				
 				self.bot.targets[key] = obj;
 			}
@@ -1812,6 +1816,8 @@ target()
 					obj.didlook = false;
 					obj.isplay = isPlayer(player);
 					obj.offset = undefined;
+					obj.bone = undefined;
+					obj.aim_offset = undefined;
 					
 					self.bot.targets[key] = obj;
 				}
@@ -2061,6 +2067,10 @@ aim()
 				if (!isDefined(offset))
 					offset = (0, 0, 0);
 
+				aimoffset = self.bot.target.aim_offset;
+				if (!isDefined(aimoffset))
+					aimoffset = (0, 0, 0);
+
 				dist = self.bot.target.dist;
 				rand = self.bot.target.rand;
 				no_trace_ads_time = self.pers["bots"]["skill"]["no_trace_ads_time"];
@@ -2119,6 +2129,7 @@ aim()
 					{
 						aimpos = target getTagOrigin( bone );
 						aimpos += offset;
+						aimpos += aimoffset;
 						aimpos += (0, 0, nadeAimOffset);
 
 						conedot = getConeDot(aimpos, eyePos, angles);
@@ -2132,6 +2143,7 @@ aim()
 					{
 						aimpos = target.origin;
 						aimpos += offset;
+						aimpos += aimoffset;
 						aimpos += (0, 0, nadeAimOffset);
 
 						conedot = getConeDot(aimpos, eyePos, angles);
