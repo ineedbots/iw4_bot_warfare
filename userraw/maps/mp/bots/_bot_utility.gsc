@@ -257,6 +257,13 @@ BotFreezeControls(what)
 		self notify("kill_goal");
 }
 
+GetRandomBone()
+{
+	bones = strtok("j_mainroot,j_coatfront_le,j_coatfront_ri,j_coatrear_le,j_hip_le,j_hip_ri,j_spinelower,j_hiptwist_le,j_hiptwist_ri,j_knee_le,j_knee_ri,j_shorts_le,j_shorts_lift_le,j_shorts_lift_ri,j_shorts_ri,j_spineupper,j_ankle_le,j_ankle_ri,j_knee_bulge_le,j_knee_bulge_ri,j_spine4,j_ball_le,j_ball_ri,j_clavicle_le,j_clavicle_ri,j_neck,j_shoulderraise_le,j_shoulderraise_ri,j_head,j_shoulder_le,j_shoulder_ri,j_brow_le,j_brow_ri,j_cheek_le,j_cheek_ri,j_elbow_bulge_le,j_elbow_bulge_ri,j_elbow_le,j_elbow_ri,j_eye_lid_bot_le,j_eye_lid_bot_ri,j_eye_lid_top_le,j_eye_lid_top_ri,j_eyeball_le,j_eyeball_ri,j_head_end,j_jaw,j_levator_le,j_levator_ri,j_lip_top_le,j_lip_top_ri,j_mouth_le,j_mouth_ri,j_shouldertwist_le,j_shouldertwist_ri,j_chin_skinroll,j_helmet,j_lip_bot_le,j_lip_bot_ri,j_wrist_le,j_wrist_ri,j_wristtwist_le,j_wristtwist_ri,j_gun,j_index_le_1,j_index_ri_1,j_mid_le_1,j_mid_ri_1,j_pinky_le_1,j_pinky_ri_1,j_ring_le_1,j_ring_ri_1,j_thumb_le_,j_thumb_ri_1,j_index_le_2,j_index_ri_2,j_mid_le_2,j_mid_ri_2,j_pinky_le_2,j_pinky_ri_2,j_ring_le_2,j_ring_ri_2,j_thumb_le_2,j_thumb_ri_2,j_index_le_3,j_index_ri_3,j_mid_le_3,j_mid_ri_3,j_pinky_le_3,j_pinky_ri_3,j_ring_le_3,j_ring_ri_3,j_thumb_le_3,j_thumb_ri_3", ",");
+
+	return random(bones);
+}
+
 /*
 	Returns if the bot is script frozen.
 */
