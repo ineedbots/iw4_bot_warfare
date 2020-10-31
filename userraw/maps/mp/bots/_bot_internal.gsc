@@ -1643,6 +1643,7 @@ createTargetObj(ent, theTime)
 	obj.offset = undefined;
 	obj.bone = undefined;
 	obj.aim_offset = undefined;
+	obj.aim_offset_base = undefined;
 
 	return obj;
 }
@@ -1650,8 +1651,27 @@ createTargetObj(ent, theTime)
 /*
 	Updates the target object's difficulty missing aim, inaccurate shots
 */
-updateAimOffset(obj)
+updateAimOffset(obj, theTime)
 {
+	if (!isDefined(obj.aim_offset_base))
+	{
+		if (self.pers["bots"]["skill"]["aim_offset_amount"] > 0)
+			obj.aim_offset_base = (randomFloatRange(0-self.pers["bots"]["skill"]["aim_offset_amount"], self.pers["bots"]["skill"]["aim_offset_amount"]),
+												randomFloatRange(0-self.pers["bots"]["skill"]["aim_offset_amount"], self.pers["bots"]["skill"]["aim_offset_amount"]),
+												randomFloatRange(0-self.pers["bots"]["skill"]["aim_offset_amount"], self.pers["bots"]["skill"]["aim_offset_amount"]));
+		else
+			obj.aim_offset_base = (0,0,0);
+	}
+
+	aimDiffTime = self.pers["bots"]["skill"]["aim_offset_time"] * 1000;
+	objCreatedFor = obj.trace_time;
+
+	if (objCreatedFor >= aimDiffTime)
+		offsetScalar = 0;
+	else
+		offsetScalar = 1 - objCreatedFor / aimDiffTime;
+
+	obj.aim_offset = obj.aim_offset_base * offsetScalar;
 }
 
 /*
@@ -1665,7 +1685,7 @@ targetObjUpdateTraced(obj, daDist, ent, theTime)
 	obj.last_seen_pos = ent.origin;
 	obj.trace_time_time = theTime;
 
-	updateAimOffset(obj);
+	self updateAimOffset(obj, theTime);
 }
 
 /*
@@ -1745,20 +1765,20 @@ target()
 				{
 					if(!isObjDef)
 					{
-						obj = createTargetObj(ent, theTime);
+						obj = self createTargetObj(ent, theTime);
 						obj.offset = self.bot.script_target_offset;
 						
 						self.bot.targets[key] = obj;
 					}
 					
-					targetObjUpdateTraced(obj, daDist, ent, theTime);
+					self targetObjUpdateTraced(obj, daDist, ent, theTime);
 				}
 				else
 				{
 					if(!isObjDef)
 						continue;
 					
-					targetObjUpdateNoTrace(obj);
+					self targetObjUpdateNoTrace(obj);
 					
 					if(obj.no_trace_time > rememberTime)
 					{
@@ -1825,19 +1845,19 @@ target()
 				{
 					if(!isObjDef)
 					{
-						obj = createTargetObj(player, theTime);
+						obj = self createTargetObj(player, theTime);
 						
 						self.bot.targets[key] = obj;
 					}
 
-					targetObjUpdateTraced(obj, daDist, player, theTime);
+					self targetObjUpdateTraced(obj, daDist, player, theTime);
 				}
 				else
 				{
 					if(!isObjDef)
 						continue;
 					
-					targetObjUpdateNoTrace(obj);
+					self targetObjUpdateNoTrace(obj);
 					
 					if(obj.no_trace_time > rememberTime)
 					{
@@ -2137,7 +2157,7 @@ aim()
 
 						conedot = getConeDot(aimpos, eyePos, angles);
 
-						if (!nadeAimOffset && conedot > 0.999 && lengthsquared(aimoffset) < 0.05)
+						if (conedot > 0.999 && lengthsquared(aimoffset) < 0.05)
 							self thread bot_lookat(aimpos, 0.05);
 						else
 							self thread bot_lookat(aimpos, aimspeed);
@@ -2151,7 +2171,10 @@ aim()
 
 						conedot = getConeDot(aimpos, eyePos, angles);
 
-						self thread bot_lookat(aimpos, aimspeed);
+						if (conedot > 0.999 && lengthsquared(aimoffset) < 0.05)
+							self thread bot_lookat(aimpos, 0.05);
+						else
+							self thread bot_lookat(aimpos, aimspeed);
 					}
 					
 					knifeDist = level.bots_maxKnifeDistance;
