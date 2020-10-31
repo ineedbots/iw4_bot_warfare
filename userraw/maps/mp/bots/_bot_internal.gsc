@@ -1602,6 +1602,9 @@ reload_thread()
 		self thread reload();
 }
 
+/*
+	Updates the bot's target bone
+*/
 updateBones()
 {
 	self endon("disconnect");
@@ -1621,6 +1624,9 @@ updateBones()
 	}
 }
 
+/*
+	Creates the base target obj
+*/
 createTargetObj(ent, theTime)
 {
 	obj = spawnStruct();
@@ -1641,10 +1647,16 @@ createTargetObj(ent, theTime)
 	return obj;
 }
 
+/*
+	Updates the target object's difficulty missing aim, inaccurate shots
+*/
 updateAimOffset(obj)
 {
 }
 
+/*
+	Updates the target object to be traced Has LOS
+*/
 targetObjUpdateTraced(obj, daDist, ent, theTime)
 {
 	obj.no_trace_time = 0;
@@ -1656,6 +1668,9 @@ targetObjUpdateTraced(obj, daDist, ent, theTime)
 	updateAimOffset(obj);
 }
 
+/*
+	Updates the target object to be not traced No LOS
+*/
 targetObjUpdateNoTrace(obj)
 {
 	obj.no_trace_time += 50;
