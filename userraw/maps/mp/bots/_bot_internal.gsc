@@ -1402,6 +1402,7 @@ spawned()
 	self thread grenade_danager();
 
 	self thread target();
+	self thread updateBones();
 	self thread aim();
 	self thread check_reload();
 	self thread stance();
@@ -1599,6 +1600,25 @@ reload_thread()
 	
 	if(cursize/maxsize < 0.5)
 		self thread reload();
+}
+
+updateBones()
+{
+	self endon("disconnect");
+	self endon("spawned_player");
+	
+	for(;;)
+	{
+		self waittill_any_timeout(self.pers["bots"]["skill"]["bone_update_interval"], "new_enemy");
+
+		if (!isAlive(self))
+			return;
+
+		if (!isDefined(self.bot.target))
+			continue;
+
+		self.bot.target.bone = random(self.pers["bots"]["skill"]["bones"]);
+	}
 }
 
 /*
