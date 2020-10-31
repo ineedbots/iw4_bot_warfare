@@ -35,6 +35,10 @@ added()
 	self.pers["bots"]["skill"]["help_dist"] = 10000;
 	self.pers["bots"]["skill"]["semi_time"] = 0.05;
 	self.pers["bots"]["skill"]["shoot_after_time"] = 1;
+	self.pers["bots"]["skill"]["aim_offset_time"] = 1;
+	self.pers["bots"]["skill"]["aim_offset_amount"] = 1;
+	self.pers["bots"]["skill"]["bones"] = [];
+	self.pers["bots"]["skill"]["bones"][0] = "j_head";
 	
 	self.pers["bots"]["behavior"] = [];
 	self.pers["bots"]["behavior"]["strafe"] = 50;
@@ -1785,13 +1789,13 @@ target()
 				targetAnkleLeft = player getTagOrigin( "j_ankle_le" );
 				targetAnkleRight = player getTagOrigin( "j_ankle_ri" );
 
-				canTargetPlayer = ((distanceSquared(BulletTrace(myEye, targetHead, false, self)["position"], targetHead) <= 1.0 ||
-									distanceSquared(BulletTrace(myEye, targetAnkleLeft, false, self)["position"], targetAnkleLeft) <= 1.0 ||
-									distanceSquared(BulletTrace(myEye, targetAnkleRight, false, self)["position"], targetAnkleRight) <= 1.0)
+				canTargetPlayer = ((distanceSquared(BulletTrace(myEye, targetHead, false, self)["position"], targetHead) < 0.05 ||
+									distanceSquared(BulletTrace(myEye, targetAnkleLeft, false, self)["position"], targetAnkleLeft) < 0.05 ||
+									distanceSquared(BulletTrace(myEye, targetAnkleRight, false, self)["position"], targetAnkleRight) < 0.05)
 
-								&& (distanceSquared(PhysicsTrace( myEye, targetHead, false, self ), targetHead) <= 1.0 ||
-									distanceSquared(PhysicsTrace( myEye, targetAnkleLeft, false, self ), targetAnkleLeft) <= 1.0 ||
-									distanceSquared(PhysicsTrace( myEye, targetAnkleRight, false, self ), targetAnkleRight) <= 1.0)
+								&& (distanceSquared(PhysicsTrace( myEye, targetHead, false, self ), targetHead) < 0.05 ||
+									distanceSquared(PhysicsTrace( myEye, targetAnkleLeft, false, self ), targetAnkleLeft) < 0.05 ||
+									distanceSquared(PhysicsTrace( myEye, targetAnkleRight, false, self ), targetAnkleRight) < 0.05)
 
 								&& (SmokeTrace(myEye, player.origin, level.smokeRadius) ||
 									daDist < level.bots_maxKnifeDistance*4)
@@ -2134,7 +2138,7 @@ aim()
 
 						conedot = getConeDot(aimpos, eyePos, angles);
 
-						if (!nadeAimOffset && conedot > 0.999)
+						if (!nadeAimOffset && conedot > 0.999 && lengthsquared(aimoffset) < 0.05)
 							self thread bot_lookat(aimpos, 0.05);
 						else
 							self thread bot_lookat(aimpos, aimspeed);
