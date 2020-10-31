@@ -2081,6 +2081,8 @@ bombPlantedFix( destroyedObj, player )
 */
 botGiveLoadout( team, class, allowCopycat )
 {
+	self endon("death");
+	
 	self takeAllWeapons();
 	
 	primaryIndex = 0;
