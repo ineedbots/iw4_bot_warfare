@@ -1025,6 +1025,7 @@ difficulty()
 				self.pers["bots"]["skill"]["shoot_after_time"] = 1;
 				self.pers["bots"]["skill"]["aim_offset_time"] = 1.5;
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 4;
+				self.pers["bots"]["skill"]["bone_update_interval"] = 2;
 				self.pers["bots"]["skill"]["bones"] = [];
 				self.pers["bots"]["skill"]["bones"][0] = "j_spineupper";
 				self.pers["bots"]["skill"]["bones"][1] = "j_ankle_le";
@@ -1055,6 +1056,7 @@ difficulty()
 				self.pers["bots"]["skill"]["shoot_after_time"] = 0.75;
 				self.pers["bots"]["skill"]["aim_offset_time"] = 1;
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 3;
+				self.pers["bots"]["skill"]["bone_update_interval"] = 1.5;
 				self.pers["bots"]["skill"]["bones"] = [];
 				self.pers["bots"]["skill"]["bones"][0] = "j_spineupper";
 				self.pers["bots"]["skill"]["bones"][1] = "j_ankle_le";
@@ -1086,6 +1088,7 @@ difficulty()
 				self.pers["bots"]["skill"]["shoot_after_time"] = 0.65;
 				self.pers["bots"]["skill"]["aim_offset_time"] = 0.75;
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 2.5;
+				self.pers["bots"]["skill"]["bone_update_interval"] = 1;
 				self.pers["bots"]["skill"]["bones"] = [];
 				self.pers["bots"]["skill"]["bones"][0] = "j_spineupper";
 				self.pers["bots"]["skill"]["bones"][1] = "j_spineupper";
@@ -1118,6 +1121,7 @@ difficulty()
 				self.pers["bots"]["skill"]["shoot_after_time"] = 0.5;
 				self.pers["bots"]["skill"]["aim_offset_time"] = 0.5;
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 2;
+				self.pers["bots"]["skill"]["bone_update_interval"] = 0.75;
 				self.pers["bots"]["skill"]["bones"] = [];
 				self.pers["bots"]["skill"]["bones"][0] = "j_spineupper";
 				self.pers["bots"]["skill"]["bones"][1] = "j_spineupper";
@@ -1151,6 +1155,7 @@ difficulty()
 				self.pers["bots"]["skill"]["shoot_after_time"] = 0.35;
 				self.pers["bots"]["skill"]["aim_offset_time"] = 0.35;
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 1.5;
+				self.pers["bots"]["skill"]["bone_update_interval"] = 0.5;
 				self.pers["bots"]["skill"]["bones"] = [];
 				self.pers["bots"]["skill"]["bones"][0] = "j_spineupper";
 				self.pers["bots"]["skill"]["bones"][1] = "j_spineupper";
@@ -1182,6 +1187,7 @@ difficulty()
 				self.pers["bots"]["skill"]["shoot_after_time"] = 0.25;
 				self.pers["bots"]["skill"]["aim_offset_time"] = 0.25;
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 1;
+				self.pers["bots"]["skill"]["bone_update_interval"] = 0.25;
 				self.pers["bots"]["skill"]["bones"] = [];
 				self.pers["bots"]["skill"]["bones"][0] = "j_spineupper";
 				self.pers["bots"]["skill"]["bones"][1] = "j_head";
@@ -1212,6 +1218,7 @@ difficulty()
 				self.pers["bots"]["skill"]["shoot_after_time"] = 0;
 				self.pers["bots"]["skill"]["aim_offset_time"] = 0;
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 0;
+				self.pers["bots"]["skill"]["bone_update_interval"] = 0.05;
 				self.pers["bots"]["skill"]["bones"] = [];
 				self.pers["bots"]["skill"]["bones"][0] = "j_head";
 
@@ -1259,6 +1266,7 @@ set_diff()
 			self.pers["bots"]["skill"]["shoot_after_time"] = randomFloatRange(0.05, 1);
 			self.pers["bots"]["skill"]["aim_offset_time"] = randomFloatRange(0.05, 1);
 			self.pers["bots"]["skill"]["aim_offset_amount"] = randomFloatRange(0.05, 1);
+			self.pers["bots"]["skill"]["bone_update_interval"] = randomFloatRange(0.05, 1);
 			self.pers["bots"]["skill"]["bones"] = [];
 			self.pers["bots"]["skill"]["bones"][0] = "j_head";
 			self.pers["bots"]["skill"]["bones"][1] = "j_spineupper";

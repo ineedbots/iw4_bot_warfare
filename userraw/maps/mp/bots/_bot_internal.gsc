@@ -37,6 +37,7 @@ added()
 	self.pers["bots"]["skill"]["shoot_after_time"] = 1;
 	self.pers["bots"]["skill"]["aim_offset_time"] = 1;
 	self.pers["bots"]["skill"]["aim_offset_amount"] = 1;
+	self.pers["bots"]["skill"]["bone_update_interval"] = 0.05;
 	self.pers["bots"]["skill"]["bones"] = [];
 	self.pers["bots"]["skill"]["bones"][0] = "j_head";
 	
