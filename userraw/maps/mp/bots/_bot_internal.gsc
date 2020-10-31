@@ -1621,6 +1621,48 @@ updateBones()
 	}
 }
 
+createTargetObj(ent, theTime)
+{
+	obj = spawnStruct();
+	obj.entity = ent;
+	obj.last_seen_pos = (0, 0, 0);
+	obj.dist = 0;
+	obj.time = theTime;
+	obj.trace_time = 0;
+	obj.no_trace_time = 0;
+	obj.trace_time_time = 0;
+	obj.rand = randomInt(100);
+	obj.didlook = false;
+	obj.isplay = isPlayer(ent);
+	obj.offset = undefined;
+	obj.bone = undefined;
+	obj.aim_offset = undefined;
+
+	return obj;
+}
+
+updateAimOffset(obj)
+{
+}
+
+targetObjUpdateTraced(obj, daDist, ent, theTime)
+{
+	obj.no_trace_time = 0;
+	obj.trace_time += 50;
+	obj.dist = daDist;
+	obj.last_seen_pos = ent.origin;
+	obj.trace_time_time = theTime;
+
+	updateAimOffset(obj);
+}
+
+targetObjUpdateNoTrace(obj)
+{
+	obj.no_trace_time += 50;
+	obj.trace_time = 0;
+	obj.didlook = false;
+}
+
 /*
 	The main target thread, will update the bot's main target. Will auto target enemy players and handle script targets.
 */
@@ -1667,205 +1709,126 @@ target()
 			hasTarget = false;
 		}
 		
-		if(isDefined(self.bot.script_target))
+		playercount = level.players.size;
+		for(i = -1; i < playercount; i++)
 		{
-			ent = self.bot.script_target;
-			key = ent getEntityNumber()+"";
-			daDist = distanceSquared(self.origin, ent.origin);
-			obj = self.bot.targets[key];
-			isObjDef = isDefined(obj);
-			entOrigin = ent.origin;
-			if (isDefined(self.bot.script_target_offset))
-				entOrigin += self.bot.script_target_offset;
-			
-			for(;;)
+			if (i == -1)
 			{
+				if (!isDefined(self.bot.script_target))
+					continue;
+
+				ent = self.bot.script_target;
+				key = ent getEntityNumber()+"";
+				daDist = distanceSquared(self.origin, ent.origin);
+				obj = self.bot.targets[key];
+				isObjDef = isDefined(obj);
+				entOrigin = ent.origin;
+				if (isDefined(self.bot.script_target_offset))
+					entOrigin += self.bot.script_target_offset;
+				
 				if(SmokeTrace(myEye, entOrigin, level.smokeRadius) && bulletTracePassed(myEye, entOrigin, false, ent))
 				{
 					if(!isObjDef)
 					{
-						obj = spawnStruct();
-						obj.entity = ent;
-						obj.last_seen_pos = (0, 0, 0);
-						obj.dist = 0;
-						obj.time = theTime;
-						obj.trace_time = 0;
-						obj.no_trace_time = 0;
-						obj.trace_time_time = 0;
-						obj.rand = randomInt(100);
-						obj.didlook = false;
-						obj.isplay = isPlayer(ent);
+						obj = createTargetObj(ent, theTime);
 						obj.offset = self.bot.script_target_offset;
-						obj.bone = undefined;
-						obj.aim_offset = undefined;
 						
 						self.bot.targets[key] = obj;
 					}
 					
-					obj.no_trace_time = 0;
-					obj.trace_time += 50;
-					obj.dist = daDist;
-					obj.last_seen_pos = ent.origin;
-					obj.trace_time_time = theTime;
+					targetObjUpdateTraced(obj, daDist, ent, theTime);
 				}
 				else
 				{
 					if(!isObjDef)
-						break;
+						continue;
 					
-					obj.no_trace_time += 50;
-					obj.trace_time = 0;
-					obj.didlook = false;
+					targetObjUpdateNoTrace(obj);
 					
 					if(obj.no_trace_time > rememberTime)
 					{
 						self.bot.targets[key] = undefined;
-						break;
+						continue;
 					}
 				}
-				
-				if(theTime - obj.time < initReactTime)
-					break;
-				
-				timeDiff = theTime - obj.trace_time_time;
-				if(timeDiff < bestTime)
-				{
-					bestTargets = [];
-					bestTime = timeDiff;
-				}
-				
-				if(timeDiff == bestTime)
-					bestTargets[key] = obj;
-				break;
-			}
-		}
-		
-		if(isDefined(self.bot.target_this_frame))
-		{
-			player = self.bot.target_this_frame;
-		
-			key = player getEntityNumber()+"";
-			obj = self.bot.targets[key];
-			daDist = distanceSquared(self.origin, player.origin);
-			
-			if(!isDefined(obj))
-			{
-				obj = spawnStruct();
-				obj.entity = player;
-				obj.last_seen_pos = (0, 0, 0);
-				obj.dist = 0;
-				obj.time = theTime;
-				obj.trace_time = 0;
-				obj.no_trace_time = 0;
-				obj.trace_time_time = 0;
-				obj.rand = randomInt(100);
-				obj.didlook = false;
-				obj.isplay = isPlayer(player);
-				obj.offset = undefined;
-				obj.bone = undefined;
-				obj.aim_offset = undefined;
-				
-				self.bot.targets[key] = obj;
-			}
-			
-			obj.no_trace_time = 0;
-			obj.trace_time += 50;
-			obj.dist = daDist;
-			obj.last_seen_pos = player.origin;
-			obj.trace_time_time = theTime;
-			
-			self.bot.target_this_frame = undefined;
-		}
-		
-		playercount = level.players.size;
-		for(i = 0; i < playercount; i++)
-		{
-			player = level.players[i];
-
-			if(player == self)
-				continue;
-			
-			key = player getEntityNumber()+"";
-			obj = self.bot.targets[key];
-			daDist = distanceSquared(self.origin, player.origin);
-			isObjDef = isDefined(obj);
-			if((level.teamBased && self.team == player.team) || player.sessionstate != "playing" || !isReallyAlive(player) || (daDist > distsq && !usingRemote))
-			{
-				if(isObjDef)
-					self.bot.targets[key] = undefined;
-			
-				continue;
-			}
-
-			canTargetPlayer = false;
-
-			if (usingRemote)
-			{
-				canTargetPlayer = (bulletTracePassed(myEye, player getTagOrigin( "j_head" ), false, vehEnt)
-													&& !player _hasPerk("specialty_coldblooded"));
 			}
 			else
 			{
-				targetHead = player getTagOrigin( "j_head" );
-				targetAnkleLeft = player getTagOrigin( "j_ankle_le" );
-				targetAnkleRight = player getTagOrigin( "j_ankle_ri" );
+				player = level.players[i];
 
-				canTargetPlayer = ((distanceSquared(BulletTrace(myEye, targetHead, false, self)["position"], targetHead) < 0.05 ||
-									distanceSquared(BulletTrace(myEye, targetAnkleLeft, false, self)["position"], targetAnkleLeft) < 0.05 ||
-									distanceSquared(BulletTrace(myEye, targetAnkleRight, false, self)["position"], targetAnkleRight) < 0.05)
-
-								&& (distanceSquared(PhysicsTrace( myEye, targetHead, false, self ), targetHead) < 0.05 ||
-									distanceSquared(PhysicsTrace( myEye, targetAnkleLeft, false, self ), targetAnkleLeft) < 0.05 ||
-									distanceSquared(PhysicsTrace( myEye, targetAnkleRight, false, self ), targetAnkleRight) < 0.05)
-
-								&& (SmokeTrace(myEye, player.origin, level.smokeRadius) ||
-									daDist < level.bots_maxKnifeDistance*4)
-
-								&& (getConeDot(player.origin, self.origin, myAngles) >= myFov ||
-								(isObjDef && obj.trace_time)));
-			}
-			
-			if(canTargetPlayer)
-			{
-				if(!isObjDef)
+				if(player == self)
+					continue;
+				
+				key = player getEntityNumber()+"";
+				obj = self.bot.targets[key];
+				daDist = distanceSquared(self.origin, player.origin);
+				isObjDef = isDefined(obj);
+				if((level.teamBased && self.team == player.team) || player.sessionstate != "playing" || !isReallyAlive(player) || (daDist > distsq && !usingRemote))
 				{
-					obj = spawnStruct();
-					obj.entity = player;
-					obj.last_seen_pos = (0, 0, 0);
-					obj.dist = 0;
-					obj.time = theTime;
-					obj.trace_time = 0;
-					obj.no_trace_time = 0;
-					obj.trace_time_time = 0;
-					obj.rand = randomInt(100);
-					obj.didlook = false;
-					obj.isplay = isPlayer(player);
-					obj.offset = undefined;
-					obj.bone = undefined;
-					obj.aim_offset = undefined;
+					if(isObjDef)
+						self.bot.targets[key] = undefined;
+				
+					continue;
+				}
+
+				canTargetPlayer = false;
+
+				if (usingRemote)
+				{
+					canTargetPlayer = (bulletTracePassed(myEye, player getTagOrigin( "j_head" ), false, vehEnt)
+														&& !player _hasPerk("specialty_coldblooded"));
+				}
+				else
+				{
+					targetHead = player getTagOrigin( "j_head" );
+					targetAnkleLeft = player getTagOrigin( "j_ankle_le" );
+					targetAnkleRight = player getTagOrigin( "j_ankle_ri" );
+
+					canTargetPlayer = ((distanceSquared(BulletTrace(myEye, targetHead, false, self)["position"], targetHead) < 0.05 ||
+										distanceSquared(BulletTrace(myEye, targetAnkleLeft, false, self)["position"], targetAnkleLeft) < 0.05 ||
+										distanceSquared(BulletTrace(myEye, targetAnkleRight, false, self)["position"], targetAnkleRight) < 0.05)
+
+									&& (distanceSquared(PhysicsTrace( myEye, targetHead, false, self ), targetHead) < 0.05 ||
+										distanceSquared(PhysicsTrace( myEye, targetAnkleLeft, false, self ), targetAnkleLeft) < 0.05 ||
+										distanceSquared(PhysicsTrace( myEye, targetAnkleRight, false, self ), targetAnkleRight) < 0.05)
+
+									&& (SmokeTrace(myEye, player.origin, level.smokeRadius) ||
+										daDist < level.bots_maxKnifeDistance*4)
+
+									&& (getConeDot(player.origin, self.origin, myAngles) >= myFov ||
+									(isObjDef && obj.trace_time)));
+				}
+
+				if (isDefined(self.bot.target_this_frame) && self.bot.target_this_frame == player)
+				{
+					self.bot.target_this_frame = undefined;
+
+					canTargetPlayer = true;
+				}
+				
+				if(canTargetPlayer)
+				{
+					if(!isObjDef)
+					{
+						obj = createTargetObj(player, theTime);
+						
+						self.bot.targets[key] = obj;
+					}
+
+					targetObjUpdateTraced(obj, daDist, player, theTime);
+				}
+				else
+				{
+					if(!isObjDef)
+						continue;
 					
-					self.bot.targets[key] = obj;
-				}
-				
-				obj.no_trace_time = 0;
-				obj.trace_time += 50;
-				obj.dist = daDist;
-				obj.last_seen_pos = player.origin;
-				obj.trace_time_time = theTime;
-			}
-			else
-			{
-				if(!isObjDef)
-					continue;
-				
-				obj.no_trace_time += 50;
-				obj.trace_time = 0;
-				obj.didlook = false;
-				
-				if(obj.no_trace_time > rememberTime)
-				{
-					self.bot.targets[key] = undefined;
-					continue;
+					targetObjUpdateNoTrace(obj);
+					
+					if(obj.no_trace_time > rememberTime)
+					{
+						self.bot.targets[key] = undefined;
+						continue;
+					}
 				}
 			}
 			
