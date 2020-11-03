@@ -1411,7 +1411,7 @@ watchNotifyKSMessage()
 			if (curStreak == 5)
 				continue;
 
-			if (curStreak % 5 == 1)
+			if (curStreak % 5 != 0)
 				continue;
 
 			self thread streakNotify(curStreak);
@@ -1424,8 +1424,6 @@ watchNotifyKSMessage()
 streakNotify( streakVal )
 {
 	self endon("disconnect");
-
-	streakVal = streakVal + "";
 
 	wait 0.05;
 	waittillframeend;
