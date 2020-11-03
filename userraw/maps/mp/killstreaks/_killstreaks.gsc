@@ -21,6 +21,9 @@
 			1 - use Puffiamo's killstreak HUD
 			2 - use NoFate's MW3 killstreak HUD
 
+		- scr_killstreak_print <bool>
+			false - (default) enables the CoD4 (10 Kill Streak!) messages
+
 		- scr_specialist <bool>
 			false - (default) enable specialist from mw3, a player must only have the nuke selected as their killstreak
 
@@ -77,6 +80,7 @@ init()
 	setDvarIfUninitialized( "scr_maxKillstreakRollover", 10 );
 	setDvarIfUninitialized( "scr_killstreakHud", false );
 	setDvarIfUninitialized( "scr_killstreak_mod", 0 );
+	setDvarIfUninitialized( "scr_killstreak_print", false );
 
 	setDvarIfUninitialized( "scr_specialist", false );
 	setDvarIfUninitialized( "scr_specialist_perks1", "specialty_scavenger,specialty_fastreload,specialty_marathon" );
@@ -87,6 +91,7 @@ init()
 	level.maxKillstreakRollover = getDvarInt("scr_maxKillstreakRollover");
 	level.killstreakHud = getDvarInt("scr_killstreakHud");
 	level.killStreakMod = getDvarInt( "scr_killstreak_mod" );
+	level.killstreakPrint = getDvarInt( "scr_killstreak_print" );
 
 	level.allowSpecialist = getDvarInt( "scr_specialist" );
 	level.specialistPerk1 = getDvar("scr_specialist_perks1");
@@ -202,6 +207,9 @@ onPlayerChangeKit()
 
 		self startSpecialist();
 		self startKSHud();
+
+		if (level.killstreakPrint)
+			self thread watchNotifyKSMessage();
 	}
 }
 
@@ -1372,23 +1380,62 @@ watchSpecialistOnKill()
 	self notify("watchSpecialistOnKill");
 	self endon("watchSpecialistOnKill");
 
-	lastKs = self.pers["cur_kill_streak"];
-	for (;;)
+	for (lastKs = self.pers["cur_kill_streak"];;)
 	{
 		self waittill( "killed_enemy" );
-		curStreak = self.pers["cur_kill_streak"];
 
-		if (curStreak <= lastKs)
-			continue;
+		for (curStreak = lastKs + 1; curStreak <= self.pers["cur_kill_streak"]; curStreak++)
+		{
+			if (curStreak % 2 == 1)
+				continue;
 
-		lastKs = curStreak;
+			self thread maps\mp\gametypes\_rank::giveRankXP( "specialist_bonus", 50 );
+			self thread underScorePopup("Specialist Bonus!", (1, 1, 0.5), 0);
+		}
 
-		if (curStreak % 2 == 1)
-			continue;
-
-		self thread maps\mp\gametypes\_rank::giveRankXP( "specialist_bonus", 50 );
-		self thread underScorePopup("Specialist Bonus!", (1, 1, 0.5), 0);
+		lastKs = self.pers["cur_kill_streak"];
 	}
+}
+
+watchNotifyKSMessage()
+{
+	self endon("disconnect");
+	self endon("changed_kit");
+
+	for (lastKs = self.pers["cur_kill_streak"];;)
+	{
+		self waittill( "killed_enemy" );
+
+		for (curStreak = lastKs + 1; curStreak <= self.pers["cur_kill_streak"]; curStreak++)
+		{
+			if (curStreak == 5)
+				continue;
+
+			if (curStreak % 5 == 1)
+				continue;
+
+			self thread streakNotify(curStreak);
+		}
+
+		lastKs = self.pers["cur_kill_streak"];
+	}
+}
+
+streakNotify( streakVal )
+{
+	self endon("disconnect");
+
+	streakVal = streakVal + "";
+
+	wait 0.05;
+	waittillframeend;
+	
+	notifyData = spawnStruct();
+	notifyData.titleText = streakVal + " Kill Streak!";
+	
+	self maps\mp\gametypes\_hud_message::notifyMessage( notifyData );
+	
+	iprintln( self.name + " has a killstreak of " + streakVal + "!" );
 }
 
 underScorePopup(string, hudColor, glowAlpha)
@@ -1439,6 +1486,9 @@ underScorePopup(string, hudColor, glowAlpha)
 
 startKSHud()
 {
+	if (level.hardcoreMode)
+		return;
+
 	if (level.killstreakHud == 1)
 		self thread initKillstreakHud( 145 );
 	else if (level.killstreakHud == 2)
