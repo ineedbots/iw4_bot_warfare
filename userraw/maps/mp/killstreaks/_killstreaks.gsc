@@ -1425,8 +1425,10 @@ streakNotify( streakVal )
 {
 	self endon("disconnect");
 
-	wait 0.05;
-	waittillframeend;
+	self notify("streakNotifyCoD4");
+	self endon("streakNotifyCoD4");
+
+	wait 0.1;
 	
 	notifyData = spawnStruct();
 	notifyData.titleText = streakVal + " Kill Streak!";
