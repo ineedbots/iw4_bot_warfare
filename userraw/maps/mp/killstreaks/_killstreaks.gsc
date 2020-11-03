@@ -1446,6 +1446,9 @@ underScorePopup(string, hudColor, glowAlpha)
 	if ( string == "" )
 		return;
 
+	if (level.hardcoreMode)
+		return;
+
 	self notify( "underScorePopup" );
 	self endon( "underScorePopup" );
 
