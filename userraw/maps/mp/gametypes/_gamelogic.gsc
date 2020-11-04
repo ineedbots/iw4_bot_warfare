@@ -55,6 +55,9 @@
 
 		- headshot_detach_head <bool>
 			false - (default) headshots dismember the victim's head
+
+		- scr_postDeathDelayMod <float>
+			1.0 - (default) Multiplier of how long to wait after death (watching your dead body before the killcam starts)
 			
 	Thanks: banz, 23Furious
 */
@@ -1392,6 +1395,7 @@ Callback_StartGameType()
 	setDvarIfUninitialized( "scr_nuke_increases_streak", true );
 	setDvarIfUninitialized( "headshot_detach_head", false );
 	setDvarIfUninitialized( "scr_killstreaks_increase_killstreak", true );
+	setDvarIfUninitialized( "scr_postDeathDelayMod", 1.0 );
 	
 	level.extraDamageFeedback = getDvarInt("scr_extraDamageFeedback");
 	level.allowPrintDamage = getDvarInt("scr_printDamage");
@@ -1411,6 +1415,7 @@ Callback_StartGameType()
 	level.headShotDetachHead = getDvarInt("headshot_detach_head");
 	level.nukeIncreasesStreak = getDvarInt( "scr_nuke_increases_streak" );
 	level.killstreaksIncreaseKillstreak = getDvarInt( "scr_killstreaks_increase_killstreak" );
+	level.postDeathDelayMod = getDvarFloat("scr_postDeathDelayMod");
 	
 	if ( level.voting )
 		level.votingMapsTok = randomizeMaps();

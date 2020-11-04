@@ -778,9 +778,9 @@ PlayerKilled_internal( eInflictor, attacker, victim, iDamage, sMeansOfDeath, sWe
 		}
 		
 		// let the player watch themselves die
-		wait( 0.25 );
+		wait( 0.25 * level.postDeathDelayMod );
 		victim thread maps\mp\gametypes\_killcam::cancelKillCamOnUse();
-		wait( 0.25 );
+		wait( 0.25 * level.postDeathDelayMod );
 		
 		self.respawnTimerStartTime = gettime() + 1000;
 		timeUntilSpawn = maps\mp\gametypes\_playerlogic::TimeUntilSpawn( true );
@@ -788,7 +788,7 @@ PlayerKilled_internal( eInflictor, attacker, victim, iDamage, sMeansOfDeath, sWe
 			timeUntilSpawn = 1;
 		victim thread maps\mp\gametypes\_playerlogic::predictAboutToSpawnPlayerOverTime( timeUntilSpawn );
 		
-		wait( 1.0 );
+		wait( 1.0 * level.postDeathDelayMod );
 		victim notify( "death_delay_finished" );
 	}
 
