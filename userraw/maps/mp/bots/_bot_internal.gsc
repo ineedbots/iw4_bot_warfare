@@ -38,8 +38,7 @@ added()
 	self.pers["bots"]["skill"]["aim_offset_time"] = 1;
 	self.pers["bots"]["skill"]["aim_offset_amount"] = 1;
 	self.pers["bots"]["skill"]["bone_update_interval"] = 0.05;
-	self.pers["bots"]["skill"]["bones"] = [];
-	self.pers["bots"]["skill"]["bones"][0] = "j_head";
+	self.pers["bots"]["skill"]["bones"] = "j_head";
 	
 	self.pers["bots"]["behavior"] = [];
 	self.pers["bots"]["behavior"]["strafe"] = 50;
@@ -146,6 +145,7 @@ resetBotVars()
 	self.bot.target_this_frame = undefined;
 	self.bot.jav_loc = undefined;
 	self.bot.after_target = undefined;
+	self.bot.after_target_pos = undefined;
 	
 	self.bot.script_aimpos = undefined;
 	
@@ -1609,10 +1609,13 @@ updateBones()
 {
 	self endon("disconnect");
 	self endon("spawned_player");
+
+	bones = strtok(self.pers["bots"]["skill"]["bones"], ",");
+	waittime = self.pers["bots"]["skill"]["bone_update_interval"];
 	
 	for(;;)
 	{
-		self waittill_any_timeout(self.pers["bots"]["skill"]["bone_update_interval"], "new_enemy");
+		self waittill_any_timeout(waittime, "new_enemy");
 
 		if (!isAlive(self))
 			return;
@@ -1620,7 +1623,7 @@ updateBones()
 		if (!isDefined(self.bot.target))
 			continue;
 
-		self.bot.target.bone = random(self.pers["bots"]["skill"]["bones"]);
+		self.bot.target.bone = random(bones);
 	}
 }
 
@@ -1655,10 +1658,11 @@ updateAimOffset(obj, theTime)
 {
 	if (!isDefined(obj.aim_offset_base))
 	{
-		if (self.pers["bots"]["skill"]["aim_offset_amount"] > 0)
-			obj.aim_offset_base = (randomFloatRange(0-self.pers["bots"]["skill"]["aim_offset_amount"], self.pers["bots"]["skill"]["aim_offset_amount"]),
-												randomFloatRange(0-self.pers["bots"]["skill"]["aim_offset_amount"], self.pers["bots"]["skill"]["aim_offset_amount"]),
-												randomFloatRange(0-self.pers["bots"]["skill"]["aim_offset_amount"], self.pers["bots"]["skill"]["aim_offset_amount"]));
+		offsetAmount = self.pers["bots"]["skill"]["aim_offset_amount"];
+		if (offsetAmount > 0)
+			obj.aim_offset_base = (randomFloatRange(0-offsetAmount, offsetAmount),
+												randomFloatRange(0-offsetAmount, offsetAmount),
+												randomFloatRange(0-offsetAmount, offsetAmount));
 		else
 			obj.aim_offset_base = (0,0,0);
 	}
@@ -1747,6 +1751,8 @@ target()
 		playercount = level.players.size;
 		for(i = -1; i < playercount; i++)
 		{
+			obj = undefined;
+
 			if (i == -1)
 			{
 				if (!isDefined(self.bot.script_target))
@@ -1866,6 +1872,9 @@ target()
 					}
 				}
 			}
+
+			if (!isdefined(obj))
+				continue;
 			
 			if(theTime - obj.time < initReactTime)
 				continue;
@@ -2012,9 +2021,8 @@ start_bot_after_target(who)
 	self endon("disconnect");
 	self endon("spawned_player");
 
-	self.bot.after_target = spawnStruct();
-	self.bot.after_target.target = who;
-	self.bot.after_target.last_pos = who.origin;
+	self.bot.after_target = who;
+	self.bot.after_target_pos = who.origin;
 
 	self notify("kill_after_target");
 	self endon("kill_after_target");
@@ -2112,7 +2120,7 @@ aim()
 						nadeAimOffset = dist/3000;
 				}
 				
-				if(no_trace_time && (!isDefined(self.bot.after_target) || self.bot.after_target.target != target))
+				if(no_trace_time && (!isDefined(self.bot.after_target) || self.bot.after_target != target))
 				{
 					if(no_trace_time > no_trace_ads_time && !usingRemote)
 					{
@@ -2211,7 +2219,7 @@ aim()
 		if (isDefined(self.bot.after_target) && !isClimbing)
 		{
 			nadeAimOffset = 0;
-			last_pos = self.bot.after_target.last_pos;
+			last_pos = self.bot.after_target_pos;
 			dist = DistanceSquared(self.origin, last_pos);
 
 			if(weaponClass(curweap) == "grenade" || curweap == "throwingknife_mp")
