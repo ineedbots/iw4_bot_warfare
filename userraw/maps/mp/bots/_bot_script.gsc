@@ -3862,13 +3862,26 @@ bot_dom_cap_think()
 		}
 
 		flag = undefined;
+		flags = [];
 		for ( i = 0; i < level.flags.size; i++ )
 		{
 			if ( level.flags[i] maps\mp\gametypes\dom::getFlagTeam() == myTeam )
 				continue;
 
-			if ( !isDefined(flag) || DistanceSquared(self.origin,level.flags[i].origin) < DistanceSquared(self.origin,flag.origin) )
-				flag = level.flags[i];
+			flags[flags.size] = level.flags[i];
+		}
+
+		if (randomInt(100) > 30)
+		{
+			for ( i = 0; i < flags.size; i++ )
+			{
+				if ( !isDefined(flag) || DistanceSquared(self.origin,level.flags[i].origin) < DistanceSquared(self.origin,flag.origin) )
+					flag = level.flags[i];
+			}
+		}
+		else if (flags.size)
+		{
+			flag = random(flags);
 		}
 
 		if ( !isDefined(flag) )
