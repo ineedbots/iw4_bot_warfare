@@ -388,11 +388,11 @@ getBestWeightedSpawnpoint( spawnpoints )
 
 DumpSpawnData( spawnpoints, winnerspawnpoint )
 {
-	if ( getSubStr( self.name, 0, 3 ) == "bot" )
-	{
+	// if ( getSubStr( self.name, 0, 3 ) == "bot" )
+	// {
 		if ( getdvarint("scr_spawnpointdebug") == 0 )
 			return;
-	}
+	// }
 	
 	println( "=================================" );
 	println( "spawndata = spawnstruct();" );
