@@ -1,1 +1,1 @@
-start "" "%~dp0iw4x.exe" -nosteam -scriptablehttp +set r_fullscreen "1" +set sv_lanonly "1" +set r_monitor "0" +set drawlagometer "0" +set cg_drawfps "0" +set r_mode "1920x1080"
+start "" "%~dp0iw4x.exe" -nosteam -scriptablehttp +set r_fullscreen "1" +set sv_lanonly "1" +set r_monitor "0" +set drawlagometer "0" +set cg_drawfps "0" +set cg_drawsnapshot "0" +set r_mode "1920x1080"
