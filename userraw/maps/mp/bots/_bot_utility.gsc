@@ -58,11 +58,19 @@ is_bot()
 }
 
 /*
-	Returns how much the bot is ads'ing all the way.
+	Bot presses the frag button for time.
 */
-botAdsAmount()
+BotPressFrag(time)
 {
-	return (1 / (self.bot.ads_highest - self.bot.ads_lowest)) * self.bot.ads_tightness + (1 + (self.bot.ads_highest / (self.bot.ads_lowest - self.bot.ads_highest)));
+	self maps\mp\bots\_bot_internal::frag(time);
+}
+
+/*
+	Bot presses the smoke button for time.
+*/
+BotPressSmoke(time)
+{
+	self maps\mp\bots\_bot_internal::smoke(time);
 }
 
 /*
@@ -79,129 +87,6 @@ BotPressADS(time)
 BotPressAttack(time)
 {
 	self maps\mp\bots\_bot_internal::pressFire(time);
-}
-
-/*
-	Bot will stop moving
-*/
-BotStopMoving(what)
-{
-	self.bot.stop_move = what;
-
-	if(what)
-		self notify("kill_goal");
-}
-
-/*
-	Returns a valid grenade launcher weapon
-*/
-getValidTube()
-{
-	weaps = self getweaponslistall();
-
-	for (i = 0; i < weaps.size; i++)
-	{
-		weap = weaps[i];
-
-		if(!self getAmmoCount(weap))
-			continue;
-
-		if ((isSubStr(weap, "gl_") && !isSubStr(weap, "_gl_")) || weap == "m79_mp")
-			return weap;
-	}
-
-	return undefined;
-}
-
-/*
-	Returns a random grenade in the bot's inventory.
-*/
-getValidGrenade()
-{
-	grenadeTypes = [];
-	grenadeTypes[grenadeTypes.size] = "frag_grenade_mp";
-	grenadeTypes[grenadeTypes.size] = "smoke_grenade_mp";
-	grenadeTypes[grenadeTypes.size] = "flash_grenade_mp";
-	grenadeTypes[grenadeTypes.size] = "concussion_grenade_mp";
-	grenadeTypes[grenadeTypes.size] = "semtex_mp";
-	grenadeTypes[grenadeTypes.size] = "throwingknife_mp";
-	
-	possibles = [];
-	
-	for(i = 0; i < grenadeTypes.size; i++)
-	{
-		if ( !self hasWeapon( grenadeTypes[i] ) )
-			continue;
-			
-		if ( !self getAmmoCount( grenadeTypes[i] ) )
-			continue;
-			
-		possibles[possibles.size] = grenadeTypes[i];
-	}
-	
-	return random(possibles);
-}
-
-/*
-	UNUSED cause buggy
-	Bots change weapons, does the anims
-*/
-botChangeWeapon(weapon)// intrestingly, this allows the bots to use pullout and pulldown anims and etc, but bugs out when the bot is frozen while midburst of a firerate limited weapon (m16, only shot one shot, or two shots, even though its a 3 round burst) (never switches until unfrozen)
-{
-	self endon("death");
-	self endon("disconnect");
-
-	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
-		return;
-
-	if (self.bot.knifing || self.bot.isfraggingafter)
-		return;
-
-	if (self.disabledWeapon)
-		return;
-
-	if (self InLastStand() && !self InFinalStand())
-		return;
-		
-	self.bot.switch_to_after_none = weapon;
-	self.bot.switching = true;
-	ret = undefined;
-
-	if (self GetCurrentWeapon() == "none")
-	{
-		self notify("weapon_change");
-		ret = self waittill_any_timeout(5, "weapon_change");
-	}
-	else
-	{
-		self _DisableWeapon();
-		self waittill_any_timeout(5, "weapon_change");
-		self _EnableWeapon();
-		ret = self waittill_any_timeout(5, "weapon_change");
-	}
-
-	if (ret == "timeout")
-		return false;
-
-	waittillframeend;
-	self notify("bot_weapon_change", self GetCurrentWeapon());
-	return true;
-}
-
-/*
-	Bot will throw the grenade
-*/
-throwBotGrenade(gname, gtime)
-{
-	return self maps\mp\bots\_bot_internal::botThrowGrenade(gname, gtime);
-}
-
-/*
-	If the bot is climbing
-*/
-botIsClimbing()
-{
-	return self.bot.climbing;
 }
 
 /*
@@ -228,7 +113,15 @@ BotGetRandom()
 */
 IsBotFragging()
 {
-	return self.bot.isfragging;
+	return self.bot.isfraggingafter;
+}
+
+/*
+	Returns if the bot is pressing smoke button.
+*/
+IsBotSmoking()
+{
+	return self.bot.issmokingafter;
 }
 
 /*
@@ -236,7 +129,7 @@ IsBotFragging()
 */
 IsBotSprinting()
 {
-	return self.bot.running;
+	return self.bot.issprinting;
 }
 
 /*
@@ -266,11 +159,14 @@ BotIsFrozen()
 }
 
 /*
-	Sets the bot's target to be this ent.
+	Bot will stop moving
 */
-SetAttacker(att)
+BotStopMoving(what)
 {
-	self.bot.target_this_frame = att;
+	self.bot.stop_move = what;
+
+	if(what)
+		self notify("kill_goal");
 }
 
 /*
@@ -370,6 +266,14 @@ ClearBotJavelinLocation()
 }
 
 /*
+	Sets the bot's target to be this ent.
+*/
+SetAttacker(att)
+{
+	self.bot.target_this_frame = att;
+}
+
+/*
 	Sets the script enemy for a bot.
 */
 SetScriptEnemy(enemy, offset)
@@ -414,51 +318,6 @@ HasThreat()
 }
 
 /*
-	If the bot is doing a knife
-*/
-IsBotKnifing()
-{
-	return self.bot.knifing;
-}
-
-/*
-	Returns the bot's velocity
-*/
-getBotVelocity()
-{
-	return self.bot.velocity;
-}
-
-/*
-	If the weapon is not a script weapon (bomb, killstreak, etc, grenades)
-*/
-isWeaponPrimary(weap)
-{
-	return (maps\mp\gametypes\_weapons::isPrimaryWeapon(weap) || maps\mp\gametypes\_weapons::isAltModeWeapon(weap));
-}
-
-/*
-	If the ent is a vehicle
-*/
-entIsVehicle(ent)
-{
-	return (ent.classname == "script_vehicle" || ent.model == "vehicle_uav_static_mp" || ent.model == "vehicle_ac130_coop");
-}
-
-/*
-	Returns if the given weapon is full auto.
-*/
-WeaponIsFullAuto(weap)
-{
-	weaptoks = strtok(weap, "_");
-
-	assert(isDefined(weaptoks[0]));
-	assert(isString(weaptoks[0]));
-	
-	return !isDefined(level.bots_nonfullautoguns[weaptoks[0]]);
-}
-
-/*
 	If the player is defusing
 */
 IsDefusing()
@@ -499,14 +358,6 @@ isFlagCarrier()
 }
 
 /*
-	If the weapon  is allowed to be dropped
-*/
-isWeaponDroppable(weap)
-{
-	return (maps\mp\gametypes\_weapons::mayDropWeapon(weap));
-}
-
-/*
 	Returns if we are stunned.
 */
 IsStunned()
@@ -520,6 +371,139 @@ IsStunned()
 isArtShocked()
 {
 	return (isDefined(self.beingArtilleryShellshocked) && self.beingArtilleryShellshocked);
+}
+
+/*
+	UNUSED cause buggy
+	Bots change weapons, does the anims
+*/
+botChangeWeapon(weapon)// intrestingly, this allows the bots to use pullout and pulldown anims and etc, but bugs out when the bot is frozen while midburst of a firerate limited weapon (m16, only shot one shot, or two shots, even though its a 3 round burst) (never switches until unfrozen)
+{
+	self endon("death");
+	self endon("disconnect");
+
+	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
+		return;
+
+	if (self.bot.knifing || self.bot.isfraggingafter)
+		return;
+
+	if (self.disabledWeapon)
+		return;
+
+	if (self InLastStand() && !self InFinalStand())
+		return;
+		
+	self.bot.switch_to_after_none = weapon;
+	self.bot.switching = true;
+	ret = undefined;
+
+	if (self GetCurrentWeapon() == "none")
+	{
+		self notify("weapon_change");
+		ret = self waittill_any_timeout(5, "weapon_change");
+	}
+	else
+	{
+		self _DisableWeapon();
+		self waittill_any_timeout(5, "weapon_change");
+		self _EnableWeapon();
+		ret = self waittill_any_timeout(5, "weapon_change");
+	}
+
+	if (ret == "timeout")
+		return false;
+
+	waittillframeend;
+	self notify("bot_weapon_change", self GetCurrentWeapon());
+	return true;
+}
+
+/*
+	Returns a valid grenade launcher weapon
+*/
+getValidTube()
+{
+	weaps = self getweaponslistall();
+
+	for (i = 0; i < weaps.size; i++)
+	{
+		weap = weaps[i];
+
+		if(!self getAmmoCount(weap))
+			continue;
+
+		if ((isSubStr(weap, "gl_") && !isSubStr(weap, "_gl_")) || weap == "m79_mp")
+			return weap;
+	}
+
+	return undefined;
+}
+
+/*
+	Returns a random grenade in the bot's inventory.
+*/
+getValidGrenade()
+{
+	grenadeTypes = [];
+	grenadeTypes[grenadeTypes.size] = "frag_grenade_mp";
+	grenadeTypes[grenadeTypes.size] = "smoke_grenade_mp";
+	grenadeTypes[grenadeTypes.size] = "flash_grenade_mp";
+	grenadeTypes[grenadeTypes.size] = "concussion_grenade_mp";
+	grenadeTypes[grenadeTypes.size] = "semtex_mp";
+	grenadeTypes[grenadeTypes.size] = "throwingknife_mp";
+	
+	possibles = [];
+	
+	for(i = 0; i < grenadeTypes.size; i++)
+	{
+		if ( !self hasWeapon( grenadeTypes[i] ) )
+			continue;
+			
+		if ( !self getAmmoCount( grenadeTypes[i] ) )
+			continue;
+			
+		possibles[possibles.size] = grenadeTypes[i];
+	}
+	
+	return random(possibles);
+}
+
+/*
+	If the weapon is not a script weapon (bomb, killstreak, etc, grenades)
+*/
+isWeaponPrimary(weap)
+{
+	return (maps\mp\gametypes\_weapons::isPrimaryWeapon(weap) || maps\mp\gametypes\_weapons::isAltModeWeapon(weap));
+}
+
+/*
+	If the ent is a vehicle
+*/
+entIsVehicle(ent)
+{
+	return (ent.classname == "script_vehicle" || ent.model == "vehicle_uav_static_mp" || ent.model == "vehicle_ac130_coop");
+}
+
+/*
+	Returns if the given weapon is full auto.
+*/
+WeaponIsFullAuto(weap)
+{
+	weaptoks = strtok(weap, "_");
+
+	assert(isDefined(weaptoks[0]));
+	assert(isString(weaptoks[0]));
+	
+	return isDefined(level.bots_fullautoguns[weaptoks[0]]);
+}
+
+/*
+	If the weapon  is allowed to be dropped
+*/
+isWeaponDroppable(weap)
+{
+	return (maps\mp\gametypes\_weapons::mayDropWeapon(weap));
 }
 
 /*
@@ -2417,51 +2401,4 @@ botPlayerModelForWeapon( weapon, secondary )
 			[[game[team+"_model"]["ASSAULT"]]]();
 			break;
 	}
-}
-
-/*
-	patches so that it uses the bot's getVelocity func
-*/
-claymoreDetonationBotFix()
-{
-	self endon( "death" );
-
-	self waittill( "missile_stuck" );
-
-	damagearea = spawn( "trigger_radius", self.origin + ( 0, 0, 0 - level.claymoreDetonateRadius ), 0, level.claymoreDetonateRadius, level.claymoreDetonateRadius * 2 );
-	self thread maps\mp\gametypes\_weapons::deleteOnDeath( damagearea );
-
-	while ( 1 )
-	{
-		damagearea waittill( "trigger", player );
-
-		if (!player is_bot())
-			continue;
-
-		if ( getdvarint( "scr_claymoredebug" ) != 1 )
-		{
-			if ( isdefined( self.owner ) && player == self.owner )
-				continue;
-			if ( !maps\mp\gametypes\_weapons::friendlyFireCheck( self.owner, player, 0 ) )
-				continue;
-		}
-		if ( lengthsquared( player getBotVelocity() ) < 10 )
-			continue;
-
-		if ( !player maps\mp\gametypes\_weapons::shouldAffectClaymore( self ) )
-			continue;
-
-		if ( player damageConeTrace( self.origin, self ) > 0 )
-			break;
-	}
-	
-	self playsound ("claymore_activated");
-	
-	
-	if ( player _hasPerk( "specialty_delaymine" ) )
-		wait 3.0;
-	else 
-		wait level.claymoreDetectionGracePeriod;
-		
-	self detonate();
 }

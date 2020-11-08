@@ -67,9 +67,6 @@ connected()
 	self resetBotVars();
 	
 	self thread onPlayerSpawned();
-	self thread onDisconnected();
-	self thread onGameEnded();
-	self thread onGiveLoadout();
 }
 
 /*
@@ -77,19 +74,6 @@ connected()
 */
 onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, timeOffset, deathAnimDuration)
 {
-	if (isDefined(self.bot_anim))
-	{
-		hidden = self isFakeAnimHidden();
-		self botsDeleteFakeAnim();
-
-		if (!hidden && !isDefined(self.nuked))
-		{
-			if (isDefined(eAttacker) && isDefined(eAttacker.guid) && isDefined(self.attackerData[eAttacker.guid]) && isDefined(self.attackerData[eAttacker.guid].firstTimeDamaged))
-				self.attackerData[eAttacker.guid].firstTimeDamaged += 100; // two frames?? but it works??
-			
-			wait 0.05;
-		}
-	}
 }
 
 /*
@@ -97,40 +81,6 @@ onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, 
 */
 onDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset)
 {
-}
-
-/*
-	The giveloadout watcher
-*/
-onGiveLoadout()
-{
-	self endon("disconnect");
-
-	for(;;)
-	{
-		self waittill("giveLoadout");
-		self botsDeleteFakeAnim();
-	}
-}
-
-/*
-	Watches for the game to end
-*/
-onGameEnded()
-{
-	self endon("disconnect");
-
-	level waittill("game_ended");
-	self botsDeleteFakeAnim();
-}
-
-/*
-	Watches for when we disconnect
-*/
-onDisconnected()
-{
-	self waittill("disconnect");
-	self botsDeleteFakeAnim();
 }
 
 /*
@@ -148,6 +98,8 @@ resetBotVars()
 	self.bot.after_target_pos = undefined;
 	
 	self.bot.script_aimpos = undefined;
+
+	self.bot.lockingon = false; // !
 	
 	self.bot.script_goal = undefined;
 	self.bot.script_goal_dist = 0.0;
@@ -156,23 +108,24 @@ resetBotVars()
 	self.bot.second_next_wp = -1;
 	self.bot.towards_goal = undefined;
 	self.bot.astar = [];
-	self.bot.velocity = (0,0,0);
-	self.bot.script_move_speed = 0;
-	self.bot.last_pos = self.origin;
 	self.bot.moveTo = self.origin;
-	self.bot.climbing = false;
 	self.bot.stop_move = false;
+	self.bot.greedy_path = false;
 	
 	self.bot.isfrozen = false;
+	self.bot.sprintendtime = -1;
 	self.bot.isreloading = false;
-
+	self.bot.issprinting = false;
 	self.bot.isfragging = false;
+	self.bot.issmoking = false;
 	self.bot.isfraggingafter = false;
-	self.bot.tryingtofrag = false;
-	self.bot.tryingtofragpullback = false;
+	self.bot.issmokingafter = false;
+	self.bot.isknifing = false;
+	self.bot.isknifingafter = false;
 	
 	self.bot.semi_time = false;
-	self.bot.greedy_path = false;
+	self.bot.jump_time = undefined;
+	
 	self.bot.is_cur_full_auto = false;
 	
 	self.bot.rand = randomInt(100);
@@ -180,29 +133,7 @@ resetBotVars()
 	self.bot.isswitching = false;
 	self.bot.switch_to_after_none = undefined;
 
-	self.bot.stance = "stand";
-
-	self.bot.running = false;
-	self.bot.max_run_time = getdvarfloat("scr_player_sprinttime");
-	self.bot.run_time = self.bot.max_run_time;
-	self.bot.runningafter = false;
-
-	self.bot.fire_pressed = false;
-	self.bot.is_frozen_internal = true;
-
-	self.bot.ads_pressed = false;
-	self.bot.ads_lowest = 9;
-	self.bot.ads_tightness = self.bot.ads_lowest;
-	self.bot.ads_highest = 1;
-
-	self.bot.jumping = false;
-	self.bot.jumpingafter = false;
-
-	self.bot.lockingon = false;
-
-	self.bot.knifing = false;
-	self.bot.knifingafter = false;
-	self.bot.knifeteleport = false;
+	self botStop();
 }
 
 /*
@@ -221,928 +152,11 @@ onPlayerSpawned()
 		self thread onLastStand();
 		
 		self thread reload_watch();
-		self thread grenade_watch();
-		self thread lockon_watch();
-		self thread jav_loc_watch();
-		self thread ti_fix();
+		self thread sprint_watch();
 
-		self thread adsHack();
-		self thread fireHack();
-		self thread stanceHack();
-		self thread moveHack();
-
-		self thread UseRunThink();
 		self thread watchUsingRemote();
 		
 		self thread spawned();
-	}
-}
-
-/*
-	Fixes the ti script, because IsOnGround is always false when freezecontrols(true)
-*/
-ti_fix()
-{
-	self endon("disconnect");
-	self endon("death");
-
-	for (;;)
-	{
-		self waittill( "grenade_fire", lightstick, weapName );
-				
-		if ( weapName != "flare_mp" )
-			continue;
-
-		self.TISpawnPosition = self.origin;
-	}
-}
-
-/*
-	Watches and handles javelin location lock on.
-*/
-jav_loc_watch()
-{
-	self endon("disconnect");
-	self endon("death");
-
-	for (;;)
-	{
-		wait 0.05;
-
-		if(!gameFlag( "prematch_done" ) || level.gameEnded || self.bot.isfrozen || self maps\mp\_flashgrenades::isFlashbanged())
-			continue;
-
-		if (!isDefined(self.bot.jav_loc))
-			continue;
-
-		weap = self getCurrentWeapon();
-		if (weap != "javelin_mp")
-			continue;
-
-		if (!self GetCurrentWeaponClipAmmo())
-			continue;
-
-		if (self isEMPed())
-			continue;
-
-		self watchJavLock();
-	}
-}
-
-/*
-	Does the javelin lock on
-*/
-watchJavLock()
-{
-	self endon("bot_kill_lockon_jav");
-
-	self thread watchJavLockEvents();
-	self thread watchJavLockHas();
-
-	self thread maps\mp\_javelin::LoopLocalSeekSound( "javelin_clu_aquiring_lock", 0.6 );
-	wait 1.5;
-
-	self notify( "stop_lockon_sound" );
-	self PlayLocalSound( "javelin_clu_lock" );
-
-	while (isDefined(self.bot.jav_loc))
-	{
-		self WeaponLockFinalize( self.bot.jav_loc, (0,0,0), true );
-		wait 0.05;
-	}
-
-	self notify("bot_kill_lockon_jav");
-}
-
-/*
-	Watches while we have a location to lock on
-*/
-watchJavLockHas()
-{
-	self endon("bot_kill_lockon_jav");
-	self endon("disconnect");
-	self endon("death");
-
-	for (;;)
-	{
-		wait 0.05;
-
-		if (!isDefined(self.bot.jav_loc))
-			break;
-
-		if (getConeDot(self.bot.jav_loc, self GetEye(), self GetPlayerAngles()) < 0.8)
-			break;
-	}
-
-	self notify( "stop_lockon_sound" );
-	self notify("bot_kill_lockon_jav");
-}
-
-/*
-	Watches when to kill the javelin lock on
-*/
-watchJavLockEvents()
-{
-	self endon("bot_kill_lockon_jav");
-	self endon("disconnect");
-	self endon("death");
-
-	self waittill_any("flash_rumble_loop", "weapon_change", "missile_fire");
-
-	self notify( "stop_lockon_sound" );
-	self notify("bot_kill_lockon_jav");
-}
-
-/*
-	Watches and does the vehicle lockon
-*/
-lockon_watch()
-{
-	self endon("disconnect");
-	self endon("death");
-
-	for (;;)
-	{
-		wait 0.05;
-
-		if(!gameFlag( "prematch_done" ) || level.gameEnded || self.bot.isfrozen || self maps\mp\_flashgrenades::isFlashbanged())
-			continue;
-
-		if (!isDefined(self.bot.target) || !isDefined(self.bot.target.entity))
-			continue;
-
-		if (!entIsVehicle(self.bot.target.entity))
-			continue;
-
-		weap = self getCurrentWeapon();
-		if (weap != "stinger_mp" && weap != "at4_mp" && weap != "javelin_mp")
-			continue;
-
-		if (!self GetCurrentWeaponClipAmmo())
-			continue;
-
-		if (weap == "javelin_mp" && self isEMPed())
-			continue;
-
-		self.bot.lockingon = true;
-		self doLockon();
-		self.bot.lockingon = false;
-	}
-}
-
-/*
-	Does the lock on
-*/
-doLockon()
-{
-	self endon("bot_kill_lockon");
-	self thread watchBotLockonEvents();
-	self thread watchBotLockonTrace();
-	isJav = (self GetCurrentWeapon() == "javelin_mp");
-	
-	wait 1.5;
-
-	if (isJav)
-		self thread maps\mp\_javelin::LoopLocalSeekSound( "javelin_clu_aquiring_lock", 0.6 );
-	self thread doRocketLockingSound();
-
-	wait 1.5;
-	
-	self notify( "stop_lockon_sound" );
-	self notify("bot_kill_lockon_sound");
-
-	self thread doRocketLockedSound();
-	if (isJav)
-		self PlayLocalSound( "javelin_clu_lock" );
-
-	// fire!
-	weap = self getCurrentWeapon();
-	while (isDefined(self.bot.target) && isDefined(self.bot.target.entity))
-	{
-		self.stingerTarget = self.bot.target.entity;
-		self.javelinTarget = self.bot.target.entity;
-
-		if (weap != "javelin_mp")
-		{
-			if ( self.stingerTarget.model == "vehicle_av8b_harrier_jet_mp"  || self.stingerTarget.model == "vehicle_little_bird_armed" )
-				self WeaponLockFinalize( self.stingerTarget );
-			else
-				self WeaponLockFinalize( self.stingerTarget, (100,0,-32) );
-		}
-		else
-			self WeaponLockFinalize( self.javelinTarget, (0,0,0), false );
-
-		if (weap == "at4_mp")
-			self.bot.lockingon = false; // so that the bot can fire
-
-		wait 0.05;
-	}
-
-	self notify("bot_kill_lockon");
-	self notify( "stop_lockon_sound" );
-}
-
-/*
-	Makes sure we have sight on the vehicle
-*/
-watchBotLockonTrace()
-{
-	self endon("death");
-	self endon("disconnect");
-	self endon("bot_kill_lockon");
-
-	for (;;)
-	{
-		wait 0.05;
-
-		if(!isDefined(self.bot.target) || !isDefined(self.bot.target.entity))
-			break;
-
-		if (self.bot.target.no_trace_time > 500)
-			break;
-
-		if (getConeDot(self.bot.target.entity.origin, self GetEye(), self GetPlayerAngles()) < 0.8)
-			break;
-	}
-
-	self notify("bot_kill_lockon");
-	self notify( "stop_lockon_sound" );
-}
-
-/*
-	Stops the lock on when an event happens
-*/
-watchBotLockonEvents()
-{
-	self endon("death");
-	self endon("disconnect");
-	self endon("bot_kill_lockon");
-
-	self waittill_any("flash_rumble_loop", "new_enemy", "weapon_change", "missile_fire");
-
-	self notify("bot_kill_lockon");
-	self notify( "stop_lockon_sound" );
-}
-
-/*
-	Plays the beeps
-*/
-doRocketLockingSound()
-{
-	self endon("disconnect");
-	self endon("death");
-	self endon("bot_kill_lockon_sound");
-	self endon("bot_kill_lockon");
-	isJav = (self GetCurrentWeapon() == "javelin_mp");
-	
-	for(;;)
-	{
-		wait 0.6;
-
-		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity))
-		{
-			if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && self.bot.target.entity == level.chopper/*.gunner*/ ) // original iw4 script has this bug...
-				level.chopper.gunner playLocalSound( "missile_locking" );
-
-			if ( isDefined( level.ac130player ) && self.bot.target.entity == level.ac130.planeModel )
-				level.ac130player playLocalSound( "missile_locking" );
-			
-			if (!isJav)
-			{
-				self playLocalSound( "stinger_locking" );
-				self PlayRumbleOnEntity( "ac130_25mm_fire" );
-			}
-		}
-	}
-}
-
-/*
-	Plays the beeps
-*/
-doRocketLockedSound()
-{
-	self endon("disconnect");
-	self endon("death");
-	self endon("bot_kill_lockon_sound");
-	self endon("bot_kill_lockon");
-	isJav = (self GetCurrentWeapon() == "javelin_mp");
-	
-	for(;;)
-	{
-		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity))
-		{
-			if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && self.bot.target.entity == level.chopper )
-				level.chopper.gunner playLocalSound( "missile_locking" );
-
-			if ( isDefined( level.ac130player ) && self.bot.target.entity == level.ac130.planeModel )
-				level.ac130player playLocalSound( "missile_locking" );
-			
-			if (!isJav)
-			{
-				self playLocalSound( "stinger_locked" );
-				self PlayRumbleOnEntity( "ac130_25mm_fire" );
-			}
-		}
-		wait 0.25;
-	}
-}
-
-/*
-	Handles when the bot is to stop running and how much run time it has
-*/
-UseRunThink()
-{
-	self endon("death");
-	self endon("disconnect");
-
-	for(;;)
-	{
-		wait 0.05;
-
-		if(self.bot.running)
-		{
-			if(!self _hasPerk("specialty_marathon"))
-				self.bot.run_time -= 0.05;
-
-			if (self.bot.run_time <= 0 ||
-			self inLastStand() || self getStance() != "stand" ||
-			level.gameEnded || !gameFlag( "prematch_done" ) ||
-			self.bot.isfrozen || self.bot.climbing ||
-			self.bot.isreloading ||
-			self.bot.ads_pressed || self.bot.fire_pressed ||
-			self.bot.isfragging || self.bot.knifing || 
-			lengthsquared(self.bot.velocity) <= 25 ||
-			self IsStunned() || self isArtShocked() || self maps\mp\_flashgrenades::isFlashbanged())
-			{
-				self thread doRunDelay();
-			}
-		}
-		else
-		{
-			if(self.bot.run_time < self.bot.max_run_time)
-				self.bot.run_time += 0.05;
-		}
-	}
-}
-
-/*
-	Adds a delay after running (simulates pulling up the gun from a sprint)
-*/
-doRunDelay()
-{
-	self endon("disconnect");
-	self endon("death");
-
-	if (!self.bot.running)
-		return;
-
-	self notify("bot_run_delay");
-	self endon("bot_run_delay");
-
-	self.bot.running = false;
-
-	if (self _hasPerk("specialty_fastsprintrecovery"))
-		wait 0.5;
-	else
-		wait 1;
-
-	self.bot.runningafter = false;
-}
-
-/*
-	Sets our stance, because the executable is always setting the bot's stance to the dvar
-*/
-stanceHack()
-{
-	self endon("disconnect");
-	self endon("death");
-
-	self SetStance(self.bot.stance);
-	for (;;)
-	{
-		wait 0.05;
-
-		if(self inLastStand())
-			continue;
-
-		if (level.gameEnded || !gameFlag( "prematch_done" ))
-			continue;
-
-		if (self.bot.isfrozen)
-			continue;
-
-		if (self GetStance() == self.bot.stance)
-			continue;
-			
-		self SetStance(self.bot.stance);
-	}
-}
-
-/*
-	Watches when we pull back a grenade
-*/
-grenade_watch()
-{
-	self endon("disconnect");
-	self endon("death");
-
-	for (;;)
-	{
-		self waittill("grenade_pullback", weaponName);
-		self.bot.isfragging = true;
-		self.bot.isfraggingafter = true;
-
-		self waittill_any_timeout( 10, "grenade_fire", "weapon_change", "offhand_end" );
-
-		self.bot.isfragging = false;
-		self thread doFragAfterThread();
-	}
-}
-
-/*
-	Wait a bit to stop the frag
-*/
-doFragAfterThread()
-{
-	self endon("disconnect");
-	self endon("death");
-	self endon("grenade_pullback");
-
-	wait 1;
-	self.bot.isfraggingafter = false;
-}
-
-/*
-	Basically unfreezes the bot when its clip is empty so it can reload
-*/
-emptyClipShoot()
-{
-	self endon("disconnect");
-	self endon("death");
-
-	for (;;)
-	{
-		wait 0.05;
-
-		if (self.bot.isreloading || self GetCurrentWeaponClipAmmo())
-			continue;
-
-		cur = self GetCurrentWeapon();
-
-		if (cur == "none" || IsWeaponClipOnly(cur) || !self GetWeaponAmmoStock(cur) || self IsUsingRemote())
-			continue;
-
-		self thread pressFire();
-	}
-}
-
-/*
-	Hides the animator script model when it needs too
-*/
-checkShouldHideAnim(shouldHideAnim)
-{
-	isHidden = self isFakeAnimHidden();
-
-	if (self.bot.isreloading || self.bot.isfraggingafter)
-		shouldHideAnim = true;
-
-	if (self isInActiveAnim())
-		shouldHideAnim = false;
-
-	if (isHidden && !shouldHideAnim)
-		self showFakeAnim();
-	else if (!isHidden && shouldHideAnim)
-		self hideFakeAnim();
-}
-
-/*
-	Does the movement for the bot, as well as telling what passive animation to play, and foot sounds
-*/
-moveHack()
-{
-	self endon("disconnect");
-	self endon("death");
-
-	self.bot.last_pos = self.origin;
-	self.bot.moveTo = self.origin;
-
-	shouldHideAnim = true;
-	for (timer = 0;;timer += 0.05)
-	{
-		self checkShouldHideAnim(shouldHideAnim);
-		shouldHideAnim = true;
-		wait 0.05;
-
-		self.bot.velocity = (self.origin-self.bot.last_pos)*20;
-		self.bot.last_pos = self.origin;
-
-		if (DistanceSquared(self.bot.moveTo, self.origin) < 1)
-			continue;
-
-		if (level.gameEnded || !gameFlag( "prematch_done" ))
-			continue;
-
-		if (self.bot.isfrozen)
-			continue;
-
-		stance = self getStance();
-		curWeap = self GetCurrentWeapon();
-		weapClass = weaponClass(curWeap);
-		inLastStand = self inLastStand();
-		usingRemote = self isUsingRemote();
-		moveTo = self.bot.moveTo;
-		botAnim = "";
-
-		if (!self.bot.climbing)
-		{
-			// a number between 0 and 1, 1 being totally flat, same level.    0 being totally above or below.      about 0.7 is a 45 degree angle
-			verticleDegree = getConeDot(moveTo + (1, 1, 0), self.origin  + (-1, -1, 0), VectorToAngles((moveTo[0], moveTo[1], self.origin[2]) - self.origin));
-			self.bot.climbing = (abs(moveTo[2] - self.origin[2]) > 50 && verticleDegree < 0.64);
-		}
-
-		// only climb if we are not inlaststand, not using a remote, not jumping, and on a waypoint path
-		if (inLastStand || usingRemote || self.bot.jumpingafter || self.bot.next_wp == -1)
-			self.bot.climbing = false;
-
-		if (usingRemote)
-			continue;
-
-		moveSpeed = 10;
-		if (self.bot.running)
-			moveSpeed *= 1.5;
-		if (self IsStunned() || self isArtShocked())
-			moveSpeed *= 0.15;
-		if (self.bot.ads_pressed)
-			moveSpeed *= 0.35;
-
-		if (inLastStand)
-			moveSpeed *= 0.2;
-		else
-		{
-			if (stance == "crouch")
-				moveSpeed *= 0.5;
-			if (stance == "prone")
-				moveSpeed *= 0.2;
-		}
-
-		myOrg = self.origin;
-		myOrg = (myOrg[0], myOrg[1], 0);
-		myAngles = self GetPlayerAngles();
-		myAngles = (0, myAngles[1], 0);
-		myVelocity = self.bot.velocity;
-		myVelocity = (myVelocity[0], myVelocity[1], 0);
-
-		// 1 is totally forward, 0 is left or right, -1 is backward
-		botForwardMoveCone = GetConeDot(myOrg + myVelocity, myOrg, myAngles);
-
-		// apply strafe slowness
-		if (botForwardMoveCone < 0.95)
-		{
-			strafeMultiplier = 0.667;
-
-			if (botForwardMoveCone < 0)
-				moveSpeed *= strafeMultiplier;
-			else
-				moveSpeed *= (((1 - strafeMultiplier) * botForwardMoveCone) + strafeMultiplier);
-		}
-
-		if (self.bot.running && botForwardMoveCone < 0.5)
-			self thread doRunDelay();
-
-		if (self.bot.climbing)
-		{
-			if (self _hasPerk("specialty_fastmantle"))
-				moveSpeed = 6;
-			else
-				moveSpeed = 4;
-		}
-
-		switch ( weapClass )
-		{
-			case "rifle":
-				if(self.hasRiotShieldEquipped)
-					moveSpeed *= 0.8;
-				else
-					moveSpeed *= 0.95;
-				break;
-			case "mg":
-				moveSpeed *= 0.875;
-				break;
-			case "spread":
-				moveSpeed *= 0.95;
-				break;
-			case "rocketlauncher":
-				moveSpeed *= 0.8;
-				break;
-		}
-
-		if (self _hasPerk("specialty_lightweight"))
-			moveSpeed *= 1.07;
-
-		moveSpeed *= (getdvarfloat("g_speed")/190.0);
-		moveSpeed *= self.moveSpeedScaler;
-
-		self.bot.script_move_speed = moveSpeed;
-
-		// do foot sound
-		if ((moveSpeed > 0) && ((3.5 / moveSpeed) <= timer))
-		{
-			timer = 0;
-
-			if (!self _hasPerk("specialty_quieter"))
-			{
-				if (self.bot.climbing)
-					self playSound( "step_run_ladder" );
-				else
-				{
-					myOg = self getOrigin();
-					trace = bullettrace( myOg, myOg + (0.0, 0.0, -5.0), false, self );
-
-					if (trace[ "surfacetype" ] != "none")
-					{
-						if (inLastStand)
-							self playSound( "step_prone_" + trace[ "surfacetype" ] );
-						else
-						{
-							switch( stance )
-							{
-								case "stand":
-									self playSound( "step_run_" + trace[ "surfacetype" ] );
-								break;
-								case "crouch":
-									self playSound( "step_walk_" + trace[ "surfacetype" ] );
-								break;
-								case "prone":
-									self playSound( "step_prone_" + trace[ "surfacetype" ] );
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		if (inLastStand)
-			botAnim = "pb_laststand_crawl";
-		else if (self.bot.climbing)
-			botAnim = "pb_climbup";
-		else if (stance == "prone")
-			botAnim = "pb_prone_crawl";
-		else
-		{
-			if (stance == "stand")
-			{
-				if (self.bot.running)
-				{
-					// sprint
-					switch(weapClass)
-					{
-						case "pistol":
-							botAnim = "pb_sprint_pistol";
-						break;
-						case "rocketlauncher":
-							botAnim = "pb_sprint_RPG";
-						break;
-						default:
-							botAnim = "pb_sprint";
-						break;
-					}
-
-					if(self.hasRiotShieldEquipped)
-						botAnim = "pb_sprint_shield";
-
-					if(isSubStr(curWeap, "akimbo_"))
-						botAnim = "pb_sprint_akimbo";
-				}
-				else
-				{
-					// stand
-					switch(weapClass)
-					{
-						case "pistol":
-							botAnim = "pb_pistol_run_fast";
-						break;
-						case "rocketlauncher":
-							botAnim = "pb_combatrun_forward_RPG";
-						break;
-						default:
-							botAnim = "pb_combatrun_forward_loop";
-						break;
-					}
-
-					if(self.hasRiotShieldEquipped)
-						botAnim = "pb_combatrun_forward_shield";
-
-					if(isSubStr(curWeap, "akimbo_"))
-						botAnim = "pb_combatrun_forward_akimbo";
-				}
-			}
-			else
-			{
-				// crouch
-				switch(weapClass)
-				{
-					case "pistol":
-						botAnim = "pb_crouch_run_forward_pistol";
-					break;
-					case "rocketlauncher":
-						botAnim = "pb_crouch_run_forward_RPG";
-					break;
-					default:
-						botAnim = "pb_crouch_run_forward";
-					break;
-				}
-
-				if(self.hasRiotShieldEquipped)
-					botAnim = "pb_crouch_walk_forward_shield";
-
-				if(isSubStr(curWeap, "akimbo_"))
-					botAnim = "pb_crouch_walk_forward_akimbo";
-			}
-		}
-
-		if (botAnim != "")
-		{
-			shouldHideAnim = false;
-
-			if (!self botDoingAnim(botAnim))
-				self botDoAnim(botAnim);
-		}
-
-		completedMove = false;
-		if (DistanceSquared(self.origin, moveTo) < (moveSpeed * moveSpeed))
-		{
-			completedMove = true;
-			self SetOrigin(moveTo);
-		}
-
-		// push out of players
-		for (i = level.players.size - 1; i >= 0; i--)
-		{
-			player = level.players[i];
-
-			if (player == self)
-				continue;
-
-			if (!isReallyAlive(player))
-				continue;
-
-			if (distanceSquared(self.origin, player.origin) > level.botPushOutDist*level.botPushOutDist)
-				continue;
-
-			dist = distance(self.origin, player.origin);
-			pushOutDist = level.botPushOutDist;
-
-			pushOutDir = VectorNormalize((self.origin[0], self.origin[1], 0)-(player.origin[0], player.origin[1], 0));
-			trace = bulletTrace(self.origin + (0,0,20), (self.origin + (0,0,20)) + (pushOutDir * ((pushOutDist-dist)+10)), false, self);
-			//no collision, so push out
-			if(trace["fraction"] == 1)
-			{
-				pushoutPos = self.origin + (pushOutDir * (pushOutDist-dist));
-				self SetOrigin((pushoutPos[0], pushoutPos[1], self.origin[2])); 
-			}
-		}
-
-		if (completedMove)
-			continue;
-
-		if (!self.bot.climbing)
-		{
-			self SetOrigin(self.origin + (VectorNormalize((moveTo[0], moveTo[1], self.origin[2])-self.origin) * moveSpeed));
-
-			// clamp to ground
-			trace = physicsTrace(self.origin + (0.0,0.0,50.0), self.origin + (0.0,0.0,-40.0), false, undefined);
-			if (self.bot.is_frozen_internal)
-			{
-				if(!self.bot.jumping && (trace[2] - (self.origin[2]-40.0)) > 0.0 && ((self.origin[2]+50.0) - trace[2]) > 0.0)
-				{
-					self SetOrigin(trace);
-				}
-				else
-				{
-					self SetOrigin(playerPhysicsTrace(self.origin + (0,0,5), self.origin - (0,0,5), false, undefined));
-				}
-			}
-
-			continue;
-		}
-		
-		self SetOrigin(self.origin + (VectorNormalize(moveTo-self.origin) * moveSpeed));
-	}
-}
-
-/*
-	Freezes and unfreezes the bot when told too,
-	Bots are always wanting to fire, so we freeze to stop firing, and unfreeze to fire
-*/
-fireHack()
-{
-	self endon("disconnect");
-	self endon("spawned_player");
-
-	self FreezeControls(true);
-	lastParam = true;
-	for (;;)
-	{
-		wait 0.05;
-
-		if (!isAlive(self))
-			return;
-
-		shouldFire = self.bot.fire_pressed;
-
-		if (self.bot.isswitching || self.bot.runningafter)
-			shouldFire = false;
-
-		if (self.bot.climbing || self.bot.knifing)
-			shouldFire = false;
-
-		if (self.bot.tryingtofrag)
-		{
-			if (self.bot.tryingtofragpullback)
-				shouldFire = true;
-			else
-				shouldFire = false;
-		}
-
-		if (self.bot.isfrozen)
-			shouldFire = false;
-
-		if (isDefined(self.bot.target) && self IsUsingRemote())
-			shouldFire = true;
-
-		if (level.gameEnded || !gameFlag( "prematch_done" ))
-			shouldFire = false;
-
-		self.bot.is_frozen_internal = !shouldFire;
-
-		//if (lastParam == !shouldFire)
-		//	continue;
-
-		lastParam = !shouldFire;
-		self FreezeControls(!shouldFire);
-	}
-}
-
-/*
-	When the bot is told to ads.
-	We use a smaller crosshair when we want to ads
-*/
-adsHack()
-{
-	self endon("disconnect");
-	self endon("spawned_player");
-
-	self setSpreadOverride(self.bot.ads_tightness);
-	lastParam = self.bot.ads_tightness;
-	for (;;)
-	{
-		wait 0.05;
-
-		if (!isAlive(self))
-			return;
-
-		shouldAds = self.bot.ads_pressed;
-
-		if (level.gameEnded)
-			shouldAds = false;
-
-		if (!gameFlag( "prematch_done" ))
-			shouldAds = false;
-
-		if (self.bot.isfrozen)
-			shouldAds = false;
-
-		if (self.bot.climbing)
-			shouldAds = false;
-
-		if (shouldAds)
-			self.bot.ads_tightness--;
-		else
-			self.bot.ads_tightness++;
-
-		if (self _hasPerk("specialty_quickdraw"))
-		{
-			if (shouldAds)
-				self.bot.ads_tightness--;
-			else
-				self.bot.ads_tightness++;
-		}
-
-		if (self.bot.ads_tightness < self.bot.ads_highest)
-			self.bot.ads_tightness = self.bot.ads_highest;
-		if (self.bot.ads_tightness > self.bot.ads_lowest)
-			self.bot.ads_tightness = self.bot.ads_lowest;
-
-		if (lastParam == self.bot.ads_tightness)
-			continue;
-
-		lastParam = self.bot.ads_tightness;
-
-		if (self.bot.ads_tightness >= self.bot.ads_lowest)
-			self ResetSpreadOverride();
-		else
-			self setSpreadOverride(self.bot.ads_tightness);
 	}
 }
 
@@ -1218,9 +232,6 @@ doSwitch(newWeapon)
 	if (self.lastDroppableWeapon != newWeapon)
 		return;
 
-	if (!self inLastStand() && !self.bot.isfraggingafter && !self.bot.knifingafter)
-		self thread botDoAnim("pt_stand_core_pullout", 0.5, true);
-
 	self.bot.isswitching = true;
 
 	wait 1;  // fast pullout?
@@ -1243,6 +254,24 @@ reload_watch()
 
 		self waittill_notify_or_timeout("reload", 7.5);
 		self.bot.isreloading = false;
+	}
+}
+
+/*
+	Updates the bot if it is sprinting.
+*/
+sprint_watch()
+{
+	self endon("disconnect");
+	self endon("death");
+	
+	for(;;)
+	{
+		self waittill("sprint_begin");
+		self.bot.issprinting = true;
+		self waittill("sprint_end");
+		self.bot.issprinting = false;
+		self.bot.sprintendtime = getTime();
 	}
 }
 
@@ -1396,8 +425,6 @@ spawned()
 	self endon("death");
 
 	wait self.pers["bots"]["skill"]["spawn_time"];
-	
-	self thread emptyClipShoot();
 
 	self thread grenade_danager();
 
@@ -1408,8 +435,28 @@ spawned()
 	self thread stance();
 	self thread onNewEnemy();
 	self thread walk();
+	self thread watchHoldBreath();
 
 	self notify("bot_spawned");
+}
+
+/*
+	The hold breath thread.
+*/
+watchHoldBreath()
+{
+	self endon("disconnect");
+	self endon("death");
+	
+	for(;;)
+	{
+		wait 1;
+		
+		if(self.bot.isfrozen)
+			continue;
+		
+		self holdbreath((self playerADS() && weaponClass(self getCurrentWEapon()) == "rifle"));
+	}
 }
 
 /*
@@ -1542,7 +589,7 @@ stance()
 			
 		curweap = self getCurrentWeapon();
 			
-		if(toStance != "stand" || self.bot.running)
+		if(toStance != "stand" || self.bot.issprinting)
 			continue;
 			
 		if(randomInt(100) > self.pers["bots"]["behavior"]["sprint"])
@@ -1587,7 +634,7 @@ reload_thread()
 	if (self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
 		return;
 	
-	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.climbing || self.bot.knifingafter)
+	if(isDefined(self.bot.target) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.issmokingafter || self.bot.isfrozen)
 		return;
 		
 	cur = self getCurrentWEapon();
@@ -2067,9 +1114,8 @@ aim()
 		curweap = self getCurrentWeapon();
 		eyePos = self getEye();
 		angles = self GetPlayerAngles();
-		isClimbing = self.bot.climbing;
 		
-		if (isDefined(self.bot.jav_loc) && !usingRemote && !isClimbing)
+		if (isDefined(self.bot.jav_loc) && !usingRemote)
 		{
 			aimpos = self.bot.jav_loc;
 
@@ -2077,11 +1123,11 @@ aim()
 			self thread pressAds();
 			
 			if (curweap == "javelin_mp")
-				self botFire();
+				self botFire(curweap);
 			continue;
 		}
 
-		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity) && !isClimbing)
+		if(isDefined(self.bot.target) && isDefined(self.bot.target.entity))
 		{
 			no_trace_look_time = self.pers["bots"]["skill"]["no_trace_look_time"];
 			no_trace_time = self.bot.target.no_trace_time;
@@ -2112,13 +1158,10 @@ aim()
 				if (!isDefined(bone))
 					bone = "j_spineupper";
 
-				if(weaponClass(curweap) == "grenade" || curweap == "throwingknife_mp")
-				{
-					if (getWeaponClass(curweap) == "weapon_projectile")
-						nadeAimOffset = dist/16000;
-					else
-						nadeAimOffset = dist/3000;
-				}
+				if(self.bot.isfraggingafter || self.bot.issmokingafter)
+					nadeAimOffset = dist/3000;
+				else if(weaponClass(curweap) == "grenade")
+					nadeAimOffset = dist/16000;
 				
 				if(no_trace_time && (!isDefined(self.bot.after_target) || self.bot.after_target != target))
 				{
@@ -2188,10 +1231,10 @@ aim()
 					knifeDist = level.bots_maxKnifeDistance;
 					if (self _hasPerk("specialty_extendedmelee"))
 						knifeDist *= 1.4;
-					if((isplay || target.classname == "misc_turret") && !self.bot.knifing && conedot > 0.9 && dist < knifeDist && trace_time > reaction_time && !usingRemote)
+					if((isplay || target.classname == "misc_turret") && !self.bot.isknifingafter && conedot > 0.9 && dist < knifeDist && trace_time > reaction_time && !usingRemote)
 					{
 						self clear_bot_after_target();
-						self thread knife(target, knifeDist);
+						self thread knife();
 						continue;
 					}
 					
@@ -2204,8 +1247,8 @@ aim()
 
 					if (trace_time > reaction_time)
 					{
-						if((!canADS || self botAdsAmount() == 1.0) && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
-							self botFire();
+						if((!canADS || self playerads() == 1.0) && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
+							self botFire(curweap);
 
 						if (isplay)
 							self thread start_bot_after_target(target);
@@ -2216,19 +1259,16 @@ aim()
 			}
 		}
 
-		if (isDefined(self.bot.after_target) && !isClimbing)
+		if (isDefined(self.bot.after_target))
 		{
 			nadeAimOffset = 0;
 			last_pos = self.bot.after_target_pos;
 			dist = DistanceSquared(self.origin, last_pos);
 
-			if(weaponClass(curweap) == "grenade" || curweap == "throwingknife_mp")
-			{
-				if (getWeaponClass(curweap) == "weapon_projectile")
-					nadeAimOffset = dist/16000;
-				else
-					nadeAimOffset = dist/3000;
-			}
+			if(self.bot.isfraggingafter || self.bot.issmokingafter)
+				nadeAimOffset = dist/3000;
+			else if(weaponClass(curweap) == "grenade")
+				nadeAimOffset = dist/16000;
 
 			aimpos = last_pos + (0, 0, self getEyeHeight() + nadeAimOffset);
 			if (usingRemote)
@@ -2244,13 +1284,13 @@ aim()
 			if (canADS)
 				self thread pressAds();
 
-			if((!canADS || self botAdsAmount() == 1.0) && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
-				self botFire();
+			if((!canADS || self playerads() == 1.0) && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
+				self botFire(curweap);
 			
 			continue;
 		}
 		
-		if (self.bot.next_wp != -1 && isDefined(level.waypoints[self.bot.next_wp].angles) && isClimbing)
+		if (self.bot.next_wp != -1 && isDefined(level.waypoints[self.bot.next_wp].angles) && false)
 		{
 			forwardPos = anglesToForward(level.waypoints[self.bot.next_wp].angles) * 1024;
 
@@ -2263,7 +1303,7 @@ aim()
 		else if (!usingRemote)
 		{
 			lookat = undefined;
-			if(self.bot.second_next_wp != -1 && !self.bot.running)
+			if(self.bot.second_next_wp != -1 && !self.bot.issprinting)
 				lookat = level.waypoints[self.bot.second_next_wp].origin;
 			else if(isDefined(self.bot.towards_goal))
 				lookat = self.bot.towards_goal;
@@ -2277,11 +1317,14 @@ aim()
 /*
 	Bots will fire their gun.
 */
-botFire()
+botFire(curweap)
 {
+	isAkimbo = isSubStr(curweap, "_akimbo_");
+
 	if(self.bot.is_cur_full_auto)
 	{
 		self thread pressFire();
+		if (isAkimbo) self thread pressAds();
 		return;
 	}
 
@@ -2289,6 +1332,7 @@ botFire()
 		return;
 		
 	self thread pressFire();
+	if (isAkimbo) self thread pressAds();
 	self thread doSemiTime();
 }
 
@@ -2315,10 +1359,7 @@ canFire(curweap)
 	if(curweap == "none")
 		return false;
 
-	if(curweap == "at4_mp" && self.bot.lockingon)
-		return false;
-
-	if (self.bot.isreloading || self.bot.knifing)
+	if(curweap == "at4_mp" && self.bot.lockingon) // !
 		return false;
 
 	if (curweap == "riotshield_mp" || curweap == "onemanarmy_mp")
@@ -2405,28 +1446,26 @@ walk()
 		
 		self botMoveTo(self.origin);
 		
-		if(self.bot.isfrozen || self.bot.stop_move || self.bot.knifeteleport)
+		if(level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self.bot.stop_move)
 			continue;
 			
-		if(self maps\mp\_flashgrenades::isFlashbanged() && !self.bot.jumpingafter)
+		if(self maps\mp\_flashgrenades::isFlashbanged())
 		{
-			myVel = self GetBotVelocity();
-			moveTo = PlayerPhysicsTrace(self.origin + (0, 0, 32), self.origin + (myVel[0], myVel[1], 0)*500, false, self);
-			self botMoveTo(moveTo);
+			self botMoveTo(self.origin + self GetVelocity()*500);
 			continue;
 		}
 		
-		hasTarget = (((isDefined(self.bot.target) && isDefined(self.bot.target.entity)) || isDefined(self.bot.jav_loc)) && !self.bot.climbing);
+		hasTarget = ((isDefined(self.bot.target) && isDefined(self.bot.target.entity)) || isDefined(self.bot.jav_loc));
 		if(hasTarget)
 		{
 			curweap = self getCurrentWeapon();
 			
-			if(isDefined(self.bot.jav_loc) || entIsVehicle(self.bot.target.entity) || self.bot.isfraggingafter)
+			if(isDefined(self.bot.jav_loc) || entIsVehicle(self.bot.target.entity) || self.bot.isfraggingafter || self.bot.issmokingafter)
 			{
 				continue;
 			}
 			
-			if(self.bot.target.isplay && self.bot.target.trace_time && self canFire(curweap) && self isInRange(self.bot.target.dist, curweap) && !self.bot.jumpingafter)
+			if(self.bot.target.isplay && self.bot.target.trace_time && self canFire(curweap) && self isInRange(self.bot.target.dist, curweap))
 			{
 				if(self.bot.target.rand <= self.pers["bots"]["behavior"]["strafe"])
 					self strafe(self.bot.target.entity);
@@ -2510,15 +1549,16 @@ strafe(target)
 	anglesLeft = (0, angles[1]+90, 0);
 	anglesRight = (0, angles[1]-90, 0);
 	
-	left = self.origin + anglestoforward(anglesLeft)*500;
-	right = self.origin + anglestoforward(anglesRight)*500;
+	myOrg = self.origin + (0, 0, 16);
+	left = myOrg + anglestoforward(anglesLeft)*500;
+	right = myOrg + anglestoforward(anglesRight)*500;
 	
-	traceLeft = PlayerPhysicsTrace(self.origin + (0, 0, 32), left, false, self);
-	traceRight = PlayerPhysicsTrace(self.origin + (0, 0, 32), right, false, self);
+	traceLeft = BulletTrace(myOrg, left, false, self);
+	traceRight = BulletTrace(myOrg, right, false, self);
 	
-	strafe = traceLeft;
-	if(DistanceSquared(left, traceLeft) > DistanceSquared(right, traceRight))
-		strafe = traceRight;
+	strafe = traceLeft["position"];
+	if(traceRight["fraction"] > traceLeft["fraction"])
+		strafe = traceRight["position"];
 	
 	self botMoveTo(strafe);
 	wait 2;
@@ -2626,7 +1666,7 @@ doWalk(goal, dist, isScriptGoal)
 	distsq = dist*dist;
 	if (isScriptGoal)
 		self thread doWalkScriptNotify();
-
+		
 	self thread killWalkOnEvents();
 	self thread watchOnGoal(goal, distsq);
 	
@@ -2654,7 +1694,7 @@ doWalk(goal, dist, isScriptGoal)
 
 			self.bot.next_wp = self.bot.astar[current];
 			self.bot.second_next_wp = -1;
-			if(current > 0)
+			if(current != 0)
 				self.bot.second_next_wp = self.bot.astar[current-1];
 			
 			self notify("new_static_waypoint");
@@ -2671,8 +1711,7 @@ doWalk(goal, dist, isScriptGoal)
 	
 	if(DistanceSquared(self.origin, goal) > distsq)
 	{
-		ppt = PlayerPhysicsTrace(self.origin + (0,0,32), goal, false, self);
-		self movetowards(ppt);
+		self movetowards(goal); // any better way??
 	}
 	
 	self notify("finished_goal");
@@ -2692,27 +1731,45 @@ movetowards(goal)
 
 	lastOri = self.origin;
 	stucks = 0;
+	timeslow = 0;
 	time = 0;
 	while(distanceSquared(self.origin, self.bot.towards_goal) > level.bots_goalDistance)
 	{
-		if (time > 1)
+		self botMoveTo(self.bot.towards_goal);
+		
+		if(time > 2.5)
 		{
 			time = 0;
-
-			if (DistanceSquared(self.origin, lastOri) < 128)
+			if(distanceSquared(self.origin, lastOri) < 128)
+			{
 				stucks++;
-			else
-				stucks = 0;
-
-			if(stucks >= 3)
-				self notify("bad_path_internal");
-
+				
+				randomDir = self getRandomLargestStafe(stucks);
+			
+				self botMoveTo(randomDir);
+				wait stucks;
+			}
+			
 			lastOri = self.origin;
 		}
-
-		self botMoveTo(self.bot.towards_goal);
+		else if(timeslow > 1.5)
+		{
+			self thread jump();
+		}
+		else if(timeslow > 0.75)
+		{
+			self crouch();
+		}
+		
 		wait 0.05;
 		time += 0.05;
+		if(lengthsquared(self getVelocity()) < 1000)
+			timeslow += 0.05;
+		else
+			timeslow = 0;
+		
+		if(stucks == 3)
+			self notify("bad_path_internal");
 	}
 	
 	self.bot.towards_goal = undefined;
@@ -2720,198 +1777,86 @@ movetowards(goal)
 }
 
 /*
-	Bot will not move for a small amount of time
+	Will return the pos of the largest trace from the bot.
 */
-dontMoveForABit()
+getRandomLargestStafe(dist)
 {
-	self endon("disconnect");
+	//find a better algo?
+	traces = NewHeap(::HeapTraceFraction);
+	myOrg = self.origin + (0, 0, 16);
+	
+	traces HeapInsert(bulletTrace(myOrg, myOrg + (-100*dist, 0, 0), false, self));
+	traces HeapInsert(bulletTrace(myOrg, myOrg + (100*dist, 0, 0), false, self));
+	traces HeapInsert(bulletTrace(myOrg, myOrg + (0, 100*dist, 0), false, self));
+	traces HeapInsert(bulletTrace(myOrg, myOrg + (0, -100*dist, 0), false, self));
+	traces HeapInsert(bulletTrace(myOrg, myOrg + (-100*dist, -100*dist, 0), false, self));
+	traces HeapInsert(bulletTrace(myOrg, myOrg + (-100*dist, 100*dist, 0), false, self));
+	traces HeapInsert(bulletTrace(myOrg, myOrg + (100*dist, -100*dist, 0), false, self));
+	traces HeapInsert(bulletTrace(myOrg, myOrg + (100*dist, 100*dist, 0), false, self));
+	
+	toptraces = [];
+	
+	top = traces.data[0];
+	toptraces[toptraces.size] = top;
+	traces HeapRemove();
+	
+	while(traces.data.size && top["fraction"] - traces.data[0]["fraction"] < 0.1)
+	{
+		toptraces[toptraces.size] = traces.data[0];
+		traces HeapRemove();
+	}
+	
+	return toptraces[randomInt(toptraces.size)]["position"];
+}
+
+/*
+	Bot will hold breath if true or not
+*/
+holdbreath(what)
+{
+	if(what)
+		self botAction("+holdbreath");
+	else
+		self botAction("-holdbreath");
+}
+
+/*
+	Bot will sprint.
+*/
+sprint()
+{
 	self endon("death");
-	level endon ( "game_ended" );
-
-	self.bot.knifeteleport = true;
-
-	wait 0.3;
-
-	self.bot.knifeteleport = false;
+	self endon("disconnect");
+	self notify("bot_sprint");
+	self endon("bot_sprint");
+	
+	self botAction("+sprint");
+	wait 0.05;
+	self botAction("-sprint");
 }
 
 /*
 	Bot will knife.
 */
-knife(ent, knifeDist)
+knife()
 {
-	self endon("disconnect");
 	self endon("death");
-	level endon ( "game_ended" );
+	self endon("disconnect");
+	self notify("bot_knife");
+	self endon("bot_knife");
 
-	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self IsUsingRemote())
-		return;
-
-	curWeap = self GetCurrentWeapon();
-
-	if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
-		return;
-
-	if(self isDefusing() || self isPlanting())
-		return;
-
-	if (self.bot.knifing || self.bot.isfraggingafter)
-		return;
-
-	self notify("bot_kill_knife");
-	self endon("bot_kill_knife");
-
-	self.bot.knifing = true;
-	self.bot.knifingafter = true;
-
-	isplay = (isDefined(ent) && isPlayer(ent));
-	usedRiot = self.hasRiotShieldEquipped;
-	org = self.origin;
-	if (isDefined(ent))
-		org = ent.origin;
-	distsq = DistanceSquared(self.origin, org);
-	inLastStand = self inLastStand();
-	stance = self getStance();
-	damage = 135;
-	if (usedRiot)
-		damage = 52;
-
-	botAnim = "";
-	botAnimTime = 0;
-	lastWeap = self GetCurrentWeapon();
-
-	hasC4 = self HasWeapon("c4_mp"); // mw2 will give you the c4 despite having another offhand primary
-
-	if (!usedRiot)
-	{
-		if (!hasC4)
-			self giveWeapon("c4_mp");
-		self setSpawnWeapon("c4_mp");
-	}
-
-	// play sound
-	if (usedRiot)
-	{
-		self playSound("melee_riotshield_swing");
-		botAnim = "pt_melee_shield";
-		botAnimTime = 1;
-	}
-	else
-	{
-		if ((distsq / knifeDist) < 0.75)
-		{
-			self playSound("melee_swing_small");
-			if (stance != "prone")
-			{
-				botAnim = "pt_melee_pistol_1";
-				botAnimTime = 1;
-			}
-			else
-			{
-				botAnim = "pt_melee_prone_pistol";
-				botAnimTime = 1;
-			}
-		}
-		else
-		{
-			self playSound("melee_swing_ps_large");
-			botAnim = "pt_melee_pistol_2";
-			botAnimTime = 1.5;
-		}
-	}
-
-	if (inLastStand)
-	{
-		botAnim = "pt_laststand_melee";
-		botAnimTime = 1.5;
-	}
-
-	if (botAnim != "")
-		self thread botDoAnim(botAnim, botAnimTime, true);
-
-	wait 0.15;
-
-	allIsStillGood = false;
-	if (isDefined(ent) && isAlive(ent))
-	{
-		allIsStillGood = (getConeDot(ent.origin, self.origin, self GetPlayerAngles()) > 0.85); // make sure that the bot is looking at the target
-	}
-
-	if (allIsStillGood)
-	{
-		if (isplay)
-		{
-			// teleport to target
-			if (!inLastStand)
-			{
-				pushOutDir = VectorNormalize((self.origin[0], self.origin[1], 0)-(ent.origin[0], ent.origin[1], 0));
-				pushoutPos = self.origin + (pushOutDir * (60-distance(ent.origin,self.origin)));
-				self SetOrigin((pushoutPos[0], pushoutPos[1], ent.origin[2]));
-				self notify("kill_goal");
-				self thread dontMoveForABit();
-			}
-
-			for (;;)
-			{
-				if (!randomInt(20)) // 5 percent chance to miss
-					break;
-
-				// check riotshield
-				if (ent.hasRiotShield)
-				{
-					entCone = getConeDot((self.origin[0], self.origin[1], 0), (ent.origin[0], ent.origin[1], 0), (0, ent GetPlayerAngles()[1], 0));
-					if ((entCone > 0.65 && ent.hasRiotShieldEquipped) || (entCone < -0.65 && !ent.hasRiotShieldEquipped))
-					{
-						// play riot shield hitting knife sound
-						if (!usedRiot)
-							self playSound("melee_knife_hit_shield");
-						else
-							self playSound("melee_riotshield_impact");
-
-						break;
-					}
-				}
-
-				if (!usedRiot)
-				{
-					playFx( level.bots_bloodfx,ent.origin + (0.0, 0.0, 30.0) );
-					self playSound("melee_knife_hit_body");
-				}
-				else
-					self playSound("melee_riotshield_impact");
-
-				ent thread maps\mp\gametypes\_callbacksetup::CodeCallback_PlayerDamage(self, self, damage, 0, "MOD_MELEE", curWeap, self.origin, VectorNormalize(ent.origin-self.origin), "none", 0);
-				break;
-			}
-		}
-		else
-		{
-			if (!usedRiot)
-				self playSound("melee_hit_other");
-			else
-				self playSound("melee_riotshield_impact");
-			
-			ent notify( "damage", damage, self, self.angles, self.origin, "MOD_MELEE" );
-		}
-	}
-
-	if(isSubStr(curWeap, "tactical_") || usedRiot)
-		wait 1;
-	else
-		wait 1.5;
-
-	if (!usedRiot)
-	{
-		if (!hasC4)
-			self takeWeapon("c4_mp");
-		self setSpawnWeapon(lastWeap);
-	}
+	self.bot.isknifing = true;
+	self.bot.isknifingafter = true;
 	
-	self.bot.knifing = false;
+	self botAction("+melee");
+	wait 0.05;
+	self botAction("-melee");
+
+	self.bot.isknifing = false;
 
 	wait 1;
 
-	self.bot.knifingafter = false;
+	self.bot.isknifingafter = false;
 }
 
 /*
@@ -2919,105 +1864,84 @@ knife(ent, knifeDist)
 */
 reload()
 {
-	cur = self GetCurrentWeapon();
-
-	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self IsUsingRemote())
-		return;
-
-	self SetWeaponAmmoStock(cur, self GetWeaponAmmoClip(cur) + self GetWeaponAmmoStock(cur));
-	self setWeaponAmmoClip(cur, 0);
-	// the script should reload for us.
+	self endon("death");
+	self endon("disconnect");
+	self notify("bot_reload");
+	self endon("bot_reload");
+	
+	self botAction("+reload");
+	wait 0.05;
+	self botAction("-reload");
 }
 
 /*
-	Bot will throw the grenade and cook it
+	Bot will hold the frag button for a time
 */
-botThrowGrenade(grenName, grenTime)
+frag(time)
 {
 	self endon("death");
 	self endon("disconnect");
-	level endon ( "game_ended" );
-
-	if (self inLastStand() && !self _hasPerk("specialty_laststandoffhand") && !self inFinalStand())
-		return "laststand";
-
-	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self.bot.climbing || self IsUsingRemote())
-		return "can't move";
-
-	if(self isDefusing() || self isPlanting())
-		return "bomb";
-
-	curWeap = self GetCurrentWeapon();
-
-	if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
-		return "cur weap is not droppable";
-
-	if (self.bot.knifingafter)
-		return "knifing";
-
-	if (self.bot.tryingtofrag || self.bot.isfraggingafter)
-		return "already nading";
-
-	if (!self getAmmoCount(grenName))
-		return "no ammo";
-
-	self setSpawnWeapon(grenName);
-	self.bot.tryingtofrag = true;
-	self.bot.tryingtofragpullback = true;
-
-	ret = self waittill_any_timeout( 5, "grenade_pullback", "grenade_fire" );
-
-	if (ret == "grenade_pullback")
-	{
-		if (isDefined(grenTime))
-		{
-			self.bot.tryingtofragpullback = false;
-			wait grenTime;
-			self.bot.tryingtofragpullback = true;
-		}
-
-		ret = self waittill_any_timeout( 5, "grenade_fire", "weapon_change", "offhand_end" );
-	}
-
-	self.bot.tryingtofrag = false;
-	self.bot.tryingtofragpullback = false;
-
-	self setSpawnWeapon(curWeap);
-
-	return ret;
-}
-
-/*
-	Bots will press the ads for a time
-*/
-pressAds(time)
-{
-	self endon("death");
-	self endon("disconnect");
-	self notify("bot_ads");
-	self endon("bot_ads");
+	self notify("bot_frag");
+	self endon("bot_frag");
 
 	if(!isDefined(time))
-		time = 0.1;
+		time = 0.05;
 	
-	self ads(true);
+	self botAction("+frag");
+	self.bot.isfragging = true;
+	self.bot.isfraggingafter = true;
 	
 	if(time)
 		wait time;
 		
-	self ads(false);
+	self botAction("-frag");
+	self.bot.isfragging = false;
+	
+	wait 1.25;
+	self.bot.isfraggingafter = false;
 }
 
 /*
-	Bots will hold the ads
+	Bot will hold the 'smoke' button for a time.
 */
-ads(what)
+smoke(time)
 {
-	self.bot.ads_pressed = what;
+	self endon("death");
+	self endon("disconnect");
+	self notify("bot_smoke");
+	self endon("bot_smoke");
+
+	if(!isDefined(time))
+		time = 0.05;
+	
+	self botAction("+smoke");
+	self.bot.issmoking = true;
+	self.bot.issmokingafter = true;
+	
+	if(time)
+		wait time;
+		
+	self botAction("-smoke");
+	self.bot.issmoking = false;
+	
+	wait 1.25;
+	self.bot.issmokingafter = false;
 }
 
 /*
-	Bots will press the fire for a time
+	Bot will fire if true or not.
+*/
+fire(what)
+{
+	self notify("bot_fire");
+	if(what)
+		self botAction("+fire");
+	else
+		self botAction("-fire");
+}
+
+/*
+	Bot will fire for a time.
 */
 pressFire(time)
 {
@@ -3027,22 +1951,47 @@ pressFire(time)
 	self endon("bot_fire");
 
 	if(!isDefined(time))
-		time = 0.1;
+		time = 0.05;
 	
-	self fire(true);
+	self botAction("+fire");
 	
 	if(time)
 		wait time;
 		
-	self fire(false);
+	self botAction("-fire");
 }
 
 /*
-	Bots will hold the fire
+	Bot will ads if true or not.
 */
-fire(what)
+ads(what)
 {
-	self.bot.fire_pressed = what;
+	self notify("bot_ads");
+	if(what)
+		self botAction("+ads");
+	else
+		self botAction("-ads");
+}
+
+/*
+	Bot will press ADS for a time.
+*/
+pressADS(time)
+{
+	self endon("death");
+	self endon("disconnect");
+	self notify("bot_ads");
+	self endon("bot_ads");
+
+	if(!isDefined(time))
+		time = 0.05;
+	
+	self botAction("+ads");
+	
+	if(time)
+		wait time;
+	
+	self botAction("-ads");
 }
 
 /*
@@ -3052,31 +2001,18 @@ jump()
 {
 	self endon("death");
 	self endon("disconnect");
-	level endon ( "game_ended" );
+	self notify("bot_jump");
+	self endon("bot_jump");
 
-	if (self inLastStand() || self getStance() != "stand" ||
-			level.gameEnded || !gameFlag( "prematch_done" ) || self IsUsingRemote() ||
-			self.bot.isfrozen || self.bot.stop_move || self.bot.climbing || self.bot.jumpingafter)
-			return;
-
-	self.bot.jumping = true;
-	self.bot.jumpingafter = true;
-
-	for (i = 0; i < 6; i++)
+	if(self getStance() != "stand")
 	{
-		self SetOrigin(PlayerPhysicsTrace(self.origin + (0, 0, 5), self.origin + (0, 0, 13), false, self));
-		wait 0.05;
+		self stand();
+		wait 1;
 	}
 
-	self.bot.jumping = false;
-
-	for (i = 0; i < 6; i++)
-	{
-		self SetOrigin(PhysicsTrace(self.origin + (0, 0, 5), self.origin + (0, 0, -5), false, self));
-		wait 0.05;
-	}
-
-	self.bot.jumpingafter = false;
+	self botAction("+gostand");
+	wait 0.05;
+	self botAction("-gostand");
 }
 
 /*
@@ -3084,10 +2020,8 @@ jump()
 */
 stand()
 {
-	if (self IsUsingRemote())
-		return;
-
-	self.bot.stance = "stand";
+	self botAction("-gocrouch");
+	self botAction("-goprone");
 }
 
 /*
@@ -3095,10 +2029,8 @@ stand()
 */
 crouch()
 {
-	if (self IsUsingRemote())
-		return;
-
-	self.bot.stance = "crouch";
+	self botAction("+gocrouch");
+	self botAction("-goprone");
 }
 
 /*
@@ -3106,36 +2038,16 @@ crouch()
 */
 prone()
 {
-	if (self IsUsingRemote())
-		return;
-	
-	curWeap = self GetCurrentWeapon();
-
-	if (curWeap == "riotshield_mp")
-		return;
-
-	self.bot.stance = "prone";
+	self botAction("-gocrouch");
+	self botAction("+goprone");
 }
 
 /*
-	Tells the moveHack where to move
+	Bot will move towards here
 */
-botMoveTo(to)
+botMoveTo(where)
 {
-	self.bot.moveTo = to;
-}
-
-/*
-	Bots will start to sprint
-*/
-sprint()
-{
-	if (self.bot.run_time < 2.0)
-		return;
-
-	self notify("bot_run_delay");
-	self.bot.running = true;
-	self.bot.runningafter = true;
+	self.bot.moveTo = where;
 }
 
 /*
@@ -3184,177 +2096,4 @@ bot_lookat(pos, time)
 		self setPlayerAngles(myAngle);
 		wait 0.05;
 	}
-}
-
-/*
-	Returns if the bot is doing an active animation
-*/
-isInActiveAnim()
-{
-	if (!isDefined(self.bot_anim))
-		return false;
-
-	return (self.bot_anim.inActiveAnim);
-}
-
-/*
-	returns if the bot is doing the given anim
-*/
-botDoingAnim(animName)
-{
-	if (!isDefined(self.bot_anim))
-		return false;
-
-	return (self.bot_anim.animation == animName);
-}
-
-/*
-	Bot plays the anim
-*/
-botDoAnim(animName, time, isActiveAnim)
-{
-	self endon("death");
-	self endon("disconnect");
-
-	if(!isDefined(self.bot_anim))
-		self makeFakeAnim();
-
-	if (!isDefined(isActiveAnim))
-		isActiveAnim = false;
-	if (!isActiveAnim && self.bot_anim.inActiveAnim)
-		return;
-
-	self notify("bot_kill_anim");
-	self endon("bot_kill_anim");
-
-	self.bot_anim.inActiveAnim = isActiveAnim;
-	self.bot_anim.animation = animName;
-	self.bot_anim scriptModelPlayAnim(animName);
-
-	if (isDefined(time))
-		wait time;
-
-	self.bot_anim.inActiveAnim = false;
-}
-
-/*
-	Creates the anim script model
-*/
-makeFakeAnim()
-{
-	if(isDefined(self.bot_anim))
-		return;
-
-	self.bot_anim = spawn("script_model", self.origin);
-	self.bot_anim setModel(self.model);
-	self.bot_anim LinkTo(self, "tag_origin", (0, 0, 0), (0, 0, 0));
-	self.bot_anim notsolid();
-	self.bot_anim setContents( 0 );
-	
-	self.bot_anim.headmodel = spawn( "script_model", self.bot_anim getTagOrigin( "j_spine4" ));
-	self.bot_anim.headmodel setModel(self.headmodel);
-	self.bot_anim.headmodel.angles = (270, 0, 270);
-	self.bot_anim.headmodel linkto( self.bot_anim, "j_spine4" );
-	self.bot_anim.headmodel notsolid();
-	self.bot_anim.headmodel setContents( 0 );
-
-	self.bot_anim.animation = undefined;
-	self.bot_anim.inActiveAnim = false;
-	
-	self showFakeAnim();
-}
-
-/*
-	Deletes the anim script model
-*/
-botsDeleteFakeAnim()
-{
-	if(!isDefined(self.bot_anim))
-		return;
-
-	self hideFakeAnim();
-
-	self notify("bot_kill_anim");
-
-	self.bot_anim.headmodel delete();
-	self.bot_anim.headmodel = undefined;
-	self.bot_anim delete();
-	self.bot_anim = undefined;
-}
-
-/*
-	Returns if the script model is hidden
-*/
-isFakeAnimHidden()
-{
-	if (!isDefined(self.bot_anim))
-		return true;
-
-	return (self.bot_anim.hidden);
-}
-
-/*
-	Shows the anim model
-*/
-showFakeAnim()
-{
-	if(isDefined(self))
-	{
-		self thread maps\mp\gametypes\_weapons::detach_all_weapons();
-		self botHideParts();
-	}
-
-	if(!isDefined(self.bot_anim))
-		return;
-
-	self.bot_anim show();
-	self.bot_anim.hidden = false;
-	self.bot_anim.headmodel show();
-}
-
-/*
-	Hides the anim model
-*/
-hideFakeAnim()
-{
-	if(isDefined(self))
-	{
-		self botShowParts();
-		self thread maps\mp\gametypes\_weapons::stowedWeaponsRefresh();
-	}
-
-	if(!isDefined(self.bot_anim))
-		return;
-
-	self.bot_anim hide();
-	self.bot_anim.hidden = true;
-	self.bot_anim.headmodel hide();
-}
-
-/*
-	Hides the bot's model
-*/
-botHideParts()
-{
-	//hideallparts
-	self hidepart("j_ankle_le");//this is the only place where bot cannot be shot at...
-	self hidepart("j_hiptwist_le");
-	self hidepart("j_head");
-	self hidepart("j_helmet");
-	self hidepart("j_eyeball_le");
-	self hidepart("j_clavicle_le");
-}
-
-/*
-	Shows the bot's model
-*/
-botShowParts()
-{
-	self showpart("j_ankle_le");
-	self showpart("j_hiptwist_le");
-	self showpart("j_head");
-	self showpart("j_helmet");
-	self showpart("j_eyeball_le");
-	self showpart("j_clavicle_le");
-	//showallparts
 }

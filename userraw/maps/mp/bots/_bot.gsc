@@ -25,12 +25,6 @@ init()
 
 	thread load_waypoints();
 	thread hook_callbacks();
-	
-	setDvar("testClients_watchKillcam", true);
-	setDvar("testclients_doReload", false);
-	setDvar("testclients_doMove", false);
-	setDvar("testclients_doAttack", true);
-	setDvar("testclients_doCrouch", false);
 
 	if(getDvar("bots_main_GUIDs") == "")
 		setDvar("bots_main_GUIDs", "");//guids of players who will be given host powers, comma seperated
@@ -91,59 +85,38 @@ init()
 	level.bots_maxShotgunDistance *= level.bots_maxShotgunDistance;
 	level.bots_listenDist = 100;
 	level.bots_listenDist *= level.bots_listenDist;
-	level.botPushOutDist = 30;
 	
 	level.smokeRadius = 255;
 
 	level.bots = [];
 	
-	level.bots_nonfullautoguns = [];
-	level.bots_nonfullautoguns["barrett"] = true;
-	level.bots_nonfullautoguns["beretta"] = true;
-	level.bots_nonfullautoguns["coltanaconda"] = true;
-	level.bots_nonfullautoguns["deserteagle"] = true;
-	level.bots_nonfullautoguns["fal"] = true;
-	level.bots_nonfullautoguns["m21"] = true;
-	level.bots_nonfullautoguns["m1014"] = true;
-	level.bots_nonfullautoguns["ranger"] = true;
-	level.bots_nonfullautoguns["striker"] = true;
-	level.bots_nonfullautoguns["usp"] = true;
-	level.bots_nonfullautoguns["wa2000"] = true;
-	level.bots_nonfullautoguns["dragunov"] = true;
+	level.bots_fullautoguns = [];
+	level.bots_fullautoguns["aa12"] = true;
+	level.bots_fullautoguns["ak47"] = true;
+	level.bots_fullautoguns["aug"] = true;
+	level.bots_fullautoguns["fn2000"] = true;
+	level.bots_fullautoguns["glock"] = true;
+	level.bots_fullautoguns["kriss"] = true;
+	level.bots_fullautoguns["m4"] = true;
+	level.bots_fullautoguns["m240"] = true;
+	level.bots_fullautoguns["masada"] = true;
+	level.bots_fullautoguns["mg4"] = true;
+	level.bots_fullautoguns["mp5k"] = true;
+	level.bots_fullautoguns["p90"] = true;
+	level.bots_fullautoguns["pp2000"] = true;
+	level.bots_fullautoguns["rpd"] = true;
+	level.bots_fullautoguns["sa80"] = true;
+	level.bots_fullautoguns["scar"] = true;
+	level.bots_fullautoguns["tavor"] = true;
+	level.bots_fullautoguns["tmp"] = true;
+	level.bots_fullautoguns["ump45"] = true;
+	level.bots_fullautoguns["uzi"] = true;
 
-	level.bots_bloodfx = loadfx("impacts/flesh_hit_body_fatal_exit");
-	PrecacheMpAnim("pb_combatrun_forward_loop");
-	PrecacheMpAnim("pb_crouch_run_forward");
-	PrecacheMpAnim("pb_sprint");
+	level.bots_fullautoguns["ac130"] = true;
+	level.bots_fullautoguns["heli"] = true;
 
-	PrecacheMpAnim("pb_crouch_walk_forward_shield");
-	PrecacheMpAnim("pb_crouch_run_forward_pistol");
-	PrecacheMpAnim("pb_crouch_run_forward_RPG");
-	PrecacheMpAnim("pb_crouch_walk_forward_akimbo");
-	
-	PrecacheMpAnim("pb_combatrun_forward_shield");
-	PrecacheMpAnim("pb_pistol_run_fast");
-	PrecacheMpAnim("pb_combatrun_forward_RPG");
-	PrecacheMpAnim("pb_combatrun_forward_akimbo");
-	
-	PrecacheMpAnim("pb_sprint_shield");
-	PrecacheMpAnim("pb_sprint_akimbo");
-	PrecacheMpAnim("pb_sprint_pistol");
-	PrecacheMpAnim("pb_sprint_RPG");
-
-	PrecacheMpAnim("pb_climbup");
-	PrecacheMpAnim("pb_prone_crawl");
-	PrecacheMpAnim("pb_laststand_crawl");
-
-	PrecacheMpAnim("pb_combatrun_forward_loop");
-
-	PrecacheMpAnim("pt_stand_core_pullout");
-	
-	PrecacheMpAnim("pt_melee_pistol_1");
-	PrecacheMpAnim("pt_melee_prone_pistol");
-	PrecacheMpAnim("pt_melee_pistol_2");
-	PrecacheMpAnim("pt_laststand_melee");
-	PrecacheMpAnim("pt_melee_shield");
+	level.bots_fullautoguns["ak47classic"] = true;
+	level.bots_fullautoguns["ak74u"] = true;
 	
 	level thread fixGamemodes();
 	
@@ -761,8 +734,6 @@ onGrenadeFire()
 			grenade thread AddToSmokeList();
 		else if (isSubStr(weaponName, "frag_"))
 			grenade thread AddToFragList(self);
-		else if ( weaponName == "claymore" || weaponName == "claymore_mp" )
-			grenade thread claymoreDetonationBotFix();
 	}
 }
 
