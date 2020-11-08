@@ -207,7 +207,7 @@ onSomeoneSaid()
 	{
 		level waittill("say", string, player);
 
-		//PrintConsole(player.name + ": " + string + "\n");
+		PrintConsole(player.name + ": " + string + "\n");
 	}
 }
 
@@ -229,6 +229,6 @@ setBotPing()
 	{
 		wait 0.05;
 
-		//self SetPing(randomIntRange(40, 60));
+		self SetPing(randomIntRange(40, 60));
 	}
 }
