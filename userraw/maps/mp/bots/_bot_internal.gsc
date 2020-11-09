@@ -225,9 +225,6 @@ doSwitch(newWeapon)
 	self endon("death");
 	self endon("weapon_change");
 
-	if (self.bot.climbing)
-		return;
-
 	waittillframeend;
 	if (self.lastDroppableWeapon != newWeapon)
 		return;
@@ -288,9 +285,11 @@ onLastStand()
 		while (!self inLastStand())
 			wait 0.05;
 
+		self notify("kill_goal");
+
 		if (!self inFinalStand() && !self IsUsingRemote())
 		{
-			while (self.bot.knifing || self.bot.tryingtofrag || self.disabledWeapon)
+			while (self.disabledWeapon)
 				wait 0.05;
 			waittillframeend;
 
@@ -426,8 +425,9 @@ spawned()
 
 	wait self.pers["bots"]["skill"]["spawn_time"];
 
-	self thread grenade_danager();
+	self thread doBotMovement();
 
+	self thread grenade_danager();
 	self thread target();
 	self thread updateBones();
 	self thread aim();
@@ -438,6 +438,44 @@ spawned()
 	self thread watchHoldBreath();
 
 	self notify("bot_spawned");
+}
+
+doBotMovement()
+{
+	self endon("disconnect");
+	self endon("death");
+
+	for (;;)
+	{
+		wait 0.05;
+
+		waittillframeend;
+		move_To = self.bot.moveTo;
+		angles = self GetPlayerAngles();
+
+		if (DistanceSquared(self.origin, move_To) < 49)
+			continue;
+
+		cosa = cos(0-angles[1]);
+		sina = sin(0-angles[1]);
+
+		// get the direction
+		dir = move_To - self.origin;
+
+		// rotate our direction according to our angles
+		dir = (dir[0] * cosa - dir[1] * sina,
+					 dir[0] * sina + dir[1] * cosa,
+					 0);
+
+		// make the length 127
+		dir = VectorNormalize(dir) * 127;
+
+		// invert the second component as the engine requires this
+		dir = (dir[0], 0-dir[1], 0);
+
+		// move!
+		self botMovement(int(dir[0]), int(dir[1]));
+	}
 }
 
 /*
@@ -461,8 +499,6 @@ watchHoldBreath()
 
 /*
 	Throws back frag grenades
-	Does this by a hack
-	Basically it'll throw its own frag grenade and delete the original frag
 */
 grenade_danager()
 {
@@ -479,15 +515,10 @@ grenade_danager()
 		if (self.bot.isfrozen || level.gameEnded || !gameFlag( "prematch_done" ))
 			continue;
 
-		if(self.bot.isfraggingafter || self.bot.climbing || self.bot.knifingafter || self IsUsingRemote())
+		if(self.bot.isfraggingafter || self.bot.issmokingafter || self IsUsingRemote())
 			continue;
 
 		if(self isDefusing() || self isPlanting())
-			continue;
-
-		curWeap = self GetCurrentWeapon();
-
-		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
 			continue;
 
 		myEye = self getEye();
@@ -510,49 +541,10 @@ grenade_danager()
 			if (!bulletTracePassed( myEye, frag.origin, false, frag.grenade ))
 				continue;
 
-			frag.throwback = true;
-			weap = "frag_grenade_mp";
-
-			offhand = self GetCurrentOffhand();
-			offhandcount = self GetAmmoCount(offhand);
-
-			self TakeWeapon(offhand);// for some odd reason, mw2 will not give you a frag if you have any other primary offhand
-			self GiveWeapon(weap);
-
-			self thread watchThrowback(frag);
-			self botThrowGrenade(weap);
-			
-			frag.throwback = undefined;
-
-			self TakeWeapon(weap);
-			self GiveWeapon(offhand);
-			self setWeaponAmmoClip(offhand, offhandcount);
+			self thread frag();
 			break;
 		}
 	}
-}
-
-/*
-	Watches if the throw was successful, and deletes the original
-*/
-watchThrowback(frag)
-{
-	self endon("bot_kill_throwback");
-	self thread notifyAfterDelay(5, "bot_kill_throwback");
-	self waittill( "grenade_fire", grenade, wName );
-
-	// blew up already
-	if (!isDefined(frag.grenade) || wName != "frag_grenade_mp")
-	{
-		grenade delete();
-		return;
-	}
-
-	grenade.threwBack = true;
-	self thread incPlayerStat( "throwbacks", 1 );
-	grenade thread maps\mp\gametypes\_shellshock::grenade_earthQuake();
-	grenade.originalOwner = frag.owner;
-	frag.grenade delete();
 }
 
 /*
@@ -566,11 +558,14 @@ stance()
 	for(;;)
 	{
 		self waittill_either("finished_static_waypoints", "new_static_waypoint");
+
+		if(self.bot.isfrozen)
+			continue;
 	
 		toStance = "stand";
 		if(self.bot.next_wp != -1)
 			toStance = level.waypoints[self.bot.next_wp].type;
-		self.bot.climbing = (toStance == "climb");
+			
 		if(toStance == "climb")
 			toStance = "stand";
 			
@@ -589,13 +584,16 @@ stance()
 			
 		curweap = self getCurrentWeapon();
 			
-		if(toStance != "stand" || self.bot.issprinting)
+		if(toStance != "stand" || self.bot.isreloading || self.bot.issprinting || self.bot.isfraggingafter || self.bot.issmokingafter)
 			continue;
 			
 		if(randomInt(100) > self.pers["bots"]["behavior"]["sprint"])
 			continue;
 			
 		if(isDefined(self.bot.target) && self canFire(curweap) && self isInRange(self.bot.target.dist, curweap))
+			continue;
+
+		if(self.bot.sprintendtime != -1 && getTime() - self.bot.sprintendtime < 2000)
 			continue;
 			
 		if(!isDefined(self.bot.towards_goal) || DistanceSquared(self.origin, self.bot.towards_goal) < level.bots_minSprintDistance || getConeDot(self.bot.towards_goal, self.origin, self GetPlayerAngles()) < 0.75)
@@ -764,7 +762,7 @@ target()
 		if (!isAlive(self))
 			return;
 		
-		if(self maps\mp\_flashgrenades::isFlashbanged() || self.bot.climbing)
+		if(self maps\mp\_flashgrenades::isFlashbanged())
 			continue;
 	
 		myEye = self GetEye();
@@ -1170,7 +1168,7 @@ aim()
 						if(isplay)
 						{
 							//better room to nade? cook time function with dist?
-							if(!self.bot.isfraggingafter)
+							if(!self.bot.isfraggingafter && !self.bot.issmokingafter)
 							{
 								nade = self getValidGrenade();
 								if(isDefined(nade) && rand <= self.pers["bots"]["behavior"]["nade"] && bulletTracePassed(eyePos, eyePos + (0, 0, 75), false, self) && bulletTracePassed(last_pos, last_pos + (0, 0, 100), false, target) && dist > level.bots_minGrenadeDistance && dist < level.bots_maxGrenadeDistance)
@@ -1178,7 +1176,12 @@ aim()
 									time = 0.5;
 									if (nade == "frag_grenade_mp")
 										time = 2;
-									self thread botThrowGrenade(nade, time);
+
+									if (isSecondaryGrenade(nade))
+										self thread smoke(time);
+									else
+										self thread frag(time);
+
 									self notify("kill_goal");
 								}
 							}
@@ -1247,7 +1250,7 @@ aim()
 
 					if (trace_time > reaction_time)
 					{
-						if((!canADS || self playerads() == 1.0) && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
+						if((!canADS || self playerads() == 1.0 || self InLastStand() || self GetStance() == "prone") && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
 							self botFire(curweap);
 
 						if (isplay)
@@ -1284,7 +1287,7 @@ aim()
 			if (canADS)
 				self thread pressAds();
 
-			if((!canADS || self playerads() == 1.0) && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
+			if((!canADS || self playerads() == 1.0 || self InLastStand() || self GetStance() == "prone") && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
 				self botFire(curweap);
 			
 			continue;
@@ -1460,7 +1463,7 @@ walk()
 		{
 			curweap = self getCurrentWeapon();
 			
-			if(isDefined(self.bot.jav_loc) || entIsVehicle(self.bot.target.entity) || self.bot.isfraggingafter || self.bot.issmokingafter)
+			if(isDefined(self.bot.jav_loc) || entIsVehicle(self.bot.target.entity) || self.bot.isfraggingafter || self.bot.issmokingafter || self InLastStand() || self GetStance() == "prone")
 			{
 				continue;
 			}
@@ -2040,6 +2043,8 @@ prone()
 {
 	self botAction("-gocrouch");
 	self botAction("+goprone");
+
+	self notify("kill_goal");
 }
 
 /*

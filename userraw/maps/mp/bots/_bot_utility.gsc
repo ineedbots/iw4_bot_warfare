@@ -141,6 +141,14 @@ IsBotReloading()
 }
 
 /*
+	Is bot knifing
+*/
+IsBotKnifing()
+{
+	return self.bot.isknifingafter;
+}
+
+/*
 	Freezes the bot's controls.
 */
 BotFreezeControls(what)
@@ -496,6 +504,14 @@ WeaponIsFullAuto(weap)
 	assert(isString(weaptoks[0]));
 	
 	return isDefined(level.bots_fullautoguns[weaptoks[0]]);
+}
+
+/*
+	If weap is a secondary gnade
+*/
+isSecondaryGrenade(gnade)
+{
+	return (gnade == "concussion_grenade_mp" || gnade == "flash_grenade_mp" || gnade == "smoke_grenade_mp");
 }
 
 /*

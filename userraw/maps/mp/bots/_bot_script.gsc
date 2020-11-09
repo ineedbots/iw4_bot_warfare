@@ -1838,14 +1838,7 @@ bot_perk_think()
 
 		for (;self _hasPerk("specialty_onemanarmy") && self hasWeapon("onemanarmy_mp");)
 		{
-			curWeap = self GetCurrentWeapon();
-			if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
-				break;
-
-			if (self botIsClimbing())
-				break;
-
-			if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
+			if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing() || self IsBotSmoking())
 				break;
 
 			if (self HasThreat() || self HasBotJavelinLocation())
@@ -1935,9 +1928,6 @@ bot_use_tube_think()
 
 		curWeap = self GetCurrentWeapon();
 		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
-			continue;
-
-		if (self botIsClimbing())
 			continue;
 
 		if (self IsUsingRemote())
@@ -2089,9 +2079,6 @@ bot_use_equipment_think()
 		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
 			continue;
 
-		if (self botIsClimbing())
-			continue;
-
 		if (self IsUsingRemote())
 			continue;
 
@@ -2150,7 +2137,7 @@ bot_use_equipment_think()
 		self BotStopMoving(true);
 		wait 1;
 
-		self throwBotGrenade(nade);
+		//self throwBotGrenade(nade);
 
 		self ClearScriptAimPos();
 		self BotStopMoving(false);
@@ -2202,9 +2189,6 @@ bot_use_grenade_think()
 
 		curWeap = self GetCurrentWeapon();
 		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
-			continue;
-
-		if (self botIsClimbing())
 			continue;
 
 		if (self IsUsingRemote())
@@ -2278,7 +2262,7 @@ bot_use_grenade_think()
 		time = 0.5;
 		if (nade == "frag_grenade_mp")
 			time = 2;
-		self throwBotGrenade(nade, time);
+		//self throwBotGrenade(nade, time);
 
 		self ClearScriptAimPos();
 		self BotStopMoving(false);
@@ -2353,9 +2337,6 @@ bot_jav_loc_think()
 
 		curWeap = self GetCurrentWeapon();
 		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
-			continue;
-
-		if (self botIsClimbing())
 			continue;
 
 		if (self IsUsingRemote())
@@ -2618,9 +2599,6 @@ bot_listen_to_steps()
 			if(player.sessionstate != "playing")
 				continue;
 			if(!isReallyAlive(player))
-				continue;
-
-			if ( player is_bot() && lengthsquared( player getBotVelocity() ) < 20000 )
 				continue;
 
 			if( lengthsquared( player getVelocity() ) < 20000 )
@@ -3067,7 +3045,7 @@ bot_weapon_think()
 	{
 		self waittill_any_timeout(randomIntRange(2, 4), "bot_force_check_switch");
 		
-		if(self IsBotReloading() || self IsBotFragging() || self botIsClimbing() || self IsBotKnifing())
+		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
 			continue;
 
 		if(self BotIsFrozen() || self.disabledWeapon)
@@ -3397,9 +3375,6 @@ bot_killstreak_think()
 		if (self isEMPed())
 			continue;
 
-		if (self botIsClimbing())
-			continue;
-
 		if (self IsUsingRemote())
 			continue;
 
@@ -3597,11 +3572,11 @@ bot_killstreak_think()
 					continue;
 
 				self BotStopMoving(true);
-				if (self throwBotGrenade(ksWeap) != "grenade_fire")
+				/*if (self throwBotGrenade(ksWeap) != "grenade_fire")
 				{
 					self BotStopMoving(false);
 					continue;
-				}
+				}*/
 
 				if (randomInt(100) < 80)
 					self waittill_any_timeout( 15, "crate_physics_done" );

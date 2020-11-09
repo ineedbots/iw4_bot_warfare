@@ -58,7 +58,5 @@ onBotGivenLoadout()
 			self [[game[self.team+"_model"]["GHILLIE"]]]();
 		else
 			self [[game[self.team+"_model"]["SNIPER"]]]();
-		// reset the bot anim model
-		self maps\mp\bots\_bot_internal::botsDeleteFakeAnim();
 	}
 }
