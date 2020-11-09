@@ -98,8 +98,6 @@ resetBotVars()
 	self.bot.after_target_pos = undefined;
 	
 	self.bot.script_aimpos = undefined;
-
-	self.bot.lockingon = false; // !
 	
 	self.bot.script_goal = undefined;
 	self.bot.script_goal_dist = 0.0;
@@ -519,6 +517,9 @@ grenade_danager()
 			continue;
 
 		if(self isDefusing() || self isPlanting())
+			continue;
+
+		if (self.disabledWeapon)
 			continue;
 
 		myEye = self getEye();
@@ -1362,7 +1363,7 @@ canFire(curweap)
 	if(curweap == "none")
 		return false;
 
-	if(curweap == "at4_mp" && self.bot.lockingon) // !
+	if(curweap == "at4_mp" && isDefined(self.bot.target) && isDefined(self.bot.target.entity) && entIsVehicle(self.bot.target.entity) && self.stingerStage != 2)
 		return false;
 
 	if (curweap == "riotshield_mp" || curweap == "onemanarmy_mp")
