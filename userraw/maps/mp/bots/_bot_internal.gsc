@@ -1997,6 +1997,7 @@ changeToWeap(weap)
 	if (toks[0] == "gl" || isSubStr(weap, "shotgun_attach_"))
 	{
 		self setSpawnWeapon(weap);
+		return;
 	}
 
 	self botWeapon(weap);
