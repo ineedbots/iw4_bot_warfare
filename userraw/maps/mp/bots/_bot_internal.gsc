@@ -166,7 +166,7 @@ onWeaponChange()
 	weap = self GetCurrentWeapon();
 	self.bot.is_cur_full_auto = WeaponIsFullAuto(weap);
 	if (weap != "none")
-		self botWeapon(weap);
+		self changeToWeap(weap);
 
 	for(;;)
 	{
@@ -177,7 +177,7 @@ onWeaponChange()
 		if (newWeapon == "none")
 			continue;
 		
-		self botWeapon(self GetCurrentWeapon());
+		self changeToWeap(self GetCurrentWeapon());
 	}
 }
 
@@ -243,7 +243,7 @@ onLastStand()
 			}
 
 			if (isDefined(pistol))
-				self botWeapon(pistol);
+				self changeToWeap(pistol);
 		}
 
 		while (self inLastStand())
@@ -275,7 +275,7 @@ watchUsingRemote()
 
 			if (isReallyAlive(self))
 			{
-				self botWeapon(self getLastWeapon());
+				self changeToWeap(self getLastWeapon());
 				self.bot.targets = [];
 			}
 		}
@@ -287,7 +287,7 @@ watchUsingRemote()
 
 			if (isReallyAlive(self))
 			{
-				self botWeapon(self getLastWeapon());
+				self changeToWeap(self getLastWeapon());
 				self.bot.targets = [];
 			}
 		}
@@ -305,7 +305,7 @@ watchUsingMinigun()
 	{
 		if (self getCurrentWeapon() != "heli_remote_mp")
 		{
-			self botWeapon("heli_remote_mp");
+			self changeToWeap("heli_remote_mp");
 		}
 
 		if (isDefined(self.bot.target))
@@ -329,7 +329,7 @@ watchAc130Weapon()
 		curWeap = self GetCurrentWeapon();
 
 		if (curWeap != "ac130_105mm_mp" && curWeap != "ac130_40mm_mp" && curWeap != "ac130_25mm_mp")
-			self botWeapon("ac130_105mm_mp");
+			self changeToWeap("ac130_105mm_mp");
 
 		if (isDefined(self.bot.target))
 			self thread pressFire();
@@ -347,11 +347,11 @@ watchUsingAc130()
 
 	while (isDefined(level.ac130Player) && level.ac130player == self)
 	{
-		self botWeapon("ac130_105mm_mp");
+		self changeToWeap("ac130_105mm_mp");
 		wait 1+randomInt(2);
-		self botWeapon("ac130_40mm_mp");
+		self changeToWeap("ac130_40mm_mp");
 		wait 2+randomInt(2);
-		self botWeapon("ac130_25mm_mp");
+		self changeToWeap("ac130_25mm_mp");
 		wait 3+randomInt(2);
 	}
 }
@@ -1992,6 +1992,11 @@ prone()
 {
 	self botAction("-gocrouch");
 	self botAction("+goprone");
+}
+
+changeToWeap(weap)
+{
+	self botWeapon(weap);
 }
 
 /*

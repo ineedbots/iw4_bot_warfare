@@ -58,6 +58,14 @@ is_bot()
 }
 
 /*
+	Bot changes to the weap
+*/
+BotChangeToWeapon(weap)
+{
+	self maps\mp\bots\_bot_internal::changeToWeap(weap);
+}
+
+/*
 	Bot presses the frag button for time.
 */
 BotPressFrag(time)
@@ -379,52 +387,6 @@ IsStunned()
 isArtShocked()
 {
 	return (isDefined(self.beingArtilleryShellshocked) && self.beingArtilleryShellshocked);
-}
-
-/*
-	UNUSED cause buggy
-	Bots change weapons, does the anims
-*/
-botChangeWeapon(weapon)// intrestingly, this allows the bots to use pullout and pulldown anims and etc, but bugs out when the bot is frozen while midburst of a firerate limited weapon (m16, only shot one shot, or two shots, even though its a 3 round burst) (never switches until unfrozen)
-{
-	self endon("death");
-	self endon("disconnect");
-
-	if (level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen)
-		return;
-
-	if (self.bot.knifing || self.bot.isfraggingafter)
-		return;
-
-	if (self.disabledWeapon)
-		return;
-
-	if (self InLastStand() && !self InFinalStand())
-		return;
-		
-	self.bot.switch_to_after_none = weapon;
-	self.bot.switching = true;
-	ret = undefined;
-
-	if (self GetCurrentWeapon() == "none")
-	{
-		self notify("weapon_change");
-		ret = self waittill_any_timeout(5, "weapon_change");
-	}
-	else
-	{
-		self _DisableWeapon();
-		self waittill_any_timeout(5, "weapon_change");
-		self _EnableWeapon();
-		ret = self waittill_any_timeout(5, "weapon_change");
-	}
-
-	if (ret == "timeout")
-		return false;
-
-	waittillframeend;
-	self notify("bot_weapon_change", self GetCurrentWeapon());
-	return true;
 }
 
 /*
