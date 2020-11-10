@@ -1723,7 +1723,7 @@ movetowards(goal)
 		else
 			timeslow = 0;
 		
-		if(stucks == 3)
+		if(stucks == 1)
 			self notify("bad_path_internal");
 	}
 	
