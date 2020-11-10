@@ -504,7 +504,7 @@ stance()
 	{
 		self waittill_either("finished_static_waypoints", "new_static_waypoint");
 
-		if(self.bot.isfrozen)
+		if(self.bot.isfrozen || self IsUsingRemote())
 			continue;
 	
 		toStance = "stand";
@@ -1396,6 +1396,9 @@ walk()
 		self botMoveTo(self.origin);
 		
 		if(level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self.bot.stop_move)
+			continue;
+
+		if (self IsUsingRemote())
 			continue;
 			
 		if(self maps\mp\_flashgrenades::isFlashbanged())
