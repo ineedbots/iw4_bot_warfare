@@ -2021,8 +2021,8 @@ fire_current_weapon()
 
 	for (;;)
 	{
-		self thread BotPressAttack(0.1);
-		wait 0.05;
+		self thread BotPressAttack(0.05);
+		wait 0.1;
 	}
 }
 
