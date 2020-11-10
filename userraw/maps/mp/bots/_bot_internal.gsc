@@ -1993,6 +1993,12 @@ prone()
 
 changeToWeap(weap)
 {
+	toks = strtok(weap, "_");
+	if (toks[0] == "gl" || isSubStr(weap, "shotgun_attach_"))
+	{
+		self setSpawnWeapon(weap);
+	}
+
 	self botWeapon(weap);
 }
 
