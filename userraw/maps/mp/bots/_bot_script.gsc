@@ -3454,6 +3454,7 @@ bot_killstreak_think()
 				self setUsingRemote( "remotemissile" );
 				self thread clear_remote_on_death();
 
+				self BotChangeToWeapon(ksWeap);
 				if (!self changeToWeapon(ksWeap))
 				{
 					self ClearUsingRemote();
