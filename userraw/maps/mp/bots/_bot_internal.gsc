@@ -2002,9 +2002,9 @@ prone()
 */
 changeToWeap(weap)
 {
-	toks = strtok(weap, "_");
-	if (toks[0] == "gl" || isSubStr(weap, "shotgun_attach_"))
+	if (maps\mp\gametypes\_weapons::isAltModeWeapon(weap))
 	{
+		self botWeapon("");
 		self setSpawnWeapon(weap);
 		return;
 	}
