@@ -128,9 +128,6 @@ resetBotVars()
 	
 	self.bot.rand = randomInt(100);
 
-	self.bot.isswitching = false;
-	self.bot.switch_to_after_none = undefined;
-
 	self botStop();
 }
 
@@ -165,73 +162,23 @@ onWeaponChange()
 {
 	self endon("disconnect");
 	self endon("death");
-
-	self.bot.isswitching = false;
 	
-	self.bot.is_cur_full_auto = WeaponIsFullAuto(self GetCurrentWeapon());
+	weap = self GetCurrentWeapon();
+	self.bot.is_cur_full_auto = WeaponIsFullAuto(weap);
+	if (weap != "none")
+		self botWeapon(weap);
+
 	for(;;)
 	{
 		self waittill( "weapon_change", newWeapon );
 		
 		self.bot.is_cur_full_auto = WeaponIsFullAuto(newWeapon);
 
-		if(level.gameEnded || !gameFlag( "prematch_done" ))
+		if (newWeapon == "none")
 			continue;
 		
-		switch (newWeapon)
-		{
-			case "none":
-				self thread doNoneSwitch();
-			break;
-			default:
-				self thread doSwitch(newWeapon);
-			break;
-		}
+		self botWeapon(self GetCurrentWeapon());
 	}
-}
-
-/*
-	When the bot switches to a none weapon, we fix it
-*/
-doNoneSwitch()
-{
-	self endon("disconnect");
-	self endon("death");
-	self endon("weapon_change");
-
-	self.bot.isswitching = false;
-
-	while (self.disabledWeapon)
-		wait 0.05;
-
-	weap = self.lastDroppableWeapon;
-	if (isDefined(self.bot.switch_to_after_none))
-	{
-		weap = self.bot.switch_to_after_none;
-		self.bot.switch_to_after_none = undefined;
-	}
-
-	self SetSpawnWeapon(weap);
-}
-
-/*
-	When the bot switches to a weapon, we play the active animation, and shoot delay
-*/
-doSwitch(newWeapon)
-{
-	self endon("disconnect");
-	self endon("death");
-	self endon("weapon_change");
-
-	waittillframeend;
-	if (self.lastDroppableWeapon != newWeapon)
-		return;
-
-	self.bot.isswitching = true;
-
-	wait 1;  // fast pullout?
-
-	self.bot.isswitching = false;
 }
 
 /*
@@ -287,10 +234,6 @@ onLastStand()
 
 		if (!self inFinalStand() && !self IsUsingRemote())
 		{
-			while (self.disabledWeapon)
-				wait 0.05;
-			waittillframeend;
-
 			pistol = undefined;
 			weaponsList = self GetWeaponsListPrimaries();
 			foreach ( weapon in weaponsList )
@@ -300,7 +243,7 @@ onLastStand()
 			}
 
 			if (isDefined(pistol))
-				self setSpawnWeapon(pistol);
+				self botWeapon(pistol);
 		}
 
 		while (self inLastStand())
@@ -332,7 +275,7 @@ watchUsingRemote()
 
 			if (isReallyAlive(self))
 			{
-				self setSpawnWeapon(self getLastWeapon());
+				self botWeapon(self getLastWeapon());
 				self.bot.targets = [];
 			}
 		}
@@ -344,7 +287,7 @@ watchUsingRemote()
 
 			if (isReallyAlive(self))
 			{
-				self setSpawnWeapon(self getLastWeapon());
+				self botWeapon(self getLastWeapon());
 				self.bot.targets = [];
 			}
 		}
@@ -362,7 +305,7 @@ watchUsingMinigun()
 	{
 		if (self getCurrentWeapon() != "heli_remote_mp")
 		{
-			self setspawnweapon("heli_remote_mp");
+			self botWeapon("heli_remote_mp");
 		}
 
 		if (isDefined(self.bot.target))
@@ -386,7 +329,7 @@ watchAc130Weapon()
 		curWeap = self GetCurrentWeapon();
 
 		if (curWeap != "ac130_105mm_mp" && curWeap != "ac130_40mm_mp" && curWeap != "ac130_25mm_mp")
-			self setSpawnWeapon("ac130_105mm_mp");
+			self botWeapon("ac130_105mm_mp");
 
 		if (isDefined(self.bot.target))
 			self thread pressFire();
@@ -404,12 +347,12 @@ watchUsingAc130()
 
 	while (isDefined(level.ac130Player) && level.ac130player == self)
 	{
-		self setspawnweapon("ac130_105mm_mp");
-		wait 3+randomInt(3);
-		self setspawnweapon("ac130_40mm_mp");
-		wait 4+randomInt(3);
-		self setspawnweapon("ac130_25mm_mp");
-		wait 4+randomInt(3);
+		self botWeapon("ac130_105mm_mp");
+		wait 1+randomInt(2);
+		self botWeapon("ac130_40mm_mp");
+		wait 2+randomInt(2);
+		self botWeapon("ac130_25mm_mp");
+		wait 3+randomInt(2);
 	}
 }
 
@@ -450,26 +393,27 @@ doBotMovement()
 		waittillframeend;
 		move_To = self.bot.moveTo;
 		angles = self GetPlayerAngles();
+		dir = (0, 0, 0);
 
-		if (DistanceSquared(self.origin, move_To) < 49)
-			continue;
+		if (DistanceSquared(self.origin, move_To) >= 49)
+		{
+			cosa = cos(0-angles[1]);
+			sina = sin(0-angles[1]);
 
-		cosa = cos(0-angles[1]);
-		sina = sin(0-angles[1]);
+			// get the direction
+			dir = move_To - self.origin;
 
-		// get the direction
-		dir = move_To - self.origin;
+			// rotate our direction according to our angles
+			dir = (dir[0] * cosa - dir[1] * sina,
+						dir[0] * sina + dir[1] * cosa,
+						0);
 
-		// rotate our direction according to our angles
-		dir = (dir[0] * cosa - dir[1] * sina,
-					 dir[0] * sina + dir[1] * cosa,
-					 0);
+			// make the length 127
+			dir = VectorNormalize(dir) * 127;
 
-		// make the length 127
-		dir = VectorNormalize(dir) * 127;
-
-		// invert the second component as the engine requires this
-		dir = (dir[0], 0-dir[1], 0);
+			// invert the second component as the engine requires this
+			dir = (dir[0], 0-dir[1], 0);
+		}
 
 		// move!
 		self botMovement(int(dir[0]), int(dir[1]));
@@ -1053,6 +997,7 @@ watchToLook()
 		
 			self.bot.jump_time = thetime;
 			self prone();
+			self notify("kill_goal");
 			wait 2.5;
 			self crouch();
 		}
@@ -1249,6 +1194,9 @@ aim()
 					if (canADS)
 						self thread pressAds();
 
+					if(curweap == "at4_mp" && entIsVehicle(self.bot.target.entity) && self.stingerStage != 2)
+						continue;
+
 					if (trace_time > reaction_time)
 					{
 						if((!canADS || self playerads() == 1.0 || self InLastStand() || self GetStance() == "prone") && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
@@ -1363,9 +1311,6 @@ canFire(curweap)
 	if(curweap == "none")
 		return false;
 
-	if(curweap == "at4_mp" && isDefined(self.bot.target) && isDefined(self.bot.target.entity) && entIsVehicle(self.bot.target.entity) && self.stingerStage != 2)
-		return false;
-
 	if (curweap == "riotshield_mp" || curweap == "onemanarmy_mp")
 		return false;
 
@@ -1464,13 +1409,16 @@ walk()
 		{
 			curweap = self getCurrentWeapon();
 			
-			if(isDefined(self.bot.jav_loc) || entIsVehicle(self.bot.target.entity) || self.bot.isfraggingafter || self.bot.issmokingafter || self InLastStand() || self GetStance() == "prone")
+			if(isDefined(self.bot.jav_loc) || entIsVehicle(self.bot.target.entity) || self.bot.isfraggingafter || self.bot.issmokingafter)
 			{
 				continue;
 			}
 			
 			if(self.bot.target.isplay && self.bot.target.trace_time && self canFire(curweap) && self isInRange(self.bot.target.dist, curweap))
 			{
+				if (self InLastStand() || self GetStance() == "prone")
+					continue;
+
 				if(self.bot.target.rand <= self.pers["bots"]["behavior"]["strafe"])
 					self strafe(self.bot.target.entity);
 				continue;
@@ -2044,8 +1992,6 @@ prone()
 {
 	self botAction("-gocrouch");
 	self botAction("+goprone");
-
-	self notify("kill_goal");
 }
 
 /*
