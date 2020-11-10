@@ -463,9 +463,6 @@ grenade_danager()
 		if(self isDefusing() || self isPlanting())
 			continue;
 
-		if (self.disabledWeapon)
-			continue;
-
 		myEye = self getEye();
 		for (i = level.bots_fragList.count-1; i >= 0; i--)
 		{

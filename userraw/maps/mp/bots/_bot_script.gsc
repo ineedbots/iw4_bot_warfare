@@ -546,7 +546,7 @@ chooseRandomAttachmentComboForGun(gun)
 		{
 			if (att1 == "shotgun" || att2 == "shotgun")
 				continue;
-			if ((att1 == "akimbo" || att2 == "akimbo") && gun != "ranger" && gun != "model1887")
+			if ((att1 == "akimbo" || att2 == "akimbo") && gun != "ranger" && gun != "model1887" && gun != "glock")
 				continue;
 			if (att1 == "acog" || att2 == "acog")
 				continue;
@@ -1838,9 +1838,6 @@ bot_perk_think()
 
 		for (;self _hasPerk("specialty_onemanarmy") && self hasWeapon("onemanarmy_mp");)
 		{
-			if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing() || self IsBotSmoking())
-				break;
-
 			if (self HasThreat() || self HasBotJavelinLocation())
 				break;
 
@@ -1919,15 +1916,17 @@ bot_use_tube_think()
 
 		if(self BotIsFrozen())
 			continue;
+
+		if (self IsBotFragging() || self IsBotSmoking())
+			continue;
 		
-		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
+		if(self IsBotReloading() || self IsBotKnifing())
 			continue;
 			
 		if(self isDefusing() || self isPlanting())
 			continue;
 
-		curWeap = self GetCurrentWeapon();
-		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
+		if (self.disabledWeapon)
 			continue;
 
 		if (self IsUsingRemote())
@@ -2069,14 +2068,10 @@ bot_use_equipment_think()
 		if(self BotIsFrozen())
 			continue;
 		
-		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
+		if(self IsBotFragging() || self IsBotSmoking())
 			continue;
 			
 		if(self isDefusing() || self isPlanting())
-			continue;
-
-		curWeap = self GetCurrentWeapon();
-		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
 			continue;
 
 		if (self IsUsingRemote())
@@ -2137,7 +2132,7 @@ bot_use_equipment_think()
 		self BotStopMoving(true);
 		wait 1;
 
-		//self throwBotGrenade(nade);
+		self botThrowGrenade(nade, 0.05);
 
 		self ClearScriptAimPos();
 		self BotStopMoving(false);
@@ -2181,14 +2176,10 @@ bot_use_grenade_think()
 		if(self BotIsFrozen())
 			continue;
 		
-		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
+		if(self IsBotFragging() || self IsBotSmoking())
 			continue;
 			
 		if(self isDefusing() || self isPlanting())
-			continue;
-
-		curWeap = self GetCurrentWeapon();
-		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
 			continue;
 
 		if (self IsUsingRemote())
@@ -2262,7 +2253,7 @@ bot_use_grenade_think()
 		time = 0.5;
 		if (nade == "frag_grenade_mp")
 			time = 2;
-		//self throwBotGrenade(nade, time);
+		self botThrowGrenade(nade, time);
 
 		self ClearScriptAimPos();
 		self BotStopMoving(false);
@@ -2292,6 +2283,28 @@ changeToWeapon(weap)
 	self.bot_perf_switch_weapon = undefined;
 
 	return (self GetCurrentWeapon() == weap);
+}
+
+/*
+	Bots throw the grenade
+*/
+botThrowGrenade(nade, time)
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon("game_ended");
+
+	if (!self GetAmmoCount(nade))
+		return false;
+
+	if (isSecondaryGrenade(nade))
+		self thread BotPressSmoke(time);
+	else
+		self thread BotPressFrag(time);
+
+	ret = self waittill_any_timeout(5, "grenade_fire");
+
+	return (ret == "grenade_fire");
 }
 
 /*
@@ -2329,14 +2342,7 @@ bot_jav_loc_think()
 		if(self BotIsFrozen())
 			continue;
 		
-		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
-			continue;
-			
 		if(self isDefusing() || self isPlanting())
-			continue;
-
-		curWeap = self GetCurrentWeapon();
-		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
 			continue;
 
 		if (self IsUsingRemote())
@@ -3044,9 +3050,6 @@ bot_weapon_think()
 	for(;;)
 	{
 		self waittill_any_timeout(randomIntRange(2, 4), "bot_force_check_switch");
-		
-		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
-			continue;
 
 		if(self BotIsFrozen() || self.disabledWeapon)
 			continue;
@@ -3070,7 +3073,7 @@ bot_weapon_think()
 			if(entIsVehicle(threat) && isDefined(rocketAmmo))
 			{
 				if (curWeap != rocketAmmo)
-					self setSpawnWeapon(rocketAmmo);
+					self BotChangeToWeapon(rocketAmmo);
 				continue;
 			}
 		}
@@ -3078,7 +3081,7 @@ bot_weapon_think()
 		if (self HasBotJavelinLocation() && self GetAmmoCount("javelin_mp"))
 		{
 			if (curWeap != "javelin_mp")
-				self setSpawnWeapon("javelin_mp");
+				self BotChangeToWeapon("javelin_mp");
 
 			continue;
 		}
@@ -3086,14 +3089,14 @@ bot_weapon_think()
 		if (isDefined(self.bot_oma_class))
 		{
 			if (curWeap != "onemanarmy_mp")
-				self setSpawnWeapon("onemanarmy_mp");
+				self BotChangeToWeapon("onemanarmy_mp");
 			continue;
 		}
 
 		if (isDefined(self.bot_perf_switch_weapon))
 		{
 			if (curWeap != self.bot_perf_switch_weapon)
-				self setSpawnWeapon(self.bot_perf_switch_weapon);
+				self BotChangeToWeapon(self.bot_perf_switch_weapon);
 
 			self.bot_perf_switch_weapon = undefined;
 			continue;
@@ -3131,7 +3134,7 @@ bot_weapon_think()
 		if(weap == "")
 			continue;
 		
-		self setSpawnWeapon(weap);
+		self BotChangeToWeapon(weap);
 	}
 }
 
@@ -3362,14 +3365,7 @@ bot_killstreak_think()
 		if(self HasThreat() || self HasBotJavelinLocation())
 			continue;
 		
-		if(self IsBotReloading() || self IsBotFragging() || self IsBotKnifing())
-			continue;
-			
 		if(self isDefusing() || self isPlanting())
-			continue;
-
-		curWeap = self GetCurrentWeapon();
-		if (!isWeaponPrimary(curWeap) || self.disabledWeapon)
 			continue;
 
 		if (self isEMPed())
@@ -3387,6 +3383,7 @@ bot_killstreak_think()
 			continue;
 
 		ksWeap = maps\mp\killstreaks\_killstreaks::getKillstreakWeapon( streakName );
+		curWeap = self GetCurrentWeapon();
 
 		if (isStrStart(streakName, "helicopter_") && self isAnyEnemyPlanes() && self.pers["bots"]["skill"]["base"] > 3)
 			continue;
@@ -3431,21 +3428,21 @@ bot_killstreak_think()
 				if (DistanceSquared(self.origin, forwardTrace["position"]) < 1000*1000 && self.pers["bots"]["skill"]["base"] > 3)
 					continue;
 
-				self BotFreezeControls(true);
-				wait 1;
+				self BotStopMoving(true);
+				
+				if (!self changeToWeapon(ksWeap))
+				{
+					self BotStopMoving(false);
+					continue;
+				}
 
-				sentryGun = maps\mp\killstreaks\_autosentry::createSentryForPlayer( "sentry_minigun", self );
-				sentryGun maps\mp\killstreaks\_autosentry::sentry_setPlaced();
-				self notify( "sentry_placement_finished", sentryGun );
+				self thread fire_current_weapon();
+				wait 0.5;
 
-				self maps\mp\_matchdata::logKillstreakEvent( "sentry", self.origin );
+				self notify("stop_firing_weapon");
+				self thread changeToWeapon(curWeap);
 
-				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "sentry", true );
-				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "sentry" );
-				self maps\mp\killstreaks\_killstreaks::giveOwnedKillstreakItem();
-				wait 1;
-
-				self BotFreezeControls(false);
+				self BotStopMoving(false);
 			}
 			else if (streakName == "predator_missile")
 			{
@@ -3455,15 +3452,23 @@ bot_killstreak_think()
 					continue;
 
 				self setUsingRemote( "remotemissile" );
-				self setSpawnWeapon(ksWeap);
 				self thread clear_remote_on_death();
+
+				if (!self changeToWeapon(ksWeap))
+				{
+					self ClearUsingRemote();
+					self notify("bot_clear_remote_on_death");
+					self thread changeToWeapon(curWeap);
+					continue;
+				}
+
 				wait 1;
 				self notify("bot_clear_remote_on_death");
 
 				if (self isEMPed())
 				{
 					self ClearUsingRemote();
-					self setSpawnWeapon(curWeap);
+					self thread changeToWeapon(curWeap);
 					continue;
 				}
 				
@@ -3482,72 +3487,25 @@ bot_killstreak_think()
 				self waittill( "stopped_using_remote" );
 
 				wait 1;
-				self setSpawnWeapon(curWeap); 
+				self thread changeToWeapon(curWeap);
 			}
 			else if (streakName == "ac130")
 			{
 				if ( isDefined( level.ac130player ) || level.ac130InUse )
 					continue;
 
-				level.ac130InUse = true;
-				self setUsingRemote( "ac130" );
-				self setSpawnWeapon(ksWeap);
-				self thread clear_remote_on_death(true);
-				wait 1;
-				self notify("bot_clear_remote_on_death");
-
-				if (self isEMPed()) // bcuz of the wait
-				{
-					level.ac130InUse = false;
-					self ClearUsingRemote();
-					self setSpawnWeapon(curWeap);
-					continue;
-				}
-
-				self maps\mp\_matchdata::logKillstreakEvent( "ac130", self.origin );
-	
-				self.ac130LifeId = self.pers["killstreaks"][0].lifeId;
-				level.ac130.planeModel.crashed = undefined;
-
-				thread maps\mp\killstreaks\_ac130::setAC130Player( self );
-
-				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "ac130", true );
-				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "ac130" );
-				self maps\mp\killstreaks\_killstreaks::giveOwnedKillstreakItem();
-
-				self waittill( "stopped_using_remote" );
-
-				wait 1;
-				self setSpawnWeapon(curWeap);
+				self BotStopMoving(true);
+				self changeToWeapon(ksWeap);
+				self BotStopMoving(false);
 			}
 			else if (streakName == "helicopter_minigun")
 			{
 				if (isDefined( level.chopper ))
 					continue;
 
-				self setUsingRemote( "helicopter_minigun" );
-				self setSpawnWeapon(ksWeap);
-				self thread clear_remote_on_death();
-				wait 1;
-				self notify("bot_clear_remote_on_death");
-
-				if (isDefined( level.chopper ) || self isEMPed())
-				{
-					self ClearUsingRemote();
-					self setSpawnWeapon(curWeap);
-					continue;
-				}
-
-				self thread maps\mp\killstreaks\_helicopter::startHelicopter(self.pers["killstreaks"][0].lifeId, "minigun");
-
-				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "helicopter_minigun", true );
-				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "helicopter_minigun" );
-				self maps\mp\killstreaks\_killstreaks::giveOwnedKillstreakItem();
-
-				self waittill( "stopped_using_remote" );
-
-				wait 1;
-				self setSpawnWeapon(curWeap);
+				self BotStopMoving(true);
+				self changeToWeapon(ksWeap);
+				self BotStopMoving(false);
 			}
 		}
 		else
@@ -3572,11 +3530,25 @@ bot_killstreak_think()
 					continue;
 
 				self BotStopMoving(true);
-				/*if (self throwBotGrenade(ksWeap) != "grenade_fire")
+				
+				if (!self changeToWeapon(ksWeap))
 				{
 					self BotStopMoving(false);
 					continue;
-				}*/
+				}
+
+				self thread fire_current_weapon();
+
+				ret = self waittill_any_timeout( 5, "grenade_fire" );
+
+				self notify("stop_firing_weapon");
+				self thread changeToWeapon(curWeap);
+
+				if (ret == "timeout")
+				{
+					self BotStopMoving(false);
+					continue;
+				}
 
 				if (randomInt(100) < 80)
 					self waittill_any_timeout( 15, "crate_physics_done" );
@@ -3618,16 +3590,22 @@ bot_killstreak_think()
 					case "nuke":
 					case "counter_uav":
 					case "emp":
-						self BotFreezeControls(true);
-						self setSpawnWeapon(ksWeap);
-						wait 1;
-						if (isDefined(location))
+						self BotStopMoving(true);
+						
+						if (self changeToWeapon(ksWeap))
 						{
-							self notify( "confirm_location", location, directionYaw );
 							wait 1;
+
+							if (isDefined(location))
+							{
+								self notify( "confirm_location", location, directionYaw );
+								wait 1;
+							}
+
+							self thread changeToWeapon(curWeap);
 						}
-						self setSpawnWeapon(curWeap);
-						self BotFreezeControls(false);
+
+						self BotStopMoving(false);
 						break;
 				}
 			}
