@@ -3420,6 +3420,9 @@ bot_killstreak_think()
 				
 			if (streakName == "sentry")
 			{
+				if (self HasScriptAimPos())
+					continue;
+
 				myEye = self GetEye();
 				angles = self GetPlayerAngles();
 
@@ -3429,10 +3432,12 @@ bot_killstreak_think()
 					continue;
 
 				self BotStopMoving(true);
+				self SetScriptAimPos(forwardTrace["position"]);
 				
 				if (!self changeToWeapon(ksWeap))
 				{
 					self BotStopMoving(false);
+					self ClearScriptAimPos();
 					continue;
 				}
 
@@ -3444,6 +3449,7 @@ bot_killstreak_think()
 				self thread changeToWeapon(curWeap);
 
 				self BotStopMoving(false);
+				self ClearScriptAimPos();
 			}
 			else if (streakName == "predator_missile")
 			{
@@ -3517,6 +3523,9 @@ bot_killstreak_think()
 		{
 			if (streakName == "airdrop_mega" || streakName == "airdrop_sentry_minigun" || streakName == "airdrop")
 			{
+				if (self HasScriptAimPos())
+					continue;
+
 				if (streakName != "airdrop_mega" && level.littleBirds > 2)
 					continue;
 
@@ -3535,10 +3544,12 @@ bot_killstreak_think()
 					continue;
 
 				self BotStopMoving(true);
+				self SetScriptAimPos(forwardTrace["position"]);
 				
 				if (!self changeToWeapon(ksWeap))
 				{
 					self BotStopMoving(false);
+					self ClearScriptAimPos();
 					continue;
 				}
 
@@ -3552,6 +3563,7 @@ bot_killstreak_think()
 				if (ret == "timeout")
 				{
 					self BotStopMoving(false);
+					self ClearScriptAimPos();
 					continue;
 				}
 
@@ -3559,6 +3571,7 @@ bot_killstreak_think()
 					self waittill_any_timeout( 15, "crate_physics_done" );
 
 				self BotStopMoving(false);
+				self ClearScriptAimPos();
 			}
 			else
 			{
