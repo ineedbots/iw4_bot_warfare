@@ -3428,21 +3428,21 @@ bot_killstreak_think()
 				if (DistanceSquared(self.origin, forwardTrace["position"]) < 1000*1000 && self.pers["bots"]["skill"]["base"] > 3)
 					continue;
 
-				self BotStopMoving(true);
-				
-				if (!self changeToWeapon(ksWeap))
-				{
-					self BotStopMoving(false);
-					continue;
-				}
+				self BotFreezeControls(true);
+				wait 1;
 
-				self thread fire_current_weapon();
-				wait 0.5;
+				sentryGun = maps\mp\killstreaks\_autosentry::createSentryForPlayer( "sentry_minigun", self );
+				sentryGun maps\mp\killstreaks\_autosentry::sentry_setPlaced();
+				self notify( "sentry_placement_finished", sentryGun );
 
-				self notify("stop_firing_weapon");
-				self thread changeToWeapon(curWeap);
+				self maps\mp\_matchdata::logKillstreakEvent( "sentry", self.origin );
 
-				self BotStopMoving(false);
+				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "sentry", true );
+				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "sentry" );
+				self maps\mp\killstreaks\_killstreaks::giveOwnedKillstreakItem();
+				wait 1;
+
+				self BotFreezeControls(false);
 			}
 			else if (streakName == "predator_missile")
 			{

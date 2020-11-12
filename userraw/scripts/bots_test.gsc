@@ -32,6 +32,10 @@ test()
 		wait 0.05;
 
 		if (self is_bot())
-			continue;
+		{
+		}
+		else
+		{
+		}
 	}
 }
