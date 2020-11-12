@@ -3453,6 +3453,7 @@ bot_killstreak_think()
 
 				self setUsingRemote( "remotemissile" );
 				self thread clear_remote_on_death();
+				self BotStopMoving(true);
 
 				self BotChangeToWeapon(ksWeap);
 				if (!self changeToWeapon(ksWeap))
@@ -3460,11 +3461,13 @@ bot_killstreak_think()
 					self ClearUsingRemote();
 					self notify("bot_clear_remote_on_death");
 					self thread changeToWeapon(curWeap);
+					self BotStopMoving(false);
 					continue;
 				}
 
 				wait 1;
 				self notify("bot_clear_remote_on_death");
+				self BotStopMoving(false);
 
 				if (self isEMPed())
 				{
