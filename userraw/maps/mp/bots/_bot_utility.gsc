@@ -1707,6 +1707,21 @@ AStarSearch(start, goal, team, greedy_path)
 	if(isDefined(_goalwp))
 		goalwp = _goalwp;
 	goalwp = goalwp.index;
+
+	/*storeKey = "astarcache " + startwp + " " + goalwp;
+	if (StoreHas(storeKey))
+	{
+		path = [];
+		pathArrStr = tokenizeLine(StoreGet(storeKey), ",");
+
+		pathArrSize = pathArrStr.size;
+		for (i = 0; i < pathArrSize; i++)
+		{
+			path[path.size] = int(pathArrStr[i]);
+		}
+
+		return path;
+	}*/
 	
 	goalorg = level.waypoints[goalWp].origin;
 	
@@ -1734,6 +1749,7 @@ AStarSearch(start, goal, team, greedy_path)
 		if(bestNode.index == goalwp)
 		{
 			path = [];
+			//storeStr = "";
 		
 			while(isDefined(bestNode))
 			{
@@ -1742,10 +1758,16 @@ AStarSearch(start, goal, team, greedy_path)
 					
 				//construct path
 				path[path.size] = bestNode.index;
+
+				//storeStr += bestNode.index;
 				
 				bestNode = bestNode.parent;
+
+				/*if (isDefined(bestNode))
+					storeStr += ",";*/
 			}
-			
+
+			//StoreSet(storeKey, storeStr);
 			return path;
 		}
 		
