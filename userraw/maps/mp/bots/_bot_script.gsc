@@ -5170,7 +5170,7 @@ bot_dem_attackers()
 	self endon( "disconnect" );
 	level endon("game_ended");
 
-	if ( level.gametype != "dem" )
+	if ( level.gametype != "dd" )
 		return;
 
 	myTeam = self.pers[ "team" ];
@@ -5352,6 +5352,9 @@ bot_dem_attackers()
 		self thread bot_dem_go_plant(plant);
 		
 		event = self waittill_any_return( "goal", "bad_path", "new_goal" );
+
+		if (event != "new_goal")
+			self ClearScriptGoal();
 		
 		if(event != "goal" || (plant.label == "_b" && level.bombBPlanted) || (plant.label == "_a" && level.bombAPlanted) || plant IsInUse() || !self isTouching(plant.trigger) || self InLastStand() || self HasThreat())
 		{
@@ -5379,7 +5382,7 @@ bot_dem_defenders()
 	self endon( "disconnect" );
 	level endon("game_ended");
 
-	if ( level.gametype != "dem" )
+	if ( level.gametype != "dd" )
 		return;
 
 	myTeam = self.pers[ "team" ];
@@ -5565,6 +5568,9 @@ bot_dem_defenders()
 		self thread bot_dem_go_defuse(defuse);
 
 		event = self waittill_any_return( "goal", "bad_path", "new_goal" );
+
+		if (event != "new_goal")
+			self ClearScriptGoal();
 		
 		if(event != "goal" || (defuse.label == "_b" && !level.bombBPlanted) || (defuse.label == "_a" && !level.bombAPlanted) || defuse IsInUse() || !self isTouching(defuse.trigger) || self InLastStand() || self HasThreat())
 		{
