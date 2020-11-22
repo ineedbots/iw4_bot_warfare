@@ -5224,7 +5224,7 @@ bot_dem_attackers()
 				continue;
 			}
 		}
-		timeleft = getTimeRemaining()/1000;
+		timeleft = maps\mp\gametypes\_gamelogic::getTimeRemaining()/1000;
 		
 		shouldLet = (game["teamScores"][myteam] > game["teamScores"][otherTeam] && timeleft < 90 && bombed == 1);
 		//spawnkill conditions
@@ -5433,7 +5433,7 @@ bot_dem_defenders()
 				continue;
 			}
 		}
-		timeleft = getTimeRemaining()/1000;
+		timeleft = maps\mp\gametypes\_gamelogic::getTimeRemaining()/1000;
 		
 		shouldLet = (timeleft < 60 && ((bombed == 0 && bombs.size != 2) || (game["teamScores"][myteam] > game["teamScores"][otherTeam] && bombed == 1)) && randomInt(100) < 98);
 		
