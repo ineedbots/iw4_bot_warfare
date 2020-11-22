@@ -350,6 +350,22 @@ isPlanting()
 }
 
 /*
+	If the player is carrying a bomb
+*/
+isBombCarrier()
+{
+	return (isDefined(self.isBombCarrier) && self.isBombCarrier);
+}
+
+/*
+	If the site is in use
+*/
+isInUse()
+{
+	return (isDefined(self.inUse) && self.inUse);
+}
+
+/*
 	If the player is in laststand
 */
 inLastStand()
