@@ -1714,6 +1714,9 @@ start_bot_threads()
 
 	self thread bot_sd_defenders();
 	self thread bot_sd_attackers();
+
+	self thread bot_dem_attackers();
+	self thread bot_dem_defenders();
 }
 
 /*
@@ -5101,4 +5104,533 @@ bot_sd_attackers()
 		self ClearScriptGoal();
 		self.bot_lock_goal = false;
 	}
+}
+
+/*
+	Bots go plant the demo bomb
+*/
+bot_dem_go_plant(plant)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+
+	for (;;)
+	{
+		wait 0.5;
+
+		if ((plant.label == "_b" && level.bombBPlanted) || (plant.label == "_a" && level.bombAPlanted))
+			break;
+
+		if (self isTouching(plant.trigger))
+			break;
+	}
+	
+	if((plant.label == "_b" && level.bombBPlanted) || (plant.label == "_a" && level.bombAPlanted))
+		self notify("bad_path");
+	else
+		self notify("goal");
+}
+
+/*
+	Bots spawn kill dom attackers
+*/
+bot_dem_attack_spawnkill()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+	
+	l1 = level.bombAPlanted;
+	l2 = level.bombBPlanted;
+
+	for (;;)
+	{
+		wait 0.5;
+
+		if (l1 != level.bombAPlanted || l2 != level.bombBPlanted)
+			break;
+	}
+	
+	self notify("bad_path");
+}
+
+/*
+	Bots play demo attackers
+*/
+bot_dem_attackers()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+
+	if ( level.gametype != "dem" )
+		return;
+
+	myTeam = self.pers[ "team" ];
+	otherTeam = getOtherTeam( myTeam );
+	
+	if(myTeam != game["attackers"])
+		return;
+
+	for ( ;; )
+	{
+		wait( randomintrange( 3, 5 ) );
+		
+		if ( self IsUsingRemote() || self.bot_lock_goal )
+		{
+			continue;
+		}
+		
+		if(!isDefined(level.bombZones) || !level.bombZones.size)
+			continue;
+		
+		bombs = [];//sites with bombs
+		sites = [];//sites to bomb at
+		bombed = 0;//exploded sites
+		for ( i = 0; i < level.bombZones.size; i++ )
+		{
+			bomb = level.bombZones[i];
+			
+			if(isDefined(bomb.bombExploded) && bomb.bombExploded)
+			{
+				bombed++;
+				continue;
+			}
+			
+			if(bomb.label == "_a")
+			{
+				if(level.bombAPlanted)
+					bombs[bombs.size] = bomb;
+				else
+					sites[sites.size] = bomb;
+				
+				continue;
+			}
+			
+			if(bomb.label == "_b")
+			{
+				if(level.bombBPlanted)
+					bombs[bombs.size] = bomb;
+				else
+					sites[sites.size] = bomb;
+				
+				continue;
+			}
+		}
+		timeleft = getTimeRemaining()/1000;
+		
+		shouldLet = (game["teamScores"][myteam] > game["teamScores"][otherTeam] && timeleft < 90 && bombed == 1);
+		//spawnkill conditions
+		//if we have bombed one site or 1 bomb is planted with lots of time left, spawn kill
+		//if we want the other team to win for overtime and they do not need to defuse, spawn kill
+		if(((bombed + bombs.size == 1 && timeleft >= 90) || (shouldLet && !bombs.size)) && randomInt(100) < 95)
+		{
+			if(self HasScriptGoal())
+				continue;
+			
+			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dem_spawn_defender_start" );
+			
+			if(!spawnPoints.size)
+				continue;
+			
+			spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random( spawnPoints );
+			
+			if(DistanceSquared(spawnpoint.origin, self.origin) <= 2048*2048)
+				continue;
+			
+			self SetScriptGoal( spawnpoint.origin, 1024 );
+			
+			self thread bot_dem_attack_spawnkill();
+
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+			continue;
+		}
+		
+		//let defuse conditions
+		//if enemy is going to lose and lots of time left, let them defuse to play longer
+		//or if want to go into overtime near end of the extended game
+		if(((bombs.size + bombed == 2 && timeleft >= 90) || (shouldLet && bombs.size)) && randomInt(100) < 95)
+		{
+			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dem_spawn_attacker_start" );
+			
+			if(!spawnPoints.size)
+				continue;
+			
+			spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random( spawnPoints );
+			
+			if(DistanceSquared(spawnpoint.origin, self.origin) <= 1024*1024)
+				continue;
+			
+			self.bot_lock_goal = true;
+			self SetScriptGoal( spawnpoint.origin, 512 );
+			
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+			
+			self.bot_lock_goal = false;
+			continue;
+		}
+		
+		//defend bomb conditions
+		//if time is running out and we have a bomb planted
+		if(bombs.size && timeleft < 90 && (!sites.size || randomInt(100) < 95))
+		{
+			site = self bot_array_nearest_curorigin(bombs);
+			origin = ( site.curorigin[0]+50, site.curorigin[1]+50, site.curorigin[2]+5 );
+			
+			if(site IsInUse())//somebody is defusing
+			{
+				self.bot_lock_goal = true;
+				self SetScriptGoal( origin, 64 );
+				
+				self thread bot_defend_site(site);
+				
+				if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+					self ClearScriptGoal();
+				
+				self.bot_lock_goal = false;
+				continue;
+			}
+			
+			//else hang around the site
+			if(DistanceSquared(origin, self.origin) <= 1024*1024)
+				continue;
+			
+			self.bot_lock_goal = true;
+			self SetScriptGoal( origin, 256 );
+			
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+			
+			self.bot_lock_goal = false;
+			continue;
+		}
+		
+		//else go plant
+		if(!sites.size)
+			continue;
+		
+		plant = self bot_array_nearest_curorigin(sites);
+		
+		if(!isDefined(plant))
+			continue;
+		
+		if(!isDefined(plant.bots))
+			plant.bots = 0;
+		
+		origin = ( plant.curorigin[0]+50, plant.curorigin[1]+50, plant.curorigin[2]+5 );
+		
+		//hang around the site if lots of time left
+		if(plant.bots > 1 && timeleft >= 60)
+		{
+			if(self HasScriptGoal())
+				continue;
+			
+			if(DistanceSquared(origin, self.origin) <= 1024*1024)
+				continue;
+			
+			self SetScriptGoal( origin, 256 );
+			self thread bot_dem_go_plant(plant);
+			
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+			continue;
+		}
+		
+		self.bot_lock_goal = true;
+		
+		self SetScriptGoal( origin, 1 );
+		self thread bot_inc_bots(plant);
+		self thread bot_dem_go_plant(plant);
+		
+		event = self waittill_any_return( "goal", "bad_path", "new_goal" );
+		
+		if(event != "goal" || (plant.label == "_b" && level.bombBPlanted) || (plant.label == "_a" && level.bombAPlanted) || plant IsInUse() || !self isTouching(plant.trigger) || self InLastStand() || self HasThreat())
+		{
+			self.bot_lock_goal = false;
+			continue;
+		}
+		
+		self SetScriptGoal( self.origin, 64 );
+		
+		self bot_use_bomb_thread(plant);
+		wait 1;
+		
+		self ClearScriptGoal();
+		
+		self.bot_lock_goal = false;
+	}
+}
+
+/*
+	Bots play demo defenders
+*/
+bot_dem_defenders()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+
+	if ( level.gametype != "dem" )
+		return;
+
+	myTeam = self.pers[ "team" ];
+	otherTeam = getOtherTeam( myTeam );
+	
+	if(myTeam == game["attackers"])
+		return;
+
+	for ( ;; )
+	{
+		wait( randomintrange( 3, 5 ) );
+		
+		if ( self IsUsingRemote() || self.bot_lock_goal )
+		{
+			continue;
+		}
+		
+		if(!isDefined(level.bombZones) || !level.bombZones.size)
+			continue;
+		
+		bombs = [];//sites with bombs
+		sites = [];//sites to bomb at
+		bombed = 0;//exploded sites
+		for ( i = 0; i < level.bombZones.size; i++ )
+		{
+			bomb = level.bombZones[i];
+			
+			if(isDefined(bomb.bombExploded) && bomb.bombExploded)
+			{
+				bombed++;
+				continue;
+			}
+			
+			if(bomb.label == "_a")
+			{
+				if(level.bombAPlanted)
+					bombs[bombs.size] = bomb;
+				else
+					sites[sites.size] = bomb;
+				
+				continue;
+			}
+			
+			if(bomb.label == "_b")
+			{
+				if(level.bombBPlanted)
+					bombs[bombs.size] = bomb;
+				else
+					sites[sites.size] = bomb;
+				
+				continue;
+			}
+		}
+		timeleft = getTimeRemaining()/1000;
+		
+		shouldLet = (timeleft < 60 && ((bombed == 0 && bombs.size != 2) || (game["teamScores"][myteam] > game["teamScores"][otherTeam] && bombed == 1)) && randomInt(100) < 98);
+		
+		//spawnkill conditions
+		//if nothing to defuse with a lot of time left, spawn kill
+		//or letting a bomb site to explode but a bomb is planted, so spawnkill
+		if((!bombs.size && timeleft >= 60 && randomInt(100) < 95) || (shouldLet && bombs.size == 1))
+		{
+			if(self HasScriptGoal())
+				continue;
+			
+			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dem_spawn_attacker_start" );
+			
+			if(!spawnPoints.size)
+				continue;
+			
+			spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random( spawnPoints );
+			
+			if(DistanceSquared(spawnpoint.origin, self.origin) <= 2048*2048)
+				continue;
+			
+			self SetScriptGoal( spawnpoint.origin, 1024 );
+			
+			self thread bot_dem_defend_spawnkill();
+			
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+			continue;
+		}
+		
+		//let blow up conditions
+		//let enemy blow up at least one to extend play time
+		//or if want to go into overtime after extended game
+		if(shouldLet)
+		{
+			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dem_spawn_defender_start" );
+			
+			if(!spawnPoints.size)
+				continue;
+			
+			spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random( spawnPoints );
+			
+			if(DistanceSquared(spawnpoint.origin, self.origin) <= 1024*1024)
+				continue;
+			
+			self.bot_lock_goal = true;
+			self SetScriptGoal( spawnpoint.origin, 512 );
+			
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+			
+			self.bot_lock_goal = false;
+			continue;
+		}
+		
+		//defend conditions
+		//if no bombs planted with little time left
+		if(!bombs.size && timeleft < 60 && randomInt(100) < 95 && sites.size)
+		{
+			site = self bot_array_nearest_curorigin(sites);
+			origin = ( site.curorigin[0]+50, site.curorigin[1]+50, site.curorigin[2]+5 );
+			
+			if(site IsInUse())//somebody is planting
+			{
+				self.bot_lock_goal = true;
+				self SetScriptGoal( origin, 64 );
+				
+				self thread bot_defend_site(site);
+					
+				if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+					self ClearScriptGoal();
+				
+				self.bot_lock_goal = false;
+				continue;
+			}
+			
+			//else hang around the site
+			
+			if(DistanceSquared(origin, self.origin) <= 1024*1024)
+				continue;
+			
+			self.bot_lock_goal = true;
+			self SetScriptGoal( origin, 256 );
+
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+			
+			self.bot_lock_goal = false;
+			continue;
+		}
+		
+		//else go defuse
+		
+		if(!bombs.size)
+			continue;
+		
+		defuse = self bot_array_nearest_curorigin(bombs);
+		
+		if(!isDefined(defuse))
+			continue;
+		
+		if(!isDefined(defuse.bots))
+			defuse.bots = 0;
+		
+		origin = ( defuse.curorigin[0]+50, defuse.curorigin[1]+50, defuse.curorigin[2]+5 );
+		
+		//hang around the site if not in danger of losing
+		if(defuse.bots > 1 && bombed + bombs.size != 2)
+		{
+			if(self HasScriptGoal())
+				continue;
+			
+			if(DistanceSquared(origin, self.origin) <= 1024*1024)
+				continue;
+			
+			self SetScriptGoal( origin, 256 );
+			
+			self thread bot_dem_go_defuse(defuse);
+				
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+			continue;
+		}
+		
+		self.bot_lock_goal = true;
+
+		self SetScriptGoal( origin, 1 );
+		self thread bot_inc_bots(defuse);
+		self thread bot_dem_go_defuse(defuse);
+
+		event = self waittill_any_return( "goal", "bad_path", "new_goal" );
+		
+		if(event != "goal" || (defuse.label == "_b" && !level.bombBPlanted) || (defuse.label == "_a" && !level.bombAPlanted) || defuse IsInUse() || !self isTouching(defuse.trigger) || self InLastStand() || self HasThreat())
+		{
+			self.bot_lock_goal = false;
+			continue;
+		}
+		
+		self SetScriptGoal( self.origin, 64 );
+		
+		self bot_use_bomb_thread(defuse);
+		wait 1;
+		
+		self ClearScriptGoal();
+		
+		self.bot_lock_goal = false;
+	}
+}
+
+/*
+	Bots go defuse
+*/
+bot_dem_go_defuse(defuse)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+
+	for (;;)
+	{
+		wait 0.5;
+
+		if (self isTouching(defuse.trigger))
+			break;
+
+		if ((defuse.label == "_b" && !level.bombBPlanted) || (defuse.label == "_a" && !level.bombAPlanted))
+			break;
+	}
+	
+	if((defuse.label == "_b" && !level.bombBPlanted) || (defuse.label == "_a" && !level.bombAPlanted))
+		self notify("bad_path");
+	else
+		self notify("goal");
+}
+
+/*
+	Bots go spawn kill
+*/
+bot_dem_defend_spawnkill()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+
+	for (;;)
+	{
+		wait 0.5;
+
+		if (level.bombBPlanted || level.bombAPlanted)
+			break;
+	}
+	
+	self notify("bad_path");
 }
