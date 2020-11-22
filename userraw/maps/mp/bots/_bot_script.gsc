@@ -3649,6 +3649,7 @@ bot_killstreak_think()
 				self notify("place_sentry");
 				wait 0.05;
 				self notify("cancel_sentry");
+				wait 0.5;
 
 				self thread changeToWeapon(curWeap);
 
