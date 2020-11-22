@@ -4928,6 +4928,8 @@ bot_sd_attackers()
 	
 	if(myTeam != game["attackers"])
 		return;
+
+	rand = self BotGetRandom();
 	
 	first = true;
 
@@ -5017,7 +5019,7 @@ bot_sd_attackers()
 			if(!isDefined(bomb.bots))
 				bomb.bots = 0;
 			
-			origin = ( bomb.curorigin[0], bomb.curorigin[1], bomb.curorigin[2]+32 );
+			origin = ( bomb.curorigin[0], bomb.curorigin[1], bomb.curorigin[2]+5 );
 			
 			//hang around the bomb if other is going to go get it
 			if(bomb.bots > 1)
@@ -5028,45 +5030,29 @@ bot_sd_attackers()
 				if(DistanceSquared(origin, self.origin) <= 1024*1024)
 					continue;
 				
-				self.did = "bot_sd_attackers(bomb_hang)";
 				self SetScriptGoal( origin, 256 );
 				
-				if(DistanceSquared(origin, self.origin) > 256*256)
-				{
-					self thread bot_get_obj(bomb);
-
-					self waittill_any( "goal", "bad_path" );
-				}
+				self thread bot_get_obj(bomb);
 				
-				self ClearScriptGoal();
+				if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+					self ClearScriptGoal();
 				continue;
 			}
-			
+
+			// go get the bomb
 			self.bot_lock_goal = true;
-		
-			self notify("bot_check_unreachable");
-			self notify("bad_path");
-			
-			self thread bot_inc_bots(bomb);
-			
-			wait 0.05;
-			self.did = "bot_sd_attackers(bomb_get)";
 			self SetScriptGoal( origin, 64 );
-			
-			if(!self isTouching(bomb.trigger))
-			{
-				self thread bot_get_obj(bomb);
-			
-				self waittill_any( "goal", "bad_path" );
-			}
-			
-			self notify("bot_inc_bots");
-			self ClearScriptGoal();
-			
+			self thread bot_inc_bots(bomb);
+			self thread bot_get_obj(bomb);
+
+			if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
+				self ClearScriptGoal();
+
 			self.bot_lock_goal = false;
 			continue;
 		}
 		
+		// check if to plant
 		if(timepassed < 120 && timeleft >= 90 && randomInt(100) < 98)
 			continue;
 		
@@ -5082,7 +5068,7 @@ bot_sd_attackers()
 		if(!sites.size)
 			continue;
 		
-		if(randomint(2))
+		if(rand > 50)
 			plant = self bot_array_nearest_curorigin(sites);
 		else
 			plant = random(sites);
@@ -5090,46 +5076,29 @@ bot_sd_attackers()
 		if(!isDefined(plant))
 			continue;
 		
-		origin = ( plant.curorigin[0]+50, plant.curorigin[1]+50, plant.curorigin[2]+32 );
+		origin = ( plant.curorigin[0]+50, plant.curorigin[1]+50, plant.curorigin[2]+5 );
 		
 		self.bot_lock_goal = true;
-		
-		self notify("bot_check_unreachable");
-		self notify("bad_path");
-		
-		wait 0.05;
-		if(!self isTouching(plant.trigger))
-		{
-			self.did = "bot_sd_attackers";
-			self SetScriptGoal( origin, 64 );
-			
-			self thread bot_go_plant(plant);
-		
-			event = self waittill_any_return( "goal", "bad_path" );
+		self SetScriptGoal( origin, 1 );
+		self thread bot_go_plant(plant);
 
+		event = self waittill_any_return( "goal", "bad_path", "new_goal" );
+
+		if (event != "new_goal")
 			self ClearScriptGoal();
-			
-			if (event == "bad_path")
-			{
-				self.bot_lock_goal = false;
-				continue;
-			}
-		}
 		
-		if(level.bombPlanted || plant.visibleTeam == "none" || !self isTouching(plant.trigger) || (isDefined(self.laststand) && self.laststand) || isDefined(self getThreat()))
+		if(event != "goal" || level.bombPlanted || plant.visibleTeam == "none" || !self isTouching(plant.trigger) || self InLastStand() || self HasThreat() || plant IsInUse())
 		{
 			self.bot_lock_goal = false;
 			continue;
 		}
 		
-		self.did = "bot_sd_attackers(2)";
 		self SetScriptGoal( self.origin, 64 );
 		
 		self bot_use_bomb_thread(plant);
 		wait 1;
 		
 		self ClearScriptGoal();
-		
 		self.bot_lock_goal = false;
 	}
 }
