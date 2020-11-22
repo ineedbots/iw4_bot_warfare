@@ -4153,7 +4153,7 @@ bot_hq()
 			if (event != "new_goal")
 				self ClearScriptGoal();
 				
-			if (event == "bad_path")
+			if (event != "goal")
 			{
 				self.bot_lock_goal = false;
 				continue;
@@ -4538,7 +4538,7 @@ bot_sab()
 				continue;
 		
 			self.bot_lock_goal = true;
-			self SetScriptGoal( origin, 64 );
+			self SetScriptGoal( origin, 1 );
 
 			self thread bot_go_plant(site);
 			event = self waittill_any_return( "goal", "bad_path", "new_goal" );
@@ -4546,7 +4546,7 @@ bot_sab()
 			if (event != "new_goal")
 				self ClearScriptGoal();
 
-			if(event == "bad_path" || level.bombPlanted || !self isTouching(site.trigger) || site IsInUse() || self inLastStand() || self HasThreat())
+			if(event != "goal" || level.bombPlanted || !self isTouching(site.trigger) || site IsInUse() || self inLastStand() || self HasThreat())
 			{
 				self.bot_lock_goal = false;
 				continue;
@@ -4648,13 +4648,14 @@ bot_sab()
 			// lets go defuse
 			self.bot_lock_goal = true;
 			self thread bot_inc_bots(site);
+			self SetScriptGoal( origin, 1 );
 
 			event = self waittill_any_return( "goal", "bad_path", "new_goal" );
 
 			if (event != "new_goal")
 				self ClearScriptGoal();
 
-			if(event == "bad_path" || !level.bombPlanted || site IsInUse() || !self isTouching(site.trigger) || self InLastStand() || self HasThreat())
+			if(event != "goal" || !level.bombPlanted || site IsInUse() || !self isTouching(site.trigger) || self InLastStand() || self HasThreat())
 			{
 				self.bot_lock_goal = false;
 				continue;
