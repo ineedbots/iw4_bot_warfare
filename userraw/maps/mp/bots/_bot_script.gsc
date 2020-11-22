@@ -1512,6 +1512,35 @@ bot_go_plant(plant)
 }
 
 /*
+	Bots will go defuse the bomb
+*/
+bot_go_defuse(plant)
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+	self endon( "goal" );
+	self endon( "bad_path" );
+	self endon( "new_goal" );
+
+	for (;;)
+	{
+		wait 1;
+
+		if (!level.bombPlanted)
+			break;
+
+		if (self isTouching(plant.trigger))
+			break;
+	}
+
+	if(!level.bombPlanted)
+		self notify("bad_path");
+	else
+		self notify("goal");
+}
+
+/*
 	Creates a bomb use thread and waits for an output
 */
 bot_use_bomb_thread(bomb)
@@ -4479,7 +4508,7 @@ bot_sab()
 		if(bombteam == myTeam)
 		{
 			site = level.bombZones[otherTeam];
-			origin = ( site.curorigin[0]+50, site.curorigin[1]+50, site.curorigin[2]+32 );
+			origin = ( site.curorigin[0]+50, site.curorigin[1]+50, site.curorigin[2]+5 );
 			
 			// protect our planted bomb
 			if(level.bombPlanted)
@@ -4590,7 +4619,7 @@ bot_sab()
 				}
 				
 				//protect bomb site
-				origin = ( site.curorigin[0]+50, site.curorigin[1]+50, site.curorigin[2]+32 );
+				origin = ( site.curorigin[0]+50, site.curorigin[1]+50, site.curorigin[2]+5 );
 				
 				self thread bot_inc_bots(site);
 			
@@ -4627,7 +4656,7 @@ bot_sab()
 			}
 			
 			// bomb is planted we need to defuse
-			origin = ( site.curorigin[0]+50, site.curorigin[1]+50, site.curorigin[2]+32 );
+			origin = ( site.curorigin[0]+50, site.curorigin[1]+50, site.curorigin[2]+5 );
 			
 			// someone else is defusing, lets just hang around
 			if(site.bots > 1)
@@ -4648,7 +4677,10 @@ bot_sab()
 			// lets go defuse
 			self.bot_lock_goal = true;
 			self thread bot_inc_bots(site);
+
 			self SetScriptGoal( origin, 1 );
+
+			self thread bot_go_defuse(site);
 
 			event = self waittill_any_return( "goal", "bad_path", "new_goal" );
 

@@ -1806,7 +1806,7 @@ AStarSearch(start, goal, team, greedy_path)
 
 			// have certain types of nodes more expensive
 			if (childtype == "climb" || childtype == "prone")
-				penalty++;
+				penalty += 4;
 			
 			//calc the total path we have took
 			newg = bestNode.g + DistanceSquared(nodeorg, childorg)*penalty;//bots on same team's path are more expensive
