@@ -1,5 +1,4 @@
 _script:
-bomb gamemodes,
 unreleased gamemodes
 
 _other:

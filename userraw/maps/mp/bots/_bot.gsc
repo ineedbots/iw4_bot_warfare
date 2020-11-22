@@ -206,7 +206,38 @@ fixGamemodes()
 			
 			break;
 		}
+
+		if (isDefined(level.bombZones) && level.gametype == "dd")
+		{
+			level thread fixDem();
+
+			break;
+		}
 		
+		wait 0.05;
+	}
+}
+
+/*
+	Converts t5 dd to iw4
+*/
+fixDem()
+{
+	for (;;)
+	{
+		level.bombAPlanted = level.aPlanted;
+		level.bombBPlanted = level.bPlanted;
+
+		for (i = 0; i < level.bombZones.size; i++)
+		{
+			bombzone = level.bombZones[i];
+
+			if (isDefined(bombzone.trigger.trigger_off))
+				bombzone.bombExploded = true;
+			else
+				bombzone.bombExploded = undefined;
+		}
+
 		wait 0.05;
 	}
 }
