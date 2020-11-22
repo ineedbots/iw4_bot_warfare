@@ -1278,6 +1278,7 @@ onSpawned()
 		self.help_time = undefined;
 		self.bot_was_follow_script_update = undefined;
 		self.bot_perf_switch_weapon = undefined;
+		self.bot_stuck_on_carepackage = undefined;
 
 		self thread bot_dom_cap_think();
 	}
@@ -1689,6 +1690,7 @@ start_bot_threads()
 	self thread bot_equipment_kill_think();
 	self thread bot_turret_think();
 
+	self thread bot_watch_stuck_on_crate();
 	self thread bot_crate_think();
 	self thread bot_revenge_think();
 
@@ -3129,6 +3131,52 @@ bot_turret_think()
 }
 
 /*
+	Checks if the bot is stuck on a carepackage
+*/
+bot_watch_stuck_on_crate()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+
+	for (;;)
+	{
+		wait 3;
+
+		if (self HasThreat())
+			continue;
+
+		crates = getEntArray( "care_package", "targetname" );
+		if ( crates.size == 0 )
+			continue;
+
+		crate = undefined;
+		for (i = crates.size - 1; i >= 0; i--)
+		{
+			tempCrate = crates[i];
+
+			if (!isDefined(tempCrate.doingPhysics) || tempCrate.doingPhysics)
+				continue;
+
+			if (isDefined(crate) && DistanceSquared(crate.origin, self.origin) < DistanceSquared(tempCrate.origin, self.origin))
+				continue;
+
+			crate = tempCrate;
+		}
+
+		if (!isDefined(crate))
+			continue;
+
+		radius = GetDvarFloat( "player_useRadius" );
+		if (DistanceSquared(crate.origin, self.origin) > radius * radius)
+			continue;
+
+		self.bot_stuck_on_carepackage = crate;
+		self notify("crate_physics_done");
+	}
+}
+
+/*
 	Bots will capture carepackages
 */
 bot_crate_think()
@@ -3148,85 +3196,92 @@ bot_crate_think()
 			first = false;
 		else
 			ret = self waittill_any_timeout( randomintrange( 3, 5 ), "crate_physics_done" );
-		
-		if ( RandomInt( 100 ) < 20 && ret != "crate_physics_done" )
-			continue;
-		
-		if ( self HasScriptGoal() || self.bot_lock_goal )
+
+		crate = self.bot_stuck_on_carepackage;
+		self.bot_stuck_on_carepackage = undefined;
+		if (!isDefined(crate))
 		{
-			wait 0.1;//because bot_crate_landed notify causes a same frame ClearScriptGoal
+			if ( RandomInt( 100 ) < 20 && ret != "crate_physics_done" )
+				continue;
 			
-			if( self HasScriptGoal() || self.bot_lock_goal )
-				continue;
-		}
-
-		if(self isDefusing() || self isPlanting())
-			continue;
-
-		if(self IsUsingRemote() || self BotIsFrozen())
-			continue;
-		
-		crates = getEntArray( "care_package", "targetname" );
-		if ( crates.size == 0 )
-			continue;
-
-		wantsClosest = randomint(2);
-
-		crate = undefined;
-		for (i = crates.size - 1; i >= 0; i--)
-		{
-			tempCrate = crates[i];
-
-			if (!isDefined(tempCrate.doingPhysics) || tempCrate.doingPhysics)
-				continue;
-
-			if ( !IsDefined( tempCrate.bots ) )
-				tempCrate.bots = 0;
-			
-			if ( tempCrate.bots >= 3 )
-				continue;
-
-			if (isDefined(crate))
+			if ( self HasScriptGoal() || self.bot_lock_goal )
 			{
-				if (wantsClosest)
-				{
-					if (DistanceSquared(crate.origin, self.origin) < DistanceSquared(tempCrate.origin, self.origin))
-						continue;
-				}
-				else
-				{
-					if (maps\mp\killstreaks\_killstreaks::getStreakCost(crate.crateType) > maps\mp\killstreaks\_killstreaks::getStreakCost(tempCrate.crateType))
-						continue;
-				}
+				wait 0.1;//because bot_crate_landed notify causes a same frame ClearScriptGoal
+				
+				if( self HasScriptGoal() || self.bot_lock_goal )
+					continue;
 			}
 
-			crate = tempCrate;
+			if(self isDefusing() || self isPlanting())
+				continue;
+
+			if(self IsUsingRemote() || self BotIsFrozen())
+				continue;
+			
+			crates = getEntArray( "care_package", "targetname" );
+			if ( crates.size == 0 )
+				continue;
+
+			wantsClosest = randomint(2);
+
+			crate = undefined;
+			for (i = crates.size - 1; i >= 0; i--)
+			{
+				tempCrate = crates[i];
+
+				if (!isDefined(tempCrate.doingPhysics) || tempCrate.doingPhysics)
+					continue;
+
+				if ( !IsDefined( tempCrate.bots ) )
+					tempCrate.bots = 0;
+				
+				if ( tempCrate.bots >= 3 )
+					continue;
+
+				if (isDefined(crate))
+				{
+					if (wantsClosest)
+					{
+						if (DistanceSquared(crate.origin, self.origin) < DistanceSquared(tempCrate.origin, self.origin))
+							continue;
+					}
+					else
+					{
+						if (maps\mp\killstreaks\_killstreaks::getStreakCost(crate.crateType) > maps\mp\killstreaks\_killstreaks::getStreakCost(tempCrate.crateType))
+							continue;
+					}
+				}
+
+				crate = tempCrate;
+			}
+
+			if (!isDefined(crate))
+				continue;
+
+			self.bot_lock_goal = true;
+
+			radius = GetDvarFloat( "player_useRadius" );
+			self SetScriptGoal(crate.origin, radius);
+			self thread bot_inc_bots(crate, true);
+			self thread bots_watch_touch_obj(crate);
+
+			path = self waittill_any_return("bad_path", "goal", "new_goal");
+
+			self.bot_lock_goal = false;
+
+			if (path != "new_goal")
+				self ClearScriptGoal();
+
+			if (path != "goal" || DistanceSquared(self.origin, crate.origin) > radius*radius)
+				continue;
 		}
-
-		if (!isDefined(crate))
-			continue;
-
-		self.bot_lock_goal = true;
-		self SetScriptGoal(crate.origin, 64);
-		self thread bot_inc_bots(crate, true);
-		self thread bots_watch_touch_obj(crate);
-
-		path = self waittill_any_return("bad_path", "goal", "new_goal");
-
-		self.bot_lock_goal = false;
-
-		if (path != "new_goal")
-			self ClearScriptGoal();
-
-		if (path != "goal" || DistanceSquared(self.origin, crate.origin) > 64*64)
-			continue;
 
 		self _DisableWeapon();
 		self BotFreezeControls(true);
 
-		waitTime = 5;
+		waitTime = 3;
 		if (crate.owner == self)
-			waitTime = 1.5;
+			waitTime = 0.5;
 		
 		crate waittill_notify_or_timeout("captured", waitTime);
 
