@@ -1598,7 +1598,7 @@ bot_use_bomb(bomb)
 	
 	myteam = self.team;
 	
-	self BotStopMoving(true):
+	self BotStopMoving(true);
 	
 	bomb [[bomb.onBeginUse]](self);
 	
