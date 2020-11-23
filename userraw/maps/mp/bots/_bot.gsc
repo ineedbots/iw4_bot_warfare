@@ -117,6 +117,7 @@ init()
 
 	level.bots_fullautoguns["ak47classic"] = true;
 	level.bots_fullautoguns["ak74u"] = true;
+	level.bots_fullautoguns["peacekeeper"] = true;
 	
 	level thread fixGamemodes();
 	
