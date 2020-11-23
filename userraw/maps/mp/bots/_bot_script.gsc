@@ -1626,6 +1626,7 @@ bot_use_bomb(bomb)
 	myteam = self.team;
 	
 	self BotStopMoving(true);
+	self _disableOffhandWeapons();
 	
 	bomb [[bomb.onBeginUse]](self);
 	
@@ -1641,6 +1642,7 @@ bot_use_bomb(bomb)
 	{
 		self.claimTrigger = undefined;
 		self BotStopMoving(false);
+		self _enableOffhandWeapons();
 	}
 
 	bomb [[bomb.onEndUse]](myteam, self, (result == "bot_try_use_success"));
@@ -2127,9 +2129,6 @@ bot_use_tube_think()
 			continue;
 			
 		if(self isDefusing() || self isPlanting())
-			continue;
-
-		if (self.disabledWeapon)
 			continue;
 
 		if (self IsUsingRemote())
