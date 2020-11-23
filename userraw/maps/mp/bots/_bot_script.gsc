@@ -1704,6 +1704,8 @@ start_bot_threads()
 	self thread bot_use_tube_think();
 	self thread bot_use_equipment_think();
 
+	self thread bot_watch_riot_weapons();
+
 	self thread bot_dom_def_think();
 	self thread bot_dom_spawn_kill_think();
 
@@ -2482,6 +2484,78 @@ changeToWeapon(weap)
 	self waittill_any_timeout(5, "weapon_change");
 
 	return (self GetCurrentWeapon() == weap);
+}
+
+/*
+	Bots will use gremades/wweapons while having a target while using a shield
+*/
+bot_watch_riot_weapons()
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon("game_ended");
+
+	for (;;)
+	{
+		wait randomIntRange(2, 4);
+
+		if (!self HasThreat())
+			continue;
+
+		if (!self.hasRiotShieldEquipped)
+			continue;
+
+		threat = self GetThreat();
+		dist = DistanceSquared(threat.origin, self.origin);
+		rand = randomInt(100);
+		curWeap = self GetCurrentWeapon();
+
+		if (randomInt(2))
+		{
+			nade = self getValidGrenade();
+
+			if (!isDefined(nade))
+				continue;
+
+			if (dist <= level.bots_minGrenadeDistance || dist >= level.bots_maxGrenadeDistance)
+				continue;
+
+			if (rand > self.pers["bots"]["behavior"]["nade"])
+				continue;
+
+			self botThrowGrenade(nade);
+		}
+		else
+		{
+			if (rand > self.pers["bots"]["behavior"]["switch"])
+				continue;
+
+			weaponslist = self getweaponslistall();
+			weap = "";
+			while(weaponslist.size)
+			{
+				weapon = weaponslist[randomInt(weaponslist.size)];
+				weaponslist = array_remove(weaponslist, weapon);
+				
+				if(!self getAmmoCount(weapon))
+					continue;
+						
+				if (!isWeaponPrimary(weapon))
+					continue;
+					
+				if(curWeap == weapon || weapon == "none" || weapon == "" || weapon == "javelin_mp" || weapon == "stinger_mp" || weapon == "onemanarmy_mp")
+					continue;
+					
+				weap = weapon;
+				break;
+			}
+			
+			if(weap == "")
+				continue;
+			
+			self ChangeToWeapon(weap);
+		}
+	}
 }
 
 /*
