@@ -65,6 +65,25 @@ init()
 	if(getDvar("bots_loadout_allow_op") == "")//allows jug, marty and laststand
 		setDvar("bots_loadout_allow_op", true);
 
+	if(getDvar("bots_play_move") == "")//bots move
+		setDvar("bots_play_move", true);
+	if(getDvar("bots_play_knife") == "")//bots knife
+		setDvar("bots_play_knife", true);
+	if(getDvar("bots_play_fire") == "")//bots fire
+		setDvar("bots_play_fire", true);
+	if(getDvar("bots_play_nade") == "")//bots grenade
+		setDvar("bots_play_nade", true);
+	if(getDvar("bots_play_take_carepackages") == "")//bots take carepackages
+		setDvar("bots_play_take_carepackages", true);
+	if(getDvar("bots_play_obj") == "")//bots play the obj
+		setDvar("bots_play_obj", true);
+	if(getDvar("bots_play_camp") == "")//bots camp and follow
+		setDvar("bots_play_camp", true);
+	if(getDvar("bots_play_jumpdrop") == "")//bots jump and dropshot
+		setDvar("bots_play_jumpdrop", true);
+	if(getDvar("bots_play_target_other") == "")//bot target non play ents (vehicles)
+		setDvar("bots_play_target_other", true);
+
 	level.defuseObject = undefined;
 	level.bots_smokeList = List();
 	level.bots_fragList = List();

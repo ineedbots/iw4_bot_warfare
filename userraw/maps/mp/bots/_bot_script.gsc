@@ -688,6 +688,7 @@ setKillstreaks()
 		chooseableStreaks++;
 
 	reasonable = getDvarInt("bots_loadout_reasonable");
+	op = getDvarInt("bots_loadout_allow_op");
 
 	i = 0;
 	while (i < chooseableStreaks)
@@ -717,6 +718,12 @@ setKillstreaks()
 			if (streak == "precision_airstrike")
 				continue;
 			if (streak == "helicopter")
+				continue;
+		}
+
+		if (op)
+		{
+			if (streak == "nuke")
 				continue;
 		}
 
