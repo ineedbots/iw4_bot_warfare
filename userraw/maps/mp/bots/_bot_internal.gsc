@@ -468,9 +468,6 @@ grenade_danager()
 		{
 			frag = level.bots_fragList.data[i];
 
-			if (isDefined(frag.throwback))
-				continue;
-
 			if (level.teamBased && frag.team == self.team)
 				continue;
 
