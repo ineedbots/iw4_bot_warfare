@@ -1286,7 +1286,8 @@ onSpawned()
 		self.bot_was_follow_script_update = undefined;
 		self.bot_stuck_on_carepackage = undefined;
 
-		self thread bot_dom_cap_think();
+		if (getDvarInt("bots_play_obj"))
+			self thread bot_dom_cap_think();
 	}
 }
 
@@ -1688,45 +1689,69 @@ start_bot_threads()
 	
 	gameFlagWait("prematch_done");
 
-	self thread bot_killstreak_think();
+	// inventory usage
+	if (getDvarInt("bots_play_killstreak"))
+		self thread bot_killstreak_think();
+
 	self thread bot_weapon_think();
 	self thread bot_perk_think();
 
-	self thread bot_target_vehicle();
-	self thread bot_equipment_kill_think();
-	self thread bot_turret_think();
+	// script targeting
+	if (getDvarInt("bots_play_target_other"))
+	{
+		self thread bot_target_vehicle();
+		self thread bot_equipment_kill_think();
+		self thread bot_turret_think();
+	}
 
-	self thread bot_watch_stuck_on_crate();
-	self thread bot_crate_think();
+	// airdrop
+	if (getDvarInt("bots_play_take_carepackages"))
+	{
+		self thread bot_watch_stuck_on_crate();
+		self thread bot_crate_think();
+	}
+
+	// awareness
 	self thread bot_revenge_think();
-
 	self thread bot_uav_think();
 	self thread bot_listen_to_steps();
 	self thread follow_target();
 
-	self thread bot_think_follow();
-	self thread bot_think_camp();
-	self thread bot_jav_loc_think();
-	self thread bot_use_grenade_think();
-	self thread bot_use_tube_think();
-	self thread bot_use_equipment_think();
+	// camp and follow
+	if (getDvarInt("bots_play_camp"))
+	{
+		self thread bot_think_follow();
+		self thread bot_think_camp();
+	}
 
-	self thread bot_watch_riot_weapons();
+	// nades
+	if (getDvarInt("bots_play_nade"))
+	{
+		self thread bot_jav_loc_think();
+		self thread bot_use_tube_think();
+		self thread bot_use_grenade_think();
+		self thread bot_use_equipment_think();
+		self thread bot_watch_riot_weapons();
+	}
 
-	self thread bot_dom_def_think();
-	self thread bot_dom_spawn_kill_think();
+	// obj
+	if (getDvarInt("bots_play_obj"))
+	{
+		self thread bot_dom_def_think();
+		self thread bot_dom_spawn_kill_think();
 
-	self thread bot_hq();
+		self thread bot_hq();
 
-	self thread bot_cap();
+		self thread bot_cap();
 
-	self thread bot_sab();
+		self thread bot_sab();
 
-	self thread bot_sd_defenders();
-	self thread bot_sd_attackers();
+		self thread bot_sd_defenders();
+		self thread bot_sd_attackers();
 
-	self thread bot_dem_attackers();
-	self thread bot_dem_defenders();
+		self thread bot_dem_attackers();
+		self thread bot_dem_defenders();
+	}
 }
 
 /*

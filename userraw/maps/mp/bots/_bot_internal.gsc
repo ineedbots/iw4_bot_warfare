@@ -463,6 +463,9 @@ grenade_danager()
 		if(self isDefusing() || self isPlanting())
 			continue;
 
+		if (!getDvarInt("bots_play_nade"))
+			continue;
+
 		myEye = self getEye();
 		for (i = level.bots_fragList.count-1; i >= 0; i--)
 		{
@@ -971,6 +974,9 @@ watchToLook()
 			
 		if(randomInt(100) > self.pers["bots"]["behavior"]["jump"])
 			continue;
+
+		if (!getDvarInt("bots_play_jumpdrop"))
+			continue;
 		
 		thetime = getTime();
 		if(isDefined(self.bot.jump_time) && thetime - self.bot.jump_time <= 5000)
@@ -1060,7 +1066,7 @@ aim()
 			self thread bot_lookat(aimpos, aimspeed);
 			self thread pressAds();
 			
-			if (curweap == "javelin_mp")
+			if (curweap == "javelin_mp" && getDvarInt("bots_play_fire"))
 				self botFire(curweap);
 			continue;
 		}
@@ -1108,7 +1114,7 @@ aim()
 						if(isplay)
 						{
 							//better room to nade? cook time function with dist?
-							if(!self.bot.isfraggingafter && !self.bot.issmokingafter)
+							if(!self.bot.isfraggingafter && !self.bot.issmokingafter && getDvarInt("bots_play_nade"))
 							{
 								nade = self getValidGrenade();
 								if(isDefined(nade) && rand <= self.pers["bots"]["behavior"]["nade"] && bulletTracePassed(eyePos, eyePos + (0, 0, 75), false, self) && bulletTracePassed(last_pos, last_pos + (0, 0, 100), false, target) && dist > level.bots_minGrenadeDistance && dist < level.bots_maxGrenadeDistance)
@@ -1174,7 +1180,7 @@ aim()
 					knifeDist = level.bots_maxKnifeDistance;
 					if (self _hasPerk("specialty_extendedmelee"))
 						knifeDist *= 1.4;
-					if((isplay || target.classname == "misc_turret") && !self.bot.isknifingafter && conedot > 0.9 && dist < knifeDist && trace_time > reaction_time && !usingRemote)
+					if((isplay || target.classname == "misc_turret") && !self.bot.isknifingafter && conedot > 0.9 && dist < knifeDist && trace_time > reaction_time && !usingRemote && getDvarInt("bots_play_knife"))
 					{
 						self clear_bot_after_target();
 						self thread knife();
@@ -1193,7 +1199,7 @@ aim()
 
 					if (trace_time > reaction_time)
 					{
-						if((!canADS || self playerads() == 1.0 || self InLastStand() || self GetStance() == "prone") && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
+						if((!canADS || self playerads() == 1.0 || self InLastStand() || self GetStance() == "prone") && (conedot > 0.95 || dist < level.bots_maxKnifeDistance) && getDvarInt("bots_play_fire"))
 							self botFire(curweap);
 
 						if (isplay)
@@ -1230,7 +1236,7 @@ aim()
 			if (canADS)
 				self thread pressAds();
 
-			if((!canADS || self playerads() == 1.0 || self InLastStand() || self GetStance() == "prone") && (conedot > 0.95 || dist < level.bots_maxKnifeDistance))
+			if((!canADS || self playerads() == 1.0 || self InLastStand() || self GetStance() == "prone") && (conedot > 0.95 || dist < level.bots_maxKnifeDistance) && getDvarInt("bots_play_fire"))
 				self botFire(curweap);
 			
 			continue;
@@ -1388,6 +1394,9 @@ walk()
 		wait 0.05;
 		
 		self botMoveTo(self.origin);
+
+		if (!getDVarINt("bots_play_move"))
+			continue;
 		
 		if(level.gameEnded || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self.bot.stop_move)
 			continue;

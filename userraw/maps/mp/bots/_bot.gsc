@@ -83,6 +83,8 @@ init()
 		setDvar("bots_play_jumpdrop", true);
 	if(getDvar("bots_play_target_other") == "")//bot target non play ents (vehicles)
 		setDvar("bots_play_target_other", true);
+	if(getDvar("bots_play_killstreak") == "")//bot use killstreaks
+		setDvar("bots_play_killstreak", true);
 
 	level.defuseObject = undefined;
 	level.bots_smokeList = List();
