@@ -1,7 +1,9 @@
 _script:
 unreleased gamemodes
 
+_menu:
+play dvars
+
 _other:
-dvars, loadout, behaviour, menu
 documentation and tutorials and release
 modules (iw4x (http))
