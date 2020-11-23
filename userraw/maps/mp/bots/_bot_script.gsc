@@ -1277,7 +1277,6 @@ onSpawned()
 		self.bot_oma_class = undefined;
 		self.help_time = undefined;
 		self.bot_was_follow_script_update = undefined;
-		self.bot_perf_switch_weapon = undefined;
 		self.bot_stuck_on_carepackage = undefined;
 
 		self thread bot_dom_cap_think();
@@ -1594,10 +1593,8 @@ bot_use_bomb_weapon(weap)
 	if(self getCurrentWeapon() != weap)
 	{
 		self GiveWeapon( weap );
-		self BotChangeToWeapon(weap);
 
-		self waittill_any_timeout(10, "weapon_change");
-		if(self getCurrentWeapon() != weap)
+		if (!self ChangeToWeapon(weap))
 		{
 			self notify("bot_try_use_fail");
 			return;
@@ -1612,7 +1609,7 @@ bot_use_bomb_weapon(weap)
 	ret = self waittill_any_return("bot_try_use_fail", "bot_try_use_success");
 	
 	if(lastWeap != "none")
-		self BotChangeToWeapon(lastWeap);
+		self thread ChangeToWeapon(lastWeap);
 	else
 		self takeWeapon(weap);
 }
@@ -2481,12 +2478,9 @@ changeToWeapon(weap)
 	if (self GetCurrentWeapon() == weap)
 		return true;
 
-	self.bot_perf_switch_weapon = weap;
-	self notify("bot_force_check_switch");
+	self BotChangeToWeapon(weap);
 
 	self waittill_any_timeout(5, "weapon_change");
-
-	self.bot_perf_switch_weapon = undefined;
 
 	return (self GetCurrentWeapon() == weap);
 }
@@ -3310,7 +3304,7 @@ bot_weapon_think()
 	{
 		self waittill_any_timeout(randomIntRange(2, 4), "bot_force_check_switch");
 
-		if(self BotIsFrozen() || self.disabledWeapon)
+		if(self BotIsFrozen())
 			continue;
 			
 		if(self isDefusing() || self isPlanting())
@@ -3332,7 +3326,7 @@ bot_weapon_think()
 			if(entIsVehicle(threat) && isDefined(rocketAmmo))
 			{
 				if (curWeap != rocketAmmo)
-					self BotChangeToWeapon(rocketAmmo);
+					self thread ChangeToWeapon(rocketAmmo);
 				continue;
 			}
 		}
@@ -3340,7 +3334,7 @@ bot_weapon_think()
 		if (self HasBotJavelinLocation() && self GetAmmoCount("javelin_mp"))
 		{
 			if (curWeap != "javelin_mp")
-				self BotChangeToWeapon("javelin_mp");
+				self thread ChangeToWeapon("javelin_mp");
 
 			continue;
 		}
@@ -3348,16 +3342,7 @@ bot_weapon_think()
 		if (isDefined(self.bot_oma_class))
 		{
 			if (curWeap != "onemanarmy_mp")
-				self BotChangeToWeapon("onemanarmy_mp");
-			continue;
-		}
-
-		if (isDefined(self.bot_perf_switch_weapon))
-		{
-			if (curWeap != self.bot_perf_switch_weapon)
-				self BotChangeToWeapon(self.bot_perf_switch_weapon);
-
-			self.bot_perf_switch_weapon = undefined;
+				self thread ChangeToWeapon("onemanarmy_mp");
 			continue;
 		}
 		
@@ -3393,7 +3378,7 @@ bot_weapon_think()
 		if(weap == "")
 			continue;
 		
-		self BotChangeToWeapon(weap);
+		self thread ChangeToWeapon(weap);
 	}
 }
 
@@ -3704,7 +3689,6 @@ bot_killstreak_think()
 				self notify("place_sentry");
 				wait 0.05;
 				self notify("cancel_sentry");
-				wait 0.5;
 
 				self thread changeToWeapon(curWeap);
 
@@ -3722,12 +3706,10 @@ bot_killstreak_think()
 				self thread clear_remote_on_death();
 				self BotStopMoving(true);
 
-				self BotChangeToWeapon(ksWeap);
 				if (!self changeToWeapon(ksWeap))
 				{
 					self ClearUsingRemote();
 					self notify("bot_clear_remote_on_death");
-					self thread changeToWeapon(curWeap);
 					self BotStopMoving(false);
 					continue;
 				}
@@ -3768,6 +3750,11 @@ bot_killstreak_think()
 				self BotStopMoving(true);
 				self changeToWeapon(ksWeap);
 				self BotStopMoving(false);
+
+				wait 3;
+
+				if ( !isDefined( level.ac130player ) || level.ac130player != self )
+					self thread changeToWeapon(curWeap);
 			}
 			else if (streakName == "helicopter_minigun")
 			{
@@ -3777,6 +3764,11 @@ bot_killstreak_think()
 				self BotStopMoving(true);
 				self changeToWeapon(ksWeap);
 				self BotStopMoving(false);
+
+				wait 3;
+
+				if ( !isDefined( level.chopper ) || !isDefined( level.chopper.gunner ) || level.chopper.gunner != self )
+					self thread changeToWeapon(curWeap);
 			}
 		}
 		else
