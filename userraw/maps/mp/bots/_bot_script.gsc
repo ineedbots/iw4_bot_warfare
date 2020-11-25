@@ -36,6 +36,8 @@ added()
 connected()
 {
 	self endon("disconnect");
+
+	self.killerLocation = undefined;
 	
 	self thread difficulty();
 	self thread teamWatch();
