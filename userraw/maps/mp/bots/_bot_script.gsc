@@ -1727,8 +1727,7 @@ bot_use_bomb(bomb)
 	
 	myteam = self.team;
 	
-	self BotStopMoving(true);
-	self _disableOffhandWeapons();
+	self BotFreezeControls(true);
 	
 	bomb [[bomb.onBeginUse]](self);
 	
@@ -1743,8 +1742,7 @@ bot_use_bomb(bomb)
 	if (isDefined(self))
 	{
 		self.claimTrigger = undefined;
-		self BotStopMoving(false);
-		self _enableOffhandWeapons();
+		self BotFreezeControls(false);
 	}
 
 	bomb [[bomb.onEndUse]](myteam, self, (result == "bot_try_use_success"));
