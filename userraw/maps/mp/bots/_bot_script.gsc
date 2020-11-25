@@ -1269,31 +1269,6 @@ set_diff()
 }
 
 /*
-	When the bot spawns.
-*/
-onSpawned()
-{
-	self endon("disconnect");
-	
-	for(;;)
-	{
-		self waittill("spawned_player");
-		
-		if(randomInt(100) <= self.pers["bots"]["behavior"]["class"])
-			self.bot_change_class = undefined;
-
-		self.bot_lock_goal = false;
-		self.bot_oma_class = undefined;
-		self.help_time = undefined;
-		self.bot_was_follow_script_update = undefined;
-		self.bot_stuck_on_carepackage = undefined;
-
-		if (getDvarInt("bots_play_obj"))
-			self thread bot_dom_cap_think();
-	}
-}
-
-/*
 	Allows the bot to spawn when force respawn is disabled
 	Watches when the bot dies
 */
@@ -1326,6 +1301,123 @@ onGiveLoadout()
 
 		self botGiveLoadout(self.team, class, !isDefined(self.bot_oma_class));
 		self.bot_oma_class = undefined;
+	}
+}
+
+/*
+	When the bot spawns.
+*/
+onSpawned()
+{
+	self endon("disconnect");
+	
+	for(;;)
+	{
+		self waittill("spawned_player");
+		
+		if(randomInt(100) <= self.pers["bots"]["behavior"]["class"])
+			self.bot_change_class = undefined;
+
+		self.bot_lock_goal = false;
+		self.bot_oma_class = undefined;
+		self.help_time = undefined;
+		self.bot_was_follow_script_update = undefined;
+		self.bot_stuck_on_carepackage = undefined;
+
+		if (getDvarInt("bots_play_obj"))
+			self thread bot_dom_cap_think();
+	}
+}
+
+/*
+	When the bot spawned, after the difficulty wait. Start the logic for the bot.
+*/
+onBotSpawned()
+{
+	self endon("disconnect");
+	level endon("game_ended");
+	
+	for(;;)
+	{
+		self waittill("bot_spawned");
+		
+		self thread start_bot_threads();
+	}
+}
+
+/*
+	Starts all the bot thinking
+*/
+start_bot_threads()
+{
+	self endon("disconnect");
+	level endon("game_ended");
+	self endon("death");
+	
+	gameFlagWait("prematch_done");
+
+	// inventory usage
+	if (getDvarInt("bots_play_killstreak"))
+		self thread bot_killstreak_think();
+
+	self thread bot_weapon_think();
+	self thread bot_perk_think();
+
+	// script targeting
+	if (getDvarInt("bots_play_target_other"))
+	{
+		self thread bot_target_vehicle();
+		self thread bot_equipment_kill_think();
+		self thread bot_turret_think();
+	}
+
+	// airdrop
+	if (getDvarInt("bots_play_take_carepackages"))
+	{
+		self thread bot_watch_stuck_on_crate();
+		self thread bot_crate_think();
+	}
+
+	// awareness
+	self thread bot_revenge_think();
+	self thread bot_uav_think();
+	self thread bot_listen_to_steps();
+	self thread follow_target();
+
+	// camp and follow
+	if (getDvarInt("bots_play_camp"))
+	{
+		self thread bot_think_follow();
+		self thread bot_think_camp();
+	}
+
+	// nades
+	if (getDvarInt("bots_play_nade"))
+	{
+		self thread bot_jav_loc_think();
+		self thread bot_use_tube_think();
+		self thread bot_use_grenade_think();
+		self thread bot_use_equipment_think();
+		self thread bot_watch_riot_weapons();
+	}
+
+	// obj
+	if (getDvarInt("bots_play_obj"))
+	{
+		self thread bot_dom_def_think();
+		self thread bot_dom_spawn_kill_think();
+
+		self thread bot_hq();
+
+		self thread bot_cap();
+
+		self thread bot_sab();
+
+		self thread bot_sd_defenders();
+		self thread bot_sd_attackers();
+
+		self thread bot_dem_attackers();
+		self thread bot_dem_defenders();
 	}
 }
 
@@ -1665,95 +1757,113 @@ bot_use_bomb(bomb)
 }
 
 /*
-	When the bot spawned, after the difficulty wait. Start the logic for the bot.
+	Fires the bots weapon until told to stop
 */
-onBotSpawned()
+fire_current_weapon()
 {
+	self endon("death");
 	self endon("disconnect");
-	level endon("game_ended");
-	
-	for(;;)
+	self endon("weapon_change");
+	self endon("stop_firing_weapon");
+
+	for (;;)
 	{
-		self waittill("bot_spawned");
-		
-		self thread start_bot_threads();
+		self thread BotPressAttack(0.05);
+		wait 0.1;
 	}
 }
 
 /*
-	Starts all the bot thinking
+	Changes to the weap
 */
-start_bot_threads()
+changeToWeapon(weap)
 {
 	self endon("disconnect");
-	level endon("game_ended");
 	self endon("death");
+	level endon("game_ended");
+
+	if (!self HasWeapon(weap))
+		return false;
+
+	if (self GetCurrentWeapon() == weap)
+		return true;
+
+	self BotChangeToWeapon(weap);
+
+	self waittill_any_timeout(5, "weapon_change");
+
+	return (self GetCurrentWeapon() == weap);
+}
+
+/*
+	Bots throw the grenade
+*/
+botThrowGrenade(nade, time)
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon("game_ended");
+
+	if (!self GetAmmoCount(nade))
+		return false;
+
+	if (isSecondaryGrenade(nade))
+		self thread BotPressSmoke(time);
+	else
+		self thread BotPressFrag(time);
+
+	ret = self waittill_any_timeout(5, "grenade_fire");
+
+	return (ret == "grenade_fire");
+}
+
+/*
+	Gets the object thats the closest in the array
+*/
+bot_array_nearest_curorigin(array)
+{
+	result = undefined;
 	
-	gameFlagWait("prematch_done");
+	for(i = 0; i < array.size; i++)
+		if(!isDefined(result) || DistanceSquared(self.origin,array[i].curorigin) < DistanceSquared(self.origin,result.curorigin))
+			result = array[i];
+		
+	return result;
+}
 
-	// inventory usage
-	if (getDvarInt("bots_play_killstreak"))
-		self thread bot_killstreak_think();
+/*
+	Returns an weapon thats a rocket with ammo
+*/
+getRocketAmmo()
+{
+	answer = self getLockonAmmo();
 
-	self thread bot_weapon_think();
-	self thread bot_perk_think();
+	if (isDefined(answer))
+		return answer;
 
-	// script targeting
-	if (getDvarInt("bots_play_target_other"))
-	{
-		self thread bot_target_vehicle();
-		self thread bot_equipment_kill_think();
-		self thread bot_turret_think();
-	}
+	if(self getAmmoCount("rpg_mp"))
+		answer = "rpg_mp";
 
-	// airdrop
-	if (getDvarInt("bots_play_take_carepackages"))
-	{
-		self thread bot_watch_stuck_on_crate();
-		self thread bot_crate_think();
-	}
+	return answer;
+}
 
-	// awareness
-	self thread bot_revenge_think();
-	self thread bot_uav_think();
-	self thread bot_listen_to_steps();
-	self thread follow_target();
+/*
+	Returns a weapon thats lockon with ammo
+*/
+getLockonAmmo()
+{
+	answer = undefined;
+		
+	if(self getAmmoCount("at4_mp"))
+		answer = "at4_mp"; 
+		
+	if(self getAmmoCount("stinger_mp"))
+		answer = "stinger_mp";
 
-	// camp and follow
-	if (getDvarInt("bots_play_camp"))
-	{
-		self thread bot_think_follow();
-		self thread bot_think_camp();
-	}
+	if(self getAmmoCount("javelin_mp"))
+		answer = "javelin_mp";
 
-	// nades
-	if (getDvarInt("bots_play_nade"))
-	{
-		self thread bot_jav_loc_think();
-		self thread bot_use_tube_think();
-		self thread bot_use_grenade_think();
-		self thread bot_use_equipment_think();
-		self thread bot_watch_riot_weapons();
-	}
-
-	// obj
-	if (getDvarInt("bots_play_obj"))
-	{
-		self thread bot_dom_def_think();
-		self thread bot_dom_spawn_kill_think();
-
-		self thread bot_hq();
-
-		self thread bot_cap();
-
-		self thread bot_sab();
-
-		self thread bot_sd_defenders();
-		self thread bot_sd_attackers();
-
-		self thread bot_dem_attackers();
-		self thread bot_dem_defenders();
-	}
+	return answer;
 }
 
 /*
@@ -2248,23 +2358,6 @@ bot_use_tube_think()
 }
 
 /*
-	Fires the bots weapon until told to stop
-*/
-fire_current_weapon()
-{
-	self endon("death");
-	self endon("disconnect");
-	self endon("weapon_change");
-	self endon("stop_firing_weapon");
-
-	for (;;)
-	{
-		self thread BotPressAttack(0.05);
-		wait 0.1;
-	}
-}
-
-/*
 	Bots thinking of using claymores and TIs
 */
 bot_use_equipment_think()
@@ -2499,28 +2592,6 @@ bot_use_grenade_think()
 }
 
 /*
-	Changes to the weap
-*/
-changeToWeapon(weap)
-{
-	self endon("disconnect");
-	self endon("death");
-	level endon("game_ended");
-
-	if (!self HasWeapon(weap))
-		return false;
-
-	if (self GetCurrentWeapon() == weap)
-		return true;
-
-	self BotChangeToWeapon(weap);
-
-	self waittill_any_timeout(5, "weapon_change");
-
-	return (self GetCurrentWeapon() == weap);
-}
-
-/*
 	Bots will use gremades/wweapons while having a target while using a shield
 */
 bot_watch_riot_weapons()
@@ -2590,28 +2661,6 @@ bot_watch_riot_weapons()
 			self ChangeToWeapon(weap);
 		}
 	}
-}
-
-/*
-	Bots throw the grenade
-*/
-botThrowGrenade(nade, time)
-{
-	self endon("disconnect");
-	self endon("death");
-	level endon("game_ended");
-
-	if (!self GetAmmoCount(nade))
-		return false;
-
-	if (isSecondaryGrenade(nade))
-		self thread BotPressSmoke(time);
-	else
-		self thread BotPressFrag(time);
-
-	ret = self waittill_any_timeout(5, "grenade_fire");
-
-	return (ret == "grenade_fire");
 }
 
 /*
@@ -3487,41 +3536,6 @@ bot_weapon_think()
 		
 		self thread ChangeToWeapon(weap);
 	}
-}
-
-/*
-	Returns an weapon thats a rocket with ammo
-*/
-getRocketAmmo()
-{
-	answer = self getLockonAmmo();
-
-	if (isDefined(answer))
-		return answer;
-
-	if(self getAmmoCount("rpg_mp"))
-		answer = "rpg_mp";
-
-	return answer;
-}
-
-/*
-	Returns a weapon thats lockon with ammo
-*/
-getLockonAmmo()
-{
-	answer = undefined;
-		
-	if(self getAmmoCount("at4_mp"))
-		answer = "at4_mp"; 
-		
-	if(self getAmmoCount("stinger_mp"))
-		answer = "stinger_mp";
-
-	if(self getAmmoCount("javelin_mp"))
-		answer = "javelin_mp";
-
-	return answer;
 }
 
 /*
@@ -4881,20 +4895,6 @@ bot_sab()
 			continue;
 		}
 	}
-}
-
-/*
-	Gets the object thats the closest in the array
-*/
-bot_array_nearest_curorigin(array)
-{
-	result = undefined;
-	
-	for(i = 0; i < array.size; i++)
-		if(!isDefined(result) || DistanceSquared(self.origin,array[i].curorigin) < DistanceSquared(self.origin,result.curorigin))
-			result = array[i];
-		
-	return result;
 }
 
 /*
