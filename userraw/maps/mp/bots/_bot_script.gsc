@@ -1501,7 +1501,7 @@ getNearestWaypointOfWaypoints(waypoints)
 		waypoint = waypoints[i];
 		thisDist = DistanceSquared(self.origin, waypoint.origin);
 
-		if (thisDist > closestDist)
+		if (isDefined(answer) && thisDist > closestDist)
 			continue;
 
 		answer = waypoint;
@@ -2269,9 +2269,6 @@ bot_use_tube_think()
 			continue;
 
 		if (self IsBotFragging() || self IsBotSmoking())
-			continue;
-		
-		if(self IsBotReloading() || self IsBotKnifing())
 			continue;
 			
 		if(self isDefusing() || self isPlanting())
