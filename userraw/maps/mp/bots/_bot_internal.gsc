@@ -382,6 +382,9 @@ spawned()
 	self notify("bot_spawned");
 }
 
+/*
+	Bot moves towards the point
+*/
 doBotMovement()
 {
 	self endon("disconnect");
