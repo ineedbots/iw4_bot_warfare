@@ -740,6 +740,9 @@ target()
 			if ( isDefined(level.chopper) && isDefined(level.chopper.gunner) && level.chopper.gunner == self )
 				vehEnt = level.chopper;
 		}
+
+		// reduce fov if ads'ing
+		myFov *= 1 - 0.5 * self PlayerADS();
 		
 		if(hasTarget && !isDefined(self.bot.target.entity))
 		{
