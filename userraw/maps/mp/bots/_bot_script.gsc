@@ -4563,7 +4563,7 @@ bot_cap()
 					self thread bot_inc_bots(theirzone);
 					self thread bot_escort_obj(myflag, carrier);
 					
-					if(self waittill_any( "goal", "bad_path", "new_goal" ) != "new_goal")
+					if(self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
 						self ClearScriptGoal();
 				}
 			}
