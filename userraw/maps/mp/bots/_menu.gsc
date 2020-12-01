@@ -703,6 +703,76 @@ AddOptions()
 	else
 		_temp = "false";
 	self AddMenu("set1", 1, "Bots can use op and annoying class setups: "+_temp, ::bot_func, "op", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_move");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 2, "Bots can move: "+_temp, ::bot_func, "move", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_knife");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 3, "Bots can knife: "+_temp, ::bot_func, "knife", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_fire");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 4, "Bots can fire: "+_temp, ::bot_func, "fire", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_nade");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 5, "Bots can nade: "+_temp, ::bot_func, "nade", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_take_carepackages");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 6, "Bots can take carepackages: "+_temp, ::bot_func, "care", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_obj");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 7, "Bots play the objective: "+_temp, ::bot_func, "obj", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_camp");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 8, "Bots can camp: "+_temp, ::bot_func, "camp", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_jumpdrop");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 9, "Bots can jump and dropshot: "+_temp, ::bot_func, "jump", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_target_other");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 10, "Bots can target other script objects: "+_temp, ::bot_func, "targetother", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_killstreak");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 11, "Bots can use killstreaks: "+_temp, ::bot_func, "killstreak", _tempDvar);
 }
 
 bot_func(a, b)
@@ -716,6 +786,46 @@ bot_func(a, b)
 		case "op":
 			setDvar("bots_loadout_allow_op", !b);
 			self iPrintln("Bots using op setups: " + !b);
+		break;
+		case "move":
+			setDvar("bots_play_move", !b);
+			self iPrintln("Bots move: " + !b);
+		break;
+		case "knife":
+			setDvar("bots_play_knife", !b);
+			self iPrintln("Bots knife: " + !b);
+		break;
+		case "fire":
+			setDvar("bots_play_fire", !b);
+			self iPrintln("Bots fire: " + !b);
+		break;
+		case "nade":
+			setDvar("bots_play_nade", !b);
+			self iPrintln("Bots nade: " + !b);
+		break;
+		case "care":
+			setDvar("bots_play_take_carepackages", !b);
+			self iPrintln("Bots take carepackages: " + !b);
+		break;
+		case "obj":
+			setDvar("bots_play_obj", !b);
+			self iPrintln("Bots play the obj: " + !b);
+		break;
+		case "camp":
+			setDvar("bots_play_camp", !b);
+			self iPrintln("Bots camp: " + !b);
+		break;
+		case "jump":
+			setDvar("bots_play_jumpdrop", !b);
+			self iPrintln("Bots jump: " + !b);
+		break;
+		case "targetother":
+			setDvar("bots_play_target_other", !b);
+			self iPrintln("Bots target other: " + !b);
+		break;
+		case "killstreak":
+			setDvar("bots_play_killstreak", !b);
+			self iPrintln("Bots use killstreaks: " + !b);
 		break;
 	}
 }
