@@ -28,6 +28,8 @@ init()
 
 	if(getDvar("bots_main_GUIDs") == "")
 		setDvar("bots_main_GUIDs", "");//guids of players who will be given host powers, comma seperated
+	if(getDvar("bots_main_firstIsHost") == "")
+		setDvar("bots_main_firstIsHost", false);//first play to connect is a host
 		
 	if(getDvar("bots_manage_add") == "")
 		setDvar("bots_manage_add", 0);//amount of bots to add to the game
@@ -85,6 +87,9 @@ init()
 		setDvar("bots_play_target_other", true);
 	if(getDvar("bots_play_killstreak") == "")//bot use killstreaks
 		setDvar("bots_play_killstreak", true);
+
+	if(!isDefined(game["botWarfare"]))
+		game["botWarfare"] = true;
 
 	level.defuseObject = undefined;
 	level.bots_smokeList = List();
