@@ -12,61 +12,61 @@
 
 init()
 {
-  if (getDvar("bots_main_menu") == "")
-    setDvar("bots_main_menu", true);
+	if (getDvar("bots_main_menu") == "")
+		setDvar("bots_main_menu", true);
 
 	if (!getDvarInt("bots_main_menu"))
 		return;
-  
-  thread watchPlayers();
+
+	thread watchPlayers();
 }
 
 watchPlayers()
 {
-  for (;;)
-  {
-    wait 1;
+	for (;;)
+	{
+		wait 1;
 
-    for (i = level.players.size - 1; i >= 0; i--)
-    {
-      player = level.players[i];
+		for (i = level.players.size - 1; i >= 0; i--)
+		{
+			player = level.players[i];
 
-      if (!player is_host())
-        continue;
+			if (!player is_host())
+				continue;
 
-      if (isDefined(player.menuInit) && player.menuInit)
-        continue;
+			if (isDefined(player.menuInit) && player.menuInit)
+				continue;
 
-      player thread init_menu();
-    }
-  }
+			player thread init_menu();
+		}
+	}
 }
 
 kill_menu()
 {
-  self notify("bots_kill_menu");
-  self.menuInit = undefined;
+	self notify("bots_kill_menu");
+	self.menuInit = undefined;
 }
 
 init_menu()
 {
 	self.menuInit = true;
-	
+
 	self.menuOpen = false;
 	self.menu_player = undefined;
 	self.SubMenu = "Main";
 	self.Curs["Main"]["X"] = 0;	
 	self AddOptions();
-	
+
 	self thread watchPlayerOpenMenu();
 	self thread MenuSelect();
 	self thread RightMenu();
 	self thread LeftMenu();
 	self thread UpMenu();
 	self thread DownMenu();
-	
+
 	self thread watchDisconnect();
-	
+
 	self thread doGreetings();
 }
 
