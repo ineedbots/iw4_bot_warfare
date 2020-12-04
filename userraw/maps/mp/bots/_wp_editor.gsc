@@ -371,6 +371,7 @@ watchSaveWaypointsCommand()
 		}
 		logprint("*/return waypoints;\n}\n\n\n\n");
 
+		PrintLn("********* Start Bot Warfare WPDump *********");
 		PrintLn(level.waypointCount);
 		for(i = 0; i < level.waypointCount; i++)
 		{
@@ -400,6 +401,7 @@ watchSaveWaypointsCommand()
 
 			PrintLn(str);
 		}
+		PrintLn("\n\n\n\n\n\n");
 
 		self iprintln("Saved!!!");
 	}
