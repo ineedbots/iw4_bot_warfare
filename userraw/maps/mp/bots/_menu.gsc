@@ -559,8 +559,8 @@ AddOptions()
 	self AddMenu("man_bots", 2, "Add 7 bot", ::man_bots, "add", 7 + _tempDvar);
 	self AddMenu("man_bots", 3, "Add 11 bot", ::man_bots, "add", 11 + _tempDvar);
 	self AddMenu("man_bots", 4, "Add 17 bot", ::man_bots, "add", 17 + _tempDvar);
-	self AddMenu("man_bots", 5, "Kick a bot", ::man_bots, "kick", 0);
-	self AddMenu("man_bots", 6, "Kick all bots", ::man_bots, "kick", 1);
+	self AddMenu("man_bots", 5, "Kick a bot", ::man_bots, "kick", 1);
+	self AddMenu("man_bots", 6, "Kick all bots", ::man_bots, "kick", getBotArray().size);
 	
 	_tempDvar = getDvarInt("bots_manage_fill_kick");
 	if(_tempDvar)
@@ -968,18 +968,19 @@ man_bots(a, b)
 		break;
 		case "kick":
 			result = false;
-			for (i = 0; i < level.players.size; i++)
-			{
-				player = level.players[i];
 
-				if(player is_bot())
+			for (i = 0; i < b; i++)
+			{
+				tempBot = random(getBotArray());
+				if (isDefined(tempBot))
 				{
+					kick( tempBot getEntityNumber(), "EXE_PLAYERKICKED" );
 					result = true;
-					kick( player getEntityNumber(), "EXE_PLAYERKICKED" );
-					if(!b)
-						break;
 				}
+
+				wait 0.25;
 			}
+
 			if(!result)
 				self iPrintln("No bots to kick");
 		break;
