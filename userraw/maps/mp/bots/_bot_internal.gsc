@@ -1700,16 +1700,18 @@ doWalk(goal, dist, isScriptGoal)
 */
 movetowards(goal)
 {
-	if(isDefined(goal))
-		self.bot.towards_goal = goal;
+	if(!isDefined(goal))
+		return;
+		
+	self.bot.towards_goal = goal;
 
 	lastOri = self.origin;
 	stucks = 0;
 	timeslow = 0;
 	time = 0;
-	while(distanceSquared(self.origin, self.bot.towards_goal) > level.bots_goalDistance)
+	while(distanceSquared(self.origin, goal) > level.bots_goalDistance)
 	{
-		self botMoveTo(self.bot.towards_goal);
+		self botMoveTo(goal);
 		
 		if(time > 2.5)
 		{
