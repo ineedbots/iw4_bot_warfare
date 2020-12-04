@@ -685,10 +685,11 @@ addBots()
 		wait 1.5;
 		
 		botsToAdd = GetDvarInt("bots_manage_add");
-		SetDvar("bots_manage_add", 0);
 		
 		if(botsToAdd > 0)
 		{
+			SetDvar("bots_manage_add", 0);
+			
 			if(botsToAdd > 64)
 				botsToAdd = 64;
 				
