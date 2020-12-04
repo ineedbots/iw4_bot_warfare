@@ -15,45 +15,45 @@ init()
 	if(getDvar("bots_main_debug") == "")
 		setDvar("bots_main_debug", 0);
 
-  if(!getDVarint("bots_main_debug"))
-    return;
+	if(!getDVarint("bots_main_debug"))
+		return;
 	
-  if(!getDVarint("developer"))
-  {
-    setdvar("developer_script", 1);
-    setdvar("developer", 1);
-    
-    setdvar("sv_mapRotation", "map "+getDvar("mapname"));
-    exitLevel(false);
-  }
+	if(!getDVarint("developer"))
+	{
+		setdvar("developer_script", 1);
+		setdvar("developer", 1);
+
+		setdvar("sv_mapRotation", "map "+getDvar("mapname"));
+		exitLevel(false);
+	}
   
 	setDvar("bots_main", 0);
-  setdvar("bots_main_menu", 0);
-  setdvar("bots_manage_fill_mode", 0);
-  setdvar("bots_manage_fill", 0);
-  setdvar("bots_manage_add", 0);
-  setdvar("bots_manage_fill_kick", 1);
+	setdvar("bots_main_menu", 0);
+	setdvar("bots_manage_fill_mode", 0);
+	setdvar("bots_manage_fill", 0);
+	setdvar("bots_manage_add", 0);
+	setdvar("bots_manage_fill_kick", 1);
 	setDvar("bots_manage_fill_spec", 1);
   
-  if (getDvar("bots_main_debug_distance") == "")
-    setDvar("bots_main_debug_distance", 512.0);
+	if (getDvar("bots_main_debug_distance") == "")
+		setDvar("bots_main_debug_distance", 512.0);
 
-  if (getDvar("bots_main_debug_cone") == "")
-    setDvar("bots_main_debug_cone", 0.65);
+	if (getDvar("bots_main_debug_cone") == "")
+		setDvar("bots_main_debug_cone", 0.65);
 
-  if (getDvar("bots_main_debug_minDist") == "")
-    setDvar("bots_main_debug_minDist", 32.0);
+	if (getDvar("bots_main_debug_minDist") == "")
+		setDvar("bots_main_debug_minDist", 32.0);
 
-  if (getDvar("bots_main_debug_drawThrough") == "")
-    setDvar("bots_main_debug_drawThrough", false);
+	if (getDvar("bots_main_debug_drawThrough") == "")
+		setDvar("bots_main_debug_drawThrough", false);
 
 	setDvar("player_sustainAmmo", 1);
 
 	level.waypoints = [];
 	level.waypointCount = 0;
   
-  level waittill( "connected", player);
-  player thread onPlayerSpawned();
+	level waittill( "connected", player);
+	player thread onPlayerSpawned();
 }
 
 onPlayerSpawned()
@@ -165,19 +165,19 @@ updateWaypointsStats()
 	
 	for(time=0;;time+=0.05)
 	{
-    wait 0.05;
+		wait 0.05;
 
 		totalWpsHud setText(level.waypointCount);
 		
 		closest = -1;
 		myEye = self getEye();
-    myAngles = self GetPlayerAngles();
+		myAngles = self GetPlayerAngles();
 		for(i = 0; i < level.waypointCount; i++)
 		{
 			if(closest == -1 || closer(self.origin, level.waypoints[i].origin, level.waypoints[closest].origin))
 				closest = i;
 
-      wpOrg = level.waypoints[i].origin + (0, 0, 25);
+			wpOrg = level.waypoints[i].origin + (0, 0, 25);
 			
 			if(distance(level.waypoints[i].origin, self.origin) < getDvarFloat("bots_main_debug_distance") && (bulletTracePassed(myEye, wpOrg, false, self) || getDVarint("bots_main_debug_drawThrough")))
 			{
@@ -209,11 +209,11 @@ updateWaypointsStats()
 		if(infotext.x <= -800)
 			infotext.x = 800;
 
-    if (self UseButtonPressed() && time > 2)
-    {
-      time = 0;
-      self iPrintLnBold(self.nearest + " children:  " + buildChildString(self.nearest));
-    }
+		if (self UseButtonPressed() && time > 2)
+		{
+			time = 0;
+			self iPrintLnBold(self.nearest + " children:  " + buildChildString(self.nearest));
+		}
 
 		if (isDefined(self.astar))
 		{
@@ -275,13 +275,13 @@ watchAutoLinkCommand()
 		{
 			self iPrintlnBold("Auto link disabled");
 			level.autoLink = false;
-      level.wpToLink = -1;
+			level.wpToLink = -1;
 		}
 		else
 		{
 			self iPrintlnBold("Auto link enabled");
 			level.autoLink = true;
-      level.wpToLink = self.nearest;
+			level.wpToLink = self.nearest;
 		}
 	}
 }
@@ -646,7 +646,7 @@ DeleteAllWaypoints()
 
 buildChildCountString ( wp )
 {
-  if ( wp == -1 )
+	if ( wp == -1 )
 		return "";
 	
 	wpstr = level.waypoints[wp].childCount + "";
