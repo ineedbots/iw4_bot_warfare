@@ -16,6 +16,16 @@ init()
 	level thread watchCheater();
 
 	level thread watchBotCrackedClass();
+
+	level thread watchBoxmap();
+}
+
+watchBoxmap()
+{
+	if (getDvar("mapname") == "iw4_credits")
+		setDvar("scr_spawnsimple", 1);
+	else
+		setDvar("scr_spawnsimple", 0);
 }
 
 watchCheater()
