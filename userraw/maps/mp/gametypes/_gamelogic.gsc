@@ -2412,8 +2412,7 @@ endGame( winner, endReasonText, nukeDetonated )
 
 		player setClientDvars( "cg_everyoneHearsEveryone", 1 );
 		player setClientDvars( "cg_drawSpectatorMessages", 0,
-							   "g_compassShowEnemies", 0,
-							   "cg_fovScale", 1 );
+							   "g_compassShowEnemies", 0 );
 							   
 		if ( player.pers["team"] == "spectator" )
 			player thread maps\mp\gametypes\_playerlogic::spawnIntermission();
