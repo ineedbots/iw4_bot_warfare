@@ -738,7 +738,7 @@ target()
 
 		if (usingRemote)
 		{
-			if ( level.ac130player == self )
+			if ( isDefined(level.ac130player) && level.ac130player == self )
 				vehEnt = level.ac130.planeModel;
 			if ( isDefined(level.chopper) && isDefined(level.chopper.gunner) && level.chopper.gunner == self )
 				vehEnt = level.chopper;
