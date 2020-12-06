@@ -2939,7 +2939,7 @@ bot_listen_to_steps()
 			continue;
 			
 		dist = level.bots_listenDist;
-		if(self hasPerk("specialty_selectivehearing"))
+		if(self _hasPerk("specialty_selectivehearing"))
 			dist *= 1.4;
 		
 		dist *= dist;
@@ -2964,7 +2964,7 @@ bot_listen_to_steps()
 			if( distanceSquared(player.origin, self.origin) > dist )
 				continue;
 			
-			if( player hasPerk("specialty_quieter"))
+			if( player _hasPerk("specialty_quieter"))
 				continue;
 				
 			heard = player;
@@ -2989,7 +2989,7 @@ bot_listen_to_steps()
 				if(!isReallyAlive(player))
 					continue;
 
-				if (player hasPerk("specialty_heartbreaker"))
+				if (player _hasPerk("specialty_heartbreaker"))
 					continue;
 
 				if (distanceSquared(player.origin, self.origin) > heartbeatDist)
@@ -3073,7 +3073,7 @@ bot_uav_think()
 			if(distFromPlayer > dist)
 				continue;
 			
-			if((!isSubStr(player getCurrentWeapon(), "_silencer_") && player.bots_firing) || (hasRadar && !player hasPerk("specialty_coldblooded")))
+			if((!isSubStr(player getCurrentWeapon(), "_silencer_") && player.bots_firing) || (hasRadar && !player _hasPerk("specialty_coldblooded")))
 			{
 				distSq = self.pers["bots"]["skill"]["help_dist"] * self.pers["bots"]["skill"]["help_dist"];
 				if (distFromPlayer < distSq && bulletTracePassed(self getEye(), player getTagOrigin( "j_spineupper" ), false, player))
@@ -3244,7 +3244,7 @@ bot_turret_think()
 			facing = false;
 		if ( turret isStunned() )
 			facing = false;
-		if(self hasPerk("specialty_coldblooded"))
+		if(self _hasPerk("specialty_coldblooded"))
 			facing = false;
 
 		if ( facing && !BulletTracePassed( myEye, turret.origin + ( 0, 0, 15 ), false, turret ) )
@@ -4777,7 +4777,7 @@ bot_sab()
 					if(self HasScriptGoal())
 						continue;
 					
-					if(carrier hasPerk( "specialty_coldblooded" ))
+					if(carrier _hasPerk( "specialty_coldblooded" ))
 						continue;
 					
 					origin = carrier.origin;
