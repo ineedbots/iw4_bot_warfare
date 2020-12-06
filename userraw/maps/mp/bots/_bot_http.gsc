@@ -62,7 +62,6 @@ getRemoteVersion()
 {
   request = httpGet( "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/version.txt" );
   request waittill( "done", success, data );
-	request destroy();
 
   if (!success)
     return undefined;
@@ -103,7 +102,6 @@ getLinesFromUrl(url)
 
 	request = httpGet( url );
   request waittill( "done", success, data );
-	request destroy();
 
   if (!success)
     return result;

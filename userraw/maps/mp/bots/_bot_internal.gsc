@@ -590,6 +590,9 @@ reload_thread()
 		return;
 		
 	cur = self getCurrentWEapon();
+
+	if (cur == "" || cur == "none")
+		return;
 	
 	if(IsWeaponClipOnly(cur) || !self GetWeaponAmmoStock(cur) || self IsUsingRemote())
 		return;
@@ -1209,7 +1212,7 @@ aim()
 					if (canADS)
 						self thread pressAds();
 
-					if(curweap == "at4_mp" && entIsVehicle(self.bot.target.entity) && self.stingerStage != 2)
+					if(curweap == "at4_mp" && entIsVehicle(self.bot.target.entity) && (!IsDefined( self.stingerStage ) || self.stingerStage != 2))
 						continue;
 
 					if (trace_time > reaction_time)
