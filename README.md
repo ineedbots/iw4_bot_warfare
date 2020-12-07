@@ -13,137 +13,116 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 - [Credits](#Credits)
 
 ## Features
-Mod is completely compatible with no internet, good for LAN with friends or just playing alone. (only if your client supports offline/lan)
+- A clean and nice menu, you can edit every bot DVAR within in-game.
 
-Also mod is compatible with every game client, as long as the client's testclient handling works properly.
+- Everything can be customized, ideal for both personal use and dedicated servers. Have a look at [Documentation](#Documentation) to see whats possible!
 
-A clean and nice menu, you can edit every bot DVAR within in-game.
+- This mod does not edit ANY stock .gsc files, meaning EVERY other mod is compatible with this mod. Mod doesn't add anything unnecessary, what you see is what you get.
 
-Everything can be customized, ideal for both personal use and dedicated servers. Have a look at '3: Documentation' to see whats possible!
-
-This mod does not edit ANY stock .gsc files, meaning EVERY other mod is compatible with this mod. Mod doesn't add anything unnecessary, what you see is what you get.
-
-Adds AI clients to multiplayer games to simulate playing real players. (essentially Combat Training for MW2)
-	-Bots move around the maps. (all normal maps, most to all custom maps)
-	-Bots play all gamemodes/objectives, they caputure flags, plant, defuse bombs, etc. (all normal modes, most custom modes)
-	-Bots have animations, move their legs and don't slide.
-	-Bots use all killstreaks. Including AC130 and chopper gunner.
-	-Bots target killstreaks, use stingers and other weapons to take out all killstreaks. (even sentry guns)
-	-Bots can capture and steal care packages.
-	-Bots target equipment, and can even camp TIs.
-	-Bots can camp randomly or when about to use the laptop.
-	-Bots can follow others on own will.
-	-Bots have smooth and realistic aim.
-	-Bots respond smartly to their surroundings, they will go to you if you shoot, uav, etc.
-	-Bots use all deathstreaks, perks and weapons, also perks do something and bots use guns tactically (use shotgun upclose, etc).
-	-Bots difficulty level can be customized and are accurate. (hard is hard, easy is easy, etc.)
-	-Bots each all have different classes, traits, and difficulty and remember it all.
-	-Bots switch from between primaries and secondaries.
-	-Bots can grenade, place claymores and TIs, they even use grenades and tubes in preset map locations.
-	-Bots use grenade launchers and shotgun attachments.
-	-Bots trip claymores indefinitely.
-	-Bots can melee people and sentry guns.
-	-Bots can run!
-	-Bots can climb ladders!
-	-Bots have foot sounds!!
-	-Bots detect smoke grenades, stun grenades, flashed and airstrike slows.
-	-Bots can watch killcams.
-	-Bots talk, react to anything that they are doing or what happened to them, etc.
-	-Bots will remember their class, killstreak, skill and traits, even on multiround based gametypes.
-	-Bots can rage quit.
-	-Bots can throwback grenades.
+- Adds AI clients to multiplayer games to simulate playing real players. (essentially Combat Training for MW2)
+  - Bots move around the maps with native engine input. (all normal maps, most to all custom maps)
+  - Bots press all the buttons with native engine input (ads, sprint, jump, etc)
+  - Bots play all gamemodes/objectives, they caputure flags, plant, defuse bombs, etc. ( all normal modes, most custom modes)
+  - Bots use all killstreaks. Including AC130 and chopper gunner.
+  - Bots target killstreaks, use stingers and other weapons to take out all killstreaks. ( even sentry guns)
+  - Bots can capture and steal care packages.
+  - Bots target equipment, and can even camp TIs.
+  - Bots can camp randomly or when about to use the laptop.
+  - Bots can follow others on own will.
+  - Bots have smooth and realistic aim.
+  - Bots respond smartly to their surroundings, they will go to you if you shoot, uav, etc.
+  - Bots use all deathstreaks, perks and weapons, also perks do something and bots use g uns tactically (use shotgun upclose, etc).
+  - Bots difficulty level can be customized and are accurate. (hard is hard, easy is easy, e tc.)
+  - Bots each all have different classes, traits, and difficulty and remember it all.
+  - Bots switch from between primaries and secondaries.
+  - Bots can grenade, place claymores and TIs, they even use grenades and tubes in preset m ap locations.
+  - Bots use grenade launchers and shotgun attachments.
+  - Bots can melee people and sentry guns.
+  - Bots can run!
+  - Bots can climb ladders!
+  - Bots detect smoke grenades, stun grenades, flashed and airstrike slows.
+  - Bots will remember their class, killstreak, skill and traits, even on multiround based gametypes.
+  - Bots can throwback grenades.
+  - ... And pretty much everything you expect a Combat Training bot to have
 
 ## Installation
-Installation for PC (requires you to have a client/server that can load mods):
-1. Locate your MW2 game folder.
+0. Make sure that [IW4x](https://xlabs.dev/support_iw4x_client.html) is installed, updated and working properly.
+    - Download the [latest release](https://github.com/ineedbots/iw4x_bot_warfare/releases) of Bot Warfare.
+1. Locate your IW4x install folder.
 2. Find and open the 'mods' folder. (if none, create one)
 3. Move the files/folders found in 'Move to mods folder' to the 'mods' folder.
-4. The folder/file structure should follow as '.MW2 game folder\mods\bots\z_svr_bots.iwd'.
-5. Run your game/server. If you are not using a dedicated server, go to private match.
-6. You must set the 'fs_game' dvar to 'mods/bots' before you load the map. Use the console (use ~ or alt-tab) to change dvars.
-7. Once in-game, press your actionSlot2 (secondary inv) button, default '5', to open the menu. Use the movement keys to navigate the menu, use the jump button to select menus and options and press the menu button to close options and menus, or use the console to change the bot dvars found at 3: Documentation.
-8. If the mod didn't load, try inserting the 'z_svr_bots_loadM1.iwd' with the 'z_svr_bots.iwd' file in the same folder and reload the map.
-Enjoy!
+    - The folder/file structure should follow as '.MW2 game folder\mods\bots\z_svr_bots.iwd'.
 
 ## Documentation
-DVAR list:
-bots_manage_add (0 to maxClients) - amount of bots to add to the game, resets to 0 once bots are added
-bots_manage_fill (0 to maxClients) - amount of bots to have server maintain
-bots_manage_fill_mode (0 to 4) - determines whether or not the bot_fill takes bots or everyone into account and if it autoadjusts amount of bots to map, or use bots as balance
-bots_manage_fill_kick (0 to 1) - allows to kick bots if bot_fill is exceeded
-bots_manage_fill_spec (0 to 1) - if to count players who are on the spec team
-bots_manage_reset (0 to 1) - used for resetting bots, resets to 0 once bots are resetted
 
-bots_team ("autoassign", "axis", "allies", "custom") - determines what team to have bots join
-bots_team_amount (0 to teamLimit) - when bot_team is on custom, how many bots to have on axis team, rest is sent to allies team
-bots_team_force (0 to 1) - when bot_team isn't on custom, forces bots to the team
-bots_team_mode (0 to 1) - determines whether or not the bot_team takes bots or everyone into account
-	
-bots_skill (0 to 9) - determines bots difficulty, 0 is random for all, 1 to 7 is easy to hard, 8 is custom and 9 is completely random
-bots_skill_axis_hard (0 to teamLimit) - when bot_skill is on 8, how many hard bots on axis team
-bots_skill_axis_med (0 to teamLimit) - when bot_skill is on 8, how many medium bots on axis team, remaining bots are set to easy
-bots_skill_allies_hard (0 to teamLimit) - when bot_skill is on 8, how many hard bots on allies team
-bots_skill_allies_med (0 to teamLimit) - when bot_skill is on 8, how many medium bots on allies team, remaining bots are set to easy
-	
-bots_play_talk (0 to 50)(float) - bot talk scaler, 0 to turn off bot talk
-bots_play_watchKillcam (0 to 2) - toggle of bots chance of watching killcams, 0 is off, 2 is always
-bots_play_rageQuit (0 to 1) - toggle of bots chance of quitting the game, 0 is off
-bots_play_camp (0 to 1) - toggle of bots camping, 0 is off
-bots_play_obj (0 to 1) - toggle of bots playing the obj, 0 is off
-bots_play_run (0 to 1) - toggle of bots running, 0 is off
-bots_play_tdks (0 to 1) - toggle of bots taking down killstreaks, 0 is off
-bots_play_takeCare (0 to 1) - toggle of bots taking carepackages, 0 is off
-bots_play_outOfMyWay (0 to 1) - toggle of bots moving of the way, 0 is off
-bots_play_attack (0 to 1) - toggle of bots attacking, 0 is off
-bots_play_move (0 to 1) - toggle of bots moving, 0 is off
-bots_play_doStuck (0 to 1) - toggle of the antiStuck thread, 0 is off
-bots_play_destroyEq (0 to 1) - toggle of bots targeting equipment, 0 is off
-bots_play_fakeAnims (0 to 1) - toggle of bots using fake animations to simulate walking, 0 is off, 2 is alternative
-bots_play_throwback (0 to 1) - toggle of bots throwing back frags, 0 is off
-bots_play_footsounds (0 to 1) - toggle of bots emulating foot sounds, 0 if off
+### DVARs
+- bots_manage_add - an integer amount of bots to add to the game, resets to 0 once the bots have been added.
+    - for example: 'bots_manage_add 10' will add 10 bots to the game.
 
-bots_loadout ("default", "random", "mod", "none", "snipe", "knife", "tube", "level") - is bot's class setup mode
-bots_loadout_deathstreak (0 to 1) - toggle of bots using deathstreaks, 0 is off
-bots_loadout_secondary (0 to 1) - toggle of bots using secondaries, 0 is off
-bots_loadout_nuke (0 to 1) - toggle of bots using nukes, 0 is off
-bots_loadout_riot (0 to 1) - toggle of bots using riot shields, 0 is off
-bots_loadout_lastStand (0 to 1) - toggle of bots using the laststand perk, 0 is off
-bots_loadout_killstreak ("default", "random", "none", "level") - is bot's killstreak mode
-bots_loadout_tube (0 to 1) - toggle of bots using explosives, 0 is off
-bots_loadout_shotgun (0 to 1) - toggle of bots using shotguns, 0 is off
-bots_loadout_sniper (0 to 1) - toggle of bots using snipers, 0 is off
-bots_loadout_knife (0 to 1) - toggle of bots using knifes, 0 is off
-bots_loadout_nade (0 to 1) - toggle of bots using grenades, 0 is off
-bots_loadout_remember (0 to 1) - toggle of remember their class setup, 0 is off
-bots_loadout_change (0 to 1) - toggle of bots chance of forgetting their class setup, 0 is off
-bots_loadout_akimbo (0 to 1) - toggle of bots using akimbo weapons
+- bots_manage_fill - an integer amount of players/bots (depends on bots_manage_fill_mode) to retain on the server, it will automatically add bots to fill player space.
+    - for example: 'bots_manage_fill 10' will have the server retain 10 players in the server, if there are less than 10, it will add bots until that value is reached.
 
-bots_main (0 to 1) - toggle of the entire bot mod
-bots_main_debug (0 to 1) - toggle of dev mode for bots
-bots_main_menu (0 to 1) - toggle of menu, 0 is off
-bots_main_Names (player exact name or "") - extra check to see host for menu operation, seperate with ',' for multiple names, set to "" to disable
-bots_main_GUIDs (player GUIDs or "") - list of 'host' GUIDs used for opening the menu, use a ',' to seperate multiple GUIDs, set to "" to disable
-bots_main_target (isSubStr of player name or "") - bots will always target this player's name, set as "" to disable (good for antiCheat or just for fun)	
-bots_main_prestige (-2 to 11) - -1 for random, -2 same as host, set all bot's prestige
-bots_main_experience (-2 to 2516000) - -1 for random, -2 for around host, set all bot's experience level
-bots_main_title (title string or "") - "" for random, set all bot's title
-bots_main_emblem (emblem string or "") - "" for random, set all bot's emblem
-bots_main_target_host (0 to 1) - when 0, bots will not target host players
-bots_main_fun (0 to 1) - toggle use of fun options in menu
+- bots_manage_fill_mode - a value to indicate if the server should consider only bots or players and bots when filling player space.
+    - 0 will consider both players and bots.
+    - 1 will only consider bots.
+
+- bots_manage_fill_kick - a boolean value (0 or 1), whether or not if the server should kick bots if the amount of players/bots (depends on bots_manage_fill_mode) exceeds the value of bots_manage_fill.
+
+- bots_manage_fill_spec - a boolean value (0 or 1), whether or not if the server should consider players who are on the spectator team when filling player space.
+
+---
+
+- bots_team - a string, the value indicates what team the bots should join:
+    - 'autoassign' will have bots balance the teams
+    - 'allies' will have the bots join the allies team
+    - 'axis' will have the bots join the axis team
+    - 'custom' will have bots_team_amount bots on the axis team, the rest will be on the allies team
+    
+- bots_team_amount - an integer amount of bots to have on the axis team if bots_team is set to 'custom', the rest of the bots will be placed on the allies team.
+    - for example: there are 5 bots on the server and 'bots_team_amount 3', then 3 bots will be placed on the axis team, the other 2 will be placed on the allies team.
+
+- bots_team_force - a boolean value (0 or 1), whether or not if the server should enforce periodically the bot's team instead of just a single team when the bot is added to the game.
+    - for example: 'bots_team_force 1' and 'bots_team autoassign' and the teams become to far unbalanced, then the server will change a bot's team to make it balanced again.
+
+- bots_team_mode - a value to indicate if the server should consider only bots or players and bots when counting players on the teams.
+    - 0 will consider both players and bots.
+    - 1 will only consider bots.
+
+---
+
+- bots_skill - value to indicate how difficult the bots should be.
+    - 0 will be mixed difficultly
+    - 1 will be the most easy
+    - 2-6 will be in between most easy and most hard
+    - 7 will be the most hard.
+    - 8 will be custom.
+
+- bots_skill_axis_hard - an integer amount of hard bots on the axis team.
+- bots_skill_axis_med - an integer amount of medium bots on the axis team.
+- bots_skill_allies_hard - an integer amount of hard bots on the allies team.
+- bots_skill_allies_med - an integer amount of medium bots on the allies team
+    - if bots_skill is 8 (custom). The remaining bots on the team will become easy bots
+    - for example: having 5 bots on the allies team, 'bots_skill_allies_hard 2' and 'bots_skill_allies_med 2' will have 2 hard bots, 2 medium bots, and 1 easy bot on the allies team.
+
+---
+
+- bots_loadout_reasonable - a boolean value (0 or 1), whether or not if the bots should filter out bad create a class selections (like no miniuzi bling with acog rapidfire and hardline for example)
+
+- bots_loadout_allow_op - a boolean value (0 or 1), whether or not if the bots are allowed to use deathstreaks, noobtubes, rpg, laststand, etc.
 
 ## Changelog
 - v2.0.0
   - Initial reboot release
 
 ## Credits
-- IW4x Team
-- CoD4x Team
-- INeedGames(me) - for completely writing and compiling the mod into what it is now: http://www.moddb.com/mods/bot-warfare
-- tinkie101 - for RSE v1 to v10, mod was based off of this: https://web.archive.org/web/20120326060712/http://alteriw.net/viewtopic.php?f=72&t=4869
-- PeZBot team - tinkie101 used PeZBot's code as a base for RSE v1 to v10: http://www.moddb.com/mods/pezbot
-- apdonato - for RSE v11+ development, much of their ideas was used: http://rsebots.blogspot.ca/
-- Ability - for their waypoint mod used in this mod (found in bots\dev.gsc)
-- Salvation - for their menu base used in this mod (found in bots\menu.gsc)
+- IW4x Team - https://github.com/XLabsProject/iw4x-client
+- CoD4x Team - https://github.com/callofduty4x/CoD4x_Server
+- INeedGames(me) - http://www.moddb.com/mods/bot-warfare
+- tinkie101 - https://web.archive.org/web/20120326060712/http://alteriw.net/viewtopic.php?f=72&t=4869
+- PeZBot team - http://www.moddb.com/mods/pezbot
+- apdonato - http://rsebots.blogspot.ca/
+- Ability
+- Salvation
 
 Feel free to use code, host on other sites, host on servers, mod it and merge mods with it, just give credit where credit is due!
 	-INeedGames/INeedBot(s) @ ineedbots@outlook.com
