@@ -3680,9 +3680,15 @@ clear_remote_on_death(isac130)
 */
 isAnyEnemyPlanes()
 {
+	if (!isDefined(level.harriers))
+		return false;
+
 	for (i = 0; i < level.harriers.size; i++)
 	{
 		plane = level.harriers[i];
+
+		if (!isDefined(plane))
+			continue;
 
 		if (level.teamBased && plane.team == self.team)
 			continue;
@@ -3745,6 +3751,13 @@ bot_killstreak_think()
 		ksWeap = maps\mp\killstreaks\_killstreaks::getKillstreakWeapon( streakName );
 		curWeap = self GetCurrentWeapon();
 
+		if (curWeap == "none")
+			curWeap = self GetLastWeapon();
+
+		lifeId = self.pers["killstreaks"][0].lifeId;
+		if (!isDefined(lifeId))
+			lifeId = -1;
+
 		if (isStrStart(streakName, "helicopter_") && self isAnyEnemyPlanes() && self.pers["bots"]["skill"]["base"] > 3)
 			continue;
 
@@ -3753,7 +3766,7 @@ bot_killstreak_think()
 			if (self inLastStand())
 				continue;
 
-			if (self.pers["killstreaks"][0].lifeId == self.pers["deaths"] && !self HasScriptGoal() && !self.bot_lock_goal && streakName != "sentry" && !self nearAnyOfWaypoints(128, level.waypointsCamp))
+			if (lifeId == self.deaths && !self HasScriptGoal() && !self.bot_lock_goal && streakName != "sentry" && !self nearAnyOfWaypoints(128, level.waypointsCamp))
 			{
 				campSpots = [];
 				distSq = 1024*1024;
@@ -3846,7 +3859,7 @@ bot_killstreak_think()
 				self maps\mp\killstreaks\_killstreaks::giveOwnedKillstreakItem();
 
 				rocket = MagicBullet( "remotemissile_projectile_mp", self.origin + (0.0,0.0,7000.0 - (self.pers["bots"]["skill"]["base"] * 400)), location, self );
-				rocket.lifeId = self.pers["killstreaks"][0].lifeId;
+				rocket.lifeId = lifeId;
 				rocket.type = "remote";
 					
 				rocket thread maps\mp\gametypes\_weapons::AddMissileToSightTraces( self.pers["team"] );
