@@ -1,3 +1,5 @@
+![GitHub Logo](/userraw/bw-assets/bw-logo.png)
+
 # IW4x Bot Warfare
 Bot Warfare is a GSC mod for the [IW4x project](https://github.com/XLabsProject/iw4x-client).
 
@@ -47,7 +49,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 ## Installation
 0. Make sure that [IW4x](https://xlabs.dev/support_iw4x_client.html) is installed, updated and working properly.
-    - Download the [latest release](/releases) of Bot Warfare.
+    - Download the [latest release](https://github.com/ineedbots/iw4x_bot_warfare/releases) of Bot Warfare.
 1. Locate your IW4x install folder.
 2. Find and open the 'mods' folder. (if none, create one)
 3. Move the files/folders found in 'Move to mods folder' to the 'mods' folder.
