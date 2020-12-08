@@ -112,6 +112,29 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 - bots_loadout_allow_op - a boolean value (0 or 1), whether or not if the bots are allowed to use deathstreaks, noobtubes, rpg, laststand, etc.
 
+- bots_play_move - a boolean value (0 or 1), whether or not if the bots will move
+- bots_play_knife - a boolean value (0 or 1), whether or not if the bots will use the knife
+- bots_play_fire - a boolean value (0 or 1), whether or not if the bots will fire their weapons
+- bots_play_nade - a boolean value (0 or 1), whether or not if the bots will grenade
+- bots_play_take_carepackages - a boolean value (0 or 1), whether or not if the bots will take carepackages
+- bots_play_obj - a boolean value (0 or 1), whether or not if the bots will play the objective
+- bots_play_camp - a boolean value (0 or 1), whether or not if the bots will camp
+- bots_play_jumpdrop - a boolean value (0 or 1), whether or not if the bots will jump shot or drop shot
+- bots_play_target_other - a boolean value (0 or 1), whether or not if the bots will target claymores, killstreaks, etc.
+- bots_play_killstreak - a boolean value (0 or 1), whether or not if the bots will use killstreaks
+
+---
+
+- bots_main - a boolean value (0 or 1), enables or disables the mod
+
+- bots_main_firstIsHost - a boolean value (0 or 1), the first player to connect is considered a host
+
+- bots_main_GUIDs - a list of GUIDs (comma seperated) of players who will be considered a host
+
+- bots_main_menu - a boolean value (0 or 1), enables or disables the menu
+
+- bots_main_debug - a boolean value (0 or 1), enables or disables the waypoint editor
+
 ## Changelog
 - v2.0.0
   - Initial reboot release
