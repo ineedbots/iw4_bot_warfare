@@ -1,5 +1,0 @@
-_script:
-unreleased gamemodes
-
-_other:
-documentation and tutorials and release
