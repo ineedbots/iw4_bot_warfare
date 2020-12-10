@@ -1418,6 +1418,11 @@ start_bot_threads()
 
 		self thread bot_dem_attackers();
 		self thread bot_dem_defenders();
+
+		self thread bot_gtnw();
+		self thread bot_oneflag();
+		self thread bot_arena();
+		self thread bot_vip();
 	}
 }
 
@@ -5802,4 +5807,347 @@ bot_dem_defend_spawnkill()
 	}
 	
 	self notify("bad_path");
+}
+
+/*
+	Bots play the Global thermonuclear warfare
+*/
+bot_gtnw()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+
+	if ( level.gametype != "gtnw" )
+		return;
+
+	for ( ;; )
+	{
+		wait( randomintrange( 3, 5 ) );
+		
+		if ( self IsUsingRemote() || self.bot_lock_goal )
+		{
+			continue;
+		}
+
+		if (!isDefined(level.nukeSite))
+			continue;
+
+		
+	}
+}
+
+/*
+	Bots play oneflag
+*/
+bot_oneflag()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+
+	if ( level.gametype != "oneflag" )
+		return;
+
+	for ( ;; )
+	{
+		wait( randomintrange( 3, 5 ) );
+		
+		if ( self IsUsingRemote() || self.bot_lock_goal )
+		{
+			continue;
+		}
+
+		if (!isDefined(level.capZones) || !isDefined(level.teamFlags))
+			continue;
+
+		/*if(isDefined(level.capZones) && isDefined(level.teamFlags))
+			{
+				if(self.pers["team"] == game["attackers"])//attacking
+				{
+					if(isDefined(self.carryFlag))//has flag
+					{
+						self.bots_objDoing = "cap";
+						self thread bots\talk::bots_oneflag_capFlag();
+						self bots_goToLoc(level.capZones[self.team].trigger.origin, ::bots_nullFunc, 0, 0, 0);
+						self.bots_objDoing = "none";
+						self thread bots\talk::bots_oneflag_doneCap();
+					}
+					else//doesn't have flag
+					{
+						if(!isDefined(level.teamFlags[game["defenders"]].carrier))//no one has flag
+						{
+							self.bots_objDoing = "flag";
+							self thread bots\talk::bots_oneflag_getFlag();
+							self bots_goToLoc(level.teamFlags[game["defenders"]].trigger.origin, ::bots_oneFlagGet, 0, 0, 0);
+							self.bots_objDoing = "none";
+							self thread bots\talk::bots_oneflag_doneGetFlag();
+						}
+						else
+						{
+							if(self.bots_traitRandom)
+							{
+								self thread bots\talk::bots_oneflag_protectCarrier(level.teamFlags[game["defenders"]].carrier);
+								self bots_goFollow(level.teamFlags[game["defenders"]].carrier, 30, false);
+							}
+							else
+							{
+								self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_nullFunc, 0, 0, 0);
+							}
+						}
+					}
+				}
+				else//defending
+				{
+					if(isDefined(level.teamFlags[self.team].carrier))//some one has flag
+					{
+						if(self.bots_traitRandom < 2)
+						{
+							self thread bots\talk::bots_oneflag_killCarrier(level.teamFlags[self.team].carrier);//kill carrier
+							self bots_goFollow(level.teamFlags[self.team].carrier, 30, false);
+						}
+						else
+						{
+							wps = bots_getWaypointsNear(level.capZones[game["attackers"]].trigger.origin, randomFloatRange(100,1000));
+							wp = undefined;
+							if(wps.size > 0)
+							{
+								wp = wps[randomint(wps.size)];
+							}
+							if(isDefined(wp))
+							{
+								self thread bots\talk::bots_oneflag_protectCapzone();//hang around cap zone
+								
+								self bots_goToLoc(level.waypoints[wp].origin, ::bots_defendOneFlagCap, 0, 0, 0);
+							}
+							else
+							{
+								self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_defendOneFlagCap, 0, 0, 0);
+							}
+						}
+					}
+					else
+					{
+						if(level.teamFlags[self.team] maps\mp\gametypes\_gameobjects::isHome())
+						{
+							wps = bots_getWaypointsNear(level.teamFlags[self.team].trigger.origin, randomFloatRange(100,1000));
+							wp = undefined;//hang around flag area
+							if(wps.size > 0)
+							{
+								wp = wps[randomint(wps.size)];
+							}
+							if(isDefined(wp))
+							{
+								self thread bots\talk::bots_oneflag_protectFlag();
+								
+								self bots_goToLoc(level.waypoints[wp].origin, ::bots_defendOneFlag, 0, 0, 0);
+							}
+							else
+							{
+								self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_defendOneFlag, 0, 0, 0);
+							}
+						}
+						else
+						{
+							self.bots_objDoing = "flag";
+							self thread bots\talk::bots_oneflag_returnFlag();//return flag
+							self bots_campAtEnt(level.teamFlags[self.team].trigger, false, ::bots_oneFlagGetDefend, 0, 0, 0);
+							self.bots_objDoing = "none";
+							self thread bots\talk::bots_oneflag_returnFlagDone();
+						}
+					}
+				}*/
+	}
+}
+
+/*
+	Bots play arena
+*/
+bot_arena()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+
+	if ( level.gametype != "arena" )
+		return;
+
+	for ( ;; )
+	{
+		wait( randomintrange( 3, 5 ) );
+		
+		if ( self IsUsingRemote() || self.bot_lock_goal )
+		{
+			continue;
+		}
+
+		/*case "arena"://iw's hidden gametypes.
+			if(isDefined(level.arenaFlag))
+			{
+				self.bots_objDoing = "flag";
+				self thread bots\talk::bots_arena_capFlag();
+				self bots_campAtEnt(level.arenaFlag.trigger, false, ::bots_nullFunc, 0, 0, 0);
+				self.bots_objDoing = "none";
+				self thread bots\talk::bots_arena_capFlagDone();
+			}
+			else
+			{
+				wps = bots_getWaypointsNear(level.bots_goalPoint.origin, level.bots_goalRad);
+				wp = undefined;
+				if(wps.size > 0)
+				{
+					wp = wps[randomint(wps.size)];
+				}
+				if(isDefined(wp) && self.bots_traitRandom != 3)
+				{
+					self bots_goToLoc(level.waypoints[wp].origin, ::bots_nullFunc, 0, 0, 0);
+				}
+				else
+				{
+					self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_nullFunc, 0, 0, 0);
+				}
+			}
+		break;
+		*/
+	}
+}
+
+/*
+	Bots play arena
+*/
+bot_vip()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon("game_ended");
+
+	if ( level.gametype != "vip" )
+		return;
+
+	for ( ;; )
+	{
+		wait( randomintrange( 3, 5 ) );
+		
+		if ( self IsUsingRemote() || self.bot_lock_goal )
+		{
+			continue;
+		}
+
+		/*case "vip"://maybe used at gaming events. (ya right, this is not even finished)
+			if(isDefined(level.extractionZone))
+			{
+				if(self.team == game["defenders"])
+				{
+					if(isDefined(self.isVip) && self.isVip)
+					{
+						if(!isDefined(level.extractionTime))
+						{
+							self.bots_objDoing = "vip";
+							self thread bots\talk::bots_vip_extract();
+							self bots_goToLoc(level.extractionZone.trigger.origin, ::bots_nullFunc, 0, 0, 0);
+							if(distance(level.extractionZone.trigger.origin, self.origin) <= level.bots_useNear)
+								level.extractionZone [[level.extractionZone.onUse]](self);
+							
+							self thread bots\talk::bots_vip_extractDone();
+							self.bots_objDoing = "none";
+						}
+						else
+						{
+							wps = bots_getWaypointsNear(level.bots_goalPoint.origin, level.bots_goalRad);
+							wp = undefined;
+							if(wps.size > 0)
+							{
+								wp = wps[randomint(wps.size)];
+							}
+							if(isDefined(wp) && self.bots_traitRandom != 3)
+							{
+								self bots_goToLoc(level.waypoints[wp].origin, ::bots_nullFunc, 0, 0, 0);
+							}
+							else
+							{
+								self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_nullFunc, 0, 0, 0);
+							}
+						}
+					}
+					else
+					{
+						if(self.bots_traitRandom)
+						{
+							tarPlay = undefined;
+							foreach(player in level.players)
+							{
+								if(!isDefined(player.isVip) || !player.isVip)
+									continue;
+								
+								if(!bots_isReallyAlive(player))
+									continue;
+								
+								tarPlay = player;
+								break;
+							}
+							
+							self thread bots\talk::bots_vip_protect(tarPlay);
+							self bots_goFollow(tarPlay, 30, false);
+						}
+						else
+						{
+							wps = bots_getWaypointsNear(level.bots_goalPoint.origin, level.bots_goalRad);
+							wp = undefined;
+							if(wps.size > 0)
+							{
+								wp = wps[randomint(wps.size)];
+							}
+							if(isDefined(wp) && self.bots_traitRandom != 3)
+							{
+								self bots_goToLoc(level.waypoints[wp].origin, ::bots_nullFunc, 0, 0, 0);
+							}
+							else
+							{
+								self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_nullFunc, 0, 0, 0);
+							}
+						}
+					}
+				}
+				else
+				{
+					tarPlay = undefined;
+					foreach(player in level.players)
+					{
+						if(!isDefined(player.isVip) || !player.isVip)
+							continue;
+						
+						if(!bots_isReallyAlive(player))
+							continue;
+						
+						tarPlay = player;
+						break;
+					}
+					
+					if((!isDefined(level.extractionTime) || self.bots_traitRandom < 2) && isDefined(tarPlay))
+					{
+						self thread bots\talk::bots_vip_kill(tarPlay);
+						self bots_goFollow(tarPlay, 30, false);
+					}
+					else
+					{
+						wps = bots_getWaypointsNear(level.extractionZone.trigger.origin, randomFloatRange(100,1000));
+						wp = undefined;
+						if(wps.size > 0)
+						{
+							wp = wps[randomint(wps.size)];
+						}
+						if(isDefined(wp) && self.bots_traitRandom != 3)
+						{
+							self thread bots\talk::bots_vip_hangaround();
+							self bots_goToLoc(level.waypoints[wp].origin, ::bots_nullFunc, 0, 0, 0);
+						}
+						else
+						{
+							self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_nullFunc, 0, 0, 0);
+						}
+					}
+				}
+			}
+		break;*/
+	}
 }
