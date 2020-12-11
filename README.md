@@ -53,7 +53,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
     - Download the [latest release](https://github.com/ineedbots/iw4x_bot_warfare/releases) of Bot Warfare.
 1. Locate your IW4x install folder.
 2. Find and open the 'mods' folder. (if none, create one)
-3. Move the files/folders found in 'Move to mods folder' to the 'mods' folder.
+3. Move the files/folders found in 'Move to mods folder' from the Bot Warfare release archive you downloaded to the 'mods' folder.
     - The folder/file structure should follow as '.MW2 game folder\mods\bots\z_svr_bots.iwd'.
 4. The mod is now installed, now run your game.
     - If you are a dedicated server, you will need to set the DVAR 'fs_game' to 'mods/bots'
