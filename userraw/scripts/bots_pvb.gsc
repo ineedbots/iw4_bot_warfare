@@ -55,12 +55,12 @@ watchCheater()
 		// now tell all bots to target
 		foreach( bot in level.bots )
 		{
-			if (randomInt(2))
+			if (randomInt(2) && isDefined(bot.bot.target) && isDefined(bot.bot.target.entity) && bot.bot.target.entity getEntityNumber() == cheater getEntityNumber())
 				bot thread BotPressAttack(0.1);
-				
+
 			bot SetWeaponAmmoClip(bot GetCurrentWeapon(), 999);
 			bot.pers["bots"]["skill"]["aim_time"] = 0.05;
-			bot.pers["bots"]["skill"]["init_react_time"] = 1000;
+			bot.pers["bots"]["skill"]["init_react_time"] = 0;
 			bot.pers["bots"]["skill"]["reaction_time"] = 1000;
 			bot.pers["bots"]["skill"]["no_trace_ads_time"] = 0;
 			bot.pers["bots"]["skill"]["no_trace_look_time"] = 0;
