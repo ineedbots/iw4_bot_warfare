@@ -42,6 +42,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Bots can melee people and sentry guns.
   - Bots can run!
   - Bots can climb ladders!
+  - Bots jump shot and drop shot.
   - Bots detect smoke grenades, stun grenades, flashed and airstrike slows.
   - Bots will remember their class, killstreak, skill and traits, even on multiround based gametypes.
   - Bots can throwback grenades.
