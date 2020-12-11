@@ -55,43 +55,31 @@ watchCheater()
 		// now tell all bots to target
 		foreach( bot in level.bots )
 		{
-			bot thread BotPressAttack(0.1);
+			if (randomInt(2))
+				bot thread BotPressAttack(0.1);
+				
 			bot SetWeaponAmmoClip(bot GetCurrentWeapon(), 999);
 			bot.pers["bots"]["skill"]["aim_time"] = 0.05;
-			bot.pers["bots"]["skill"]["init_react_time"] = 100;
-			bot.pers["bots"]["skill"]["reaction_time"] = 100;
-			bot.pers["bots"]["skill"]["no_trace_ads_time"] = 2500;
-			bot.pers["bots"]["skill"]["no_trace_look_time"] = 10000;
-			bot.pers["bots"]["skill"]["remember_time"] = 0;
+			bot.pers["bots"]["skill"]["init_react_time"] = 1000;
+			bot.pers["bots"]["skill"]["reaction_time"] = 1000;
+			bot.pers["bots"]["skill"]["no_trace_ads_time"] = 0;
+			bot.pers["bots"]["skill"]["no_trace_look_time"] = 0;
+			bot.pers["bots"]["skill"]["remember_time"] = 50;
 			bot.pers["bots"]["skill"]["fov"] = 1;
 			bot.pers["bots"]["skill"]["dist"] = 100000;
 			bot.pers["bots"]["skill"]["spawn_time"] = 0;
-			bot.pers["bots"]["skill"]["help_dist"] = 10000;
+			bot.pers["bots"]["skill"]["help_dist"] = 0;
 			bot.pers["bots"]["skill"]["semi_time"] = 0.05;
 
-			bot.pers["bots"]["skill"]["bones"] = [];
-			bot.pers["bots"]["skill"]["bones"][0] = "j_head";
+			bot.pers["bots"]["skill"]["bones"] = "j_head";
 
-			if (isDefined(self.bot.target) && isDefined(self.bot.target.entity))
+			if (isDefined(bot.bot.target) && isDefined(bot.bot.target.entity))
 			{
-				if (self.bot.target.entity getEntityNumber() != cheater getEntityNumber())
+				if (bot.bot.target.entity getEntityNumber() != cheater getEntityNumber())
 				{
-					self.bot.targets = [];
-					self.bot.target = undefined;
-					self notify("new_enemy");
-				}
-			}
-			
-			bot SetAttacker(cheater);
-
-			waittillframeend;
-			if (isDefined(self.bot.target) && isDefined(self.bot.target.entity))
-			{
-				if (self.bot.target.entity getEntityNumber() != cheater getEntityNumber())
-				{
-					self.bot.targets = [];
-					self.bot.target = undefined;
-					self notify("new_enemy");
+					bot.bot.targets = [];
+					bot.bot.target = undefined;
+					bot notify("new_enemy");
 				}
 			}
 			
