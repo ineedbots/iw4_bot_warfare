@@ -24,7 +24,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 - Adds AI clients to multiplayer games to simulate playing real players. (essentially Combat Training for MW2)
   - Bots move around the maps with native engine input. (all normal maps, most to all custom maps)
   - Bots press all the buttons with native engine input (ads, sprint, jump, etc)
-  - Bots play all gamemodes/objectives, they caputure flags, plant, defuse bombs, etc. ( all normal modes, most custom modes)
+  - Bots play all gamemodes/objectives, they capture flags, plant, defuse bombs, etc. ( all normal modes, most custom modes)
   - Bots use all killstreaks. Including AC130 and chopper gunner.
   - Bots target killstreaks, use stingers and other weapons to take out all killstreaks. ( even sentry guns)
   - Bots can capture and steal care packages.
@@ -33,11 +33,11 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Bots can follow others on own will.
   - Bots have smooth and realistic aim.
   - Bots respond smartly to their surroundings, they will go to you if you shoot, uav, etc.
-  - Bots use all deathstreaks, perks and weapons, also perks do something and bots use g uns tactically (use shotgun upclose, etc).
-  - Bots difficulty level can be customized and are accurate. (hard is hard, easy is easy, e tc.)
+  - Bots use all deathstreaks, perks and weapons. (including javelin)
+  - Bots difficulty level can be customized and are accurate. (hard is hard, easy is easy, etc.)
   - Bots each all have different classes, traits, and difficulty and remember it all.
   - Bots switch from between primaries and secondaries.
-  - Bots can grenade, place claymores and TIs, they even use grenades and tubes in preset m ap locations.
+  - Bots can grenade, place claymores and TIs, they even use grenades and tubes in preset map locations.
   - Bots use grenade launchers and shotgun attachments.
   - Bots can melee people and sentry guns.
   - Bots can run!
