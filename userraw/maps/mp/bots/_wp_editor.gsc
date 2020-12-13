@@ -127,6 +127,10 @@ watchAstarCommand()
 	for (;;)
 	{
 		self waittill("astar");
+
+		if (1)
+			continue;
+
 		self iprintln("Start AStar");
 		self.astar = undefined;
 		astar = spawnStruct();
@@ -136,7 +140,7 @@ watchAstarCommand()
 		self iprintln("End AStar");
 		astar.goal = self.origin;
 
-		astar.nodes = AStarSearch(astar.start, astar.goal, self.team, false);
+		astar.nodes = AStarSearch(astar.start, astar.goal, undefined, true);
 		self iprintln("AStar size: " + astar.nodes.size);
 
 		self.astar = astar;

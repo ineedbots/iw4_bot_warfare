@@ -15,7 +15,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 - [Credits](#Credits)
 
 ## Features
-- A Waypoint Editor for creating and modifying bot's waypoints of traversing the map. Have a look at [Using the Waypoint editor]().
+- A Waypoint Editor for creating and modifying bot's waypoints of traversing the map. Have a look at [Using the Waypoint editor](/userraw/bw-assets/wpedit.md).
 
 - A clean and nice menu, you can edit every bot DVAR within in-game.
 
@@ -65,11 +65,11 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 ## Documentation
 
 ### Menu Usage
-You can open the menu by pressing the Action Slot 2 key (default '5').
+- You can open the menu by pressing the Action Slot 2 key (default '5').
 
-You can navigate the options by pressing your movement keys (default WASD), and you can select options by pressing your jump key (default SPACE).
+- You can navigate the options by pressing your movement keys (default WASD), and you can select options by pressing your jump key (default SPACE).
 
-Pressing the menu button again closes menus.
+- Pressing the menu button again closes menus.
 
 ### DVARs
 - bots_manage_add - an integer amount of bots to add to the game, resets to 0 once the bots have been added.
