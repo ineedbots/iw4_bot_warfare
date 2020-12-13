@@ -1350,6 +1350,9 @@ canAds(dist, curweap)
 	if(curweap == "none")
 		return false;
 
+	if (!getDvarInt("bots_play_ads"))
+		return false;
+
 	far = level.bots_noADSDistance;
 	if(self _hasPerk("specialty_bulletaccuracy"))
 		far *= 1.4;

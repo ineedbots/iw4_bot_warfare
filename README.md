@@ -136,6 +136,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 - bots_play_jumpdrop - a boolean value (0 or 1), whether or not if the bots will jump shot or drop shot
 - bots_play_target_other - a boolean value (0 or 1), whether or not if the bots will target claymores, killstreaks, etc.
 - bots_play_killstreak - a boolean value (0 or 1), whether or not if the bots will use killstreaks
+- bots_play_ads - a boolean value (0 or 1), whether or not if the bots will ads
 
 ---
 

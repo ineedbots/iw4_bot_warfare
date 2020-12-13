@@ -87,6 +87,8 @@ init()
 		setDvar("bots_play_target_other", true);
 	if(getDvar("bots_play_killstreak") == "")//bot use killstreaks
 		setDvar("bots_play_killstreak", true);
+	if(getDvar("bots_play_ads") == "")//bot ads
+		setDvar("bots_play_ads", true);
 
 	if(!isDefined(game["botWarfare"]))
 		game["botWarfare"] = true;

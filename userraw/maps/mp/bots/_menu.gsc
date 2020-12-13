@@ -773,6 +773,13 @@ AddOptions()
 	else
 		_temp = "false";
 	self AddMenu("set1", 11, "Bots can use killstreaks: "+_temp, ::bot_func, "killstreak", _tempDvar);
+
+	_tempDvar = getDvarInt("bots_play_ads");
+	if(_tempDvar)
+		_temp = "true";
+	else
+		_temp = "false";
+	self AddMenu("set1", 12, "Bots can ads: "+_temp, ::bot_func, "ads", _tempDvar);
 }
 
 bot_func(a, b)
@@ -826,6 +833,10 @@ bot_func(a, b)
 		case "killstreak":
 			setDvar("bots_play_killstreak", !b);
 			self iPrintln("Bots use killstreaks: " + !b);
+		break;
+		case "ads":
+			setDvar("bots_play_ads", !b);
+			self iPrintln("Bots ads: " + !b);
 		break;
 	}
 }
