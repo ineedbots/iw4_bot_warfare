@@ -1,3 +1,5 @@
+![How tilde](/userraw/bw-assets/how-tilde.png)
+![Setting the dvar](/userraw/bw-assets/wp-editor-debug-dvar.png)
 ![The editor](/userraw/bw-assets/wp-editor-0.png)
 ![Adding a waypoint](/userraw/bw-assets/wp-editor-added.png)
 ![Adding another waypoint](/userraw/bw-assets/wp-editor-added2.png)
