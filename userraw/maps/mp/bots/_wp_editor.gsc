@@ -351,7 +351,10 @@ watchSaveWaypointsCommand()
 	for(;;)
 	{
 		self waittill("[{+actionslot 1}]");
+		
 		self checkForWarnings();
+		wait 1;
+
 		logprint("***********ABiliTy's WPDump**************\n\n");
 		logprint("\n\n\n\n");
 		mpnm=getMapName(getdvar("mapname"));
