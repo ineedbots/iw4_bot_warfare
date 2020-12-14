@@ -978,6 +978,15 @@ load_waypoints()
 		level.waypoints[i].bots["allies"] = 1;
 		level.waypoints[i].bots["axis"] = 1;
 
+		if (!isDefined(level.waypoints[i].children) || !isDefined(level.waypoints[i].children.size))
+			level.waypoints[i].children = [];
+
+		if (!isDefined(level.waypoints[i].origin))
+			level.waypoints[i].origin = (0, 0, 0);
+
+		if (!isDefined(level.waypoints[i].type))
+			level.waypoints[i].type = "crouch";
+
 		level.waypoints[i].childCount = level.waypoints[i].children.size;
 	}
 	
