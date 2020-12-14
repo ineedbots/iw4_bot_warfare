@@ -438,18 +438,27 @@ checkForWarnings()
 		
 		if(level.waypoints[i].childCount <= 0)
 			self iprintln("WARNING: waypoint "+i+" childCount is "+level.waypoints[i].childCount);
-		
-		if(level.waypoints[i].childCount != level.waypoints[i].children.size)
-			self iprintln("WARNING: waypoint "+i+" childCount is not "+level.waypoints[i].children.size);
-		
-		for (h = 0; h < level.waypoints[i].childCount; h++)
+		else
 		{
-			child = level.waypoints[i].children[h];
+			if (!isDefined(level.waypoints[i].children) || !isDefined(level.waypoints[i].children.size))
+			{
+				self iprintln("WARNING: waypoint "+i+" children is not defined");
+			}
+			else
+			{
+				if(level.waypoints[i].childCount != level.waypoints[i].children.size)
+					self iprintln("WARNING: waypoint "+i+" childCount is not "+level.waypoints[i].children.size);
+				
+				for (h = 0; h < level.waypoints[i].childCount; h++)
+				{
+					child = level.waypoints[i].children[h];
 
-			if(!isDefined(level.waypoints[child]))
-				self iprintln("WARNING: waypoint "+i+" child "+child+" is undefined");
-			else if(child == i)
-				self iprintln("WARNING: waypoint "+i+" child "+child+" is itself");
+					if(!isDefined(level.waypoints[child]))
+						self iprintln("WARNING: waypoint "+i+" child "+child+" is undefined");
+					else if(child == i)
+						self iprintln("WARNING: waypoint "+i+" child "+child+" is itself");
+				}
+			}
 		}
 		
 		if(!isDefined(level.waypoints[i].type))
