@@ -416,6 +416,8 @@ LoadWaypoints()
 	self DeleteAllWaypoints();
 	self iPrintlnBold("Loading WPS...");
 	load_waypoints();
+
+	wait 1;
 	
 	self checkForWarnings();
 }
