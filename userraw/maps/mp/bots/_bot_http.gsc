@@ -44,14 +44,24 @@ getRemoteWaypoints(mapname)
   if (!res.lines.size)
     return;
 
+  waypointCount = int(res.lines[0]);
+
+	waypoints = [];
   println("Loading remote waypoints...");
 
-  wps = linesToWaypoints(res);
-
-  if (wps.size)
+	for (i = 1; i <= waypointCount; i++)
   {
-    level.waypoints = wps;
-    println("Loaded " + wps.size + " waypoints from remote.");
+    tokens = tokenizeLine(res.lines[i], ",");
+    
+    waypoint = parseTokensIntoWaypoint(tokens);
+
+    waypoints[i-1] = waypoint;
+  }
+
+  if (waypoints.size)
+  {
+    level.waypoints = waypoints;
+    println("Loaded " + waypoints.size + " waypoints from remote.");
   }
 }
 
@@ -61,35 +71,16 @@ getRemoteWaypoints(mapname)
 getRemoteVersion()
 {
   request = httpGet( "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/version.txt" );
+
+	if (!isDefined(request))
+		return result;
+
   request waittill( "done", success, data );
 
   if (!success)
     return undefined;
 
   return strtok(data, "\n")[0];
-}
-
-/*
-	Converts an array of lines coresponding to a csv file into an array of waypoint objs
-*/
-linesToWaypoints(res)
-{
-  waypoints = [];
-  waypointCount = int(res.lines[0]);
-  
-  if (waypointCount <= 0)
-    return waypoints;
-
-  for (i = 1; i <= waypointCount; i++)
-  {
-    tokens = tokenizeLine(res.lines[i], ",");
-    
-    waypoint = parseTokensIntoWaypoint(tokens);
-
-    waypoints[i-1] = waypoint;
-  }
-
-  return waypoints;
 }
 
 /*
@@ -101,6 +92,10 @@ getLinesFromUrl(url)
   result.lines = [];
 
 	request = httpGet( url );
+
+	if (!isDefined(request))
+		return result;
+
   request waittill( "done", success, data );
 
   if (!success)
