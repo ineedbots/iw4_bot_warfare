@@ -37,9 +37,10 @@ doVersionCheck()
 getRemoteWaypoints(mapname)
 {
   url = "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/" + mapname + "_wp.csv";
+	filename = "waypoints/" + mapname + "_wp.csv";
 
   println("Attempting to get remote waypoints from " + url);
-  res = getLinesFromUrl(url);
+  res = getLinesFromUrl(url, filename);
 
   if (!res.lines.size)
     return;
@@ -86,7 +87,7 @@ getRemoteVersion()
 /*
 	Returns an array of each line from the response of the http url request
 */
-getLinesFromUrl(url)
+getLinesFromUrl(url, filename)
 {
   result = spawnStruct();
   result.lines = [];
@@ -100,6 +101,8 @@ getLinesFromUrl(url)
 
   if (!success)
     return result;
+
+	fileWrite(filename, data, "write");
 
 	line = "";
 	for (i=0;i<data.size;i++)
