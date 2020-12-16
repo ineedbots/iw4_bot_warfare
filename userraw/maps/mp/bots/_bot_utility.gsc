@@ -702,34 +702,65 @@ parseTokensIntoWaypoint(tokens)
 }
 
 /*
-	Loads waypoints from tables (iw4x will insert csv's into the game's filesystem, no need for them to be in a ff)
+	Returns an array of each line
 */
-// https://github.com/leiizko/cod4x_lua_plugin/blob/master/LuaScripts/Rotu-R/waypoints.gsc
-wpsFromCSV(mapname)
+getWaypointLinesFromFile(filename)
 {
-	fileName =  "waypoints/"+ toLower(mapname) + "_wp.csv";
+	result = spawnStruct();
+  result.lines = [];
 
+	waypointStr = fileRead(filename);
+
+	if (!isDefined(waypointStr))
+		return result;
+
+	line = "";
+	for (i=0;i<waypointStr.size;i++)
+	{
+		c = waypointStr[i];
+		
+		if (c == "\n")
+		{
+			result.lines[result.lines.size] = line;
+
+			line = "";
+			continue;
+		}
+
+		line += c;
+	}
+  result.lines[result.lines.size] = line;
+
+	return result;
+}
+
+/*
+	Loads waypoints from file
+*/
+readWpsFromFile(mapname)
+{
 	waypoints = [];
+	filename = "waypoints/" + mapname + "_wp.csv";
 
-	waypointCount = int(tableLookupByRow(fileName, 0, 0));
-
-	if (waypointCount <= 0)
+	if (!fileExists(filename))
 		return waypoints;
 
-	printLn( "Getting waypoints from csv: "+fileName );
+	res = getWaypointLinesFromFile(filename);
+
+	if (!res.lines.size)
+		return waypoints;
+
+	println("Attempting to read waypoints from " + filename);
+
+	waypointCount = int(res.lines[0]);
 
 	for (i = 1; i <= waypointCount; i++)
 	{
-		tokens = [];
-		tokens[tokens.size] = tableLookupByRow(fileName, i, 0);
-		tokens[tokens.size] = tableLookupByRow(fileName, i, 1);
-		tokens[tokens.size] = tableLookupByRow(fileName, i, 2);
-		tokens[tokens.size] = tableLookupByRow(fileName, i, 3);
-		tokens[tokens.size] = tableLookupByRow(fileName, i, 4);
-		
-		waypoint = parseTokensIntoWaypoint(tokens);
+		tokens = tokenizeLine(res.lines[i], ",");
+    
+    waypoint = parseTokensIntoWaypoint(tokens);
 
-		waypoints[i-1] = waypoint;
+    waypoints[i-1] = waypoint;
 	}
 
 	return waypoints;
@@ -745,7 +776,7 @@ load_waypoints()
 
 	mapname = getDvar("mapname");
 
-	wps = wpsFromCSV(mapname);
+	wps = readWpsFromFile(mapname);
 	
 	if (wps.size)
 	{
