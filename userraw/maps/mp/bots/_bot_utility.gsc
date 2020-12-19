@@ -532,19 +532,51 @@ notifyAfterDelay(delay, not)
 
 /*
 	Pezbot's line sphere intersection.
+	http://paulbourke.net/geometry/circlesphere/raysphere.c
 */
 RaySphereIntersect(start, end, spherePos, radius)
 {
-   dp = end - start;
-   a = dp[0] * dp[0] + dp[1] * dp[1] + dp[2] * dp[2];
-   b = 2 * (dp[0] * (start[0] - spherePos[0]) + dp[1] * (start[1] - spherePos[1]) + dp[2] * (start[2] - spherePos[2]));
-   c = spherePos[0] * spherePos[0] + spherePos[1] * spherePos[1] + spherePos[2] * spherePos[2];
-   c += start[0] * start[0] + start[1] * start[1] + start[2] * start[2];
-   c -= 2.0 * (spherePos[0] * start[0] + spherePos[1] * start[1] + spherePos[2] * start[2]);
-   c -= radius * radius;
-   bb4ac = b * b - 4.0 * a * c;
-   
-   return (bb4ac >= 0);
+	// check if the start or end points are in the sphere
+	r2 = radius * radius;
+	if (DistanceSquared(start, spherePos) < r2)
+		return true;
+
+	if (DistanceSquared(end, spherePos) < r2)
+		return true;
+
+	// check if the line made by start and end intersect the sphere
+	dp = end - start;
+	a = dp[0] * dp[0] + dp[1] * dp[1] + dp[2] * dp[2];
+	b = 2 * (dp[0] * (start[0] - spherePos[0]) + dp[1] * (start[1] - spherePos[1]) + dp[2] * (start[2] - spherePos[2]));
+	c = spherePos[0] * spherePos[0] + spherePos[1] * spherePos[1] + spherePos[2] * spherePos[2];
+	c += start[0] * start[0] + start[1] * start[1] + start[2] * start[2];
+	c -= 2.0 * (spherePos[0] * start[0] + spherePos[1] * start[1] + spherePos[2] * start[2]);
+	c -= radius * radius;
+	bb4ac = b * b - 4.0 * a * c;
+
+	if (abs(a) < 0.0001 || bb4ac < 0)
+		return false;
+
+	mu1 = (0-b + sqrt(bb4ac)) / (2 * a);
+	//mu2 = (0-b - sqrt(bb4ac)) / (2 * a);
+
+	// intersection points of the sphere
+	ip1 = start + mu1 * dp;
+	//ip2 = start + mu2 * dp;
+
+	myDist = DistanceSquared(start, end);
+
+	// check if both intersection points far
+	if (DistanceSquared(start, ip1) > myDist/* && DistanceSquared(start, ip2) > myDist*/)
+		return false;
+
+	dpAngles = VectorToAngles(dp);
+
+	// check if the point is behind us
+	if (getConeDot(ip1, start, dpAngles) < 0/* || getConeDot(ip2, start, dpAngles) < 0*/)
+		return false;
+
+	return true;
 }
 
 /*
