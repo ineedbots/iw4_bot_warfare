@@ -699,7 +699,7 @@ targetObjUpdateTraced(obj, daDist, ent, theTime)
 		timeMulti = 1 - ((daDist - distClose) / (distMax - distClose));
 
 	obj.no_trace_time = 0;
-	obj.trace_time += 50 * timeMulti;
+	obj.trace_time += int(50 * timeMulti);
 	obj.dist = daDist;
 	obj.last_seen_pos = ent.origin;
 	obj.trace_time_time = theTime;
