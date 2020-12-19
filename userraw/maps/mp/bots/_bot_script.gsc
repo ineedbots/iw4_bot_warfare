@@ -1027,7 +1027,8 @@ difficulty()
 				self.pers["bots"]["skill"]["no_trace_look_time"] = 600;
 				self.pers["bots"]["skill"]["remember_time"] = 750;
 				self.pers["bots"]["skill"]["fov"] = 0.7;
-				self.pers["bots"]["skill"]["dist"] = 1000;
+				self.pers["bots"]["skill"]["dist_max"] = 2500;
+				self.pers["bots"]["skill"]["dist_start"] = 1000;
 				self.pers["bots"]["skill"]["spawn_time"] = 0.75;
 				self.pers["bots"]["skill"]["help_dist"] = 0;
 				self.pers["bots"]["skill"]["semi_time"] = 0.9;
@@ -1055,7 +1056,8 @@ difficulty()
 				self.pers["bots"]["skill"]["no_trace_look_time"] = 1250;
 				self.pers["bots"]["skill"]["remember_time"] = 1500;
 				self.pers["bots"]["skill"]["fov"] = 0.65;
-				self.pers["bots"]["skill"]["dist"] = 1500;
+				self.pers["bots"]["skill"]["dist_max"] = 3000;
+				self.pers["bots"]["skill"]["dist_start"] = 1500;
 				self.pers["bots"]["skill"]["spawn_time"] = 0.65;
 				self.pers["bots"]["skill"]["help_dist"] = 500;
 				self.pers["bots"]["skill"]["semi_time"] = 0.75;
@@ -1083,7 +1085,8 @@ difficulty()
 				self.pers["bots"]["skill"]["no_trace_look_time"] = 1500;
 				self.pers["bots"]["skill"]["remember_time"] = 2000;
 				self.pers["bots"]["skill"]["fov"] = 0.6;
-				self.pers["bots"]["skill"]["dist"] = 2250;
+				self.pers["bots"]["skill"]["dist_max"] = 4000;
+				self.pers["bots"]["skill"]["dist_start"] = 2250;
 				self.pers["bots"]["skill"]["spawn_time"] = 0.5;
 				self.pers["bots"]["skill"]["help_dist"] = 750;
 				self.pers["bots"]["skill"]["semi_time"] = 0.65;
@@ -1111,7 +1114,8 @@ difficulty()
 				self.pers["bots"]["skill"]["no_trace_look_time"] = 2000;
 				self.pers["bots"]["skill"]["remember_time"] = 3000;
 				self.pers["bots"]["skill"]["fov"] = 0.55;
-				self.pers["bots"]["skill"]["dist"] = 3350;
+				self.pers["bots"]["skill"]["dist_max"] = 5000;
+				self.pers["bots"]["skill"]["dist_start"] = 3350;
 				self.pers["bots"]["skill"]["spawn_time"] = 0.35;
 				self.pers["bots"]["skill"]["help_dist"] = 1000;
 				self.pers["bots"]["skill"]["semi_time"] = 0.5;
@@ -1139,7 +1143,8 @@ difficulty()
 				self.pers["bots"]["skill"]["no_trace_look_time"] = 3000;
 				self.pers["bots"]["skill"]["remember_time"] = 4000;
 				self.pers["bots"]["skill"]["fov"] = 0.5;
-				self.pers["bots"]["skill"]["dist"] = 5000;
+				self.pers["bots"]["skill"]["dist_max"] = 7500;
+				self.pers["bots"]["skill"]["dist_start"] = 5000;
 				self.pers["bots"]["skill"]["spawn_time"] = 0.25;
 				self.pers["bots"]["skill"]["help_dist"] = 1500;
 				self.pers["bots"]["skill"]["semi_time"] = 0.4;
@@ -1167,7 +1172,8 @@ difficulty()
 				self.pers["bots"]["skill"]["no_trace_look_time"] = 4000;
 				self.pers["bots"]["skill"]["remember_time"] = 5000;
 				self.pers["bots"]["skill"]["fov"] = 0.45;
-				self.pers["bots"]["skill"]["dist"] = 7500;
+				self.pers["bots"]["skill"]["dist_max"] = 10000;
+				self.pers["bots"]["skill"]["dist_start"] = 7500;
 				self.pers["bots"]["skill"]["spawn_time"] = 0.2;
 				self.pers["bots"]["skill"]["help_dist"] = 2000;
 				self.pers["bots"]["skill"]["semi_time"] = 0.25;
@@ -1195,7 +1201,8 @@ difficulty()
 				self.pers["bots"]["skill"]["no_trace_look_time"] = 4000;
 				self.pers["bots"]["skill"]["remember_time"] = 7500;
 				self.pers["bots"]["skill"]["fov"] = 0.4;
-				self.pers["bots"]["skill"]["dist"] = 10000;
+				self.pers["bots"]["skill"]["dist_max"] = 15000;
+				self.pers["bots"]["skill"]["dist_start"] = 10000;
 				self.pers["bots"]["skill"]["spawn_time"] = 0.05;
 				self.pers["bots"]["skill"]["help_dist"] = 3000;
 				self.pers["bots"]["skill"]["semi_time"] = 0.1;
@@ -1242,7 +1249,11 @@ set_diff()
 			self.pers["bots"]["skill"]["no_trace_ads_time"] = 50 * randomInt(100);
 			self.pers["bots"]["skill"]["no_trace_look_time"] = 50 * randomInt(100);
 			self.pers["bots"]["skill"]["fov"] = randomFloatRange(-1, 1);
-			self.pers["bots"]["skill"]["dist"] = randomIntRange(500, 25000);
+
+			randomNum = randomIntRange(500, 25000);
+			self.pers["bots"]["skill"]["dist_start"] = randomNum;
+			self.pers["bots"]["skill"]["dist_max"] = randomNum * 2;
+			
 			self.pers["bots"]["skill"]["spawn_time"] = 0.05 * randomInt(20);
 			self.pers["bots"]["skill"]["help_dist"] = randomIntRange(500, 25000);
 			self.pers["bots"]["skill"]["semi_time"] = randomFloatRange(0.05, 1);

@@ -30,7 +30,8 @@ added()
 	self.pers["bots"]["skill"]["no_trace_look_time"] = 10000;
 	self.pers["bots"]["skill"]["remember_time"] = 25000;
 	self.pers["bots"]["skill"]["fov"] = -1;
-	self.pers["bots"]["skill"]["dist"] = 100000;
+	self.pers["bots"]["skill"]["dist_max"] = 100000;
+	self.pers["bots"]["skill"]["dist_start"] = 100000;
 	self.pers["bots"]["skill"]["spawn_time"] = 0;
 	self.pers["bots"]["skill"]["help_dist"] = 10000;
 	self.pers["bots"]["skill"]["semi_time"] = 0.05;
@@ -685,8 +686,20 @@ updateAimOffset(obj, theTime)
 */
 targetObjUpdateTraced(obj, daDist, ent, theTime)
 {
+	distClose = self.pers["bots"]["skill"]["dist_start"];
+	distClose *= distClose;
+
+	distMax = self.pers["bots"]["skill"]["dist_max"];
+	distMax *= distMax;
+
+	timeMulti = 1;
+	if (daDist > distMax)
+		timeMulti = 0;
+	else if (daDist > distClose)
+		timeMulti = 1 - ((daDist - distClose) / (distMax - distClose));
+
 	obj.no_trace_time = 0;
-	obj.trace_time += 50;
+	obj.trace_time += 50 * timeMulti;
 	obj.dist = daDist;
 	obj.last_seen_pos = ent.origin;
 	obj.trace_time_time = theTime;
@@ -725,8 +738,6 @@ target()
 		myEye = self GetEye();
 		theTime = getTime();
 		myAngles = self GetPlayerAngles();
-		distsq = self.pers["bots"]["skill"]["dist"];
-		distsq *= distsq;
 		myFov = self.pers["bots"]["skill"]["fov"];
 		bestTargets = [];
 		bestTime = 9999999999;
@@ -809,7 +820,7 @@ target()
 				obj = self.bot.targets[key];
 				daDist = distanceSquared(self.origin, player.origin);
 				isObjDef = isDefined(obj);
-				if((level.teamBased && self.team == player.team) || player.sessionstate != "playing" || !isReallyAlive(player) || (daDist > distsq && !usingRemote))
+				if((level.teamBased && self.team == player.team) || player.sessionstate != "playing" || !isReallyAlive(player))
 				{
 					if(isObjDef)
 						self.bot.targets[key] = undefined;
