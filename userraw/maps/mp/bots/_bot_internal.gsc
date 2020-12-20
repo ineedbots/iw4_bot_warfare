@@ -1739,7 +1739,7 @@ movetowards(goal)
 	{
 		self botMoveTo(goal);
 		
-		if(time > 2.5)
+		if(time > 3)
 		{
 			time = 0;
 			if(distanceSquared(self.origin, lastOri) < 128)
@@ -1758,8 +1758,6 @@ movetowards(goal)
 		}
 		else if(timeslow > 1.5)
 		{
-			self stand();
-			wait 1;
 			self thread jump();
 		}
 		else if(timeslow > 0.75)
