@@ -684,7 +684,7 @@ updateAimOffset(obj, theTime)
 /*
 	Updates the target object to be traced Has LOS
 */
-targetObjUpdateTraced(obj, daDist, ent, theTime)
+targetObjUpdateTraced(obj, daDist, ent, theTime, isScriptObj, usingRemote)
 {
 	distClose = self.pers["bots"]["skill"]["dist_start"];
 	distClose *= distClose;
@@ -693,10 +693,13 @@ targetObjUpdateTraced(obj, daDist, ent, theTime)
 	distMax *= distMax;
 
 	timeMulti = 1;
-	if (daDist > distMax)
-		timeMulti = 0;
-	else if (daDist > distClose)
-		timeMulti = 1 - ((daDist - distClose) / (distMax - distClose));
+	if (!usingRemote && !isScriptObj)
+	{
+		if (daDist > distMax)
+			timeMulti = 0;
+		else if (daDist > distClose)
+			timeMulti = 1 - ((daDist - distClose) / (distMax - distClose));
+	}
 
 	obj.no_trace_time = 0;
 	obj.trace_time += int(50 * timeMulti);
@@ -793,7 +796,7 @@ target()
 						self.bot.targets[key] = obj;
 					}
 					
-					self targetObjUpdateTraced(obj, daDist, ent, theTime);
+					self targetObjUpdateTraced(obj, daDist, ent, theTime, true, usingRemote);
 				}
 				else
 				{
@@ -872,7 +875,7 @@ target()
 						self.bot.targets[key] = obj;
 					}
 
-					self targetObjUpdateTraced(obj, daDist, player, theTime);
+					self targetObjUpdateTraced(obj, daDist, player, theTime, false, usingRemote);
 				}
 				else
 				{
