@@ -62,7 +62,7 @@ bot_get_prestige()
 
 	if (p_dvar == -1)
 	{
-		for (i = 0; i < level.players[i]; i++)
+		for (i = 0; i < level.players.size; i++)
 		{
 			player = level.players[i];
 
