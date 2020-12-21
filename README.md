@@ -128,6 +128,8 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 - bots_loadout_rank - an integer number, bots will be around this rank, -1 is average of all players in game, 0 is all random
 
+- bots_loadout_prestige - an integer number, bots will be this prestige, -1 is the same as player, -2 is all random
+
 - bots_play_move - a boolean value (0 or 1), whether or not if the bots will move
 - bots_play_knife - a boolean value (0 or 1), whether or not if the bots will use the knife
 - bots_play_fire - a boolean value (0 or 1), whether or not if the bots will fire their weapons

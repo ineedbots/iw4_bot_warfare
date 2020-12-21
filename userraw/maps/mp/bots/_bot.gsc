@@ -68,6 +68,8 @@ init()
 		setDvar("bots_loadout_allow_op", true);
 	if(getDvar("bots_loadout_rank") == "")// what rank the bots should be around, -1 is around the players, 0 is all random
 		setDvar("bots_loadout_rank", -1);
+	if(getDvar("bots_loadout_prestige") == "")// what pretige the bots will be, -1 is the players, -2 is random
+		setDvar("bots_loadout_prestige", -1);
 
 	if(getDvar("bots_play_move") == "")//bots move
 		setDvar("bots_play_move", true);

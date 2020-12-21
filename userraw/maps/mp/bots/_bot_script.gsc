@@ -19,7 +19,7 @@ added()
 	self endon("disconnect");
 
 	self setPlayerData("experience", self bot_get_rank());
-	self setPlayerData("prestige", 0);
+	self setPlayerData("prestige", self bot_get_prestige());
 	
 	self setPlayerData("cardTitle", random(getCardTitles()));
 	self setPlayerData("cardIcon", random(getCardIcons()));
@@ -50,6 +50,42 @@ connected()
 	self thread onGiveLoadout();
 
 	self thread onKillcam();
+}
+
+/*
+	Gets the prestige
+*/
+bot_get_prestige()
+{
+	p_dvar = getDvarInt("bots_loadout_prestige");
+	p = 0;
+
+	if (p_dvar == -1)
+	{
+		for (i = 0; i < level.players[i]; i++)
+		{
+			player = level.players[i];
+
+			if (!isDefined(player.team))
+				continue;
+
+			if (player is_bot())
+				continue;
+
+			p = player getPlayerData("prestige");
+			break;
+		}
+	}
+	else if (p_dvar == -2)
+	{
+		p = randomInt(12);
+	}
+	else
+	{
+		p = p_dvar;
+	}
+
+	return p;
 }
 
 /*
