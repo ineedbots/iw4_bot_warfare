@@ -535,7 +535,7 @@ notifyAfterDelay(delay, not)
 */
 GetHostPlayer()
 {
-	for (i = 0; i < level.player.size; i++)
+	for (i = 0; i < level.players.size; i++)
 	{
 		player = level.players[i];
 
