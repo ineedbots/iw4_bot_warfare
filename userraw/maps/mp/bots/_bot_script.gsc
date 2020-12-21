@@ -57,48 +57,62 @@ connected()
 */
 bot_get_rank()
 {
-	ranks = [];
-	bot_ranks = [];
-	human_ranks = [];
-	
-	for ( i = level.players.size - 1; i >= 0; i-- )
+	rank = 1;
+	rank_dvar = getDvarInt("bots_loadout_rank");
+
+	if (rank_dvar == -1)
 	{
-		player = level.players[i];
-	
-		if ( player == self )
-			continue;
+		ranks = [];
+		bot_ranks = [];
+		human_ranks = [];
 		
-		if ( !IsDefined( player.pers[ "rank" ] ) )
-			continue;
+		for ( i = level.players.size - 1; i >= 0; i-- )
+		{
+			player = level.players[i];
 		
-		if ( player is_bot() )
-		{
-			bot_ranks[ bot_ranks.size ] = player.pers[ "rank" ];
+			if ( player == self )
+				continue;
+			
+			if ( !IsDefined( player.pers[ "rank" ] ) )
+				continue;
+			
+			if ( player is_bot() )
+			{
+				bot_ranks[ bot_ranks.size ] = player.pers[ "rank" ];
+			}
+			else
+			{
+				human_ranks[ human_ranks.size ] = player.pers[ "rank" ];
+			}
 		}
-		else
+
+		if( !human_ranks.size )
+			human_ranks[ human_ranks.size ] = Round( random_normal_distribution( 45, 20, 0, level.maxRank ) );
+
+		human_avg = array_average( human_ranks );
+
+		while ( bot_ranks.size + human_ranks.size < 5 )
 		{
-			human_ranks[ human_ranks.size ] = player.pers[ "rank" ];
+			// add some random ranks for better random number distribution
+			rank = human_avg + RandomIntRange( -10, 10 );
+			human_ranks[ human_ranks.size ] = rank;
 		}
+
+		ranks = array_combine( human_ranks, bot_ranks );
+
+		avg = array_average( ranks );
+		s = array_std_deviation( ranks, avg );
+		
+		rank = Round( random_normal_distribution( avg, s, 0, level.maxRank ) );
 	}
-
-	if( !human_ranks.size )
-		human_ranks[ human_ranks.size ] = Round( random_normal_distribution( 45, 20, 0, level.maxRank ) );
-
-	human_avg = array_average( human_ranks );
-
-	while ( bot_ranks.size + human_ranks.size < 5 )
+	else if (rank_dvar == 0)
 	{
-		// add some random ranks for better random number distribution
-		rank = human_avg + RandomIntRange( -10, 10 );
-		human_ranks[ human_ranks.size ] = rank;
+		rank = Round( random_normal_distribution( 45, 20, 0, level.maxRank ) );
 	}
-
-	ranks = array_combine( human_ranks, bot_ranks );
-
-	avg = array_average( ranks );
-	s = array_std_deviation( ranks, avg );
-	
-	rank = Round( random_normal_distribution( avg, s, 0, level.maxRank ) );
+	else
+	{
+		rank = Round( random_normal_distribution( rank_dvar, 5, 0, level.maxRank ) );
+	}
 
 	return maps\mp\gametypes\_rank::getRankInfoMinXP( rank );
 }
