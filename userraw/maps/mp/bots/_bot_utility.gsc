@@ -531,6 +531,64 @@ notifyAfterDelay(delay, not)
 }
 
 /*
+	Gets a player who is host
+*/
+GetHostPlayer()
+{
+	for (i = 0; i < level.player.size; i++)
+	{
+		player = level.players[i];
+
+		if (!player is_host())
+			continue;
+
+		return player;
+	}
+
+	return undefined;
+}
+
+/*
+  Waits for a host player
+*/
+bot_wait_for_host()
+{
+	host = undefined;
+	
+	for(i = 0; i < 100; i++)
+	{
+		host = GetHostPlayer();
+		
+		if(isDefined(host))
+			break;
+		
+		wait 0.05;
+	}
+	
+	if(!isDefined(host))
+		return;
+	
+	for(i = 0; i < 100; i++)
+	{
+		if(IsDefined( host.pers[ "team" ] ))
+			break;
+		
+		wait 0.05;
+	}
+
+	if(!IsDefined( host.pers[ "team" ] ))
+		return;
+	
+	for(i = 0; i < 100; i++)
+	{
+		if(host.pers[ "team" ] == "allies" || host.pers[ "team" ] == "axis")
+			break;
+		
+		wait 0.05;
+	}
+}
+
+/*
 	Pezbot's line sphere intersection.
 	http://paulbourke.net/geometry/circlesphere/raysphere.c
 */
