@@ -23,6 +23,8 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 - This mod does not edit ANY stock .gsc files, meaning EVERY other mod is compatible with this mod. Mod doesn't add anything unnecessary, what you see is what you get.
 
+- Loading waypoints from CSV files, and if the CSV file is missing, will download the CSV from [this repo](https://github.com/ineedbots/iw4x_waypoints) automatically.
+
 - Adds AI clients to multiplayer games to simulate playing real players. (essentially Combat Training for MW2)
   - Bots move around the maps with native engine input. (all normal maps, most to all custom maps)
   - Bots press all the buttons with native engine input (ads, sprint, jump, etc)

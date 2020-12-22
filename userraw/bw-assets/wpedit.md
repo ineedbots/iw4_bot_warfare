@@ -24,7 +24,7 @@ Now start a match with the map you want to edit.
 It should be noted that waypoints load in this following order;
 1. check the 'waypoints' folder (FS_Game\waypoints) for a csv file
 2. load the waypoints from GSC (maps\mp\bots\waypoints)
-3. check online at [this repo](https://github.com/ineedbots/iw4x_waypoints) for the waypoints (if you have the HTTP module for Bot Warfare)
+3. check online at [this repo](https://github.com/ineedbots/iw4x_waypoints) for the waypoints (if dedicated server, or -scriptablehttp flag)
 
 If all fail to load waypoints, then the bots will not know how to navigate the map.
 
