@@ -748,6 +748,7 @@ target()
 		initReactTime = self.pers["bots"]["skill"]["init_react_time"];
 		hasTarget = isDefined(self.bot.target);
 		usingRemote = self isUsingRemote();
+		ignoreSmoke = isSubStr(self GetCurrentWeapon(), "_thermal_");
 		vehEnt = undefined;
 
 		if (usingRemote)
@@ -786,7 +787,7 @@ target()
 				if (isDefined(self.bot.script_target_offset))
 					entOrigin += self.bot.script_target_offset;
 				
-				if(SmokeTrace(myEye, entOrigin, level.smokeRadius) && bulletTracePassed(myEye, entOrigin, false, ent))
+				if(ignoreSmoke || (SmokeTrace(myEye, entOrigin, level.smokeRadius)) && bulletTracePassed(myEye, entOrigin, false, ent))
 				{
 					if(!isObjDef)
 					{
@@ -852,7 +853,8 @@ target()
 										distanceSquared(PhysicsTrace( myEye, targetAnkleLeft, false, self ), targetAnkleLeft) < 0.05 ||
 										distanceSquared(PhysicsTrace( myEye, targetAnkleRight, false, self ), targetAnkleRight) < 0.05)
 
-									&& (SmokeTrace(myEye, player.origin, level.smokeRadius) ||
+									&& (ignoreSmoke ||
+										SmokeTrace(myEye, player.origin, level.smokeRadius) ||
 										daDist < level.bots_maxKnifeDistance*4)
 
 									&& (getConeDot(player.origin, self.origin, myAngles) >= myFov ||
