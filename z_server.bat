@@ -1,1 +1,1 @@
-start "" "%~dp0iw4x.exe" -dedicated +set sv_lanonly "0" +set net_port "28960" +set fs_game "" +exec server.cfg +map_rotate
+start "" "%~dp0iw4x.exe" -dedicated +set sv_lanonly "0" +set net_port "28960" +set fs_game "" +set g_antilag "0" +exec server.cfg +map_rotate

@@ -1,1 +1,1 @@
-start "" "%~dp0iw4x.exe" -dedicated +set sv_lanonly "1" +set net_port "28960" +set fs_game "mods/pvb" +exec pvbvote.cfg +map_rotate
+start "" "%~dp0iw4x.exe" -dedicated +set sv_lanonly "1" +set net_port "28960" +set fs_game "mods/pvb" +set g_antilag "0" +exec pvbvote.cfg +map_rotate
