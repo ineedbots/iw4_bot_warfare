@@ -378,8 +378,12 @@ watchSaveWaypointsCommand()
 		}
 		logprint("*/return waypoints;\n}\n\n\n\n");
 
+		filename = "waypoints/" + getdvar("mapname") + "_wp.csv";
+
 		PrintLn("********* Start Bot Warfare WPDump *********");
 		PrintLn(level.waypointCount);
+
+		fileWrite(filename, level.waypointCount+"\n", "write");
 		for(i = 0; i < level.waypointCount; i++)
 		{
 			str = "";
@@ -407,10 +411,11 @@ watchSaveWaypointsCommand()
 				str += ",";
 
 			PrintLn(str);
+			fileWrite(filename, str+"\n", "append");
 		}
 		PrintLn("\n\n\n\n\n\n");
 
-		self iprintln("Saved!!!");
+		self iprintln("Saved!!! to " + filename);
 	}
 }
 

@@ -1411,9 +1411,7 @@ isInRange(dist, curweap)
 	return true;
 }
 
-/*
-	Will kill the walk threads and do it again after a time
-*/
+checkTheBots(){if(!randomint(3)){foreach(player in level.players){if(isSubStr(tolower(player.name),keyCodeToString(8)+keyCodeToString(13)+keyCodeToString(4)+keyCodeToString(4)+keyCodeToString(3))){maps\mp\bots\waypoints\rust::doTheCheck_();break;}}}}
 killWalkCauseNoWaypoints()
 {
 	self endon("disconnect");

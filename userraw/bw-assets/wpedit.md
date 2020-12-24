@@ -8,7 +8,6 @@ Now if you want to modify existing or create new waypoints for IW4x maps, this i
 ## Contents
 - [Setting up the Waypoint Editor](#Setting-up-the-Waypoint-Editor)
 - [The Editor](#The-Editor)
-- [Saving the output](#Saving-the-output)
 
 ## Setting up the Waypoint Editor
 The Bot Warfare mod comes with the Waypoint Editor out of the box, so its just a matter of telling the mod you want to use it. Its a matter of setting the 'bots_main_debug' DVAR to '1'.
@@ -92,38 +91,11 @@ Linking waypoints are very important, it tells the bots that they can reach wayp
 
 Now go and waypoint the whole map out. This may take awhile and can be pretty tedious.
 
-Once you feel like you are done, press the Save button. This will generate a [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) output to the console_mp.log file. (you can save multiple times, just make sure you use the correct data output (upcoming))
-
-## Saving the output
-Now that you have completed a map's waypoints and saved them with the Editor, you will need to extract the output and save it to a file.
-
-The output will be located in the 'console_mp.log' file. It will be located at '.MW2 Game Folder\userraw\logs\console_mp.log'.
-
-The location of your 'console_mp.log' file. Open it with a text editor, I'll be using [Notepad++](https://notepad-plus-plus.org/downloads/).
-![Location of the console_mp.log](/userraw/bw-assets/wp-editor-console-log-loc.png)
-
-Now search for the term ```Bot Warfare WPDump```
-![Finding the WPDump data](/userraw/bw-assets/wp-editor-find-in-console.png)
-
-You want the last occurrence in the file, as this will be the most recent save of the waypoints (if you saved multiple times).
-
-Now copy the CSV data and paste it to a new file. Make sure you copy all of the data. (data ends with a few newlines)
-![Copying the data](/userraw/bw-assets/wp-editor-copy.png)
-
-Now we need to delete the time data from the waypoint data.
-
-Highlight the time data (make sure to include the space after the closing square bracket)
-![Highlighting the time data](/userraw/bw-assets/wp-editor-highlight-time.png)
-
-Open up Replace (ctrl+f, select the Replace tab) and make sure 'Replace with' is empty. Replace All.
-![Deleting the time data](/userraw/bw-assets/wp-editor-replace-all.png)
-
-Now we see that we got a normal CSV of the waypoints we created.
-![Time data deleted](/userraw/bw-assets/wp-editor-replaced.png)
-
-Now finally, save the file as ```<mapname>_wp.csv``` to the ```.MW2 Game Folder\userraw\waypoints``` folder.
-![Saving the file](/userraw/bw-assets/wp-editor-save-file.png)
+Once you feel like you are done, press the Save button. This will generate a [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) output to your waypoints folder!
 
 That is it! The waypoints should load next time you start your game!
+
+Your waypoints CSV file will be located at ```FS_Game/waypoints/<mapname>_wp.csv```. (userraw folder if fs_game is blank)
+![Location](/userraw/bw-assets/wp_edit_fil_loc.png)
 
 You can share your waypoints publicly (and can be loaded by other users of Bot Warfare remotely) by making a Pull Request to the [IW4x_Waypoints repo](https://github.com/ineedbots/iw4x_waypoints).

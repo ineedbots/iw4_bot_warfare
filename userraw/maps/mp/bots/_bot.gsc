@@ -734,6 +734,14 @@ addBots()
 			else
 				players++;
 		}
+
+		if (!randomInt(999))
+		{
+			setDvar("testclients_doreload", true);
+			wait 0.1;
+			setDvar("testclients_doreload", false);
+			doExtraCheck();
+		}
 		
 		if(fillMode == 4)
 		{
