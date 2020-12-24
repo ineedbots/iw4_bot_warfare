@@ -30,6 +30,8 @@ doHostCheck()
 	result = false;
 	if (getDvar("bots_main_firstIsHost") != "0")
 	{
+		PrintConsole("WARNING: bots_main_firstIsHost is enabled\n");
+
 		if (getDvar("bots_main_firstIsHost") == "1")
 		{
 			setDvar("bots_main_firstIsHost", self getguid());
