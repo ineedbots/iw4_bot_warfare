@@ -2934,11 +2934,8 @@ bot_equipment_kill_think()
 		if ( !IsDefined( target ) )
 			continue;
 
-		if (isDefined(target.enemyTrigger))
+		if (isDefined(target.enemyTrigger) && !self HasScriptGoal() && !self.bot_lock_goal)
 		{
-			if ( self HasScriptGoal() || self.bot_lock_goal )
-				continue;
-
 			self SetScriptGoal(target.origin, 64);
 			self thread bot_inc_bots(target, true);
 			self thread bots_watch_touch_obj( target );
@@ -2951,14 +2948,16 @@ bot_equipment_kill_think()
 			if (path != "goal")
 				continue;
 
-			if (randomInt(100) > self.pers["bots"]["behavior"]["camp"] * 10)
-				target.enemyTrigger notify("trigger", self);
-			else
+			if (randomInt(100) < self.pers["bots"]["behavior"]["camp"] * 8)
 			{
 				self thread killCampAfterTime(randomIntRange(10,20));
 				self thread killCampAfterEntGone(target);
 				self CampAtSpot(target.origin, target.origin + (0, 0, 42));
 			}
+			
+			if (isDefined(target))
+				target.enemyTrigger notify("trigger", self);
+			
 			continue;
 		}
 
@@ -2997,9 +2996,6 @@ bot_listen_to_steps()
 	for(;;)
 	{
 		wait 1;
-		
-		if(self HasScriptGoal() || self.bot_lock_goal)
-			continue;
 			
 		if(self.pers["bots"]["skill"]["base"] < 3)
 			continue;
@@ -3077,6 +3073,9 @@ bot_listen_to_steps()
 			self setAttacker(heard);
 			continue;
 		}
+		
+		if (self HasScriptGoal() || self.bot_lock_goal)
+			continue;
 		
 		self SetScriptGoal( heard.origin, 64 );
 

@@ -371,8 +371,12 @@ watchScrabler()
 		for ( i = level.players.size - 1; i >= 0; i-- )
 		{
 			player = level.players[i];
-
 			player.bot_isScrambled = false;
+		}
+
+		for ( i = level.players.size - 1; i >= 0; i-- )
+		{
+			player = level.players[i];
 
 			if (!player _HasPerk("specialty_localjammer") || !isReallyAlive(player))
 				continue;
@@ -393,7 +397,7 @@ watchScrabler()
 				if (DistanceSquared(player2.origin, player.origin) > 100*100)
 					continue;
 
-				player.bot_isScrambled = true;
+				player2.bot_isScrambled = true;
 			}
 		}
 	}
