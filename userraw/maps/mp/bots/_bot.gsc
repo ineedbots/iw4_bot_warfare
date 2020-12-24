@@ -116,7 +116,6 @@ init()
 	level.bots_maxShotgunDistance = 500;
 	level.bots_maxShotgunDistance *= level.bots_maxShotgunDistance;
 	level.bots_listenDist = 100;
-	level.bots_listenDist *= level.bots_listenDist;
 	
 	level.smokeRadius = 255;
 
@@ -394,7 +393,7 @@ watchScrabler()
 				if(level.teamBased && player2.team == player.team)
 					continue;
 
-				if (DistanceSquared(player2.origin, player.origin) > 100*100)
+				if (DistanceSquared(player2.origin, player.origin) > 256*256)
 					continue;
 
 				player2.bot_isScrambled = true;
