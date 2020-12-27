@@ -3816,7 +3816,7 @@ bot_killstreak_think()
 		ksWeap = maps\mp\killstreaks\_killstreaks::getKillstreakWeapon( streakName );
 		curWeap = self GetCurrentWeapon();
 
-		if (curWeap == "none")
+		if (curWeap == "none" || !isWeaponPrimary(curWeap))
 			curWeap = self GetLastWeapon();
 
 		lifeId = self.pers["killstreaks"][0].lifeId;
