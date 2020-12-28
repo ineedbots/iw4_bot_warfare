@@ -152,6 +152,8 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 - bots_main_GUIDs - a list of GUIDs (comma seperated) of players who will be considered a host
 
+- bots_main_waitForHostTime - a float value, how long in seconds to wait for the host player to connect before adding in bots
+
 - bots_main_menu - a boolean value (0 or 1), enables or disables the menu
 
 - bots_main_debug - a boolean value (0 or 1), enables or disables the waypoint editor

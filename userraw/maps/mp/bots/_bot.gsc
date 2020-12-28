@@ -30,6 +30,8 @@ init()
 		setDvar("bots_main_GUIDs", "");//guids of players who will be given host powers, comma seperated
 	if(getDvar("bots_main_firstIsHost") == "")
 		setDvar("bots_main_firstIsHost", false);//first play to connect is a host
+	if(getDvar("bots_main_waitForHostTime") == "")
+		setDvar("bots_main_waitForHostTime", 10.0);//how long to wait to wait for the host player
 		
 	if(getDvar("bots_manage_add") == "")
 		setDvar("bots_manage_add", 0);//amount of bots to add to the game
