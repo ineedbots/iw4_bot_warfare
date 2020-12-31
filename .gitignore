@@ -22,6 +22,7 @@
 !/README.md
 !/out
 
+*.zip
 *.log
 *.stat
 logs/
