@@ -20,6 +20,7 @@
 !/main/pvbrust.cfg
 !/main/pvbvote.cfg
 !/README.md
+!/out
 
 *.log
 *.stat
