@@ -3415,17 +3415,15 @@ bot_crate_think()
 				continue;
 			
 			if ( self HasScriptGoal() || self.bot_lock_goal )
-			{
-				wait 0.1;//because bot_crate_landed notify causes a same frame ClearScriptGoal
-				
-				if( self HasScriptGoal() || self.bot_lock_goal )
-					continue;
-			}
+				continue;
 
 			if(self isDefusing() || self isPlanting())
 				continue;
 
 			if(self IsUsingRemote() || self BotIsFrozen())
+				continue;
+
+			if (self inLastStand())
 				continue;
 			
 			crates = getEntArray( "care_package", "targetname" );
