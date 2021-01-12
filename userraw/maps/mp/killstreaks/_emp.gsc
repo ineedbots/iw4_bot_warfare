@@ -134,7 +134,7 @@ EMP_JamTeam( teamName, duration, delay, silent )
 	level.teamEMPed[teamName] = true;
 	level notify ( "emp_update" );
 	
-	level destroyActiveVehicles( self, !level.empDoesFriendlyFire );
+	level destroyActiveVehicles( self, !level.empDoesFriendlyFire, teamName );
 	
 	maps\mp\gametypes\_hostmigration::waitLongDurationWithHostMigrationPause( duration );
 	
@@ -284,7 +284,7 @@ EMP_PlayerTracker()
 	}
 }
 
-destroyActiveVehicles( attacker, friendlyFireCheck )
+destroyActiveVehicles( attacker, friendlyFireCheck, teamName )
 {
 	if (!isDefined(friendlyFireCheck))
 		friendlyFireCheck = false;
@@ -331,24 +331,30 @@ destroyActiveVehicles( attacker, friendlyFireCheck )
 	else
 	{
 		foreach ( heli in level.helis )
-			radiusDamage( heli.origin, 384, 5000, 5000 );
+			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && heli.team == teamName))
+				radiusDamage( heli.origin, 384, 5000, 5000 );
 	
 		foreach ( littleBird in level.littleBird )
-			radiusDamage( littleBird.origin, 384, 5000, 5000 );
+			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && littleBird.team == teamName))
+				radiusDamage( littleBird.origin, 384, 5000, 5000 );
 		
 		foreach ( turret in level.turrets )
-			radiusDamage( turret.origin, 16, 5000, 5000 );
+			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && turret.team == teamName))
+				radiusDamage( turret.origin, 16, 5000, 5000 );
 	
 		foreach ( rocket in level.rockets )
-			rocket notify ( "death" );
+			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && rocket.team == teamName))
+				rocket notify ( "death" );
 		
 		if ( level.teamBased )
 		{
 			foreach ( uav in level.uavModels["allies"] )
-				radiusDamage( uav.origin, 384, 5000, 5000 );
+				if (!friendlyFireCheck || (isDefined(teamName) && uav.team == teamName))
+					radiusDamage( uav.origin, 384, 5000, 5000 );
 	
 			foreach ( uav in level.uavModels["axis"] )
-				radiusDamage( uav.origin, 384, 5000, 5000 );
+				if (!friendlyFireCheck || (isDefined(teamName) && uav.team == teamName))
+					radiusDamage( uav.origin, 384, 5000, 5000 );
 		}
 		else
 		{	
@@ -357,6 +363,7 @@ destroyActiveVehicles( attacker, friendlyFireCheck )
 		}
 		
 		if ( isDefined( level.ac130player ) )
-			radiusDamage( level.ac130.planeModel.origin+(0,0,10), 1000, 5000, 5000 );
+			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && level.ac130player.team == teamName))
+				radiusDamage( level.ac130.planeModel.origin+(0,0,10), 1000, 5000, 5000 );
 	}
 }
