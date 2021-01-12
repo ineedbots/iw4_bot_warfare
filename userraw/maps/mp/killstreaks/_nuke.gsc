@@ -343,7 +343,18 @@ nukeEffects()
 		}
 	}
 	else
-		level maps\mp\killstreaks\_emp::destroyActiveVehicles( level.nukeInfo.player );
+	{
+		// clear the heli queue
+		while (true)
+		{
+			chopper = queueRemoveFirst( "helicopter" );
+
+			if (!isDefined(chopper))
+				break;
+		}
+
+		level maps\mp\killstreaks\_emp::destroyActiveVehicles( level.nukeInfo.player, false );
+	}
 
 	foreach( player in level.players )
 	{
