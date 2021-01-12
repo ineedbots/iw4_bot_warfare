@@ -251,17 +251,30 @@ handleNormalDeath( lifeId, attacker, eInflictor, sWeapon, sMeansOfDeath )
 		{
 			if (level.killstreaksIncreaseKillstreak)
 			{
+				toLifeId = attacker.pers["deaths"];
+				if (isDefined(attacker.maxKillstreakVal) && attacker.maxKillstreakVal > 0 && isDefined(level.rolloverKillstreaksOnlyIncrease) && level.rolloverKillstreaksOnlyIncrease)
+				{
+					curRollover = int(attacker.pers["cur_kill_streak"]/attacker.maxKillstreakVal);
+					if (curRollover > 0)
+					{
+						if (curRollover == 1)
+							toLifeId += 0.75;
+						else
+							toLifeId += 1/curRollover;
+					}
+				}
+
 				switch ( sWeapon )
 				{
 					case "ac130_105mm_mp":
 					case "ac130_40mm_mp":
 					case "ac130_25mm_mp":
-						if ( attacker.ac130LifeId == attacker.pers["deaths"] )
+						if ( attacker.ac130LifeId == toLifeId )
 							attacker.pers["cur_kill_streak"]++;
 						break;
 					case "cobra_player_minigun_mp":
 					case "weapon_cobra_mk19_mp":
-						if ( attacker.heliRideLifeId == attacker.pers["deaths"] )
+						if ( attacker.heliRideLifeId == toLifeId )
 							attacker.pers["cur_kill_streak"]++;
 						break;
 					case "cobra_20mm_mp":
@@ -277,7 +290,7 @@ handleNormalDeath( lifeId, attacker, eInflictor, sWeapon, sMeansOfDeath )
 						else
 							killstreakLifeId = attacker.lifeId;
 							
-						if ( killstreakLifeId == attacker.pers["deaths"] && (level.nukeIncreasesStreak || sWeapon != "nuke_mp") )
+						if ( killstreakLifeId == toLifeId && (level.nukeIncreasesStreak || sWeapon != "nuke_mp") )
 							attacker.pers["cur_kill_streak"]++;
 						break;
 					default:

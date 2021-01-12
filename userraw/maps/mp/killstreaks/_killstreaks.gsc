@@ -77,6 +77,7 @@ init()
 	level.killstreakRoundDelay = getIntProperty( "scr_game_killstreakdelay", 8 );
 
 	setDvarIfUninitialized( "scr_killstreak_rollover", false );
+	setDvarIfUninitialized( "scr_currentRolloverKillstreaksOnlyIncrease", false );
 	setDvarIfUninitialized( "scr_maxKillstreakRollover", 10 );
 	setDvarIfUninitialized( "scr_killstreakHud", false );
 	setDvarIfUninitialized( "scr_killstreak_mod", 0 );
@@ -89,6 +90,7 @@ init()
 
 	level.killstreaksRollOver = getDvarInt("scr_killstreak_rollover");
 	level.maxKillstreakRollover = getDvarInt("scr_maxKillstreakRollover");
+	level.rolloverKillstreaksOnlyIncrease = getDvarInt("scr_currentRolloverKillstreaksOnlyIncrease");
 	level.killstreakHud = getDvarInt("scr_killstreakHud");
 	level.killStreakMod = getDvarInt( "scr_killstreak_mod" );
 	level.killstreakPrint = getDvarInt( "scr_killstreak_print" );
@@ -525,6 +527,7 @@ checkKillstreakReward( streakCount )
 	foreach ( streakVal, streakName in self.killStreaks )
 	{
 		actualVal = streakVal + level.killStreakMod;
+		curRollover = 0;
 		
 		if ( actualVal > streakCount )
 			break;
@@ -556,7 +559,7 @@ checkKillstreakReward( streakCount )
 			useStreakName = streakName;
 		}
 		
-		if ( self tryGiveKillstreak( useStreakName, int(max( actualVal, streakCount )) ) )
+		if ( self tryGiveKillstreak( useStreakName, int(max( actualVal, streakCount )), curRollover ) )
 		{
 			self thread killstreakEarned( useStreakName );
 			self.pers["lastEarnedStreak"] = streakName;
@@ -620,19 +623,19 @@ rewardNotify( streakName, streakVal )
 }
 
 
-tryGiveKillstreak( streakName, streakVal )
+tryGiveKillstreak( streakName, streakVal, curRollover )
 {
 	level notify ( "gave_killstreak", streakName );
 
 	if ( !level.gameEnded )
 		self thread rewardNotify( streakName, streakVal );
 
-	self giveKillstreak( streakName, streakVal, true );
+	self giveKillstreak( streakName, streakVal, true, self, curRollover );
 	return true;
 }
 
 
-giveKillstreak( streakName, isEarned, awardXp, owner )
+giveKillstreak( streakName, isEarned, awardXp, owner, curRollover )
 {
 	self endon ( "disconnect" );
 
@@ -655,10 +658,19 @@ giveKillstreak( streakName, isEarned, awardXp, owner )
 
 	self.pers["kID"]++;
 
+	toLifeId = self.pers["deaths"];
+	if (level.rolloverKillstreaksOnlyIncrease && isDefined(curRollover) && curRollover > 0)
+	{
+		if (curRollover == 1)
+			toLifeId += 0.75;
+		else
+			toLifeId += 1/curRollover;
+	}
+
 	if ( !self.pers["killstreaks"][0].earned )
 		self.pers["killstreaks"][0].lifeId = -1;
 	else
-		self.pers["killstreaks"][0].lifeId = self.pers["deaths"];
+		self.pers["killstreaks"][0].lifeId = toLifeId;
 	
 	// probably obsolete unless we bring back the autoshotty	
 	if ( isdefined( level.killstreakSetupFuncs[ streakName ] ) )

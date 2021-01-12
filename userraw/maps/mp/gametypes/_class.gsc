@@ -1124,6 +1124,7 @@ setKillstreaks( streak1, streak2, streak3 )
 	}
 	
 	self.killstreaks = newKillstreaks;
+	self.maxKillstreakVal = maxVal;
 }
 
 

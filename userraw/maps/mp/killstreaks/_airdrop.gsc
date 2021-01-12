@@ -1295,8 +1295,12 @@ killstreakCrateThink( dropType )
 	
 		player playLocalSound( "ammo_crate_use" );
 
+		curRollover = undefined;
+		if (isDefined(player.maxKillstreakVal) && player.maxKillstreakVal > 0 && isDefined(level.rolloverKillstreaksOnlyIncrease) && level.rolloverKillstreaksOnlyIncrease)
+			curRollover = int(player.pers["cur_kill_streak"]/player.maxKillstreakVal);
+
 		doesIncreaseKS = level.airdropKillstreaksIncreaseStreak;
-		player thread maps\mp\killstreaks\_killstreaks::giveKillstreak( self.crateType, doesIncreaseKS, doesIncreaseKS, self.owner );
+		player thread maps\mp\killstreaks\_killstreaks::giveKillstreak( self.crateType, doesIncreaseKS, doesIncreaseKS, self.owner, curRollover );
 
 		player maps\mp\gametypes\_hud_message::killstreakSplashNotify( self.crateType, undefined, "pickup" );
 		
@@ -1378,8 +1382,12 @@ deleteCrate()
 
 sentryUseTracker(owner)
 {
+	curRollover = undefined;
+	if (isDefined(self.maxKillstreakVal) && self.maxKillstreakVal > 0 && isDefined(level.rolloverKillstreaksOnlyIncrease) && level.rolloverKillstreaksOnlyIncrease)
+		curRollover = int(self.pers["cur_kill_streak"]/self.maxKillstreakVal);
+
 	// if ( !self maps\mp\killstreaks\_autosentry::giveSentry( "sentry_minigun" ) )
-		self maps\mp\killstreaks\_killstreaks::giveKillstreak( "sentry", true, true, owner );
+		self maps\mp\killstreaks\_killstreaks::giveKillstreak( "sentry", true, true, owner, curRollover );
 }
 
 
