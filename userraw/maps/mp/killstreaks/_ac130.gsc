@@ -10,6 +10,9 @@
 		- scr_ac130_flares <int>
 			2 - (default) how many flares a ac130 has
 
+		- scr_ac130_fast <bool>
+			0 - (default) if to allow users to use ac130 faster
+
 	Thanks: H3X1C, Emosewaj
 */
 
@@ -22,8 +25,10 @@ init()
 
 	setDvarIfUninitialized( "scr_ac130_duration", 40 );				
 	setDvarIfUninitialized(  "scr_ac130_flares", 2 );
+	setDvarIfUninitialized(  "scr_ac130_fast", false );
 	level.ac130_use_duration = getDvarInt( "scr_ac130_duration" );
 	level.ac130_num_flares= getDvarInt( "scr_ac130_flares" );
+	level.ac130_fast= getDvarInt( "scr_ac130_fast" );
 
 	makeDvarServerInfo( "ui_ac130usetime", level.ac130_use_duration );
 	
@@ -660,6 +665,9 @@ removeAC130Player( player, disconnected )
 		level.ac130InUse = false;
 		return;
 	}
+
+	if (level.ac130_fast)
+		level.ac130InUse = false;
 	
 	ac130model = spawn( "script_model", level.ac130.planeModel getTagOrigin( "tag_origin" ) );
 	ac130model.angles = level.ac130.planeModel.angles;
@@ -676,7 +684,8 @@ removeAC130Player( player, disconnected )
 	wait ( 5.0 );
 	ac130model thread deployFlares( true );
 
-	level.ac130InUse = false;
+	if (!level.ac130_fast)
+		level.ac130InUse = false;
 
 	wait ( 30.0 );
 

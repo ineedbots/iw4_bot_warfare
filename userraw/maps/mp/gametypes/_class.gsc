@@ -1114,6 +1114,9 @@ setKillstreaks( streak1, streak2, streak3 )
 
 	// defcon rollover
 	maxRollOvers = 10;
+	if (isDefined(level.maxKillstreakRollover))
+		maxRollOvers = level.maxKillstreakRollover;
+
 	newKillstreaks = self.killstreaks;
 	for ( rollOver = 1; rollOver <= maxRollOvers; rollOver++ )
 	{

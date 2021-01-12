@@ -13,6 +13,9 @@
 		- scr_maxKillstreakRollover <int>
 			10 - (default) allow to rollover killstreaks <int> times. (remember you are limited to 10 rollovers as defined in _class.gsc)
 
+		- scr_currentRolloverKillstreaksOnlyIncrease <bool>
+			0 - (default) if only killstreaks from their current rollover will increase streak
+
 		- scr_killstreak_mod <int>
 			0 - (default) offsets all killstreaks reward costs by <int> amount
 
