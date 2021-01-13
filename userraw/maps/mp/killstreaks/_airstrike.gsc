@@ -213,7 +213,7 @@ doAirstrike( lifeId, origin, yaw, owner, team, airStrikeType )
 			playerteam = player.pers["team"];
 			if ( isdefined( playerteam ) )
 			{
-				if ( playerteam == team && self.airStrikeType != "stealth" )
+				if ( playerteam == team && airStrikeType != "stealth" )
 					player iprintln( &"MP_WAR_AIRSTRIKE_INBOUND", owner );
 			}
 		}
@@ -235,7 +235,7 @@ doAirstrike( lifeId, origin, yaw, owner, team, airStrikeType )
 	level.artilleryDangerCenters[ level.artilleryDangerCenters.size ] = dangerCenter;
 	/# level thread debugArtilleryDangerCenters( airstrikeType ); #/
 	
-	harrierEnt = self callStrike( lifeId, owner, targetpos, yaw );
+	harrierEnt = self callStrike( lifeId, owner, targetpos, yaw, airstrikeType );
 	
 	wait( 1.0 );
 	level.airstrikeInProgress = undefined;
@@ -882,8 +882,10 @@ playPlaneFx()
 	playfxontag( level.fx_airstrike_contrail, self, "tag_left_wingtip" );
 }
 
-callStrike( lifeId, owner, coord, yaw )
-{	
+callStrike( lifeId, owner, coord, yaw, airStrikeType )
+{
+	if (!isDefined(airStrikeType))
+		airStrikeType = self.airStrikeType;
 	
 	heightEnt = undefined;
 	planeBombExplodeDistance = 0;
@@ -891,7 +893,7 @@ callStrike( lifeId, owner, coord, yaw )
 	direction = ( 0, yaw, 0 );
 	heightEnt = GetEnt( "airstrikeheight", "targetname" );
 
-	if ( self.airStrikeType == "stealth" )
+	if ( airStrikeType == "stealth" )
 	{
 		thread teamPlayerCardSplash( "used_stealth_airstrike", owner, owner.team );
 		
@@ -940,7 +942,7 @@ callStrike( lifeId, owner, coord, yaw )
 		
 	startPoint += ( 0, 0, planeFlyHeight );
 
-	if ( self.airStrikeType == "stealth" )
+	if ( airStrikeType == "stealth" )
 		endPoint = coord + vector_multiply( anglestoforward( direction ), planeHalfDistance*4 );
 	else
 		endPoint = coord + vector_multiply( anglestoforward( direction ), planeHalfDistance );
@@ -968,13 +970,13 @@ callStrike( lifeId, owner, coord, yaw )
 	level.airStrikeDamagedEntsCount = 0;
 	level.airStrikeDamagedEntsIndex = 0;
 	
-	if ( self.airStrikeType == "harrier" )
+	if ( airStrikeType == "harrier" )
 	{
-		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(500)), endPoint+(0,0,randomInt(500)), bombTime, flyTime, direction, self.airStrikeType );
+		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(500)), endPoint+(0,0,randomInt(500)), bombTime, flyTime, direction, airStrikeType );
 		
 		wait randomfloatrange( 1.5, 2.5 );
 		maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, self.airStrikeType );
+		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType );
 		
 		wait randomfloatrange( 1.5, 2.5 );
 		maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
@@ -985,27 +987,27 @@ callStrike( lifeId, owner, coord, yaw )
 		//owner thread harrierMissileStrike( startPoint, coord );
 	
 	}
-	else if ( self.airStrikeType == "stealth" )
+	else if ( airStrikeType == "stealth" )
 	{
-		level thread doBomberStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(1000)), endPoint+(0,0,randomInt(1000)), bombTime, flyTime, direction, self.airStrikeType  );
+		level thread doBomberStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(1000)), endPoint+(0,0,randomInt(1000)), bombTime, flyTime, direction, airStrikeType  );
 	}
 	else	//common airstrike
 	{
-		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(500)), endPoint+(0,0,randomInt(500)), bombTime, flyTime, direction, self.airStrikeType );
+		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(500)), endPoint+(0,0,randomInt(500)), bombTime, flyTime, direction, airStrikeType );
 		
 		wait randomfloatrange( 1.5, 2.5 );
 		maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, self.airStrikeType );
+		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType );
 		
 		wait randomfloatrange( 1.5, 2.5 );
 		maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, self.airStrikeType );	
+		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType );	
 
-		if ( self.airStrikeType == "super" )
+		if ( airStrikeType == "super" )
 		{
 			wait randomfloatrange( 2.5, 3.5 );
 			maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-			level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, self.airStrikeType );	
+			level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType );	
 		}
 	}
 }
