@@ -351,6 +351,8 @@ nukeEffects()
 
 			if (!isDefined(chopper))
 				break;
+
+			chopper delete();
 		}
 
 		level maps\mp\killstreaks\_emp::destroyActiveVehicles( level.nukeInfo.player, false );

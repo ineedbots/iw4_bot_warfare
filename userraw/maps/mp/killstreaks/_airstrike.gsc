@@ -6,6 +6,12 @@
 	DVAR:
 		- scr_harrier_duration <int>
 			45 - (default) amount of seconds a harrier sticks around for
+
+		- scr_harrier_fast <bool>
+			0 - (default) allow players to call in harrier sooner (as it leaves, instead of being deleted)
+
+		- scr_fixStealthBomberDupe <bool>
+			0 - (default) fixes an issue where queuing harriers and airstrikes, and using a stealth bomber will dupe the stealth bomber airstrike
 */
 
 #include maps\mp\_utility;
@@ -37,7 +43,11 @@ init()
 	PrecacheMiniMapIcon( "hud_minimap_harrier_red" );
 
 	setDvarIfUninitialized( "scr_harrier_duration", 45 );
+	setDvarIfUninitialized( "scr_harrier_fast", false );
+	setDvarIfUninitialized( "scr_fixStealthBomberDupe", false );
 	level.harrierDuration = getDvarInt( "scr_harrier_duration" );
+	level.harrier_fast = getDvarInt( "scr_harrier_fast" );
+	level.fixStealthBomberDupe = getDvarInt( "scr_fixStealthBomberDupe" );
 	
 	
 	level.onfirefx = loadfx ("fire/fire_smoke_trail_L");
@@ -250,10 +260,22 @@ doAirstrike( lifeId, origin, yaw, owner, team )
 	if ( airStrikeType != "harrier" )
 		return;
 
-	while ( isDefined( harrierEnt ) )
-		wait ( 0.1 );
-		
+	if (isDefined(harrierEnt))
+		harrierEnt waitForHarrierToDie();
+
 	level.planes--;
+}
+
+
+waitForHarrierToDie()
+{
+	self endon("death");
+
+	if (level.harrier_fast)
+		self endon("leaving");
+
+	while ( isDefined( self ) )
+		wait ( 0.1 );
 }
 
 
@@ -963,6 +985,12 @@ callStrike( lifeId, owner, coord, yaw )
 	else if ( self.airStrikeType == "stealth" )
 	{
 		level thread doBomberStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(1000)), endPoint+(0,0,randomInt(1000)), bombTime, flyTime, direction, self.airStrikeType  );
+
+		if (level.fixStealthBomberDupe)
+		{
+			wait randomfloatrange( 3.5, 5.5 );
+			maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
+		}
 	}
 	else	//common airstrike
 	{
