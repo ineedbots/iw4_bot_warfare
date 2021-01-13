@@ -1485,6 +1485,8 @@ start_bot_threads()
 		self thread bot_arena();
 		self thread bot_vip();
 	}
+
+	self thread bot_think_revive();
 }
 
 /*
@@ -5877,6 +5879,13 @@ bot_dem_defend_spawnkill()
 	}
 	
 	self notify("bad_path");
+}
+
+/*
+	Bots think to revive
+*/
+bot_think_revive()
+{
 }
 
 /*
