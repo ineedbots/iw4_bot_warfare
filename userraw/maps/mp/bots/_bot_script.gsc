@@ -2870,6 +2870,9 @@ bot_equipment_kill_think()
 		{
 			item = grenades[i];
 
+			if (!isDefined(item))
+				continue;
+
 			if ( !IsDefined( item.name ) )
 				continue;
 
@@ -2945,7 +2948,7 @@ bot_equipment_kill_think()
 			if (path != "new_goal")
 				self ClearScriptGoal();
 
-			if (path != "goal")
+			if (path != "goal" || !isDefined(target))
 				continue;
 
 			if (randomInt(100) < self.pers["bots"]["behavior"]["camp"] * 8)
@@ -3278,6 +3281,9 @@ bot_turret_think()
 		for (i = turretsKeys.size - 1; i >= 0; i--)
 		{
 			tempTurret = turrets[turretsKeys[i]];
+			
+			if (!isDefined(tempTurret))
+				continue;
 
 			if(tempTurret.health <= 20000)
 				continue;
@@ -3365,6 +3371,9 @@ bot_watch_stuck_on_crate()
 		{
 			tempCrate = crates[i];
 
+			if (!isDefined(tempCrate))
+				continue;
+
 			if (!isDefined(tempCrate.doingPhysics) || tempCrate.doingPhysics)
 				continue;
 
@@ -3437,6 +3446,9 @@ bot_crate_think()
 			{
 				tempCrate = crates[i];
 
+				if (!isDefined(tempCrate))
+					continue;
+
 				if (!isDefined(tempCrate.doingPhysics) || tempCrate.doingPhysics)
 					continue;
 
@@ -3480,7 +3492,7 @@ bot_crate_think()
 			if (path != "new_goal")
 				self ClearScriptGoal();
 
-			if (path != "goal" || DistanceSquared(self.origin, crate.origin) > radius*radius)
+			if (path != "goal" || !isDefined(crate) || DistanceSquared(self.origin, crate.origin) > radius*radius)
 				continue;
 		}
 
@@ -3488,7 +3500,7 @@ bot_crate_think()
 		self BotFreezeControls(true);
 
 		waitTime = 3;
-		if (crate.owner == self)
+		if (isDefined(crate.owner) && crate.owner == self)
 			waitTime = 0.5;
 		
 		crate waittill_notify_or_timeout("captured", waitTime);
