@@ -10,8 +10,8 @@
 		- scr_harrier_fast <bool>
 			0 - (default) allow players to call in harrier sooner (as it leaves, instead of being deleted)
 
-		- scr_fixStealthBomberDupe <bool>
-			0 - (default) fixes an issue where queuing harriers and airstrikes, and using a stealth bomber will dupe the stealth bomber airstrike
+		- scr_airstrike_mutate_fix <bool>
+			0 - (default) fixes a bug where calling in airstrikes too fast will cause them to mutate types
 */
 
 #include maps\mp\_utility;
@@ -44,10 +44,10 @@ init()
 
 	setDvarIfUninitialized( "scr_harrier_duration", 45 );
 	setDvarIfUninitialized( "scr_harrier_fast", false );
-	setDvarIfUninitialized( "scr_fixStealthBomberDupe", false );
+	setDvarIfUninitialized( "scr_airstrike_mutate_fix", false );
 	level.harrierDuration = getDvarInt( "scr_harrier_duration" );
 	level.harrier_fast = getDvarInt( "scr_harrier_fast" );
-	level.fixStealthBomberDupe = getDvarInt( "scr_fixStealthBomberDupe" );
+	level.airstrike_mutate_fix = getDvarInt( "scr_airstrike_mutate_fix" );
 	
 	
 	level.onfirefx = loadfx ("fire/fire_smoke_trail_L");
@@ -164,15 +164,18 @@ tryUseAirstrike( lifeId, airStrikeType )
 }
 
 
-doAirstrike( lifeId, origin, yaw, owner, team )
+doAirstrike( lifeId, origin, yaw, owner, team, airStrikeType )
 {	
 	assert( isDefined( origin ) );
 	assert( isDefined( yaw ) );
 	
-	if ( isDefined( self.airStrikeType ) )
-		airstrikeType = self.airStrikeType;
-	else
-		airstrikeType = "default";
+	if (!level.airstrike_mutate_fix || !isDefined(airStrikeType))
+	{
+		if ( isDefined( self.airStrikeType ) )
+			airstrikeType = self.airStrikeType;
+		else
+			airstrikeType = "default";
+	}
 
 	if ( airStrikeType == "harrier" )
 		level.planes++;
@@ -232,7 +235,7 @@ doAirstrike( lifeId, origin, yaw, owner, team )
 	level.artilleryDangerCenters[ level.artilleryDangerCenters.size ] = dangerCenter;
 	/# level thread debugArtilleryDangerCenters( airstrikeType ); #/
 	
-	harrierEnt = callStrike( lifeId, owner, targetpos, yaw );
+	harrierEnt = self callStrike( lifeId, owner, targetpos, yaw );
 	
 	wait( 1.0 );
 	level.airstrikeInProgress = undefined;
@@ -985,12 +988,6 @@ callStrike( lifeId, owner, coord, yaw )
 	else if ( self.airStrikeType == "stealth" )
 	{
 		level thread doBomberStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(1000)), endPoint+(0,0,randomInt(1000)), bombTime, flyTime, direction, self.airStrikeType  );
-
-		if (level.fixStealthBomberDupe)
-		{
-			wait randomfloatrange( 3.5, 5.5 );
-			maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-		}
 	}
 	else	//common airstrike
 	{
@@ -1130,11 +1127,11 @@ selectAirstrikeLocation( lifeId, airStrikeType )
 		return false;	
 	}
 
-	self thread finishAirstrikeUsage( lifeId, location, directionYaw );
+	self thread finishAirstrikeUsage( lifeId, location, directionYaw, airStrikeType );
 	return true;
 }
 
-finishAirstrikeUsage( lifeId, location, directionYaw )
+finishAirstrikeUsage( lifeId, location, directionYaw, airStrikeType )
 {
 	self notify( "used" );
 
@@ -1142,7 +1139,7 @@ finishAirstrikeUsage( lifeId, location, directionYaw )
 	trace = bullettrace( level.mapCenter + (0,0,1000000), level.mapCenter, false, undefined );
 	location = (location[0], location[1], trace["position"][2] - 514);
 	
-	thread doAirstrike( lifeId, location, directionYaw, self, self.pers["team"] );
+	self thread doAirstrike( lifeId, location, directionYaw, self, self.pers["team"], airStrikeType );
 }
 
 
