@@ -574,16 +574,19 @@ chooseRandomAttachmentComboForGun(gun)
 	allowOp = (getDvarInt("bots_loadout_allow_op") >= 1);
 	reasonable = getDvarInt("bots_loadout_reasonable");
 
+	if (RandomFloatRange(0, 1) >= ((rank / level.maxRank) + 0.1))
+	{
+		retAtts = [];
+		retAtts[0] = "none";
+		retAtts[1] = "none";
+
+		return retAtts;
+	}
+
 	while (true)
 	{
 		att1 = random(atts);
 		att2 = random(atts);
-
-		if (RandomFloatRange(0, 1) >= ((rank / level.maxRank) + 0.1))
-		{
-			att1 = "none";
-			att2 = "none";
-		}
 
 		if (!isValidAttachmentCombo(att1, att2))
 			continue;
