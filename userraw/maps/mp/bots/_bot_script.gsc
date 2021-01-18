@@ -4029,7 +4029,7 @@ bot_killstreak_think()
 				}
 
 				if (randomInt(100) < 80 && !self HasScriptGoal() && !self.bot_lock_goal)
-					self waittill_any_timeout( 15, "crate_physics_done" );
+					self waittill_any_timeout( 15, "crate_physics_done", "new_goal" );
 
 				self BotStopMoving(false);
 				self ClearScriptAimPos();
