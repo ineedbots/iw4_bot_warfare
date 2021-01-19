@@ -1500,6 +1500,9 @@ bot_inc_bots(obj, unreach)
 {
 	level endon("game_ended");
 	self endon("bot_inc_bots");
+
+	if (!isDefined(obj))
+		return;
 	
 	if (!isDefined(obj.bots))
 		obj.bots = 0;
@@ -3182,6 +3185,8 @@ bot_revenge_think()
 	if(!isDefined(self.killerLocation))
 		return;
 	
+	loc = self.killerLocation;
+	
 	for(;;)
 	{
 		wait( RandomIntRange( 1, 5 ) );
@@ -3192,7 +3197,7 @@ bot_revenge_think()
 		if ( randomint( 100 ) < 75 )
 			return;
 		
-		self SetScriptGoal( self.killerLocation, 64 );
+		self SetScriptGoal( loc, 64 );
 
 		if (self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal")
 			self ClearScriptGoal();
