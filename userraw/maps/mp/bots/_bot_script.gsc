@@ -3938,6 +3938,8 @@ bot_killstreak_think()
 					self thread changeToWeapon(curWeap);
 					continue;
 				}
+
+				self BotFreezeControls(true);
 				
 				self maps\mp\killstreaks\_killstreaks::usedKillstreak( "predator_missile", true );
 				self maps\mp\killstreaks\_killstreaks::shuffleKillStreaksFILO( "predator_missile" );
@@ -3954,6 +3956,7 @@ bot_killstreak_think()
 				self waittill( "stopped_using_remote" );
 
 				wait 1;
+				self BotFreezeControls(false);
 				self thread changeToWeapon(curWeap);
 			}
 			else if (streakName == "ac130")
