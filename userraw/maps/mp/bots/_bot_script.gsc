@@ -5486,7 +5486,7 @@ bot_dem_attackers()
 			if(self HasScriptGoal())
 				continue;
 			
-			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dem_spawn_defender_start" );
+			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dd_spawn_defender_start" );
 			
 			if(!spawnPoints.size)
 				continue;
@@ -5510,7 +5510,7 @@ bot_dem_attackers()
 		//or if want to go into overtime near end of the extended game
 		if(((bombs.size + bombed == 2 && timeleft >= 90) || (shouldLet && bombs.size)) && randomInt(100) < 95)
 		{
-			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dem_spawn_attacker_start" );
+			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dd_spawn_attacker_start" );
 			
 			if(!spawnPoints.size)
 				continue;
@@ -5699,7 +5699,7 @@ bot_dem_defenders()
 			if(self HasScriptGoal())
 				continue;
 			
-			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dem_spawn_attacker_start" );
+			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dd_spawn_attacker_start" );
 			
 			if(!spawnPoints.size)
 				continue;
@@ -5723,7 +5723,7 @@ bot_dem_defenders()
 		//or if want to go into overtime after extended game
 		if(shouldLet)
 		{
-			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dem_spawn_defender_start" );
+			spawnPoints = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dd_spawn_defender_start" );
 			
 			if(!spawnPoints.size)
 				continue;
