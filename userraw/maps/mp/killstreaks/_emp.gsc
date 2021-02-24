@@ -157,7 +157,7 @@ EMP_JamPlayers( owner, duration, delay, silent )
 	level notify ( "EMP_JamPlayers" );
 	level endon ( "EMP_JamPlayers" );
 	
-	assert( isDefined( owner ) );
+	//assert( isDefined( owner ) );
 	
 	//wait ( delay );
 	
@@ -165,7 +165,7 @@ EMP_JamPlayers( owner, duration, delay, silent )
 	{
 		player playLocalSound( "emp_activate" );
 		
-		if ( player == owner )
+		if ( isDefined( owner ) && player == owner )
 			continue;
 		
 		if ( player _hasPerk( "specialty_localjammer" ) )
@@ -198,7 +198,7 @@ EMP_JamPlayers( owner, duration, delay, silent )
 	
 	foreach ( player in level.players )
 	{
-		if ( player == owner )
+		if ( isDefined( owner ) && player == owner )
 			continue;
 		
 		if ( player _hasPerk( "specialty_localjammer" ) )
@@ -331,19 +331,19 @@ destroyActiveVehicles( attacker, friendlyFireCheck, teamName )
 	else
 	{
 		foreach ( heli in level.helis )
-			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && heli.team == teamName))
+			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && heli.team == teamName) || !level.teamBased)
 				radiusDamage( heli.origin, 384, 5000, 5000 );
 	
 		foreach ( littleBird in level.littleBird )
-			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && littleBird.team == teamName))
+			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && littleBird.team == teamName) || !level.teamBased)
 				radiusDamage( littleBird.origin, 384, 5000, 5000 );
 		
 		foreach ( turret in level.turrets )
-			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && turret.team == teamName))
+			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && turret.team == teamName) || !level.teamBased)
 				radiusDamage( turret.origin, 16, 5000, 5000 );
 	
 		foreach ( rocket in level.rockets )
-			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && rocket.team == teamName))
+			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && rocket.team == teamName) || !level.teamBased)
 				rocket notify ( "death" );
 		
 		if ( level.teamBased )
@@ -363,7 +363,7 @@ destroyActiveVehicles( attacker, friendlyFireCheck, teamName )
 		}
 		
 		if ( isDefined( level.ac130player ) )
-			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && level.ac130player.team == teamName))
+			if (!friendlyFireCheck || (level.teamBased && isDefined(teamName) && level.ac130player.team == teamName) || !level.teamBased)
 				radiusDamage( level.ac130.planeModel.origin+(0,0,10), 1000, 5000, 5000 );
 	}
 }

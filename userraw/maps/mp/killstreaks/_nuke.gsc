@@ -319,7 +319,7 @@ nukeEffects()
 		if ( level.teamBased )
 		{
 			if (level.nukeEmpDuration != 0)
-				level thread maps\mp\killstreaks\_emp::EMP_JamTeam(level.otherTeam[level.nukeInfo.team], level.nukeEmpDuration, 5, level.nukeInfo.player, true);
+				level.nukeInfo.player thread maps\mp\killstreaks\_emp::EMP_JamTeam(level.otherTeam[level.nukeInfo.team], level.nukeEmpDuration, 5, true);
 			
 			foreach (player in level.players)
 			{
@@ -333,7 +333,7 @@ nukeEffects()
 		else
 		{
 			if (level.nukeEmpDuration != 0)
-				level thread maps\mp\killstreaks\_emp::EMP_JamPlayers(level.nukeInfo.player, level.nukeEmpDuration, 5, true);
+				level.nukeInfo.player thread maps\mp\killstreaks\_emp::EMP_JamPlayers(level.nukeInfo.player, level.nukeEmpDuration, 5, true);
 
 			if(isDefined(level.nukeInfo.player))
 			{
