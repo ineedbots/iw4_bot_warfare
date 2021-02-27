@@ -1093,10 +1093,10 @@ difficulty()
 
 				self.pers["bots"]["behavior"]["strafe"] = 0;
 				self.pers["bots"]["behavior"]["nade"] = 10;
-				self.pers["bots"]["behavior"]["sprint"] = 10;
+				self.pers["bots"]["behavior"]["sprint"] = 30;
 				self.pers["bots"]["behavior"]["camp"] = 5;
 				self.pers["bots"]["behavior"]["follow"] = 5;
-				self.pers["bots"]["behavior"]["crouch"] = 70;
+				self.pers["bots"]["behavior"]["crouch"] = 20;
 				self.pers["bots"]["behavior"]["switch"] = 2;
 				self.pers["bots"]["behavior"]["class"] = 2;
 				self.pers["bots"]["behavior"]["jump"] = 0;
@@ -1122,10 +1122,10 @@ difficulty()
 
 				self.pers["bots"]["behavior"]["strafe"] = 10;
 				self.pers["bots"]["behavior"]["nade"] = 15;
-				self.pers["bots"]["behavior"]["sprint"] = 15;
+				self.pers["bots"]["behavior"]["sprint"] = 45;
 				self.pers["bots"]["behavior"]["camp"] = 5;
 				self.pers["bots"]["behavior"]["follow"] = 5;
-				self.pers["bots"]["behavior"]["crouch"] = 60;
+				self.pers["bots"]["behavior"]["crouch"] = 15;
 				self.pers["bots"]["behavior"]["switch"] = 2;
 				self.pers["bots"]["behavior"]["class"] = 2;
 				self.pers["bots"]["behavior"]["jump"] = 10;
@@ -1151,10 +1151,10 @@ difficulty()
 
 				self.pers["bots"]["behavior"]["strafe"] = 20;
 				self.pers["bots"]["behavior"]["nade"] = 20;
-				self.pers["bots"]["behavior"]["sprint"] = 20;
+				self.pers["bots"]["behavior"]["sprint"] = 50;
 				self.pers["bots"]["behavior"]["camp"] = 5;
 				self.pers["bots"]["behavior"]["follow"] = 5;
-				self.pers["bots"]["behavior"]["crouch"] = 50;
+				self.pers["bots"]["behavior"]["crouch"] = 10;
 				self.pers["bots"]["behavior"]["switch"] = 2;
 				self.pers["bots"]["behavior"]["class"] = 2;
 				self.pers["bots"]["behavior"]["jump"] = 25;
@@ -1180,10 +1180,10 @@ difficulty()
 
 				self.pers["bots"]["behavior"]["strafe"] = 30;
 				self.pers["bots"]["behavior"]["nade"] = 25;
-				self.pers["bots"]["behavior"]["sprint"] = 30;
+				self.pers["bots"]["behavior"]["sprint"] = 55;
 				self.pers["bots"]["behavior"]["camp"] = 5;
 				self.pers["bots"]["behavior"]["follow"] = 5;
-				self.pers["bots"]["behavior"]["crouch"] = 40;
+				self.pers["bots"]["behavior"]["crouch"] = 10;
 				self.pers["bots"]["behavior"]["switch"] = 2;
 				self.pers["bots"]["behavior"]["class"] = 2;
 				self.pers["bots"]["behavior"]["jump"] = 35;
@@ -1209,10 +1209,10 @@ difficulty()
 
 				self.pers["bots"]["behavior"]["strafe"] = 40;
 				self.pers["bots"]["behavior"]["nade"] = 35;
-				self.pers["bots"]["behavior"]["sprint"] = 40;
+				self.pers["bots"]["behavior"]["sprint"] = 60;
 				self.pers["bots"]["behavior"]["camp"] = 5;
 				self.pers["bots"]["behavior"]["follow"] = 5;
-				self.pers["bots"]["behavior"]["crouch"] = 30;
+				self.pers["bots"]["behavior"]["crouch"] = 10;
 				self.pers["bots"]["behavior"]["switch"] = 2;
 				self.pers["bots"]["behavior"]["class"] = 2;
 				self.pers["bots"]["behavior"]["jump"] = 50;
@@ -1238,10 +1238,10 @@ difficulty()
 
 				self.pers["bots"]["behavior"]["strafe"] = 50;
 				self.pers["bots"]["behavior"]["nade"] = 45;
-				self.pers["bots"]["behavior"]["sprint"] = 50;
+				self.pers["bots"]["behavior"]["sprint"] = 65;
 				self.pers["bots"]["behavior"]["camp"] = 5;
 				self.pers["bots"]["behavior"]["follow"] = 5;
-				self.pers["bots"]["behavior"]["crouch"] = 20;
+				self.pers["bots"]["behavior"]["crouch"] = 10;
 				self.pers["bots"]["behavior"]["switch"] = 2;
 				self.pers["bots"]["behavior"]["class"] = 2;
 				self.pers["bots"]["behavior"]["jump"] = 75;
@@ -1267,7 +1267,7 @@ difficulty()
 
 				self.pers["bots"]["behavior"]["strafe"] = 65;
 				self.pers["bots"]["behavior"]["nade"] = 65;
-				self.pers["bots"]["behavior"]["sprint"] = 65;
+				self.pers["bots"]["behavior"]["sprint"] = 70;
 				self.pers["bots"]["behavior"]["camp"] = 5;
 				self.pers["bots"]["behavior"]["follow"] = 5;
 				self.pers["bots"]["behavior"]["crouch"] = 5;
