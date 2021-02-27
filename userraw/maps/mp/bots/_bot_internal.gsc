@@ -399,6 +399,7 @@ doBotMovement()
 		move_To = self.bot.moveTo;
 		angles = self GetPlayerAngles();
 		dir = (0, 0, 0);
+		eye = self getEye();
 
 		if (DistanceSquared(self.origin, move_To) >= 49)
 		{
@@ -419,6 +420,13 @@ doBotMovement()
 			// invert the second component as the engine requires this
 			dir = (dir[0], 0-dir[1], 0);
 		}
+
+		if (self isMantling())
+			self crouch();
+		
+		bt = bulletTrace(eye, eye + anglesToForward(angles) * 25, false, self);
+		if (bt["surfacetype"] == "glass")
+			self thread knife();
 
 		// move!
 		self botMovement(int(dir[0]), int(dir[1]));
@@ -1739,7 +1747,7 @@ movetowards(goal)
 	{
 		self botMoveTo(goal);
 		
-		if(time > 3)
+		if(time > 3.5)
 		{
 			time = 0;
 			if(distanceSquared(self.origin, lastOri) < 128)
@@ -1747,9 +1755,7 @@ movetowards(goal)
 				stucks++;
 				
 				randomDir = self getRandomLargestStafe(stucks);
-			
-				self knife(); // knife glass
-				wait 0.25;
+				
 				self botMoveTo(randomDir);
 				wait stucks;
 			}
@@ -1758,7 +1764,7 @@ movetowards(goal)
 		}
 		else if(timeslow > 1.5)
 		{
-			self thread jump();
+			self thread doMantle();
 		}
 		else if(timeslow > 0.75)
 		{
@@ -1778,6 +1784,19 @@ movetowards(goal)
 	
 	self.bot.towards_goal = undefined;
 	self notify("completed_move_to");
+}
+
+doMantle()
+{
+	self endon("disconnect");
+	self endon("death");
+	self endon("kill_goal");
+
+	self jump();
+
+	wait 0.35;
+
+	self jump();
 }
 
 /*
