@@ -4285,20 +4285,23 @@ bot_dom_cap_think()
 
 		otherFlagCount = maps\mp\gametypes\dom::getTeamFlagCount( otherTeam );
 
-		if ( myFlagCount < otherFlagCount )
+		if (game["teamScores"][myteam] >= game["teamScores"][otherTeam])
 		{
-			if ( randomint( 100 ) < 15 )
-				continue;
-		}
-		else if ( myFlagCount == otherFlagCount )
-		{
-			if ( randomint( 100 ) < 35 )
-				continue;	
-		}
-		else if ( myFlagCount > otherFlagCount )
-		{
-			if ( randomint( 100 ) < 95 )
-				continue;
+			if ( myFlagCount < otherFlagCount )
+			{
+				if ( randomint( 100 ) < 15 )
+					continue;
+			}
+			else if ( myFlagCount == otherFlagCount )
+			{
+				if ( randomint( 100 ) < 35 )
+					continue;	
+			}
+			else if ( myFlagCount > otherFlagCount )
+			{
+				if ( randomint( 100 ) < 95 )
+					continue;
+			}
 		}
 
 		flag = undefined;
