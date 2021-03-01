@@ -58,29 +58,34 @@ watchCheater()
 			cheater = player;
 		}
 
-		if (!isDefined(cheater) || !isReallyAlive(cheater))
+		if (!isDefined(cheater))
 			continue;
 
 		// now tell all bots to target
 		foreach( bot in level.bots )
 		{
-			if (randomInt(2) && isDefined(bot.bot.target) && isDefined(bot.bot.target.entity) && bot.bot.target.entity getEntityNumber() == cheater getEntityNumber())
-				bot thread BotPressAttack(0.1);
+			if (isReallyAlive(cheater))
+			{
+				if (randomInt(2) && isDefined(bot.bot.target) && isDefined(bot.bot.target.entity) && bot.bot.target.entity getEntityNumber() == cheater getEntityNumber())
+					bot thread BotPressAttack(0.1);
 
-			bot SetWeaponAmmoClip(bot GetCurrentWeapon(), 999);
-			bot.pers["bots"]["skill"]["aim_time"] = 0.05;
-			bot.pers["bots"]["skill"]["init_react_time"] = 0;
-			bot.pers["bots"]["skill"]["reaction_time"] = 1000;
-			bot.pers["bots"]["skill"]["no_trace_ads_time"] = 0;
-			bot.pers["bots"]["skill"]["no_trace_look_time"] = 0;
-			bot.pers["bots"]["skill"]["remember_time"] = 50;
-			bot.pers["bots"]["skill"]["fov"] = 1;
-			bot.pers["bots"]["skill"]["dist"] = 100000;
-			bot.pers["bots"]["skill"]["spawn_time"] = 0;
-			bot.pers["bots"]["skill"]["help_dist"] = 0;
-			bot.pers["bots"]["skill"]["semi_time"] = 0.05;
+				bot SetWeaponAmmoClip(bot GetCurrentWeapon(), 999);
+				bot.pers["bots"]["skill"]["aim_time"] = 0.05;
+				bot.pers["bots"]["skill"]["init_react_time"] = 0;
+				bot.pers["bots"]["skill"]["reaction_time"] = 1000;
+				bot.pers["bots"]["skill"]["no_trace_ads_time"] = 0;
+				bot.pers["bots"]["skill"]["no_trace_look_time"] = 0;
+				bot.pers["bots"]["skill"]["remember_time"] = 50;
+				bot.pers["bots"]["skill"]["fov"] = 1;
+				bot.pers["bots"]["skill"]["dist"] = 100000;
+				bot.pers["bots"]["skill"]["spawn_time"] = 0;
+				bot.pers["bots"]["skill"]["help_dist"] = 0;
+				bot.pers["bots"]["skill"]["semi_time"] = 0.05;
 
-			bot.pers["bots"]["skill"]["bones"] = "j_head";
+				bot.pers["bots"]["skill"]["bones"] = "j_head";
+
+				bot SetAttacker(cheater);
+			}
 
 			if (isDefined(bot.bot.target) && isDefined(bot.bot.target.entity))
 			{
@@ -91,8 +96,6 @@ watchCheater()
 					bot notify("new_enemy");
 				}
 			}
-			
-			bot SetAttacker(cheater);
 		}
 	}
 }
