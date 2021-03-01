@@ -368,7 +368,7 @@ getKillstreaks()
 /*
 	bots chooses a random perk
 */
-chooseRandomPerk(perkkind, primary)
+chooseRandomPerk(perkkind, primary, primaryAtts)
 {
 	perks = getPerks(perkkind);
 	rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData("experience") );
@@ -396,11 +396,7 @@ chooseRandomPerk(perkkind, primary)
 
 		if (reasonable)
 		{
-			if (perk == "specialty_onemanarmy")
-				continue;
 			if (perk == "specialty_bling")
-				continue;
-			if (perk == "specialty_explosivedamage")
 				continue;
 			if (perk == "specialty_localjammer")
 				continue;
@@ -415,36 +411,54 @@ chooseRandomPerk(perkkind, primary)
 			if (perk == "specialty_copycat")
 				continue;
 
+			if (perkkind == "perk1")
+			{
+				if (perk == "specialty_onemanarmy")
+				{
+					if (primaryAtts[0] != "gl"/* && primaryAtts[1] != "gl"*/)
+						continue;
+				}
+			}
+
 			if (perkkind == "perk2")
 			{
 				if (perk != "specialty_bulletdamage")
 				{
-					if (randomInt(100) < 35)
-						continue;
-					if (primary == "cheytac")
-						continue;
-					if (primary == "rpd")
-						continue;
-					if (primary == "ak47" && randomInt(100) < 80)
-						continue;
-					if (primary == "aug")
-						continue;
-					if (primary == "barrett" && randomInt(100) < 80)
-						continue;
-					if (primary == "tavor" && randomInt(100) < 80)
-						continue;
-					if (primary == "scar")
-						continue;
-					if (primary == "masada" && randomInt(100) < 60)
-						continue;
-					if (primary == "m4" && randomInt(100) < 80)
-						continue;
-					if (primary == "m16")
-						continue;
-					if (primary == "fal")
-						continue;
-					if (primary == "famas")
-						continue;
+					if (perk == "specialty_explosivedamage")
+					{
+						if (primaryAtts[0] != "gl"/* && primaryAtts[1] != "gl"*/)
+							continue;
+					}
+					else
+					{
+						if (randomInt(100) < 10)
+							continue;
+
+						if (primary == "cheytac")
+							continue;
+						if (primary == "rpd")
+							continue;
+						if (primary == "ak47" && randomInt(100) < 80)
+							continue;
+						if (primary == "aug")
+							continue;
+						if (primary == "barrett" && randomInt(100) < 80)
+							continue;
+						if (primary == "tavor" && randomInt(100) < 80)
+							continue;
+						if (primary == "scar")
+							continue;
+						if (primary == "masada" && randomInt(100) < 60)
+							continue;
+						if (primary == "m4" && randomInt(100) < 80)
+							continue;
+						if (primary == "m16")
+							continue;
+						if (primary == "fal")
+							continue;
+						if (primary == "famas")
+							continue;
+					}
 				}
 			}
 		}
@@ -601,8 +615,13 @@ chooseRandomAttachmentComboForGun(gun)
 		{
 			if (att1 == "shotgun" || att2 == "shotgun")
 				continue;
-			if ((att1 == "akimbo" || att2 == "akimbo") && gun != "ranger" && gun != "model1887" && gun != "glock")
-				continue;
+
+			if (att1 == "akimbo" || att2 == "akimbo")
+			{
+				if (gun != "ranger" && gun != "model1887" && gun != "glock")
+					continue;
+			}
+
 			if (att1 == "acog" || att2 == "acog")
 				continue;
 			if (att1 == "thermal" || att2 == "thermal")
@@ -660,16 +679,23 @@ setClasses()
 	for (i = 0; i < 5; i++)
 	{
 		equipment = chooseRandomPerk("equipment");
-		perk1 = chooseRandomPerk("perk1");
 		perk3 = chooseRandomPerk("perk3");
 		deathstreak = chooseRandomPerk("perk4");
 		tactical = chooseRandomTactical();
 		primary = chooseRandomPrimary();
-		perk2 = chooseRandomPerk("perk2", primary);
 		primaryAtts = chooseRandomAttachmentComboForGun(primary);
+		perk1 = chooseRandomPerk("perk1", primary, primaryAtts);
+
+		if (perk1 != "specialty_bling")
+			primaryAtts[1] = "none";
+
+		perk2 = chooseRandomPerk("perk2", primary, primaryAtts);
 		primaryCamo = chooseRandomCamo();
 		secondary = chooseRandomSecondary(perk1);
 		secondaryAtts = chooseRandomAttachmentComboForGun(secondary);
+
+		if (perk1 != "specialty_bling" || !isDefined(self.pers["bots"]["unlocks"]["upgraded_specialty_bling"]))
+			secondaryAtts[1] = "none";
 
 		self setPlayerData("customClasses", i, "weaponSetups", 0, "weapon", primary);
 		self setPlayerData("customClasses", i, "weaponSetups", 0, "attachment", 0, primaryAtts[0]);
@@ -1063,7 +1089,7 @@ difficulty()
 
 	for(;;)
 	{
-		wait 1;
+		wait 5;
 		
 		rankVar = GetDvarInt("bots_skill");
 		
@@ -1090,6 +1116,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 4;
 				self.pers["bots"]["skill"]["bone_update_interval"] = 2;
 				self.pers["bots"]["skill"]["bones"] = "j_spineupper,j_ankle_le,j_ankle_ri";
+				self.pers["bots"]["skill"]["ads_fov_multi"] = 0.5;
+				self.pers["bots"]["skill"]["ads_aimspeed_multi"] = 0.5;
 
 				self.pers["bots"]["behavior"]["strafe"] = 0;
 				self.pers["bots"]["behavior"]["nade"] = 10;
@@ -1119,6 +1147,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 3;
 				self.pers["bots"]["skill"]["bone_update_interval"] = 1.5;
 				self.pers["bots"]["skill"]["bones"] = "j_spineupper,j_ankle_le,j_ankle_ri,j_head";
+				self.pers["bots"]["skill"]["ads_fov_multi"] = 0.5;
+				self.pers["bots"]["skill"]["ads_aimspeed_multi"] = 0.5;
 
 				self.pers["bots"]["behavior"]["strafe"] = 10;
 				self.pers["bots"]["behavior"]["nade"] = 15;
@@ -1148,6 +1178,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 2.5;
 				self.pers["bots"]["skill"]["bone_update_interval"] = 1;
 				self.pers["bots"]["skill"]["bones"] = "j_spineupper,j_spineupper,j_ankle_le,j_ankle_ri,j_head";
+				self.pers["bots"]["skill"]["ads_fov_multi"] = 0.5;
+				self.pers["bots"]["skill"]["ads_aimspeed_multi"] = 0.5;
 
 				self.pers["bots"]["behavior"]["strafe"] = 20;
 				self.pers["bots"]["behavior"]["nade"] = 20;
@@ -1177,6 +1209,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 2;
 				self.pers["bots"]["skill"]["bone_update_interval"] = 0.75;
 				self.pers["bots"]["skill"]["bones"] = "j_spineupper,j_spineupper,j_ankle_le,j_ankle_ri,j_head,j_head";
+				self.pers["bots"]["skill"]["ads_fov_multi"] = 0.5;
+				self.pers["bots"]["skill"]["ads_aimspeed_multi"] = 0.5;
 
 				self.pers["bots"]["behavior"]["strafe"] = 30;
 				self.pers["bots"]["behavior"]["nade"] = 25;
@@ -1206,6 +1240,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 1.5;
 				self.pers["bots"]["skill"]["bone_update_interval"] = 0.5;
 				self.pers["bots"]["skill"]["bones"] = "j_spineupper,j_head";
+				self.pers["bots"]["skill"]["ads_fov_multi"] = 0.5;
+				self.pers["bots"]["skill"]["ads_aimspeed_multi"] = 0.5;
 
 				self.pers["bots"]["behavior"]["strafe"] = 40;
 				self.pers["bots"]["behavior"]["nade"] = 35;
@@ -1235,6 +1271,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 1;
 				self.pers["bots"]["skill"]["bone_update_interval"] = 0.25;
 				self.pers["bots"]["skill"]["bones"] = "j_spineupper,j_head,j_head";
+				self.pers["bots"]["skill"]["ads_fov_multi"] = 0.5;
+				self.pers["bots"]["skill"]["ads_aimspeed_multi"] = 0.5;
 
 				self.pers["bots"]["behavior"]["strafe"] = 50;
 				self.pers["bots"]["behavior"]["nade"] = 45;
@@ -1264,6 +1302,8 @@ difficulty()
 				self.pers["bots"]["skill"]["aim_offset_amount"] = 0;
 				self.pers["bots"]["skill"]["bone_update_interval"] = 0.05;
 				self.pers["bots"]["skill"]["bones"] = "j_head";
+				self.pers["bots"]["skill"]["ads_fov_multi"] = 0.5;
+				self.pers["bots"]["skill"]["ads_aimspeed_multi"] = 0.5;
 
 				self.pers["bots"]["behavior"]["strafe"] = 65;
 				self.pers["bots"]["behavior"]["nade"] = 65;
@@ -1463,6 +1503,7 @@ start_bot_threads()
 		self thread bot_use_grenade_think();
 		self thread bot_use_equipment_think();
 		self thread bot_watch_riot_weapons();
+		self thread bot_watch_think_mw2(); // bots play mw2
 	}
 
 	// obj
@@ -2661,6 +2702,57 @@ bot_use_grenade_think()
 }
 
 /*
+	Bots play mw2
+*/
+bot_watch_think_mw2()
+{
+	self endon("disconnect");
+	self endon("death");
+	level endon("game_ended");
+
+	for (;;)
+	{
+		wait randomIntRange(1, 4);
+
+		if(self BotIsFrozen())
+			continue;
+			
+		if(self isDefusing() || self isPlanting())
+			continue;
+
+		if (self IsUsingRemote())
+			continue;
+
+		if (self InLastStand() && !self InFinalStand())
+			continue;
+
+		if (self HasThreat())
+			continue;
+
+		tube = self getValidTube();
+		if (!isDefined(tube))
+		{
+			if (self GetAmmoCount("at4_mp"))
+				tube = "at4_mp";
+			else if (self GetAmmoCount("rpg_mp"))
+				tube = "rpg_mp";
+			else
+				continue;
+		}
+
+		if (self GetCurrentWeapon() == tube)
+			continue;
+
+		chance = self.pers["bots"]["behavior"]["nade"];
+
+		if (randomInt(100) > chance)
+			continue;
+
+		self ChangeToWeapon(tube);
+	}
+}
+
+/*
 	Bots will use gremades/wweapons while having a target while using a shield
 */
 bot_watch_riot_weapons()
@@ -2673,6 +2765,18 @@ bot_watch_riot_weapons()
 	{
 		wait randomIntRange(2, 4);
 
+		if(self BotIsFrozen())
+			continue;
+			
+		if(self isDefusing() || self isPlanting())
+			continue;
+
+		if (self IsUsingRemote())
+			continue;
+
+		if (self InLastStand() && !self InFinalStand())
+			continue;
+
 		if (!self HasThreat())
 			continue;
 
@@ -2681,7 +2785,6 @@ bot_watch_riot_weapons()
 
 		threat = self GetThreat();
 		dist = DistanceSquared(threat.origin, self.origin);
-		rand = randomInt(100);
 		curWeap = self GetCurrentWeapon();
 
 		if (randomInt(2))
@@ -2694,14 +2797,14 @@ bot_watch_riot_weapons()
 			if (dist <= level.bots_minGrenadeDistance || dist >= level.bots_maxGrenadeDistance)
 				continue;
 
-			if (rand > self.pers["bots"]["behavior"]["nade"])
+			if (randomInt(100) > self.pers["bots"]["behavior"]["nade"])
 				continue;
 
 			self botThrowGrenade(nade);
 		}
 		else
 		{
-			if (rand > self.pers["bots"]["behavior"]["switch"])
+			if (randomInt(100) > self.pers["bots"]["behavior"]["switch"] * 10)
 				continue;
 
 			weaponslist = self getweaponslistall();
@@ -4085,8 +4188,12 @@ bot_killstreak_think()
 
 							if (isDefined(location))
 							{
+								self BotFreezeControls(true);
+
 								self notify( "confirm_location", location, directionYaw );
 								wait 1;
+
+								self BotFreezeControls(false);
 							}
 
 							self thread changeToWeapon(curWeap);
