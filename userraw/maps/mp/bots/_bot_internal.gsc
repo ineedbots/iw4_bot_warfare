@@ -573,17 +573,25 @@ stance()
 			self prone();
 			
 		curweap = self getCurrentWeapon();
+		time = getTime();
+		chance = self.pers["bots"]["behavior"]["sprint"];
+
+		if (time - self.lastSpawnTime < 5000)
+			chance *= 2;
+
+		if(isDefined(self.bot.script_goal) && DistanceSquared(self.origin, self.bot.script_goal) > 256*256)
+			chance *= 2;
 			
 		if(toStance != "stand" || self.bot.isreloading || self.bot.issprinting || self.bot.isfraggingafter || self.bot.issmokingafter)
 			continue;
 			
-		if(randomInt(100) > self.pers["bots"]["behavior"]["sprint"])
+		if(randomInt(100) > chance)
 			continue;
 			
 		if(isDefined(self.bot.target) && self canFire(curweap) && self isInRange(self.bot.target.dist, curweap))
 			continue;
 
-		if(self.bot.sprintendtime != -1 && getTime() - self.bot.sprintendtime < 2000)
+		if(self.bot.sprintendtime != -1 && time - self.bot.sprintendtime < 2000)
 			continue;
 			
 		if(!isDefined(self.bot.towards_goal) || DistanceSquared(self.origin, self.bot.towards_goal) < level.bots_minSprintDistance || getConeDot(self.bot.towards_goal, self.origin, self GetPlayerAngles()) < 0.75)
