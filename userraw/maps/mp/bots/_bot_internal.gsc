@@ -129,6 +129,7 @@ resetBotVars()
 	self.bot.jump_time = undefined;
 	
 	self.bot.is_cur_full_auto = false;
+	self.bot.cur_weap_dist_multi = 1;
 	
 	self.bot.rand = randomInt(100);
 
@@ -160,6 +161,27 @@ onPlayerSpawned()
 }
 
 /*
+	Sets the factor of distance for a weapon
+*/
+SetWeaponDistMulti(weap)
+{
+	if (weap == "none")
+		return 1;
+
+	switch(weaponClass(weap))
+	{
+		case "rifle":
+			return 0.9;
+		case "smg":
+			return 0.7;
+		case "pistol":
+			return 0.5;
+		default:
+			return 1;
+	}
+}
+
+/*
 	When the bot changes weapon.
 */
 onWeaponChange()
@@ -169,6 +191,8 @@ onWeaponChange()
 	
 	weap = self GetCurrentWeapon();
 	self.bot.is_cur_full_auto = WeaponIsFullAuto(weap);
+	self.bot.cur_weap_dist_multi = SetWeaponDistMulti(weap);
+	
 	if (weap != "none")
 		self changeToWeap(weap);
 
@@ -177,6 +201,7 @@ onWeaponChange()
 		self waittill( "weapon_change", newWeapon );
 		
 		self.bot.is_cur_full_auto = WeaponIsFullAuto(newWeapon);
+		self.bot.cur_weap_dist_multi = SetWeaponDistMulti(weap);
 
 		if (newWeapon == "none")
 			continue;
@@ -450,7 +475,7 @@ watchHoldBreath()
 		if(self.bot.isfrozen)
 			continue;
 		
-		self holdbreath((self playerADS() && weaponClass(self getCurrentWEapon()) == "rifle"));
+		self holdbreath(self playerADS() >= 1);
 	}
 }
 
@@ -697,9 +722,11 @@ updateAimOffset(obj, theTime)
 targetObjUpdateTraced(obj, daDist, ent, theTime, isScriptObj, usingRemote)
 {
 	distClose = self.pers["bots"]["skill"]["dist_start"];
+	distClose *= self.bot.cur_weap_dist_multi;
 	distClose *= distClose;
 
 	distMax = self.pers["bots"]["skill"]["dist_max"];
+	distMax *= self.bot.cur_weap_dist_multi;
 	distMax *= distMax;
 
 	timeMulti = 1;
