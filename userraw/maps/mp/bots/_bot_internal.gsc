@@ -428,7 +428,6 @@ doBotMovement()
 		move_To = self.bot.moveTo;
 		angles = self GetPlayerAngles();
 		dir = (0, 0, 0);
-		eye = self getEye();
 
 		if (DistanceSquared(self.origin, move_To) >= 49)
 		{
@@ -454,15 +453,11 @@ doBotMovement()
 		if (self isMantling())
 			self crouch();
 		
-		// check if need to knife glass
-		bt = bulletTrace(eye, eye + anglesToForward(angles) * FORWARDAMOUNT, false, self);
-		if (bt["surfacetype"] == "glass")
-			self thread knife();
-
 		
 		startPos = self.origin + (0, 0, 50);
 		startPosForward = startPos + anglesToForward((0, angles[1], 0)) * FORWARDAMOUNT;
-		if (bulletTracePassed(startPos, startPosForward, false, self))
+		bt = bulletTrace(startPos, startPosForward, false, self);
+		if (bt["fraction"] >= 1)
 		{
 			// check if need to jump
 			bt = bulletTrace(startPosForward, startPosForward - (0, 0, 40), false, self);
@@ -471,6 +466,15 @@ doBotMovement()
 			{
 				i = 0;
 				self thread jump();
+			}
+		}
+		// check if need to knife glass
+		else if (bt["surfacetype"] == "glass")
+		{
+			if (i > 1.5)
+			{
+				i = 0;
+				self thread knife();
 			}
 		}
 		else
