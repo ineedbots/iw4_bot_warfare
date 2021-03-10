@@ -13,6 +13,9 @@
 		- scr_emp_doesFriendlyFire <bool>
 			true - (default) whether or not if an emp destroies all killstreaks reguardless of friendly fire
 
+		- scr_emp_checkHeliQueue <bool>
+			false - (default) whether or not if an emp destroies helicopters in the queue
+
 	Thanks: H3X1C, Emosewaj
 */
 
@@ -37,9 +40,11 @@ init()
 	
 	setDvarIfUninitialized( "scr_emp_duration", 60 );
 	setDvarIfUninitialized( "scr_emp_doesFriendlyFire", true );
+	setDvarIfUninitialized( "scr_emp_checkHeliQueue", false );
 
   level.empduration  = getDvarInt( "scr_emp_duration" ); 
 	level.empDoesFriendlyFire = getDvarInt( "scr_emp_doesFriendlyFire" );
+	level.empCheckHeliQueue = getDvarInt( "scr_emp_checkHeliQueue" );
 	
 	level thread onPlayerConnect();
 }
@@ -288,6 +293,27 @@ destroyActiveVehicles( attacker, friendlyFireCheck, teamName )
 {
 	if (!isDefined(friendlyFireCheck))
 		friendlyFireCheck = false;
+
+	if (level.empCheckHeliQueue && isDefined(level.queues) && isDefined(level.queues["helicopter"]))
+	{
+		newQueue = [];
+
+		foreach ( element in level.queues[ "helicopter" ] )
+		{
+			if ( !isDefined( element ) )
+				continue;
+
+			if (!friendlyFireCheck || !isDefined(element.player) || !isDefined(element.player.team) || (level.teamBased && (!isDefined(teamName) || element.player.team == teamName)) || (!level.teamBased && (!isDefined(attacker) || element.player != attacker)))
+			{
+				element delete();
+				continue;
+			}
+
+			newQueue[newQueue.size] = element;
+		}
+
+		level.queues[ "helicopter" ] = newQueue;
+	}
 
 	if ( isDefined( attacker ) )
 	{
