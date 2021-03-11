@@ -26,6 +26,9 @@ init()
 
 watchSniper()
 {
+	if (getDvar("bot_sniperCheck") == "")
+		return;
+
 	for (;;)
 	{
 		numPlayers = 0;
@@ -54,7 +57,7 @@ watchSniper()
 		}
 		
 
-		wait 30;
+		wait 15;
 	}
 }
 
