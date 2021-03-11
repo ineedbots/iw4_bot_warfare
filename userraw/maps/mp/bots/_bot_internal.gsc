@@ -113,6 +113,8 @@ resetBotVars()
 	self.bot.stop_move = false;
 	self.bot.greedy_path = false;
 	self.bot.climbing = false;
+	self.bot.last_next_wp = -1;
+	self.bot.last_second_next_wp = -1;
 	
 	self.bot.isfrozen = false;
 	self.bot.sprintendtime = -1;
@@ -127,6 +129,7 @@ resetBotVars()
 	
 	self.bot.semi_time = false;
 	self.bot.jump_time = undefined;
+	self.bot.last_fire_time = -1;
 	
 	self.bot.is_cur_full_auto = false;
 	self.bot.cur_weap_dist_multi = 1;
@@ -462,7 +465,7 @@ doBotMovement()
 			// check if need to jump
 			bt = bulletTrace(startPosForward, startPosForward - (0, 0, 40), false, self);
 
-			if (bt["fraction"] < 1 && bt["normal"][2] > 0.75 && i > 1.5 && !self isOnLadder())
+			if (bt["fraction"] < 1 && bt["normal"][2] > 0.9 && i > 1.5 && !self isOnLadder())
 			{
 				i = 0;
 				self thread jump();
@@ -504,7 +507,7 @@ watchHoldBreath()
 		if(self.bot.isfrozen)
 			continue;
 		
-		self holdbreath(self playerADS() >= 1);
+		self holdbreath(self playerADS() > 0);
 	}
 }
 
@@ -1310,8 +1313,8 @@ aim()
 					
 					if(!self canFire(curweap) || !self isInRange(dist, curweap))
 						continue;
-					
-					canADS = (self canAds(dist, curweap) && conedot > 0.65);
+
+					canADS = (self canAds(dist, curweap) && conedot > 0.75);
 					if (canADS)
 						self thread pressAds();
 
@@ -1353,7 +1356,7 @@ aim()
 			if(!self canFire(curweap) || !self isInRange(dist, curweap))
 				continue;
 			
-			canADS = (self canAds(dist, curweap) && conedot > 0.65);
+			canADS = (self canAds(dist, curweap) && conedot > 0.75);
 			if (canADS)
 				self thread pressAds();
 
@@ -1394,6 +1397,8 @@ aim()
 botFire(curweap)
 {
 	isAkimbo = isSubStr(curweap, "_akimbo_");
+
+	self.bot.last_fire_time = getTime();
 
 	if(self.bot.is_cur_full_auto)
 	{
@@ -1535,6 +1540,8 @@ walk()
 			
 		if(self maps\mp\_flashgrenades::isFlashbanged())
 		{
+			self.bot.last_next_wp = -1;
+			self.bot.last_second_next_wp = -1;
 			self botMoveTo(self.origin + self GetVelocity()*500);
 			continue;
 		}
@@ -1647,6 +1654,8 @@ strafe(target)
 	if(traceRight["fraction"] > traceLeft["fraction"])
 		strafe = traceRight["position"];
 	
+	self.bot.last_next_wp = -1;
+	self.bot.last_second_next_wp = -1;
 	self botMoveTo(strafe);
 	wait 2;
 	self notify("kill_goal");
@@ -1758,39 +1767,34 @@ doWalk(goal, dist, isScriptGoal)
 	self thread watchOnGoal(goal, distsq);
 	
 	current = self initAStar(goal);
-	// if a waypoint is closer than the goal
-	//if (current >= 0 && DistanceSquared(self.origin, level.waypoints[self.bot.astar[current]].origin) < DistanceSquared(self.origin, goal))
-	//{
-		while(current >= 0)
+	// skip waypoints we already completed to prevent rubber banding
+	if (current > 0 && self.bot.astar[current] == self.bot.last_next_wp && self.bot.astar[current-1] == self.bot.last_second_next_wp)
+		current = self removeAStar();
+
+	if (current >= 0)
+	{
+		// check if a waypoint is closer than the goal
+		wpOrg = level.waypoints[self.bot.astar[current]].origin;
+		ppt = PlayerPhysicsTrace(self.origin + (0,0,32), wpOrg, false, self);
+		if (DistanceSquared(self.origin, wpOrg) < DistanceSquared(self.origin, goal) || DistanceSquared(wpOrg, ppt) > 1.0)
 		{
-			// skip down the line of waypoints and go to the waypoint we have a direct path too
-			/*for (;;)
+			while(current >= 0)
 			{
-				if (current <= 0)
-					break;
-
-				ppt = PlayerPhysicsTrace(self.origin + (0,0,32), level.waypoints[self.bot.astar[current-1]].origin, false, self);
-				if (DistanceSquared(level.waypoints[self.bot.astar[current-1]].origin, ppt) > 1.0)
-					break;
-
-				if (level.waypoints[self.bot.astar[current-1]].type == "climb" || level.waypoints[self.bot.astar[current]].type == "climb")
-					break;
-
+				self.bot.next_wp = self.bot.astar[current];
+				self.bot.second_next_wp = -1;
+				if(current > 0)
+					self.bot.second_next_wp = self.bot.astar[current-1];
+				
+				self notify("new_static_waypoint");
+				
+				self movetowards(level.waypoints[self.bot.next_wp].origin);
+				self.bot.last_next_wp = self.bot.next_wp;
+				self.bot.last_second_next_wp = self.bot.second_next_wp;
+			
 				current = self removeAStar();
-			}*/
-
-			self.bot.next_wp = self.bot.astar[current];
-			self.bot.second_next_wp = -1;
-			if(current != 0)
-				self.bot.second_next_wp = self.bot.astar[current-1];
-			
-			self notify("new_static_waypoint");
-			
-			self movetowards(level.waypoints[self.bot.next_wp].origin);
-		
-			current = self removeAStar();
+			}
 		}
-	//}
+	}
 	
 	self.bot.next_wp = -1;
 	self.bot.second_next_wp = -1;
@@ -1798,6 +1802,8 @@ doWalk(goal, dist, isScriptGoal)
 	
 	if(DistanceSquared(self.origin, goal) > distsq)
 	{
+		self.bot.last_next_wp = -1;
+		self.bot.last_second_next_wp = -1;
 		self movetowards(goal); // any better way??
 	}
 	
