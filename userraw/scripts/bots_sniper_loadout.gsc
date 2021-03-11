@@ -31,6 +31,8 @@ onBotGivenLoadout()
 		if (!getDvarInt("bots_sniperLoadout"))
 			continue;
 
+		self.pers["bots"]["behavior"]["quickscope"] = true;
+
 		// clear perks and weapons
 		self takeAllWeapons();
 		self.specialty = [];
