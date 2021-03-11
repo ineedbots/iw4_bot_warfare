@@ -20,6 +20,42 @@ init()
 	level thread watchBoxmap();
 
 	level thread watchNuke();
+
+	level thread watchSniper();
+}
+
+watchSniper()
+{
+	for (;;)
+	{
+		numPlayers = 0;
+		numSnipers = 0;
+
+		foreach(player in level.players)
+		{
+			if (player is_bot())
+				continue;
+
+			if (!isDefined(player.team))
+				continue;
+
+			numPlayers++;
+
+			if (isDefined(player.isSniper) && player.isSniper)
+				numSnipers++;
+		}
+
+		if (numPlayers > 0)
+		{
+			if (numSnipers / numPlayers >= 0.5)
+				setDvar("bots_sniperLoadout", 1);
+			else
+				setDvar("bots_sniperLoadout", 0);
+		}
+		
+
+		wait 30;
+	}
 }
 
 watchNuke()
