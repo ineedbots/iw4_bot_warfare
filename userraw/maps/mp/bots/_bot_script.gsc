@@ -675,7 +675,10 @@ setClasses()
 	rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData("experience") );
 
 	if (RandomFloatRange(0, 1) < ((rank / level.maxRank) + 0.1))
+	{
 		self.pers["bots"]["unlocks"]["ghillie"] = true;
+		self.pers["bots"]["behavior"]["quickscope"] = true;
+	}
 
 	for (i = 0; i < 5; i++)
 	{
