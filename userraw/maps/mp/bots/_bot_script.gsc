@@ -3288,7 +3288,7 @@ bot_revenge_think()
 	if(self.pers["bots"]["skill"]["base"] <= 1)
 		return;
 
-	if (isDefined(self.lastKiller))
+	if (isDefined(self.lastKiller) && isReallyAlive(self.lastKiller))
 	{
 		if(bulletTracePassed(self getEye(), self.lastKiller getTagOrigin( "j_spineupper" ), false, self.lastKiller))
 		{
