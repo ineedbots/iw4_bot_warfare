@@ -38,6 +38,7 @@ connected()
 	self endon("disconnect");
 
 	self.killerLocation = undefined;
+	self.lastKiller = undefined;
 	
 	self thread difficulty();
 	self thread teamWatch();
@@ -830,6 +831,7 @@ setKillstreaks()
 onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, timeOffset, deathAnimDuration)
 {
 	self.killerLocation = undefined;
+	self.lastKiller = undefined;
 
 	if(!IsDefined( self ) || !isDefined(self.team))
 		return;
@@ -856,6 +858,7 @@ onKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, 
 		return;
 	
 	self.killerLocation = eAttacker.origin;
+	self.lastKiller = eAttacker;
 }
 
 /*
@@ -3284,6 +3287,14 @@ bot_revenge_think()
 	
 	if(self.pers["bots"]["skill"]["base"] <= 1)
 		return;
+
+	if (isDefined(self.lastKiller))
+	{
+		if(bulletTracePassed(self getEye(), self.lastKiller getTagOrigin( "j_spineupper" ), false, self.lastKiller))
+		{
+			self setAttacker(self.lastKiller);
+		}
+	}
 	
 	if(!isDefined(self.killerLocation))
 		return;
