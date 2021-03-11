@@ -158,6 +158,20 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 - bots_main_debug - a boolean value (0 or 1), enables or disables the waypoint editor
 
 ## Changelog
+- v2.0.1 (to be released)
+  - Reduced bots crouching
+  - Increased bots sprinting
+  - Improved bots mantling, crouching and knifing glass when needed
+  - Fixed possible script runtime errors
+  - Fixed demolition spawn killing
+  - Improved domination
+  - Bots use explosives more if they have it
+  - Fixed bots moving their player when using remote
+  - Bots aim slower when ads'ing
+  - Fixed bots holding breath
+  - Bots more smart when waiting for carepackages
+  - Improved and fixed various waypoints for maps
+
 - v2.0.0
   - Initial reboot release
 
