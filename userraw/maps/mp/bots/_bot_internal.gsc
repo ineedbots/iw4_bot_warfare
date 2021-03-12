@@ -1267,7 +1267,7 @@ aim()
 						if (self canAds(dist, curweap))
 						{
 							if (weaponClass(curweap) != "sniper" || !self.pers["bots"]["behavior"]["quickscope"])
-								 self thread pressAds();
+								self thread pressAds();
 						}
 					}
 					
