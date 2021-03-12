@@ -169,8 +169,10 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Fixed bots moving their player when using remote
   - Bots aim slower when ads'ing
   - Fixed bots holding breath
-  - Bots more smart when waiting for carepackages
+  - Bots are more smart when waiting for carepackages
   - Improved and fixed various waypoints for maps
+  - Fixed bots rubberbanding movement when their goal changes
+  - Added bots quickscoping with snipers
 
 - v2.0.0
   - Initial reboot release
