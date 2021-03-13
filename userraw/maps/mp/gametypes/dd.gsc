@@ -270,7 +270,11 @@ onStartGameType()
 	winlimit = getWatchedDvar("winlimit");
 	
 	allowed[0] = "dd";
-	allowed[1] = "bombzone";
+	bombZones = getEntArray( "dd_bombzone", "targetname" );
+	if ( bombZones.size )
+		allowed[1] = "dd_bombzone";
+	else
+		allowed[1] = "bombzone";
 	allowed[2] = "blocker";
 	maps\mp\gametypes\_gameobjects::main(allowed);
 	
@@ -453,7 +457,9 @@ bombs()
 
 	level.bombZones = [];
 	
-	bombZones = getEntArray( "bombzone", "targetname" );
+	bombZones = getEntArray( "dd_bombzone", "targetname" );
+	if ( !bombZones.size )	
+		bombZones = getEntArray( "bombzone", "targetname" );
 	
 	for ( index = 0; index < bombZones.size; index++ )
 	{
