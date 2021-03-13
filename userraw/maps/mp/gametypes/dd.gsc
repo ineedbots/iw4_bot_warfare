@@ -248,9 +248,9 @@ onStartGameType()
 		maps\mp\gametypes\_spawnlogic::placeSpawnPoints( "mp_dd_spawn_attacker_start" );
 	
 	if ( getDvar( "mapname" ) == "mp_shipment_long" )
-		level.spawn_attackers = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_cha_spawn_axis" );
+		level.spawn_defenders = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_cha_spawn_axis" );
 	else
-		level.spawn_attackers = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dd_spawn_defender" );
+		level.spawn_defenders = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dd_spawn_defender" );
 		
 	level.spawn_defenders_a = maps\mp\gametypes\_spawnlogic::getSpawnpointArray( "mp_dd_spawn_defender_a" );
 	level.spawn_defenders_a = array_combine( level.spawn_defenders, level.spawn_defenders_a );
