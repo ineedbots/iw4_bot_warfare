@@ -61,7 +61,7 @@ LoopStingerLockingFeedback()
 
 	for ( ;; )
 	{
-		if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && isDefined( self.stingerTarget ) && self.stingerTarget == level.chopper.gunner )
+		if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && isDefined( self.stingerTarget ) && self.stingerTarget == level.chopper )
 			level.chopper.gunner playLocalSound( "missile_locking" );
 
 		if ( isDefined( level.ac130player ) && isDefined( self.stingerTarget ) && self.stingerTarget == level.ac130.planeModel )
@@ -81,7 +81,7 @@ LoopStingerLockedFeedback()
 
 	for ( ;; )
 	{
-		if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && isDefined( self.stingerTarget ) && self.stingerTarget == level.chopper.gunner )
+		if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && isDefined( self.stingerTarget ) && self.stingerTarget == level.chopper )
 			level.chopper.gunner playLocalSound( "missile_locking" );
 
 		if ( isDefined( level.ac130player ) && isDefined( self.stingerTarget ) && self.stingerTarget == level.ac130.planeModel )
