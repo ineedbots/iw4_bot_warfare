@@ -149,7 +149,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 - bots_main_firstIsHost - a boolean value (0 or 1), the first player to connect is considered a host
 
-- bots_main_GUIDs - a list of GUIDs (comma seperated) of players who will be considered a host
+- bots_main_GUIDs - a list of GUIDs (comma separated) of players who will be considered a host
 
 - bots_main_waitForHostTime - a float value, how long in seconds to wait for the host player to connect before adding in bots
 
