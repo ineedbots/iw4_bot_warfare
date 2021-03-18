@@ -1343,7 +1343,7 @@ aim()
 
 					if (trace_time > reaction_time)
 					{
-						if((!canADS || adsAmount >= 1.0 || self InLastStand() || self GetStance() == "prone") && (conedot > 0.95 || dist < level.bots_maxKnifeDistance) && getDvarInt("bots_play_fire"))
+						if((!canADS || adsAmount >= 1.0 || self InLastStand() || self GetStance() == "prone") && (conedot > 0.99 || dist < level.bots_maxKnifeDistance) && getDvarInt("bots_play_fire"))
 							self botFire(curweap);
 
 						if (isplay)
