@@ -3976,8 +3976,6 @@ bot_killstreak_think()
 	self endon("death");
 	level endon("game_ended");
 
-	self thread maps\mp\killstreaks\_killstreaks::giveKillstreak( "sentry", false, false, self );
-
 	doFastContinue = false;
 
 	for (;;)
