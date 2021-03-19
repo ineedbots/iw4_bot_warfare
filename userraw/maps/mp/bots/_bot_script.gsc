@@ -3671,7 +3671,7 @@ doReloadCancel()
 
 		curWeap = self GetCurrentWeapon();
 		// check single reloads
-		if (self GetCurrentWeaponClipAmmo() < WeaponClipSize(curWeap))
+		if (self GetWeaponAmmoClip(curWeap) < WeaponClipSize(curWeap))
 			continue;
 
 		// check difficulty
@@ -3679,7 +3679,7 @@ doReloadCancel()
 			continue;
 
 		// check if got another weapon
-		weaponslist = self getweaponslistall();
+		weaponslist = self GetWeaponsListPrimaries();
 		weap = "";
 		while(weaponslist.size)
 		{
@@ -3976,6 +3976,8 @@ bot_killstreak_think()
 	self endon("death");
 	level endon("game_ended");
 
+	self thread maps\mp\killstreaks\_killstreaks::giveKillstreak( "sentry", false, false, self );
+
 	doFastContinue = false;
 
 	for (;;)
@@ -4083,6 +4085,7 @@ bot_killstreak_think()
 				self notify("place_sentry");
 				wait 0.05;
 				self notify("cancel_sentry");
+				wait 0.5;
 
 				self thread changeToWeapon(curWeap);
 
