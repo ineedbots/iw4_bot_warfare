@@ -3655,7 +3655,7 @@ doReloadCancel()
 
 	for (;;)
 	{
-		self waittill("reload");
+		ret = self waittill_any_return("reload", "weapon_change");
 
 		if(self BotIsFrozen())
 			continue;
@@ -3670,9 +3670,16 @@ doReloadCancel()
 			continue;
 
 		curWeap = self GetCurrentWeapon();
-		// check single reloads
-		if (self GetWeaponAmmoClip(curWeap) < WeaponClipSize(curWeap))
+
+		if (!maps\mp\gametypes\_weapons::isPrimaryWeapon(curWeap))
 			continue;
+
+		if (ret == "reload")
+		{
+			// check single reloads
+			if (self GetWeaponAmmoClip(curWeap) < WeaponClipSize(curWeap))
+				continue;
+		}
 
 		// check difficulty
 		if (self.pers["bots"]["skill"]["base"] <= 3)
@@ -3686,7 +3693,7 @@ doReloadCancel()
 			weapon = weaponslist[randomInt(weaponslist.size)];
 			weaponslist = array_remove(weaponslist, weapon);
 					
-			if (!isWeaponPrimary(weapon))
+			if (!maps\mp\gametypes\_weapons::isPrimaryWeapon(weapon))
 				continue;
 				
 			if(curWeap == weapon || weapon == "none" || weapon == "")
@@ -3704,6 +3711,7 @@ doReloadCancel()
 		self BotChangeToWeapon(weap);
 		wait 0.25;
 		self BotChangeToWeapon(curWeap);
+		wait 2;
 	}
 }
 
@@ -3715,6 +3723,8 @@ bot_weapon_think()
 	self endon("death");
 	self endon("disconnect");
 	level endon("game_ended");
+
+	first = true;
 	
 	for(;;)
 	{
@@ -3762,13 +3772,23 @@ bot_weapon_think()
 			continue;
 		}
 		
-		if(curWeap != "none" && self getAmmoCount(curWeap) && curWeap != "stinger_mp" && curWeap != "javelin_mp" && curWeap != "onemanarmy_mp")
+		if (first)
 		{
-			if(randomInt(100) > self.pers["bots"]["behavior"]["switch"])
+			first = false;
+
+			if(randomInt(100) > self.pers["bots"]["behavior"]["initswitch"])
 				continue;
+		}
+		else
+		{
+			if(curWeap != "none" && self getAmmoCount(curWeap) && curWeap != "stinger_mp" && curWeap != "javelin_mp" && curWeap != "onemanarmy_mp")
+			{
+				if(randomInt(100) > self.pers["bots"]["behavior"]["switch"])
+					continue;
 				
-			if(hasTarget)
-				continue;
+				if(hasTarget)
+					continue;
+			}
 		}
 		
 		weaponslist = self getweaponslistall();
