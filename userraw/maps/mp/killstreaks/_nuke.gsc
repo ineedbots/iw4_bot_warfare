@@ -315,7 +315,6 @@ nukeEffects()
 	setGameEndTime( 0 );
 	
 	level.nukeDetonated = true;
-	level.nuked = true;
 	
 	if ( !level.nukeEndsGame )
 	{
@@ -431,6 +430,8 @@ nukeSlowMo()
 	//SetSlowMotion( <startTimescale>, <endTimescale>, <deltaTime> )
 	setSlowMotion( 1.0, 0.25, 0.5 );
 	level waittill_either( "nuke_death", "nuke_cancelled" );
+	
+	level.nuked = true;
 	setSlowMotion( 0.25, 1, 2.0 );
 }
 
