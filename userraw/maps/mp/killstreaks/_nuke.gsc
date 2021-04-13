@@ -25,8 +25,10 @@
 		- scr_nuke_canCall_whenScoreLimitClose_selfOnly <bool>
 			false - (default) wether or not to take into account just the caller's score, or everyone's score
 
-		- scr_nuke_doSlowmo <bool>
-			true - (default) should do a slowmo effect when nuke
+		- scr_nuke_doSlowmo <int>
+			0 - none
+			1 - (default) should do a slowmo effect when nuke
+			2 - only do slowmo effect if its the first nuke of the game
 
 	Thanks: H3X1C, Emosewaj, RaidMax
 */
@@ -54,7 +56,7 @@ init()
 	setDvarIfUninitialized( "scr_nukeCancelMode", 0 );
 
 	setDvarIfUninitialized( "scr_nuke_is_moab", false );
-	setDvarIfUninitialized( "scr_nuke_doSlowmo", true );
+	setDvarIfUninitialized( "scr_nuke_doSlowmo", 1 );
 	setDvarIfUninitialized( "scr_nuke_kills_all", true );
 	setDvarIfUninitialized( "scr_nuke_emp_duration", 60.0 );
 	setDvarIfUninitialized( "scr_nuke_perm_vision", true );
@@ -313,6 +315,7 @@ nukeEffects()
 	setGameEndTime( 0 );
 	
 	level.nukeDetonated = true;
+	level.nuked = true;
 	
 	if ( !level.nukeEndsGame )
 	{
@@ -422,7 +425,7 @@ nukeAftermathEffect()
 
 nukeSlowMo()
 {
-	if (!level.nukeDoSlowmo)
+	if (!level.nukeDoSlowmo || (level.nukeDoSlowmo == 2 && isDefined(level.nuked)))
 		return;
 
 	//SetSlowMotion( <startTimescale>, <endTimescale>, <deltaTime> )
