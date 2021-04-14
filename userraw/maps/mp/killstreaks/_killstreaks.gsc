@@ -230,6 +230,7 @@ waitForChangeTeam()
 	{
 		self waittill ( "joined_team" );
 		clearKillstreaks();
+		self clearUsingRemote();
 	}
 }
 
