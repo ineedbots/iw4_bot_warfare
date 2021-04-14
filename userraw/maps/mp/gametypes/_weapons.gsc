@@ -7,6 +7,8 @@
 	Fixes claymores from tripping when the victim is elevated from the claymore.
 	Fixes stuns and flashes friendly fire on claymores and c4s.
 	Fixes direct impact stun stunning the victim.
+	Fixes missile and grenade threads being killed on death.
+	Fixes new c4s and claymores after an emp not being affected 
 
 	DVARS:
 		- scr_allowDropWeaponOnCommand <bool>
@@ -1179,7 +1181,7 @@ friendlyFireCheck( owner, attacker, forcedFriendlyFireRule )
 
 watchGrenadeUsage()
 {
-	self endon( "death" );
+	self endon( "spawned_player" );
 	self endon( "disconnect" );
 
 	self.throwingGrenade = undefined;
@@ -1247,6 +1249,7 @@ watchGrenadeUsage()
 
 deleteOnOwnerTeamChange( owner )
 {
+	self notify( "delete_on_team_overlap" );
 	self endon( "delete_on_team_overlap" );
 	
 	self endon( "death" );
@@ -1258,7 +1261,7 @@ deleteOnOwnerTeamChange( owner )
 
 beginGrenadeTracking()
 {
-	self endon( "death" );
+	self endon( "spawned_player" );
 	self endon( "disconnect" );
 	self endon( "offhand_end" );
 	self endon( "weapon_change" );
@@ -1329,7 +1332,7 @@ AddMissileToSightTraces( team )
 
 watchMissileUsage()
 {
-	self endon( "death" );
+	self endon( "spawned_player" );
 	self endon( "disconnect" );
 
 	for ( ;; )
@@ -1412,7 +1415,7 @@ empExplodeWaiter()
 
 beginC4Tracking()
 {
-	self endon( "death" );
+	self endon( "spawned_player" );
 	self endon( "disconnect" );
 
 	self waittill_any( "grenade_fire", "weapon_change", "offhand_end" );
@@ -1421,7 +1424,7 @@ beginC4Tracking()
 
 watchForThrowbacks()
 {
-	self endon( "death" );
+	self endon( "spawned_player" );
 	self endon( "disconnect" );
 
 	for ( ;; )
@@ -1446,10 +1449,7 @@ watchForThrowbacks()
 		if( level.extraTeamIcons )
 			grenade thread setClaymoreTeamHeadIcon( self.pers[ "team" ] );
 		if ( level.deleteNadeOnTeamChange )
-		{
-			grenade notify( "delete_on_team_overlap" );
 			grenade thread deleteOnOwnerTeamChange( self );
-		}
 	}
 }
 
@@ -1528,6 +1528,12 @@ c4EMPDamage()
 c4EMPKillstreakWait()
 {
 	self endon( "death" );
+
+	if ( (level.teamBased && level.teamEMPed[self.team]) || (!level.teamBased && isDefined( level.empPlayer ) && level.empPlayer != self.owner ) )
+	{
+		self.disabled = true;
+		self notify( "disabled" );
+	}
 
 	for ( ;; )
 	{
@@ -1949,7 +1955,7 @@ waitAndDetonate( delay )
 
 deleteC4AndClaymoresOnDisconnect()
 {
-	self endon( "death" );
+	self endon( "spawned_player" );
 	self waittill( "disconnect" );
 
 	c4array = self.c4array;
