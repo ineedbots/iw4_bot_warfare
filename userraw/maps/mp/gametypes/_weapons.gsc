@@ -1531,6 +1531,8 @@ c4EMPKillstreakWait()
 
 	if ( (level.teamBased && level.teamEMPed[self.team]) || (!level.teamBased && isDefined( level.empPlayer ) && level.empPlayer != self.owner ) )
 	{
+		playfxOnTag( getfx( "sentry_explode_mp" ), self, "tag_origin" );
+		
 		self.disabled = true;
 		self notify( "disabled" );
 	}
@@ -1541,6 +1543,8 @@ c4EMPKillstreakWait()
 
 		if ( (level.teamBased && level.teamEMPed[self.team]) || (!level.teamBased && isDefined( level.empPlayer ) && level.empPlayer != self.owner ) )
 		{
+			playfxOnTag( getfx( "sentry_explode_mp" ), self, "tag_origin" );
+
 			self.disabled = true;
 			self notify( "disabled" );
 		}
