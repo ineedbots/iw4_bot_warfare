@@ -12,6 +12,9 @@
 
 		- scr_airstrike_mutate_fix <bool>
 			0 - (default) fixes a bug where calling in airstrikes too fast will cause them to mutate types
+
+		- scr_airstrike_teamChangeFix <bool>
+			false - (default) if should prevent players from doing damage when changing teams and airstriking
 */
 
 #include maps\mp\_utility;
@@ -45,9 +48,11 @@ init()
 	setDvarIfUninitialized( "scr_harrier_duration", 45 );
 	setDvarIfUninitialized( "scr_harrier_fast", false );
 	setDvarIfUninitialized( "scr_airstrike_mutate_fix", false );
+	setDvarIfUninitialized( "scr_airstrike_teamChangeFix", false );
 	level.harrierDuration = getDvarInt( "scr_harrier_duration" );
 	level.harrier_fast = getDvarInt( "scr_harrier_fast" );
 	level.airstrike_mutate_fix = getDvarInt( "scr_airstrike_mutate_fix" );
+	level.airstrike_teamChangeFix = getDvarInt( "scr_airstrike_teamChangeFix" );
 	
 	
 	level.onfirefx = loadfx ("fire/fire_smoke_trail_L");
@@ -235,7 +240,7 @@ doAirstrike( lifeId, origin, yaw, owner, team, airStrikeType )
 	level.artilleryDangerCenters[ level.artilleryDangerCenters.size ] = dangerCenter;
 	/# level thread debugArtilleryDangerCenters( airstrikeType ); #/
 	
-	harrierEnt = self callStrike( lifeId, owner, targetpos, yaw, airstrikeType );
+	harrierEnt = self callStrike( lifeId, owner, targetpos, yaw, airstrikeType, team );
 	
 	wait( 1.0 );
 	level.airstrikeInProgress = undefined;
@@ -400,8 +405,14 @@ pointIsInAirstrikeArea( point, targetpos, yaw, airstrikeType )
 }
 
 
-losRadiusDamage( pos, radius, max, min, owner, eInflictor, sWeapon )
+losRadiusDamage( pos, radius, max, min, owner, eInflictor, sWeapon, team )
 {
+	if (level.airstrike_teamChangeFix && level.teambased && isDefined(team))
+	{
+		if (!isDefined(owner) || owner.team != team)
+			return;
+	}
+
 	ents = maps\mp\gametypes\_weapons::getDamageableEnts(pos, radius, true);
 	
 	glassRadiusDamage( pos, radius, max, min );
@@ -547,7 +558,7 @@ traceBomb()
 #/
 
 
-doBomberStrike( lifeId, owner, requiredDeathCount, bombsite, startPoint, endPoint, bombTime, flyTime, direction, airStrikeType )
+doBomberStrike( lifeId, owner, requiredDeathCount, bombsite, startPoint, endPoint, bombTime, flyTime, direction, airStrikeType, team )
 {
 	// plane spawning randomness = up to 125 units, biased towards 0
 	// radius of bomb damage is 512
@@ -575,7 +586,7 @@ doBomberStrike( lifeId, owner, requiredDeathCount, bombsite, startPoint, endPoin
 
 	thread stealthBomber_killCam( plane, pathEnd, flyTime, airStrikeType );
 	
-	thread bomberDropBombs( plane, bombsite, owner );
+	thread bomberDropBombs( plane, bombsite, owner, team );
 
 	// Delete the plane after its flyby
 	wait ( flyTime );
@@ -584,7 +595,7 @@ doBomberStrike( lifeId, owner, requiredDeathCount, bombsite, startPoint, endPoin
 }
 
 
-bomberDropBombs( plane, bombSite, owner )
+bomberDropBombs( plane, bombSite, owner, team )
 {
 	while ( !targetIsClose( plane, bombsite, 5000 ) )
 		wait ( 0.05 );
@@ -609,7 +620,7 @@ bomberDropBombs( plane, bombSite, owner )
 
 		showFx = !showFx;
 		if ( dist < 4500 )
-			plane thread callStrike_bomb( plane.origin, owner, (0,0,0), showFx );
+			plane thread callStrike_bomb( plane.origin, owner, (0,0,0), showFx, team );
 		wait ( 0.1 );
 	}
 
@@ -650,7 +661,7 @@ stealthBomber_killCam( plane, pathEnd, flyTime, typeOfStrike )
 }
 
 
-callStrike_bomb( coord, owner, offset, showFx )
+callStrike_bomb( coord, owner, offset, showFx, team )
 {
 	if ( !isDefined( owner ) || owner isEMPed() )
 	{
@@ -689,11 +700,11 @@ callStrike_bomb( coord, owner, offset, showFx )
 
 	thread playSoundInSpace( "exp_airstrike_bomb", bombPoint );
 	radiusArtilleryShellshock( bombPoint, 512, 8, 4, owner.team );
-	losRadiusDamage( bombPoint + (0,0,16), 896, 300, 50, owner, self, "stealth_bomb_mp" ); // targetpos, radius, maxdamage, mindamage, player causing damage
+	losRadiusDamage( bombPoint + (0,0,16), 896, 300, 50, owner, self, "stealth_bomb_mp", team ); // targetpos, radius, maxdamage, mindamage, player causing damage
 }
 
 
-doPlaneStrike( lifeId, owner, requiredDeathCount, bombsite, startPoint, endPoint, bombTime, flyTime, direction, typeOfStrike )
+doPlaneStrike( lifeId, owner, requiredDeathCount, bombsite, startPoint, endPoint, bombTime, flyTime, direction, typeOfStrike, team )
 {
 	// plane spawning randomness = up to 125 units, biased towards 0
 	// radius of bomb damage is 512
@@ -739,7 +750,7 @@ doPlaneStrike( lifeId, owner, requiredDeathCount, bombsite, startPoint, endPoint
 	#/
 	
 	//thread callStrike_planeSound( plane, bombsite );
-	thread callStrike_bombEffect( plane, pathEnd, flyTime, bombTime - 1.0, owner, requiredDeathCount, typeOfStrike );
+	thread callStrike_bombEffect( plane, pathEnd, flyTime, bombTime - 1.0, owner, requiredDeathCount, typeOfStrike, team );
 
 	// Delete the plane after its flyby
 	wait flyTime;
@@ -747,7 +758,7 @@ doPlaneStrike( lifeId, owner, requiredDeathCount, bombsite, startPoint, endPoint
 	plane delete(); 
 }
 
-callStrike_bombEffect( plane, pathEnd, flyTime, launchTime, owner, requiredDeathCount, typeOfStrike )
+callStrike_bombEffect( plane, pathEnd, flyTime, launchTime, owner, requiredDeathCount, typeOfStrike, team )
 {
 	wait ( launchTime );
 
@@ -829,7 +840,7 @@ callStrike_bombEffect( plane, pathEnd, flyTime, launchTime, owner, requiredDeath
 			thread airstrikeLine( bombOrigin, traceHit, (1,0,0), 40 );
 		#/
 		
-		thread losRadiusDamage( traceHit + (0,0,16), 512, 200, 30, owner, bomb, "artillery_mp" ); // targetpos, radius, maxdamage, mindamage, player causing damage, entity that player used to cause damage
+		thread losRadiusDamage( traceHit + (0,0,16), 512, 200, 30, owner, bomb, "artillery_mp", team ); // targetpos, radius, maxdamage, mindamage, player causing damage, entity that player used to cause damage
 	
 		if ( i%3 == 0 )
 		{
@@ -882,7 +893,7 @@ playPlaneFx()
 	playfxontag( level.fx_airstrike_contrail, self, "tag_left_wingtip" );
 }
 
-callStrike( lifeId, owner, coord, yaw, airStrikeType )
+callStrike( lifeId, owner, coord, yaw, airStrikeType, team )
 {
 	if (!isDefined(airStrikeType))
 		airStrikeType = self.airStrikeType;
@@ -972,15 +983,19 @@ callStrike( lifeId, owner, coord, yaw, airStrikeType )
 	
 	if ( airStrikeType == "harrier" )
 	{
-		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(500)), endPoint+(0,0,randomInt(500)), bombTime, flyTime, direction, airStrikeType );
+		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(500)), endPoint+(0,0,randomInt(500)), bombTime, flyTime, direction, airStrikeType, team );
 		
 		wait randomfloatrange( 1.5, 2.5 );
 		maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType );
+		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType, team );
 		
 		wait randomfloatrange( 1.5, 2.5 );
 		maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-		harrier = beginHarrier( lifeId, startPoint, coord );
+		harrier = beginHarrier( lifeId, startPoint, coord, team );
+		
+		if (!isDefined(harrier))
+			return;
+
 		owner thread defendLocation( harrier );
 
 		return harrier;		
@@ -989,25 +1004,25 @@ callStrike( lifeId, owner, coord, yaw, airStrikeType )
 	}
 	else if ( airStrikeType == "stealth" )
 	{
-		level thread doBomberStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(1000)), endPoint+(0,0,randomInt(1000)), bombTime, flyTime, direction, airStrikeType  );
+		level thread doBomberStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(1000)), endPoint+(0,0,randomInt(1000)), bombTime, flyTime, direction, airStrikeType, team );
 	}
 	else	//common airstrike
 	{
-		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(500)), endPoint+(0,0,randomInt(500)), bombTime, flyTime, direction, airStrikeType );
+		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(500)), endPoint+(0,0,randomInt(500)), bombTime, flyTime, direction, airStrikeType, team );
 		
 		wait randomfloatrange( 1.5, 2.5 );
 		maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType );
+		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType, team );
 		
 		wait randomfloatrange( 1.5, 2.5 );
 		maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType );	
+		level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType, team );	
 
 		if ( airStrikeType == "super" )
 		{
 			wait randomfloatrange( 2.5, 3.5 );
 			maps\mp\gametypes\_hostmigration::waitTillHostMigrationDone();
-			level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType );	
+			level thread doPlaneStrike( lifeId, owner, requiredDeathCount, coord, startPoint+(0,0,randomInt(200)), endPoint+(0,0,randomInt(200)), bombTime, flyTime, direction, airStrikeType, team );	
 		}
 	}
 }

@@ -16,8 +16,14 @@
 //	Jordan Hirsh	Dec. 18th 	2008
 ********************************************************************/
 
-beginHarrier( lifeId, startPoint, pos )
+beginHarrier( lifeId, startPoint, pos, team )
 {
+	if (isDefined(level.airstrike_teamChangeFix) && level.airstrike_teamChangeFix && level.teambased && isDefined(team))
+	{
+		if (!isDefined(self) || self.team != team)
+			return;
+	}
+
 	heightEnt = GetEnt( "airstrikeheight", "targetname" );
 	
 	if ( isDefined( heightEnt ) )
