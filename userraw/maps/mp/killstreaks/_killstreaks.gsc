@@ -2,7 +2,7 @@
 	_killstreaks modded
 	Author: INeedGames
 	Date: 09/22/2020
-	Adds killstreak rollover and killstreak HUD.origin
+	Adds killstreak rollover and killstreak HUD
 
 	DVARS:
 		- scr_killstreak_rollover <int>
@@ -24,8 +24,10 @@
 			1 - use Puffiamo's killstreak HUD
 			2 - use NoFate's MW3 killstreak HUD
 
-		- scr_killstreak_print <bool>
-			false - (default) enables the CoD4 (10 Kill Streak!) messages
+		- scr_killstreak_print <int>
+			0 - (default) none
+			1 - enables the CoD4 (10 Kill Streak!) messages
+			2 - adds exp rewards for each 5 kills
 
 		- scr_specialist <bool>
 			false - (default) enable specialist from mw3, a player must only have the nuke selected as their killstreak
@@ -1424,8 +1426,8 @@ watchNotifyKSMessage()
 
 		for (curStreak = lastKs + 1; curStreak <= self.pers["cur_kill_streak"]; curStreak++)
 		{
-			if (curStreak == 5)
-				continue;
+			//if (curStreak == 5)
+			//	continue;
 
 			if (curStreak % 5 != 0)
 				continue;
@@ -1439,19 +1441,27 @@ watchNotifyKSMessage()
 
 streakNotify( streakVal )
 {
-	self endon("disconnect");
+	self endon( "disconnect" );
 
-	self notify("streakNotifyCoD4");
-	self endon("streakNotifyCoD4");
-
-	wait 0.1;
-	
 	notifyData = spawnStruct();
-	notifyData.titleText = streakVal + " Kill Streak!";
+
+	if (level.killstreakPrint > 1)
+	{
+		xpReward = streakVal * 100;
+
+		self thread maps\mp\gametypes\_rank::giveRankXP( "killstreak_bonus", xpReward );
+
+		notifyData.notifyText = "+" + xpReward;
+	}
+
+	wait .05;
+
+	notifyData.titleLabel = &"MP_KILLSTREAK_N";
+	notifyData.titleText = streakVal;
 	
 	self maps\mp\gametypes\_hud_message::notifyMessage( notifyData );
 	
-	iprintln( self.name + " has a killstreak of " + streakVal + "!" );
+	iprintln( &"RANK_KILL_STREAK_N", self, streakVal );
 }
 
 underScorePopup(string, hudColor, glowAlpha)
