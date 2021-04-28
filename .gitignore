@@ -31,3 +31,4 @@ images/
 missingasset.csv
 userraw/scripts/_commands.gsc
 userraw/scripts/_customcallbacks.gsc
+userraw/scripts/bots_custom.gsc

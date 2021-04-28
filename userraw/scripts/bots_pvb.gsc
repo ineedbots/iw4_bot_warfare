@@ -13,8 +13,6 @@ init()
 
 	level thread watchTeams();
 
-	level thread watchCheater();
-
 	level thread watchBotCrackedClass();
 
 	level thread watchBoxmap();
@@ -74,69 +72,6 @@ watchBoxmap()
 		setDvar("scr_spawnsimple", 1);
 	else
 		setDvar("scr_spawnsimple", 0);
-}
-
-watchCheater()
-{
-	SetDvar("bot_cheater", "");
-	for (;;)
-	{
-		wait 0.05;
-
-		cheatername = GetDvar("bot_cheater");
-		if (cheatername == "")
-			continue;
-
-		cheater = undefined;
-		// find player name
-		foreach( player in level.players )
-		{
-			if (!isSubStr(toLower(player.name), toLower(cheatername)))
-				continue;
-
-			cheater = player;
-		}
-
-		if (!isDefined(cheater))
-			continue;
-
-		// now tell all bots to target
-		foreach( bot in level.bots )
-		{
-			if (isReallyAlive(cheater))
-			{
-				if (randomInt(2) && isDefined(bot.bot.target) && isDefined(bot.bot.target.entity) && bot.bot.target.entity getEntityNumber() == cheater getEntityNumber())
-					bot thread BotPressAttack(0.1);
-
-				bot SetWeaponAmmoClip(bot GetCurrentWeapon(), 999);
-				bot.pers["bots"]["skill"]["aim_time"] = 0.05;
-				bot.pers["bots"]["skill"]["init_react_time"] = 0;
-				bot.pers["bots"]["skill"]["reaction_time"] = 1000;
-				bot.pers["bots"]["skill"]["no_trace_ads_time"] = 0;
-				bot.pers["bots"]["skill"]["no_trace_look_time"] = 0;
-				bot.pers["bots"]["skill"]["remember_time"] = 50;
-				bot.pers["bots"]["skill"]["fov"] = 1;
-				bot.pers["bots"]["skill"]["dist"] = 100000;
-				bot.pers["bots"]["skill"]["spawn_time"] = 0;
-				bot.pers["bots"]["skill"]["help_dist"] = 0;
-				bot.pers["bots"]["skill"]["semi_time"] = 0.05;
-
-				bot.pers["bots"]["skill"]["bones"] = "j_head";
-
-				bot SetAttacker(cheater);
-			}
-
-			if (isDefined(bot.bot.target) && isDefined(bot.bot.target.entity))
-			{
-				if (bot.bot.target.entity getEntityNumber() != cheater getEntityNumber())
-				{
-					bot.bot.targets = [];
-					bot.bot.target = undefined;
-					bot notify("new_enemy");
-				}
-			}
-		}
-	}
 }
 
 watchBotCrackedClass()

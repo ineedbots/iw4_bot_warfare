@@ -672,6 +672,10 @@ chooseRandomTactical()
 */
 setClasses()
 {
+	n = 5;
+	if (!self is_bot())
+		n = 15;
+		
 	rank = self maps\mp\gametypes\_rank::getRankForXp( self getPlayerData("experience") );
 
 	if (RandomFloatRange(0, 1) < ((rank / level.maxRank) + 0.1))
@@ -680,7 +684,7 @@ setClasses()
 		self.pers["bots"]["behavior"]["quickscope"] = true;
 	}
 
-	for (i = 0; i < 5; i++)
+	for (i = 0; i < n; i++)
 	{
 		equipment = chooseRandomPerk("equipment");
 		perk3 = chooseRandomPerk("perk3");
