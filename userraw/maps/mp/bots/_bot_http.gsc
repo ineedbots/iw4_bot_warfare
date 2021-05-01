@@ -36,34 +36,34 @@ doVersionCheck()
 */
 getRemoteWaypoints(mapname)
 {
-  url = "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/" + mapname + "_wp.csv";
+	url = "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/" + mapname + "_wp.csv";
 	filename = "waypoints/" + mapname + "_wp.csv";
 
-  PrintConsole("Attempting to get remote waypoints from " + url + "\n");
-  res = getLinesFromUrl(url, filename);
+	PrintConsole("Attempting to get remote waypoints from " + url + "\n");
+	res = getLinesFromUrl(url, filename);
 
-  if (!res.lines.size)
-    return;
+	if (!res.lines.size)
+		return;
 
-  waypointCount = int(res.lines[0]);
+	waypointCount = int(res.lines[0]);
 
 	waypoints = [];
-  PrintConsole("Loading remote waypoints...\n");
+	PrintConsole("Loading remote waypoints...\n");
 
 	for (i = 1; i <= waypointCount; i++)
-  {
-    tokens = tokenizeLine(res.lines[i], ",");
-    
-    waypoint = parseTokensIntoWaypoint(tokens);
+	{
+		tokens = tokenizeLine(res.lines[i], ",");
+	
+		waypoint = parseTokensIntoWaypoint(tokens);
 
-    waypoints[i-1] = waypoint;
-  }
+		waypoints[i-1] = waypoint;
+	}
 
-  if (waypoints.size)
-  {
-    level.waypoints = waypoints;
-    PrintConsole("Loaded " + waypoints.size + " waypoints from remote.\n");
-  }
+	if (waypoints.size)
+	{
+		level.waypoints = waypoints;
+		PrintConsole("Loaded " + waypoints.size + " waypoints from remote.\n");
+	}
 }
 
 /*
@@ -71,17 +71,17 @@ getRemoteWaypoints(mapname)
 */
 getRemoteVersion()
 {
-  request = httpGet( "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/version.txt" );
+	request = httpGet( "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/version.txt" );
 
 	if (!isDefined(request))
 		return undefined;
 
-  request waittill( "done", success, data );
+	request waittill( "done", success, data );
 
-  if (!success)
-    return undefined;
+	if (!success)
+		return undefined;
 
-  return strtok(data, "\n")[0];
+	return strtok(data, "\n")[0];
 }
 
 /*
@@ -89,18 +89,18 @@ getRemoteVersion()
 */
 getLinesFromUrl(url, filename)
 {
-  result = spawnStruct();
-  result.lines = [];
+	result = spawnStruct();
+	result.lines = [];
 
 	request = httpGet( url );
 
 	if (!isDefined(request))
 		return result;
 
-  request waittill( "done", success, data );
+	request waittill( "done", success, data );
 
-  if (!success)
-    return result;
+	if (!success)
+		return result;
 
 	fileWrite(filename, data, "write");
 
@@ -119,7 +119,7 @@ getLinesFromUrl(url, filename)
 
 		line += c;
 	}
-  result.lines[result.lines.size] = line;
+	result.lines[result.lines.size] = line;
 
 	return result;
 }

@@ -29,11 +29,14 @@ watchSniper()
 
 	for (;;)
 	{
+		wait 15;
+
 		numPlayers = 0;
 		numSnipers = 0;
 
-		foreach(player in level.players)
+		for(i = 0; i < level.players.size; i++)
 		{
+			player = level.players[i];
 			if (player is_bot())
 				continue;
 
@@ -53,9 +56,6 @@ watchSniper()
 			else
 				setDvar("bots_sniperLoadout", 0);
 		}
-		
-
-		wait 15;
 	}
 }
 
@@ -148,8 +148,9 @@ watchTeams()
 			continue;
 
 		team = getDvar("bot_pvb_helper_noPlayersOnTeam");
-		foreach (player in level.players)
+		for(i = 0; i < level.players.size; i++)
 		{
+			player = level.players[i];
 			if (player is_bot())
 				continue;
 

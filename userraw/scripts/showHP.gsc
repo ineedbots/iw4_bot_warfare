@@ -24,9 +24,9 @@ onPlayerSpawned()
    self endon("disconnect");
    for(;;)
    {
-      self waittill("spawned_player");
+	  self waittill("spawned_player");
 
-	  	if(level.showHP)
+		if(level.showHP)
 				self thread drawHP();
    }
 }

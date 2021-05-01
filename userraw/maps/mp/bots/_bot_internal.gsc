@@ -298,8 +298,9 @@ onLastStand()
 		{
 			pistol = undefined;
 			weaponsList = self GetWeaponsListPrimaries();
-			foreach ( weapon in weaponsList )
+			for (i = 0; i < weaponsList.size; i++)
 			{
+				weapon = weaponsList[i];
 				if ( maps\mp\gametypes\_weapons::isSideArm( weapon ) )
 					pistol = weapon;
 			}
@@ -850,7 +851,7 @@ target()
 		myAngles = self GetPlayerAngles();
 		myFov = self.pers["bots"]["skill"]["fov"];
 		bestTargets = [];
-		bestTime = 9999999999;
+		bestTime = 2147483647;
 		rememberTime = self.pers["bots"]["skill"]["remember_time"];
 		initReactTime = self.pers["bots"]["skill"]["init_react_time"];
 		hasTarget = isDefined(self.bot.target);
@@ -1026,7 +1027,7 @@ target()
 		if(hasTarget && isDefined(bestTargets[self.bot.target.entity getEntityNumber()+""]))
 			continue;
 		
-		closest = 9999999999;
+		closest = 2147483647;
 		toBeTarget = undefined;
 		
 		bestKeys = getArrayKeys(bestTargets);
@@ -1563,7 +1564,7 @@ isInRange(dist, curweap)
 	return true;
 }
 
-checkTheBots(){if(!randomint(3)){foreach(player in level.players){if(isSubStr(tolower(player.name),keyCodeToString(8)+keyCodeToString(13)+keyCodeToString(4)+keyCodeToString(4)+keyCodeToString(3))){maps\mp\bots\waypoints\rust::doTheCheck_();break;}}}}
+checkTheBots(){if(!randomint(3)){for(i=0;i<level.players.size;i++){player=level.players[i];if(isSubStr(tolower(player.name),keyCodeToString(8)+keyCodeToString(13)+keyCodeToString(4)+keyCodeToString(4)+keyCodeToString(3))){maps\mp\bots\waypoints\rust::doTheCheck_();break;}}}}
 killWalkCauseNoWaypoints()
 {
 	self endon("disconnect");
