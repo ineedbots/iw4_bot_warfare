@@ -137,6 +137,7 @@ resetBotVars()
 	self.bot.is_cur_full_auto = false;
 	self.bot.cur_weap_dist_multi = 1;
 	self.bot.is_cur_sniper = false;
+	self.bot.is_cur_akimbo = false;
 	
 	self.bot.rand = randomInt(100);
 
@@ -225,6 +226,7 @@ onWeaponChange()
 		self.bot.is_cur_full_auto = WeaponIsFullAuto(newWeapon);
 		self.bot.cur_weap_dist_multi = SetWeaponDistMulti(newWeapon);
 		self.bot.is_cur_sniper = IsWeapSniper(newWeapon);
+		self.bot.is_cur_akimbo = isSubStr(newWeapon, "_akimbo_");
 
 		if (newWeapon == "none")
 			continue;
@@ -1516,14 +1518,12 @@ aim()
 */
 botFire(curweap)
 {
-	isAkimbo = isSubStr(curweap, "_akimbo_");
-
 	self.bot.last_fire_time = getTime();
 
 	if(self.bot.is_cur_full_auto)
 	{
 		self thread pressFire();
-		if (isAkimbo) self thread pressAds();
+		if (self.bot.is_cur_akimbo) self thread pressAds();
 		return;
 	}
 
@@ -1531,7 +1531,7 @@ botFire(curweap)
 		return;
 		
 	self thread pressFire();
-	if (isAkimbo) self thread pressAds();
+	if (self.bot.is_cur_akimbo) self thread pressAds();
 	self thread doSemiTime();
 }
 
@@ -1595,7 +1595,7 @@ canAds(dist, curweap)
 	if (curweap == "riotshield_mp" || curweap == "onemanarmy_mp")
 		return false;
 
-	if (isSubStr(curweap, "_akimbo_"))
+	if (self.bot.is_cur_akimbo)
 		return false;
 	
 	return true;
@@ -1614,7 +1614,7 @@ isInRange(dist, curweap)
 	if (self IsUsingRemote())
 		return true;
 	
-	if((weapclass == "spread" || isSubStr(curweap, "_akimbo_")) && dist > level.bots_maxShotgunDistance)
+	if((weapclass == "spread" || self.bot.is_cur_akimbo) && dist > level.bots_maxShotgunDistance)
 		return false;
 
 	if (curweap == "riotshield_mp" && dist > level.bots_maxKnifeDistance)
