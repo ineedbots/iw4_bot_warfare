@@ -192,7 +192,7 @@ onSomeoneSaid()
 	{
 		level waittill("say", string, player);
 
-		PrintConsole(player.name + ": " + string + "\n");
+		PrintConsole(player.name + ": ^7" + string + "\n");
 	}
 }
 
