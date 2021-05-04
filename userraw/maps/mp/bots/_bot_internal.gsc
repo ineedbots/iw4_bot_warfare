@@ -487,7 +487,7 @@ watchC4Thrown(c4)
 			if((level.teamBased && self.team == player.team) || player.sessionstate != "playing" || !isReallyAlive(player))
 				continue;
 
-			if (distanceSquared(c4.origin, player.origin) > 1024)
+			if (distanceSquared(c4.origin, player.origin) > 200*200)
 				continue;
 
 			if (!bulletTracePassed(c4.origin, player.origin + (0, 0, 25), false, c4))

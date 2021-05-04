@@ -405,8 +405,6 @@ chooseRandomPerk(perkkind, primary, primaryAtts)
 				continue;
 			if (perk == "specialty_blastshield")
 				continue;
-			if (perk == "c4_mp")
-				continue;
 			if (perk == "frag_grenade_mp")
 				continue;
 			if (perk == "specialty_copycat")
@@ -2510,6 +2508,8 @@ bot_use_equipment_think()
 			nade = "claymore_mp";
 		if (self GetAmmoCount("flare_mp"))
 			nade = "flare_mp";
+		if (self GetAmmoCount("c4_mp"))
+			nade = "c4_mp";
 		
 		if (!isDefined(nade))
 			continue;
