@@ -173,7 +173,8 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Improved and fixed various waypoints for maps
   - Fixed bots rubberbanding movement when their goal changes
   - Added bots quickscoping with snipers
-  - Added bots reload canceling
+  - Added bots reload canceling and fast swaps
+  - Bots use C4
 
 - v2.0.0
   - Initial reboot release
