@@ -152,16 +152,16 @@ updateWaypointsStats()
 	self endon("disconnect");
 	self endon("death");
 	
-	self initHudElem("TotalWps:",502,5);
-	totalWpsHud = self initHudElem("",580,5);
-	self initHudElem("NearestWP:",502,15);
-	nearestWP = self initHudElem("",580,15);
-	self initHudElem("Childs:",502,25);
-	children = self initHudElem("",560,25);
-	self initHudElem("Type:",502,35);
-	type = self initHudElem("",560,35);
-	self initHudElem("ToLink:",502,45);
-	wpToLink = self initHudElem("",560,45);
+	self initHudElem("TotalWps:",102,5);
+	totalWpsHud = self initHudElem("",180,5);
+	self initHudElem("NearestWP:",102,15);
+	nearestWP = self initHudElem("",180,15);
+	self initHudElem("Childs:",102,25);
+	children = self initHudElem("",160,25);
+	self initHudElem("Type:",102,35);
+	type = self initHudElem("",160,35);
+	self initHudElem("ToLink:",102,45);
+	wpToLink = self initHudElem("",160,45);
 	
 	infotext = self initHudElem2();
 	self initHudElem3();
@@ -718,10 +718,10 @@ initHudElem(txt, xl, yl)
 {
 	hud = NewClientHudElem( self );
 	hud setText(txt);
-	hud.alignX = "top";
-	hud.alignY =  "left";
-	hud.horzAlign =  "top";
-	hud.vertAlign =  "left";
+	hud.alignX = "left";
+	hud.alignY =  "top";
+	hud.horzAlign =  "left";
+	hud.vertAlign =  "top";
 	hud.x = xl;
 	hud.y = yl;
 	hud.foreground = true;
@@ -780,13 +780,13 @@ initHudElem3()
 initHudElem4()
 {
 	OptionsBG = NewClientHudElem( self );
-	OptionsBG.x = 500;
+	OptionsBG.x = 100;
 	OptionsBG.y = 2;
-	OptionsBG.alignX = "top";
-	OptionsBG.alignY = "left";
-	OptionsBG.horzAlign = "top";
-	OptionsBG.vertAlign = "left";
-	OptionsBG setshader("black", 200, 50);
+	OptionsBG.alignX = "left";
+	OptionsBG.alignY = "top";
+	OptionsBG.horzAlign = "left";
+	OptionsBG.vertAlign = "top";
+	OptionsBG setshader("black", 200, 60);
 	OptionsBG.alpha = 0.4;
 	
 	self thread destroyOnDeath( OptionsBG );

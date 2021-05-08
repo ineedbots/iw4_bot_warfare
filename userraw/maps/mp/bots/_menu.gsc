@@ -27,6 +27,9 @@ watchPlayers()
 	{
 		wait 1;
 
+		if (!getDvarInt("bots_main_menu"))
+			return;
+
 		for (i = level.players.size - 1; i >= 0; i--)
 		{
 			player = level.players[i];
