@@ -158,7 +158,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 - bots_main_debug - a boolean value (0 or 1), enables or disables the waypoint editor
 
 ## Changelog
-- v2.0.1 (to be released)
+- v2.0.1
   - Reduced bots crouching
   - Increased bots sprinting
   - Improved bots mantling, crouching and knifing glass when needed
@@ -175,6 +175,8 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Added bots quickscoping with snipers
   - Added bots reload canceling and fast swaps
   - Bots use C4
+  - Improved revenge
+  - Bots can swap weapons on spawn more likely
 
 - v2.0.0
   - Initial reboot release
@@ -188,6 +190,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 - apdonato - http://rsebots.blogspot.ca/
 - Ability
 - Salvation
+- VicRattlehead - https://www.moddb.com/members/vicrattlehead
 
 Feel free to use code, host on other sites, host on servers, mod it and merge mods with it, just give credit where credit is due!
 	-INeedGames/INeedBot(s) @ ineedbots@outlook.com

@@ -23,6 +23,26 @@ You can find the GitHub containing more info at https://github.com/ineedbots/iw4
 - Pressing the menu button again closes menus.
 
 ## Changelog
+- v2.0.1
+  - Reduced bots crouching
+  - Increased bots sprinting
+  - Improved bots mantling, crouching and knifing glass when needed
+  - Fixed possible script runtime errors
+  - Fixed demolition spawn killing
+  - Improved domination
+  - Bots use explosives more if they have it
+  - Fixed bots moving their player when using remote
+  - Bots aim slower when ads'ing
+  - Fixed bots holding breath
+  - Bots are more smart when waiting for carepackages
+  - Improved and fixed various waypoints for maps
+  - Fixed bots rubberbanding movement when their goal changes
+  - Added bots quickscoping with snipers
+  - Added bots reload canceling and fast swaps
+  - Bots use C4
+  - Improved revenge
+  - Bots can swap weapons on spawn more likely
+
 - v2.0.0
   - Initial reboot release
 
@@ -35,6 +55,7 @@ You can find the GitHub containing more info at https://github.com/ineedbots/iw4
 - apdonato - http://rsebots.blogspot.ca/
 - Ability
 - Salvation
+- VicRattlehead - https://www.moddb.com/members/vicrattlehead
 
 Feel free to use code, host on other sites, host on servers, mod it and merge mods with it, just give credit where credit is due!
 	-INeedGames/INeedBot(s) @ ineedbots@outlook.com

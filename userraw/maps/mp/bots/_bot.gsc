@@ -15,7 +15,7 @@
 */
 init()
 {
-	level.bw_VERSION = "2.0.0";
+	level.bw_VERSION = "2.0.1";
 
 	if(getDvar("bots_main") == "")
 		setDvar("bots_main", true);
