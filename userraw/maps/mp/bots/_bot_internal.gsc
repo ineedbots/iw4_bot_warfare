@@ -550,7 +550,7 @@ doBotMovement()
 
 		// climb through windows
 		if (self isMantling())
-			self crouch();
+			self stand();
 		
 		
 		startPos = self.origin + (0, 0, 50);
@@ -1974,11 +1974,11 @@ movetowards(goal)
 			
 			lastOri = self.origin;
 		}
-		else if(timeslow > 1.5)
+		else if(timeslow > 0.75)
 		{
 			self thread doMantle();
 		}
-		else if(timeslow > 0.75)
+		else if(timeslow > 1.5)
 		{
 			self crouch();
 		}
