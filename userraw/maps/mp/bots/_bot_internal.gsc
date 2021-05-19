@@ -587,7 +587,7 @@ doBotMovement()
 		else
 		{
 			// check if need to crouch
-			if (bulletTracePassed(startPos - (0, 0, 25), startPosForward - (0, 0, 25), false, self))
+			if (bulletTracePassed(startPos - (0, 0, 25), startPosForward - (0, 0, 25), false, self) && !self.bot.climbing)
 				self crouch();
 		}
 
@@ -688,6 +688,9 @@ stance()
 
 		if (!isDefined(toStance))
 			toStance = "crouch";
+
+		if(toStance == "stand" && randomInt(100) <= self.pers["bots"]["behavior"]["crouch"])
+			toStance = "crouch";
 			
 		if(toStance == "climb")
 		{
@@ -696,9 +699,6 @@ stance()
 		}
 			
 		if(toStance != "stand" && toStance != "crouch" && toStance != "prone")
-			toStance = "crouch";
-			
-		if(toStance == "stand" && randomInt(100) <= self.pers["bots"]["behavior"]["crouch"])
 			toStance = "crouch";
 			
 		if(toStance == "stand")
