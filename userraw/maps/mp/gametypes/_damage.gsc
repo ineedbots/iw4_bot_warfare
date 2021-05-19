@@ -1592,14 +1592,45 @@ Callback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, s
 }
 
 
+doPrintDamage(dmg, hitloc)
+{
+	huddamage = newclienthudelem(self);
+  huddamage.alignx = "center";
+  huddamage.horzalign = "center";
+  huddamage.x = 10;
+  huddamage.y = 235;
+  huddamage.fontscale = 1.6;
+  huddamage.font = "objective";
+  huddamage setvalue(dmg);
+
+  if (hitloc == "head")
+    huddamage.color = (1, 1, 0.25);
+
+  huddamage moveovertime(1);
+  huddamage fadeovertime(1);
+  huddamage.alpha = 0;
+  huddamage.x = randomIntRange(25, 70);
+
+	val = 1;
+	if (cointoss())
+		val = -1;
+	
+  huddamage.y = 235 + randomIntRange(25, 70) * val;
+
+  wait 1;
+
+	huddamage destroy();
+}
+
+
 finishPlayerDamageWrapper( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, psOffsetTime, stunFraction )
 {
 	if( level.allowPrintDamage )
 	{
 		if ( isDefined( eAttacker ) && isPlayer( eAttacker ) && eAttacker.printDamage )
-			eAttacker iPrintLnBold( iDamage );
+			eAttacker thread doPrintDamage(iDamage, sHitLoc);
 		else if( isDefined( eAttacker.owner ) && isPlayer( eAttacker.owner ) && eAttacker.owner.printDamage )
-			eAttacker.owner iPrintLnBold( iDamage );
+			eAttacker.owner thread doPrintDamage(iDamage, sHitLoc);
 	}
 	
 	if( level.extraDamageFeedback )
