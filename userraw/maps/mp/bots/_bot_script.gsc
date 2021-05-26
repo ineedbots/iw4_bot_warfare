@@ -4348,6 +4348,8 @@ bot_dom_spawn_kill_think()
 		{
 			if ( level.flags[i] maps\mp\gametypes\dom::getFlagTeam() == myTeam )
 				continue;
+
+			flag = level.flags[i];
 		}
 		
 		if(!isDefined(flag))

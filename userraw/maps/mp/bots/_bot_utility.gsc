@@ -103,6 +103,14 @@ BotPressADS(time)
 }
 
 /*
+	Bot presses the use button for time.
+*/
+BotPressUse(time)
+{
+	self maps\mp\bots\_bot_internal::use(time);
+}
+
+/*
 	Bots will press the attack button for a time
 */
 BotPressAttack(time)
