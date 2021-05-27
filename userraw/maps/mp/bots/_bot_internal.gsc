@@ -2042,6 +2042,7 @@ movetowards(goal)
 				
 				self botMoveTo(randomDir);
 				wait stucks;
+				self stand();
 			}
 			
 			lastOri = self.origin;
