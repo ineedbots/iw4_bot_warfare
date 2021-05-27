@@ -23,11 +23,6 @@ init()
 	if (!getDvarInt("bots_main"))
 		return;
 
-	if(getDvar("bots_main_lowmem") == "")
-		setDvar("bots_main_lowmem", false);//lower memory usage mode, more cpu
-
-	level.bots_lowmem = getDvarInt("bots_main_lowmem");
-
 	thread load_waypoints();
 	thread hook_callbacks();
 

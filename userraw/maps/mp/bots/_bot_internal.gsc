@@ -1823,7 +1823,7 @@ cleanUpAStar(team)
 	self waittill_any("death", "disconnect", "kill_goal");
 	
 	for(i = self.bot.astar.size - 1; i >= 0; i--)
-		level.waypoints[self.bot.astar[i]].bots[team]--;
+		RemoveWaypointUsage(self.bot.astar[i], team);
 }
 
 /*
@@ -1851,7 +1851,7 @@ removeAStar()
 	remove = self.bot.astar.size-1;
 	
 	if(level.teamBased)
-		level.waypoints[self.bot.astar[remove]].bots[self.team]--;
+		RemoveWaypointUsage(self.bot.astar[remove], self.team);
 	
 	self.bot.astar[remove] = undefined;
 	

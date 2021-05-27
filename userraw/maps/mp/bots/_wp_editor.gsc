@@ -51,7 +51,6 @@ init()
 
 	level.waypoints = [];
 	level.waypointCount = 0;
-	level.bots_lowmem = false;
   
 	level waittill( "connected", player);
 	player thread onPlayerSpawned();
@@ -186,7 +185,7 @@ updateWaypointsStats()
 			
 			if(distance(level.waypoints[i].origin, self.origin) < getDvarFloat("bots_main_debug_distance") && (bulletTracePassed(myEye, wpOrg, false, self) || getDVarint("bots_main_debug_drawThrough")))
 			{
-				for(h = 0; h < level.waypoints[i].childCount; h++)
+				for(h = level.waypoints[i].children.size - 1; h >= 0; h--)
 					line(wpOrg, level.waypoints[level.waypoints[i].children[h]].origin + (0, 0, 25), (1,0,1));
 				
 				if(getConeDot(wpOrg, myEye, myAngles) > getDvarFloat("bots_main_debug_cone"))
@@ -366,12 +365,11 @@ watchSaveWaypointsCommand()
 			logprint("*/waypoints["+i+"] = spawnstruct();\n/*");
 			logprint("*/waypoints["+i+"].origin = "+level.waypoints[i].origin+";\n/*");
 			logprint("*/waypoints["+i+"].type = \""+level.waypoints[i].type+"\";\n/*");
-			logprint("*/waypoints["+i+"].childCount = "+level.waypoints[i].childCount+";\n/*");
-			for(c = 0; c < level.waypoints[i].childCount; c++)
+			for(c = 0; c < level.waypoints[i].children.size; c++)
 			{
 				logprint("*/waypoints["+i+"].children["+c+"] = "+level.waypoints[i].children[c]+";\n/*");
 			}
-			if(isDefined(level.waypoints[i].angles) && (level.waypoints[i].type == "claymore" || level.waypoints[i].type == "tube" || (level.waypoints[i].type == "crouch" && level.waypoints[i].childCount == 1) || level.waypoints[i].type == "climb" || level.waypoints[i].type == "grenade"))
+			if(isDefined(level.waypoints[i].angles) && (level.waypoints[i].type == "claymore" || level.waypoints[i].type == "tube" || (level.waypoints[i].type == "crouch" && level.waypoints[i].children.size == 1) || level.waypoints[i].type == "climb" || level.waypoints[i].type == "grenade"))
 				logprint("*/waypoints["+i+"].angles = "+level.waypoints[i].angles+";\n/*");
 
 			if (isDefined(level.waypoints[i].jav_point) && level.waypoints[i].type == "javelin")
@@ -392,11 +390,11 @@ watchSaveWaypointsCommand()
 
 			str += wp.origin[0] + " " + wp.origin[1] + " " + wp.origin[2] + ",";
 
-			for(h = 0; h < wp.childCount; h++)
+			for(h = 0; h < wp.children.size; h++)
 			{
 				str += wp.children[h];
 
-				if (h < wp.childCount - 1)
+				if (h < wp.children.size - 1)
 					str += " ";
 			}
 			str += "," + wp.type + ",";
@@ -447,8 +445,8 @@ checkForWarnings()
 			continue;
 		}
 		
-		if(level.waypoints[i].childCount <= 0)
-			self iprintln("WARNING: waypoint "+i+" childCount is "+level.waypoints[i].childCount);
+		if(level.waypoints[i].children.size <= 0)
+			self iprintln("WARNING: waypoint "+i+" childCount is "+level.waypoints[i].children.size);
 		else
 		{
 			if (!isDefined(level.waypoints[i].children) || !isDefined(level.waypoints[i].children.size))
@@ -457,10 +455,7 @@ checkForWarnings()
 			}
 			else
 			{
-				if(level.waypoints[i].childCount != level.waypoints[i].children.size)
-					self iprintln("WARNING: waypoint "+i+" childCount is not "+level.waypoints[i].children.size);
-				
-				for (h = 0; h < level.waypoints[i].childCount; h++)
+				for(h = level.waypoints[i].children.size - 1; h >= 0; h--)
 				{
 					child = level.waypoints[i].children[h];
 
@@ -481,7 +476,7 @@ checkForWarnings()
 		if (level.waypoints[i].type == "javelin" && !isDefined(level.waypoints[i].jav_point))
 			self iprintln("WARNING: waypoint "+i+" jav_point is undefined");
 		
-		if(!isDefined(level.waypoints[i].angles) && (level.waypoints[i].type == "claymore" || level.waypoints[i].type == "tube" || (level.waypoints[i].type == "crouch" && level.waypoints[i].childCount == 1) || level.waypoints[i].type == "climb" || level.waypoints[i].type == "grenade"))
+		if(!isDefined(level.waypoints[i].angles) && (level.waypoints[i].type == "claymore" || level.waypoints[i].type == "tube" || (level.waypoints[i].type == "crouch" && level.waypoints[i].children.size == 1) || level.waypoints[i].type == "climb" || level.waypoints[i].type == "grenade"))
 			self iprintln("WARNING: waypoint "+i+" angles is undefined");
 	}
 }
@@ -505,9 +500,6 @@ UnLinkWaypoint(nwp)
 	level.waypoints[nwp].children = array_remove(level.waypoints[nwp].children, level.wpToLink);
 	level.waypoints[level.wpToLink].children = array_remove(level.waypoints[level.wpToLink].children, nwp);
 	
-	level.waypoints[nwp].childCount = level.waypoints[nwp].children.size;
-	level.waypoints[level.wpToLink].childCount = level.waypoints[level.wpToLink].children.size;
-	
 	self iprintln("Waypoint " + nwp + " Broken to " + level.wpToLink);
 	level.wpToLink = -1;
 }
@@ -529,7 +521,7 @@ LinkWaypoint(nwp)
 	}
 	
 	weGood = true;
-	for (i = 0; i < level.waypoints[level.wpToLink].childCount; i++)
+	for(i = level.waypoints[level.wpToLink].children.size - 1; i >= 0; i--)
 	{
 		child = level.waypoints[level.wpToLink].children[i];
 
@@ -542,7 +534,7 @@ LinkWaypoint(nwp)
 	
 	if(weGood)
 	{
-		for (i = 0; i < level.waypoints[nwp].childCount; i++)
+		for(i = level.waypoints[nwp].children.size - 1; i >= 0; i--)
 		{
 			child = level.waypoints[nwp].children[i];
 			
@@ -561,10 +553,8 @@ LinkWaypoint(nwp)
 		return;
 	}
 	
-	level.waypoints[level.wpToLink].children[level.waypoints[level.wpToLink].childcount] = nwp;
-	level.waypoints[level.wpToLink].childcount++;
-	level.waypoints[nwp].children[level.waypoints[nwp].childcount] = level.wpToLink;
-	level.waypoints[nwp].childcount++;
+	level.waypoints[level.wpToLink].children[level.waypoints[level.wpToLink].children.size] = nwp;
+	level.waypoints[nwp].children[level.waypoints[nwp].children.size] = level.wpToLink;
 	
 	self iprintln("Waypoint " + nwp + " Linked to " + level.wpToLink);
 	level.wpToLink = -1;
@@ -580,18 +570,16 @@ DeleteWaypoint(nwp)
 	
 	level.wpToLink = -1;
 	
-	for (i = 0; i < level.waypoints[nwp].childCount; i++)
+	for(i = level.waypoints[nwp].children.size - 1; i >= 0; i--)
 	{
 		child = level.waypoints[nwp].children[i];
 		
 		level.waypoints[child].children = array_remove(level.waypoints[child].children, nwp);
-		
-		level.waypoints[child].childCount = level.waypoints[child].children.size;
 	}
 	
 	for(i = 0; i < level.waypointCount; i++)
 	{
-		for(h = 0; h < level.waypoints[i].childCount; h++)
+		for(h = level.waypoints[i].children.size - 1; h >= 0; h--)
 		{
 			if(level.waypoints[i].children[h] > nwp)
 				level.waypoints[i].children[h]--;
@@ -639,7 +627,6 @@ AddWaypoint()
 	level.waypoints[level.waypointCount].angles = self getPlayerAngles();
 	
 	level.waypoints[level.waypointCount].children = [];
-	level.waypoints[level.waypointCount].childCount = 0;
 
 	if (level.waypoints[level.waypointCount].type == "javelin")
 	{
@@ -666,13 +653,6 @@ DeleteAllWaypoints()
 {
 	level.waypoints = [];
 	level.waypointCount = 0;
-	level.waypointsKDTree = WaypointsToKDTree();
-	
-	level.waypointsCamp = [];
-	level.waypointsTube = [];
-	level.waypointsGren = [];
-	level.waypointsClay = [];
-	level.waypointsJav = [];
 	
 	self iprintln("DelAllWps");
 }
@@ -682,7 +662,7 @@ buildChildCountString ( wp )
 	if ( wp == -1 )
 		return "";
 	
-	wpstr = level.waypoints[wp].childCount + "";
+	wpstr = level.waypoints[wp].children.size + "";
 	
 	return wpstr;
 }
@@ -694,7 +674,7 @@ buildChildString( wp )
 	
 	wpstr = "";
 	
-	for(i = 0; i < level.waypoints[wp].childCount; i++)
+	for(i = 0; i < level.waypoints[wp].children.size; i++)
 	{
 		if(i != 0)
 			wpstr = wpstr + "," + level.waypoints[wp].children[i];

@@ -779,7 +779,6 @@ parseTokensIntoWaypoint(tokens)
 
 	childStr = tokens[1];
 	childToks = strtok(childStr, " ");
-	waypoint.childCount = childToks.size;
 	waypoint.children = [];
 	for( j=0; j<childToks.size; j++ )
 		waypoint.children[j] = int(childToks[j]);
@@ -876,6 +875,9 @@ load_waypoints()
 {
 	level.waypointCount = 0;
 	level.waypoints = [];
+	level.waypointUsage = [];
+	level.waypointUsage["allies"] = [];
+	level.waypointUsage["axis"] = [];
 
 	mapname = getDvar("mapname");
 
@@ -1107,11 +1109,6 @@ load_waypoints()
 	
 	for(i = 0; i < level.waypointCount; i++)
 	{
-		level.waypoints[i].index = i;
-		level.waypoints[i].bots = [];
-		level.waypoints[i].bots["allies"] = 1;
-		level.waypoints[i].bots["axis"] = 1;
-
 		if (!isDefined(level.waypoints[i].children) || !isDefined(level.waypoints[i].children.size))
 			level.waypoints[i].children = [];
 
@@ -1121,31 +1118,108 @@ load_waypoints()
 		if (!isDefined(level.waypoints[i].type))
 			level.waypoints[i].type = "crouch";
 
-		level.waypoints[i].childCount = level.waypoints[i].children.size;
+		level.waypoints[i].childCount = undefined;
 	}
-	
-	if (!level.bots_lowmem)
+}
+
+/*
+	Is bot near any of the given waypoints
+*/
+nearAnyOfWaypoints(dist, waypoints)
+{
+	dist *= dist;
+	for (i = 0; i < waypoints.size; i++)
 	{
-		level.waypointsKDTree = WaypointsToKDTree();
+		waypoint = level.waypoints[waypoints[i]];
+
+		if (DistanceSquared(waypoint.origin, self.origin) > dist)
+			continue;
+
+		return true;
 	}
-	
-	level.waypointsCamp = [];
-	level.waypointsTube = [];
-	level.waypointsGren = [];
-	level.waypointsClay = [];
-	level.waypointsJav = [];
-	
+
+	return false;
+}
+
+/*
+	Returns the waypoints that are near
+*/
+waypointsNear(waypoints, dist)
+{
+	dist *= dist;
+
+	answer = [];
+
+	for (i = 0; i < waypoints.size; i++)
+	{
+		wp = level.waypoints[waypoints[i]];
+
+		if (DistanceSquared(wp.origin, self.origin) > dist)
+			continue;
+
+		answer[answer.size] = waypoints[i];
+	}
+
+	return answer;
+}
+
+/*
+	Returns nearest waypoint of waypoints
+*/
+getNearestWaypointOfWaypoints(waypoints)
+{
+	answer = undefined;
+	closestDist = 2147483647;
+	for (i = 0; i < waypoints.size; i++)
+	{
+		waypoint = level.waypoints[waypoints[i]];
+		thisDist = DistanceSquared(self.origin, waypoint.origin);
+
+		if (isDefined(answer) && thisDist > closestDist)
+			continue;
+
+		answer = waypoints[i];
+		closestDist = thisDist;
+	}
+
+	return answer;
+}
+
+/*
+	Returns all waypoints of type
+*/
+getWaypointsOfType(type)
+{
+	answer = [];
 	for(i = 0; i < level.waypointCount; i++)
-		if(level.waypoints[i].type == "crouch" && level.waypoints[i].childCount == 1)
-			level.waypointsCamp[level.waypointsCamp.size] = level.waypoints[i];
-		else if(level.waypoints[i].type == "tube")
-			level.waypointsTube[level.waypointsTube.size] = level.waypoints[i];
-		else if(level.waypoints[i].type == "grenade")
-			level.waypointsGren[level.waypointsGren.size] = level.waypoints[i];
-		else if(level.waypoints[i].type == "claymore")
-			level.waypointsClay[level.waypointsClay.size] = level.waypoints[i];
-		else if(level.waypoints[i].type == "javelin")
-			level.waypointsJav[level.waypointsJav.size] = level.waypoints[i];
+	{
+		wp = level.waypoints[i];
+		
+		if (type == "camp")
+		{
+			if (wp.type != "crouch")
+				continue;
+
+			if (wp.children.size != 1)
+				continue;
+		}
+		else if (type != wp.type)
+			continue;
+
+		answer[answer.size] = i;
+	}
+	return answer;
+}
+
+/*
+	Returns the waypoint for index
+*/
+getWaypointForIndex(i)
+{
+	if (!isDefined(i))
+		return undefined;
+
+	return level.waypoints[i];
 }
 
 /*
@@ -1873,6 +1947,23 @@ ReverseHeapAStar(item, item2)
 }
 
 /*
+	Removes the waypoint usage
+*/
+RemoveWaypointUsage(wp, team)
+{
+	if (!isDefined(level.waypointUsage))
+		return;
+	
+	if (!isDefined(level.waypointUsage[team][wp+""]))
+		return;
+
+	level.waypointUsage[team][wp+""]--;
+
+	if (level.waypointUsage[team][wp+""] <= 0)
+		level.waypointUsage[team][wp+""] = undefined;
+}
+
+/*
 	Will linearly search for the nearest waypoint to pos that has a direct line of sight.
 */
 GetNearestWaypointWithSight(pos)
@@ -1890,7 +1981,7 @@ GetNearestWaypointWithSight(pos)
 			continue;
 			
 		dist = curdis;
-		candidate = level.waypoints[i];
+		candidate = i;
 	}
 	
 	return candidate;
@@ -1911,7 +2002,7 @@ GetNearestWaypoint(pos)
 			continue;
 			
 		dist = curdis;
-		candidate = level.waypoints[i];
+		candidate = i;
 	}
 	
 	return candidate;
@@ -1920,71 +2011,48 @@ GetNearestWaypoint(pos)
 /*
 	Modified Pezbot astar search.
 	This makes use of sets for quick look up and a heap for a priority queue instead of simple lists which require to linearly search for elements everytime.
-	Also makes use of the KD tree to search for the nearest node to the goal. We only use the closest node from the KD tree if it has a direct line of sight, else we will have to linearly search for one that we have a line of sight on.
 	It is also modified to make paths with bots already on more expensive and will try a less congested path first. Thus spliting up the bots onto more paths instead of just one (the smallest).
 */
 AStarSearch(start, goal, team, greedy_path)
 {
 	open = NewHeap(::ReverseHeapAStar);//heap
 	openset = [];//set for quick lookup
-	
 	closed = [];//set for quick lookup
 	
-	startwp = undefined;
-	if (level.bots_lowmem)
-		startwp = getNearestWaypoint(start);
-	else
-		startwp = level.waypointsKDTree KDTreeNearest(start);//balanced kdtree, for nns
-	if(!isDefined(startwp))
+
+	startWp = getNearestWaypoint(start);
+	if(!isDefined(startWp))
 		return [];
+	
 	_startwp = undefined;
-	if(!bulletTracePassed(start + (0, 0, 15), startwp.origin + (0, 0, 15), false, undefined))
+	if(!bulletTracePassed(start + (0, 0, 15), level.waypoints[startWp].origin + (0, 0, 15), false, undefined))
 		_startwp = GetNearestWaypointWithSight(start);
+
 	if(isDefined(_startwp))
-		startwp = _startwp;
-	startwp = startwp.index;
+		startWp = _startwp;
+
 	
-	goalwp = undefined;
-	if (level.bots_lowmem)
-		goalwp = getNearestWaypoint(goal);
-	else
-		goalwp = level.waypointsKDTree KDTreeNearest(goal);
-	if(!isDefined(goalwp))
+	goalWp = getNearestWaypoint(goal);
+	if(!isDefined(goalWp))
 		return [];
-	_goalwp = undefined;
-	if(!bulletTracePassed(goal + (0, 0, 15), goalwp.origin + (0, 0, 15), false, undefined))
+
+	_goalWp = undefined;
+	if(!bulletTracePassed(goal + (0, 0, 15), level.waypoints[goalWp].origin + (0, 0, 15), false, undefined))
 		_goalwp = GetNearestWaypointWithSight(goal);
+		
 	if(isDefined(_goalwp))
-		goalwp = _goalwp;
-	goalwp = goalwp.index;
+		goalWp = _goalwp;
 
-	/*storeKey = "astarcache " + startwp + " " + goalwp;
-	if (StoreHas(storeKey))
-	{
-		path = [];
-		pathArrStr = tokenizeLine(StoreGet(storeKey), ",");
-
-		pathArrSize = pathArrStr.size;
-		for (i = 0; i < pathArrSize; i++)
-		{
-			path[path.size] = int(pathArrStr[i]);
-		}
-
-		return path;
-	}*/
-	
-	goalorg = level.waypoints[goalWp].origin;
 	
 	node = spawnStruct();
 	node.g = 0; //path dist so far
-	node.h = DistanceSquared(level.waypoints[startWp].origin, goalorg); //herustic, distance to goal for path finding
-	//node.f = node.h + node.g; // combine path dist and heru, use reverse heap to sort the priority queue by this attru
-	node.f = node.h;
-	node.index = startwp;
+	node.h = DistanceSquared(level.waypoints[startWp].origin, level.waypoints[goalWp].origin); //herustic, distance to goal for path finding
+	node.f = node.h + node.g; // combine path dist and heru, use reverse heap to sort the priority queue by this attru
+	node.index = startWp;
 	node.parent = undefined; //we are start, so we have no parent
 	
 	//push node onto queue
-	openset[node.index] = node;
+	openset[node.index+""] = node;
 	open HeapInsert(node);
 	
 	//while the queue is not empty
@@ -1993,94 +2061,94 @@ AStarSearch(start, goal, team, greedy_path)
 		//pop bestnode from queue
 		bestNode = open.data[0];
 		open HeapRemove();
-		openset[bestNode.index] = undefined;
+		openset[bestNode.index+""] = undefined;
+		wp = level.waypoints[bestNode.index];
 		
 		//check if we made it to the goal
-		if(bestNode.index == goalwp)
+		if(bestNode.index == goalWp)
 		{
 			path = [];
-			//storeStr = "";
 		
 			while(isDefined(bestNode))
 			{
-				if(isdefined(team))
-					level.waypoints[bestNode.index].bots[team]++;
+				if(isdefined(team) && isDefined(level.waypointUsage))
+				{
+					if (!isDefined(level.waypointUsage[team][bestNode.index+""]))
+						level.waypointUsage[team][bestNode.index+""] = 0;
+
+					level.waypointUsage[team][bestNode.index+""]++;
+				}
 					
 				//construct path
 				path[path.size] = bestNode.index;
-
-				//storeStr += bestNode.index;
 				
 				bestNode = bestNode.parent;
-
-				/*if (isDefined(bestNode))
-					storeStr += ",";*/
 			}
 
-			//StoreSet(storeKey, storeStr);
 			return path;
 		}
-		
-		nodeorg = level.waypoints[bestNode.index].origin;
-		childcount = level.waypoints[bestNode.index].childCount;
+
 		//for each child of bestnode
-		for(i = 0; i < childcount; i++)
+		for(i = wp.children.size - 1; i >= 0; i--)
 		{
-			child = level.waypoints[bestNode.index].children[i];
-			childorg = level.waypoints[child].origin;
-			childtype = level.waypoints[child].type;
+			child = wp.children[i];
+			childWp = level.waypoints[child];
 			
 			penalty = 1;
-			if(!greedy_path && isdefined(team))
+			if(!greedy_path && isdefined(team) && isDefined(level.waypointUsage))
 			{
-				temppen = level.waypoints[child].bots[team];//consider how many bots are taking this path
+				temppen = 1;
+				if (isDefined(level.waypointUsage[team][child+""]))
+					temppen = level.waypointUsage[team][child+""];//consider how many bots are taking this path
+				
 				if(temppen > 1)
 					penalty = temppen;
 			}
 
 			// have certain types of nodes more expensive
-			if (childtype == "climb" || childtype == "prone")
+			if (childWp.type == "climb" || childWp.type == "prone")
 				penalty += 4;
 			
 			//calc the total path we have took
-			newg = bestNode.g + DistanceSquared(nodeorg, childorg)*penalty;//bots on same team's path are more expensive
+			newg = bestNode.g + DistanceSquared(wp.origin, childWp.origin)*penalty;//bots on same team's path are more expensive
 			
 			//check if this child is in open or close with a g value less than newg
-			inopen = isDefined(openset[child]);
-			if(inopen && openset[child].g <= newg)
+			inopen = isDefined(openset[child+""]);
+			if(inopen && openset[child+""].g <= newg)
 				continue;
 			
-			inclosed = isDefined(closed[child]);
-			if(inclosed && closed[child].g <= newg)
+			inclosed = isDefined(closed[child+""]);
+			if(inclosed && closed[child+""].g <= newg)
 				continue;
 			
+			node = undefined;
 			if(inopen)
-				node = openset[child];
+				node = openset[child+""];
 			else if(inclosed)
-				node = closed[child];
+				node = closed[child+""];
 			else
 				node = spawnStruct();
 				
 			node.parent = bestNode;
 			node.g = newg;
-			node.h = DistanceSquared(childorg, goalorg);
+			node.h = DistanceSquared(childWp.origin, level.waypoints[goalWp].origin);
 			node.f = node.g + node.h;
 			node.index = child;
 			
 			//check if in closed, remove it
 			if(inclosed)
-				closed[child] = undefined;
+				closed[child+""] = undefined;
 			
 			//check if not in open, add it
 			if(!inopen)
 			{
 				open HeapInsert(node);
-				openset[child] = node;
+				openset[child+""] = node;
 			}
 		}
 		
 		//done with children, push onto closed
-		closed[bestNode.index] = bestNode;
+		closed[bestNode.index+""] = bestNode;
 	}
 	
 	return [];
