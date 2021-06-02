@@ -1039,7 +1039,11 @@ target_loop()
 			
 			key = player getEntityNumber()+"";
 			obj = self.bot.targets[key];
+			
 			daDist = distanceSquared(self.origin, player.origin);
+			if (usingRemote)
+				daDist = 0;
+
 			isObjDef = isDefined(obj);
 			if((level.teamBased && self.team == player.team) || player.sessionstate != "playing" || !isReallyAlive(player))
 			{
