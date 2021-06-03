@@ -159,12 +159,13 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 ## Changelog
 - v2.0.2
-  - Greatly reduce script variables usage
+  - Greatly reduce script variable usage
   - Fix bots slowly reacting in remote streaks
   - Improved bots mantling and stuck
   - Improved bots aim
   - Fix some runtime errors
   - Still TODOs (some required in-engine)
+    - A variable leak in _menu
     - Use proper activate button
     - Proper weapon swaps, including altmode
     - Complete cut/unfinished gamemodes and features
