@@ -51,6 +51,9 @@ connected()
 	self thread onGiveLoadout();
 
 	self thread onKillcam();
+
+	wait 0.1;
+	self.challengeData = [];
 }
 
 /*

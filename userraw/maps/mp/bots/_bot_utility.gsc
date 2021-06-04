@@ -448,6 +448,27 @@ getValidTube()
 }
 
 /*
+	helper
+*/
+waittill_either_return_(str1, str2)
+{
+	self endon(str1);
+	self waittill(str2);
+	return true;
+}
+
+/*
+	Returns which string gets notified first
+*/
+waittill_either_return(str1, str2)
+{
+	if (!isDefined(self waittill_either_return_(str1, str2)))
+		return str1;
+
+	return str2;
+}
+
+/*
 	Returns a random grenade in the bot's inventory.
 */
 getValidGrenade()
