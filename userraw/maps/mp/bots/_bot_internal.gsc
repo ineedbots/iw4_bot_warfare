@@ -1066,13 +1066,13 @@ target_loop()
 				targetAnkleLeft = player getTagOrigin( "j_ankle_le" );
 				targetAnkleRight = player getTagOrigin( "j_ankle_ri" );
 
-				canTargetPlayer = ((distanceSquared(BulletTrace(myEye, targetHead, false, self)["position"], targetHead) < 0.05 ||
-									distanceSquared(BulletTrace(myEye, targetAnkleLeft, false, self)["position"], targetAnkleLeft) < 0.05 ||
-									distanceSquared(BulletTrace(myEye, targetAnkleRight, false, self)["position"], targetAnkleRight) < 0.05)
+				canTargetPlayer = ((bulletTracePassed(myEye, targetHead, false, undefined) ||
+									bulletTracePassed(myEye, targetAnkleLeft, false, undefined) ||
+									bulletTracePassed(myEye, targetAnkleRight, false, undefined))
 
-								&& (distanceSquared(PhysicsTrace( myEye, targetHead, false, self ), targetHead) < 0.05 ||
-									distanceSquared(PhysicsTrace( myEye, targetAnkleLeft, false, self ), targetAnkleLeft) < 0.05 ||
-									distanceSquared(PhysicsTrace( myEye, targetAnkleRight, false, self ), targetAnkleRight) < 0.05)
+								&& (sightTracePassed(myEye, targetHead, false, undefined) ||
+									sightTracePassed(myEye, targetAnkleLeft, false, undefined) ||
+									sightTracePassed(myEye, targetAnkleRight, false, undefined))
 
 								&& (ignoreSmoke ||
 									SmokeTrace(myEye, player.origin, level.smokeRadius) ||
