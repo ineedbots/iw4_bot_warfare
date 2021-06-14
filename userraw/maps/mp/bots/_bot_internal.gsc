@@ -754,7 +754,7 @@ stance_loop()
 	if(self.bot.sprintendtime != -1 && getTime() - self.bot.sprintendtime < 2000)
 		return;
 		
-	if(!isDefined(self.bot.towards_goal) || DistanceSquared(self.origin, self.bot.towards_goal) < level.bots_minSprintDistance || getConeDot(self.bot.towards_goal, self.origin, self GetPlayerAngles()) < 0.75)
+	if(!isDefined(self.bot.towards_goal) || DistanceSquared(self.origin, physicsTrace(self getEye(), self getEye() + anglesToForward(self getPlayerAngles()) * 1024, false, undefined)) < level.bots_minSprintDistance || getConeDot(self.bot.towards_goal, self.origin, self GetPlayerAngles()) < 0.75)
 		return;
 		
 	self thread sprint();
