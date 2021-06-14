@@ -4107,13 +4107,21 @@ bot_killstreak_think_loop(data)
 	if (self InLastStand() && !self InFinalStand())
 		return;
 
+
+	if (isDefined(self.isCarrying) && self.isCarrying)
+		self notify("place_sentry");
+
+	curWeap = self GetCurrentWeapon();
+	if (isSubStr(curWeap, "airdrop_"))
+		self thread BotPressAttack(0.05);
+
+
 	streakName = self.pers["killstreaks"][0].streakName;
 
 	if (level.inGracePeriod && maps\mp\killstreaks\_killstreaks::deadlyKillstreak(streakName))
 		return;
 
 	ksWeap = maps\mp\killstreaks\_killstreaks::getKillstreakWeapon( streakName );
-	curWeap = self GetCurrentWeapon();
 
 	if (curWeap == "none" || !isWeaponPrimary(curWeap))
 		curWeap = self GetLastWeapon();
