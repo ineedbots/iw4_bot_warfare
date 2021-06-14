@@ -448,6 +448,22 @@ getValidTube()
 }
 
 /*
+	iw5
+*/
+allowClassChoice()
+{
+	return true;
+}
+
+/*
+	iw5
+*/
+allowTeamChoice()
+{
+	return true;
+}
+
+/*
 	helper
 */
 waittill_either_return_(str1, str2)

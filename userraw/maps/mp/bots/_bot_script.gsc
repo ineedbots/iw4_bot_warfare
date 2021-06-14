@@ -1014,7 +1014,7 @@ classWatch()
 
 	for(;;)
 	{
-		while(!isdefined(self.pers["team"]))
+		while(!isdefined(self.pers["team"]) || !allowClassChoice())
 			wait .05;
 			
 		wait 0.5;
@@ -1078,7 +1078,7 @@ teamWatch()
 
 	for(;;)
 	{
-		while(!isdefined(self.pers["team"]))
+		while(!isdefined(self.pers["team"]) || !allowTeamChoice())
 			wait .05;
 			
 		wait 0.05;
@@ -2866,7 +2866,7 @@ bot_jav_loc_think_loop(data)
 		if (chance > 20)
 			chance = 20;
 
-		if (randomInt(100) > chance)
+		if (randomInt(100) > chance && self getCurrentWeapon() != "javelin_mp")
 			return;
 	}
 
