@@ -2414,6 +2414,38 @@ botMoveTo(where)
 }
 
 /*
+	Gets the camera offset for thirdperson
+*/
+botGetThirdPersonOffset(angles)
+{
+	offset = (0,0,0);
+
+	if (getDvarInt("camera_thirdPerson"))
+	{
+		offset = getDvarVector("camera_thirdPersonOffset");
+		if (self playerAds() >= 1)
+		{
+			curweap = self getCurrentWeapon();
+			if ((isSubStr(curweap, "thermal_") || weaponClass(curweap) == "sniper") && !isSubStr(curweap, "acog_"))
+				offset = (0,0,0);
+			else
+				offset = getDvarVector("camera_thirdPersonOffsetAds");
+		}
+
+		// rotate about x             // y cos xangle - z sin xangle                                  // y sin xangle + z cos xangle
+		offset = (offset[0], offset[1] * cos(angles[2]) - offset[2] * sin(angles[2]), offset[1] * sin(angles[2]) + offset[2] * cos(angles[2]));
+
+		// rotate about y
+		offset = (offset[0] * cos(angles[0]) + offset[2] * sin(angles[0]), offset[1], (0-offset[0]) * sin(angles[0]) + offset[2] * cos(angles[0]));
+
+		// rotate about z
+		offset = (offset[0] * cos(angles[1]) - offset[1] * sin(angles[1]), offset[0] * sin(angles[1]) + offset[1] * cos(angles[1]), offset[2]);
+	}
+
+	return offset;
+}
+
+/*
 	Bots will look at the pos
 */
 bot_lookat(pos, time, vel)
@@ -2441,12 +2473,14 @@ bot_lookat(pos, time, vel)
 	if (steps < 1)
 		steps = 1;
 
+	myAngle=self getPlayerAngles();
+
 	myEye = self GetEye(); // get our eye pos
+	myEye += self botGetThirdPersonOffset(myAngle); // account for third person
 	myEye += (self getVelocity() * 0.05) * (steps - 1); // account for our velocity
 
 	pos += (vel * 0.05) * (steps - 1); // add the velocity vector
 
-	myAngle=self getPlayerAngles();
 	angles = VectorToAngles( (pos - myEye) - anglesToForward(myAngle) );
 	
 	X=(angles[0]-myAngle[0]);
