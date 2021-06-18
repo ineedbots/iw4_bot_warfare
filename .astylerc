@@ -10,7 +10,6 @@ pad-paren-in
 pad-header
 
 # delete-empty-lines
-fill-empty-lines
 
 break-blocks
 
