@@ -6,6 +6,15 @@ const repo_name = 'iw4x_bot_warfare'
 const repo_url = `https://github.com/ineedbots/${repo_name}`
 const deploy_check_rate = 60000
 
+function setTerminalTitle(title)
+{
+  process.stdout.write(
+    String.fromCharCode(27) + "]0;" + title + String.fromCharCode(7)
+  );
+}
+
+setTerminalTitle('IW4x GitHub Deployer')
+
 async function doDeploy() {
   try {
     const { stdout, stderr } = await exec(`cd ${repo_name} && git fetch`)
