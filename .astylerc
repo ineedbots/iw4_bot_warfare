@@ -12,6 +12,7 @@ pad-header
 # delete-empty-lines
 
 break-blocks
+# remove-braces
 
 indent-switches
 indent-cases

@@ -14,55 +14,55 @@ doVersionCheck()
 {
 	remoteVersion = getRemoteVersion();
 
-	if (!isDefined(remoteVersion))
+	if ( !isDefined( remoteVersion ) )
 	{
-		PrintConsole("Error getting remote version of Bot Warfare.\n");
+		PrintConsole( "Error getting remote version of Bot Warfare.\n" );
 		return false;
 	}
 
-	if (level.bw_VERSION != remoteVersion)
+	if ( level.bw_VERSION != remoteVersion )
 	{
-		PrintConsole("There is a new version of Bot Warfare!\n");
-		PrintConsole("You are on version " + level.bw_VERSION + " but " + remoteVersion + " is available!\n");
+		PrintConsole( "There is a new version of Bot Warfare!\n" );
+		PrintConsole( "You are on version " + level.bw_VERSION + " but " + remoteVersion + " is available!\n" );
 		return false;
 	}
 
-	PrintConsole("You are on the latest version of Bot Warfare!\n");
+	PrintConsole( "You are on the latest version of Bot Warfare!\n" );
 	return true;
 }
 
 /*
 	Will attempt to retreive waypoints from the internet
 */
-getRemoteWaypoints(mapname)
+getRemoteWaypoints( mapname )
 {
 	url = "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/" + mapname + "_wp.csv";
 	filename = "waypoints/" + mapname + "_wp.csv";
 
-	PrintConsole("Attempting to get remote waypoints from " + url + "\n");
-	res = getLinesFromUrl(url, filename);
+	PrintConsole( "Attempting to get remote waypoints from " + url + "\n" );
+	res = getLinesFromUrl( url, filename );
 
-	if (!res.lines.size)
+	if ( !res.lines.size )
 		return;
 
-	waypointCount = int(res.lines[0]);
+	waypointCount = int( res.lines[0] );
 
 	waypoints = [];
-	PrintConsole("Loading remote waypoints...\n");
+	PrintConsole( "Loading remote waypoints...\n" );
 
-	for (i = 1; i <= waypointCount; i++)
+	for ( i = 1; i <= waypointCount; i++ )
 	{
-		tokens = tokenizeLine(res.lines[i], ",");
-	
-		waypoint = parseTokensIntoWaypoint(tokens);
+		tokens = tokenizeLine( res.lines[i], "," );
 
-		waypoints[i-1] = waypoint;
+		waypoint = parseTokensIntoWaypoint( tokens );
+
+		waypoints[i - 1] = waypoint;
 	}
 
-	if (waypoints.size)
+	if ( waypoints.size )
 	{
 		level.waypoints = waypoints;
-		PrintConsole("Loaded " + waypoints.size + " waypoints from remote.\n");
+		PrintConsole( "Loaded " + waypoints.size + " waypoints from remote.\n" );
 	}
 }
 
@@ -73,43 +73,44 @@ getRemoteVersion()
 {
 	request = httpGet( "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/version.txt" );
 
-	if (!isDefined(request))
+	if ( !isDefined( request ) )
 		return undefined;
 
 	request waittill( "done", success, data );
 
-	if (!success)
+	if ( !success )
 		return undefined;
 
-	return strtok(data, "\n")[0];
+	return strtok( data, "\n" )[0];
 }
 
 /*
 	Returns an array of each line from the response of the http url request
 */
-getLinesFromUrl(url, filename)
+getLinesFromUrl( url, filename )
 {
 	result = spawnStruct();
 	result.lines = [];
 
 	request = httpGet( url );
 
-	if (!isDefined(request))
+	if ( !isDefined( request ) )
 		return result;
 
 	request waittill( "done", success, data );
 
-	if (!success)
+	if ( !success )
 		return result;
 
-	fileWrite(filename, data, "write");
+	fileWrite( filename, data, "write" );
 
 	line = "";
-	for (i=0;i<data.size;i++)
+
+	for ( i = 0; i < data.size; i++ )
 	{
 		c = data[i];
-		
-		if (c == "\n")
+
+		if ( c == "\n" )
 		{
 			result.lines[result.lines.size] = line;
 
@@ -119,6 +120,7 @@ getLinesFromUrl(url, filename)
 
 		line += c;
 	}
+
 	result.lines[result.lines.size] = line;
 
 	return result;
