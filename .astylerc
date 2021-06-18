@@ -1,0 +1,9 @@
+# try to mimic the original gsc provided
+style=allman
+indent=tab
+lineend=windows
+
+pad-oper
+pad-paren
+
+break-blocks
