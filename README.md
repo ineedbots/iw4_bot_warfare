@@ -169,7 +169,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Improved bots sight on enemies
   - Still TODOs (some required in-engine)
     - A variable leak in _menu
-    - Use proper activate button
+    - Use proper activate button for bombs, carepackages, etc
     - Proper weapon swaps, including altmode
     - Complete cut/unfinished gamemodes and features
     - Pick up weapons from ground
