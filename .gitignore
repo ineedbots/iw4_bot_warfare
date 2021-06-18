@@ -23,6 +23,10 @@
 !/out
 
 !/.astylerc
+!/z_deploy.bat
+!/deploy.bat
+!/deploy.js
+
 *.zip
 *.log
 *.stat
