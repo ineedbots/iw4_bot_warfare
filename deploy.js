@@ -5,15 +5,14 @@ const exec = require('util').promisify(require('child_process').exec)
 const repo_name = 'iw4x_bot_warfare'
 const repo_url = `https://github.com/ineedbots/${repo_name}`
 const deploy_check_rate = 60000
+const title = 'IW4x Bot Warfare Git Deployer'
 
-function setTerminalTitle(title)
+function printToConsole(what, error = false)
 {
-  process.stdout.write(
-    String.fromCharCode(27) + "]0;" + title + String.fromCharCode(7)
-  );
-}
+  log = error ? console.error : console.log
 
-setTerminalTitle('IW4x GitHub Deployer')
+  log(`[${new Date().toISOString()}]:`, what)
+}
 
 async function doDeploy() {
   try {
@@ -24,20 +23,29 @@ async function doDeploy() {
 
     if (stderr.startsWith('From '))
     {
-      console.log(Date.now(), 'git fetched! pulling and deploying...')
+      printToConsole('git fetched! Pulling...')
       await exec(`cd ${repo_name} && git pull && git submodule update --init --recursive`)
+      printToConsole('Deploying...')
       await exec('deploy.bat')
+      printToConsole('Deployed!')
     }
   } catch (e) {
-    console.error(e); // should contain code (exit code) and signal (that caused the termination).
+    printToConsole(e, true)
 
-    console.log('Cloning...')
+    if (!e.stderr.startsWith('The system cannot find the path specified'))
+      return
+
+    printToConsole('Cloning repo...')
     try {
       await exec(`git clone ${repo_url} && cd ${repo_name} && git submodule update --init --recursive`)
+
+      printToConsole('Cloned!')
     } catch (f) {
-      console.error(f)
+      printToConsole(f, true)
     }
   }
 }
 
+process.stdout.write(`${String.fromCharCode(27)}]0;${title}${String.fromCharCode(7)}`)
+doDeploy()
 setInterval(doDeploy, deploy_check_rate)
