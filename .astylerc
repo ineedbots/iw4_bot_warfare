@@ -1,9 +1,21 @@
 # try to mimic the original gsc provided
+mode=c
 style=allman
+
 indent=tab
 lineend=windows
 
 pad-oper
-pad-paren
+pad-paren-in
+pad-header
+
+# delete-empty-lines
+fill-empty-lines
 
 break-blocks
+
+indent-switches
+indent-cases
+indent-after-parens
+
+remove-comment-prefix
