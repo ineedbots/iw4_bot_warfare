@@ -164,6 +164,9 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Improved bots mantling and stuck
   - Improved bots aim
   - Fix some runtime errors
+  - Fixed bots aim in third person
+  - Bots sprint more
+  - Improved bots sight on enemies
   - Still TODOs (some required in-engine)
     - A variable leak in _menu
     - Use proper activate button
