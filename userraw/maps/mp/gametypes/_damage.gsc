@@ -1604,10 +1604,10 @@ doPrintDamage(dmg, hitloc, flags)
   huddamage setvalue(dmg);
 
 	if ((flags & level.iDFLAGS_PENETRATION) != 0)
-		huddamage.color = (1, 0.25, 0.25);
+		huddamage.color = (1, 1, 0.25);
 
   if (hitloc == "head")
-    huddamage.color = (1, 1, 0.25);
+    huddamage.color = (1, 0.25, 0.25);
 
   huddamage moveovertime(1);
   huddamage fadeovertime(1);
