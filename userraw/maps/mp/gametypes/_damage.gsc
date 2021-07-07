@@ -1592,7 +1592,7 @@ Callback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, s
 }
 
 
-doPrintDamage(dmg, hitloc)
+doPrintDamage(dmg, hitloc, flags)
 {
 	huddamage = newclienthudelem(self);
   huddamage.alignx = "center";
@@ -1602,6 +1602,9 @@ doPrintDamage(dmg, hitloc)
   huddamage.fontscale = 1.6;
   huddamage.font = "objective";
   huddamage setvalue(dmg);
+
+	if ((flags & level.iDFLAGS_PENETRATION) != 0)
+		huddamage.color = (1, 0.25, 1);
 
   if (hitloc == "head")
     huddamage.color = (1, 1, 0.25);
@@ -1628,9 +1631,9 @@ finishPlayerDamageWrapper( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 	if( level.allowPrintDamage )
 	{
 		if ( isDefined( eAttacker ) && isPlayer( eAttacker ) && eAttacker.printDamage )
-			eAttacker thread doPrintDamage(iDamage, sHitLoc);
+			eAttacker thread doPrintDamage(iDamage, sHitLoc, iDFlags);
 		else if( isDefined( eAttacker.owner ) && isPlayer( eAttacker.owner ) && eAttacker.owner.printDamage )
-			eAttacker.owner thread doPrintDamage(iDamage, sHitLoc);
+			eAttacker.owner thread doPrintDamage(iDamage, sHitLoc, iDFlags);
 	}
 	
 	if( level.extraDamageFeedback )
