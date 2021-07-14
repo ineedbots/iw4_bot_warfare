@@ -1085,13 +1085,17 @@ target_loop()
 				targetAnkleLeft = player getTagOrigin( "j_ankle_le" );
 				targetAnkleRight = player getTagOrigin( "j_ankle_ri" );
 
-				canTargetPlayer = ( ( bulletTracePassed( myEye, targetHead, false, undefined ) ||
-				            bulletTracePassed( myEye, targetAnkleLeft, false, undefined ) ||
-				            bulletTracePassed( myEye, targetAnkleRight, false, undefined ) )
+				traceHead = bulletTrace( myEye, targetHead, false );
+				traceAnkleLeft = bulletTrace( myEye, targetAnkleLeft, false );
+				traceAnkleRight = bulletTrace( myEye, targetAnkleRight, false );
 
-				        && ( sightTracePassed( myEye, targetHead, false, undefined ) ||
-				            sightTracePassed( myEye, targetAnkleLeft, false, undefined ) ||
-				            sightTracePassed( myEye, targetAnkleRight, false, undefined ) )
+				canTargetPlayer = ( ( sightTracePassed( myEye, targetHead, false ) ||
+				            sightTracePassed( myEye, targetAnkleLeft, false ) ||
+				            sightTracePassed( myEye, targetAnkleRight, false ) )
+
+				        && ( ( traceHead["fraction"] >= 1.0 || traceHead["surfacetype"] == "glass" ) ||
+				            ( traceAnkleLeft["fraction"] >= 1.0 || traceAnkleLeft["surfacetype"] == "glass" ) ||
+				            ( traceAnkleRight["fraction"] >= 1.0 || traceAnkleRight["surfacetype"] == "glass" ) )
 
 				        && ( ignoreSmoke ||
 				            SmokeTrace( myEye, player.origin, level.smokeRadius ) ||
