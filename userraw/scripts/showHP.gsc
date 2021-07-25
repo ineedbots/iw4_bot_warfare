@@ -58,7 +58,9 @@ drawHP()
 	{
 		//self.drawHP setText("HP: "+self.health+"  KS: "+self.pers["cur_kill_streak"]);
 		self.drawHP setValue(self.health);
-		self.drawSpeed setValue(length(self getVelocity()));
+
+		vel = self getVelocity();
+		self.drawSpeed setValue(int(length((vel[0], vel[1], 0))));
 		wait 0.05;
 	}
 }
