@@ -6454,6 +6454,82 @@ bot_think_revive()
 /*
 	Bots play the Global thermonuclear warfare
 */
+bot_gtnw_loop()
+{
+	myteam = self.team;
+	theirteam = getOtherTeam( myteam );
+	origin = level.nukeSite.trigger.origin;
+	trigger = level.nukeSite.trigger;
+
+	ourCapCount = level.nukeSite.touchList[myteam];
+	theirCapCount = level.nukeSite.touchList[theirteam];
+	rand = self BotGetRandom();
+
+	if ( ( !ourCapCount && !theirCapCount ) || rand <= 20 )
+	{
+		// go cap the obj
+		self.bot_lock_goal = true;
+		self SetScriptGoal( origin, 64 );
+		self thread bots_watch_touch_obj( trigger );
+
+		ret = self waittill_any_return( "goal", "bad_path", "new_goal" );
+
+		if ( ret != "new_goal" )
+			self ClearScriptGoal();
+
+		if ( ret != "goal" || !self isTouching( trigger ) )
+		{
+			self.bot_lock_goal = false;
+			return;
+		}
+
+		self SetScriptGoal( self.origin, 64 );
+
+		while ( self isTouching( trigger ) )
+		{
+			cur = level.nukeSite.curProgress;
+			wait 0.5;
+
+			if ( cur == level.nukeSite.curProgress )
+				break;//no prog made, enemy must be capping
+		}
+
+		self ClearScriptGoal();
+		self.bot_lock_goal = false;
+		return;
+	}
+
+	if ( theirCapCount )
+	{
+		// kill capturtour
+		self.bot_lock_goal = true;
+
+		self SetScriptGoal( origin, 64 );
+		self thread bots_watch_touch_obj( trigger );
+
+		if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+			self ClearScriptGoal();
+
+		self.bot_lock_goal = false;
+		return;
+	}
+
+	//else hang around the site
+	if ( DistanceSquared( origin, self.origin ) <= 1024 * 1024 )
+		return;
+
+	self.bot_lock_goal = true;
+	self SetScriptGoal( origin, 256 );
+
+	if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+		self ClearScriptGoal();
+
+	self.bot_lock_goal = false;
+}
+
+/*
+	Bots play the Global thermonuclear warfare
+*/
 bot_gtnw()
 {
 	self endon( "death" );
@@ -6472,10 +6548,10 @@ bot_gtnw()
 			continue;
 		}
 
-		if ( !isDefined( level.nukeSite ) )
+		if ( !isDefined( level.nukeSite ) || !isDefined( level.nukeSite.trigger ) )
 			continue;
 
-
+		self bot_gtnw_loop();
 	}
 }
 
