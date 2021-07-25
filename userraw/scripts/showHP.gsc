@@ -35,12 +35,17 @@ destoryHPdraw()
 {
 	self waittill_either("disconnect", "death");
 	self.drawHP destroy();
+	self.drawSpeed destroy();
 }
 
 initHPdraw()
 {
 	self.drawHP = self createFontString("default", 1.2);
 	self.drawHP setPoint("BOTTOMRIGHT", "BOTTOMRIGHT", -150, -20);
+	self thread destoryHPdraw();
+
+	self.drawSpeed = self createFontString("default", 1.2);
+	self.drawSpeed setPoint("BOTTOMRIGHT", "BOTTOMRIGHT", -150, -10);
 	self thread destoryHPdraw();
 }
 
@@ -52,7 +57,8 @@ drawHP()
 	for(;;)
 	{
 		//self.drawHP setText("HP: "+self.health+"  KS: "+self.pers["cur_kill_streak"]);
-		self.drawHP setText(self.health);
+		self.drawHP setValue(self.health);
+		self.drawSpeed setValue(length(self getVelocity()));
 		wait 0.05;
 	}
 }
