@@ -399,6 +399,14 @@ inLastStand()
 }
 
 /*
+	Is being revived
+*/
+isBeingRevived()
+{
+	return ( isDefined( self.beingRevived ) && self.beingRevived );
+}
+
+/*
 	If the player is in final stand
 */
 inFinalStand()

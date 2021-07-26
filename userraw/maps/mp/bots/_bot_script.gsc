@@ -2045,9 +2045,8 @@ follow_target_loop()
 	if ( randomInt( 100 ) > self.pers["bots"]["behavior"]["follow"] * 5 )
 		return;
 
-	self thread stop_go_target_on_death( threat );
-
 	self SetScriptGoal( threat.origin, 64 );
+	self thread stop_go_target_on_death( threat );
 
 	if ( self waittill_any_return( "new_goal", "goal", "bad_path" ) != "new_goal" )
 		self ClearScriptGoal();
@@ -3375,8 +3374,8 @@ bot_uav_think_loop()
 
 			if ( !self HasScriptGoal() && !self.bot_lock_goal )
 			{
-				self thread stop_go_target_on_death( player );
 				self SetScriptGoal( player.origin, 128 );
+				self thread stop_go_target_on_death( player );
 
 				if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
 					self ClearScriptGoal();
@@ -6447,8 +6446,106 @@ bot_dem_defend_spawnkill()
 /*
 	Bots think to revive
 */
+bot_think_revive_loop()
+{
+	needsRevives = [];
+
+	for ( i = 0; i < level.players.size; i++ )
+	{
+		player = level.players[i];
+
+		if ( player.team != self.team )
+			continue;
+
+		if ( distanceSquared( self.origin, player.origin ) >= 2048 * 2048 )
+			continue;
+
+		if ( player inLastStand() )
+			needsRevives[needsRevives.size] = player;
+	}
+
+	if ( !needsRevives.size )
+		return;
+
+	revive = random( needsRevives );
+	self.bot_lock_goal = true;
+
+	self SetScriptGoal( revive.origin, 64 );
+	self thread stop_go_target_on_death( revive );
+
+	ret = self waittill_any_return( "new_goal", "goal", "bad_path" );
+
+	if ( ret != "new_goal" )
+		self ClearScriptGoal();
+
+	self.bot_lock_goal = false;
+
+	if ( ret != "goal" || !isDefined(revive) || distanceSquared(self.origin, revive.origin) >= 100 * 100 || !revive inLastStand() || revive isBeingRevived() || !isAlive(revive) )
+		return;
+
+	self _DisableWeapon();
+	self BotFreezeControls( true );
+
+	wait 3;
+
+	self _EnableWeapon();
+	self BotFreezeControls( false );
+
+	if ( !isDefined(revive) || distanceSquared(self.origin, revive.origin) >= 100 * 100 || !revive inLastStand() || revive isBeingRevived() || !isAlive(revive) )
+		return;
+
+	self thread maps\mp\gametypes\_hud_message::SplashNotifyDelayed( "reviver", 200 );
+	self thread maps\mp\gametypes\_rank::giveRankXP( "reviver", 200 );
+
+	revive.lastStand = undefined;
+	revive clearLowerMessage( "last_stand" );
+	
+	if ( revive _hasPerk( "specialty_lightweight" ) )
+		revive.moveSpeedScaler = 1.07;
+	else
+		revive.moveSpeedScaler = 1;
+	
+	revive.maxHealth = 100;
+	
+	revive maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
+	revive maps\mp\gametypes\_playerlogic::lastStandRespawnPlayer();
+
+	revive setPerk( "specialty_pistoldeath", true );
+	revive.beingRevived = false;
+	
+	// reviveEnt delete();
+}
+
+/*
+	Bots think to revive
+*/
 bot_think_revive()
 {
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon( "game_ended" );
+
+	if ( !level.dieHardMode || !level.teamBased )
+		return;
+
+	for ( ;; )
+	{
+		wait( randomintrange( 1, 3 ) );
+
+		if ( self HasScriptGoal() || self.bot_lock_goal )
+			continue;
+
+		if ( self isDefusing() || self isPlanting() )
+			continue;
+
+		if ( self IsUsingRemote() || self BotIsFrozen() )
+			continue;
+
+		if ( self inLastStand() )
+			continue;
+
+		self bot_think_revive_loop();
+	}
 }
 
 /*
