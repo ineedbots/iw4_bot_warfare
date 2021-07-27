@@ -6480,7 +6480,7 @@ bot_think_revive_loop()
 
 	self.bot_lock_goal = false;
 
-	if ( ret != "goal" || !isDefined(revive) || distanceSquared(self.origin, revive.origin) >= 100 * 100 || !revive inLastStand() || revive isBeingRevived() || !isAlive(revive) )
+	if ( ret != "goal" || !isDefined( revive ) || distanceSquared( self.origin, revive.origin ) >= 100 * 100 || !revive inLastStand() || revive isBeingRevived() || !isAlive( revive ) )
 		return;
 
 	self _DisableWeapon();
@@ -6491,7 +6491,7 @@ bot_think_revive_loop()
 	self _EnableWeapon();
 	self BotFreezeControls( false );
 
-	if ( !isDefined(revive) || distanceSquared(self.origin, revive.origin) >= 100 * 100 || !revive inLastStand() || revive isBeingRevived() || !isAlive(revive) )
+	if ( !isDefined( revive ) || distanceSquared( self.origin, revive.origin ) >= 100 * 100 || !revive inLastStand() || revive isBeingRevived() || !isAlive( revive ) )
 		return;
 
 	self thread maps\mp\gametypes\_hud_message::SplashNotifyDelayed( "reviver", 200 );
@@ -6499,20 +6499,20 @@ bot_think_revive_loop()
 
 	revive.lastStand = undefined;
 	revive clearLowerMessage( "last_stand" );
-	
+
 	if ( revive _hasPerk( "specialty_lightweight" ) )
 		revive.moveSpeedScaler = 1.07;
 	else
 		revive.moveSpeedScaler = 1;
-	
+
 	revive.maxHealth = 100;
-	
+
 	revive maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
 	revive maps\mp\gametypes\_playerlogic::lastStandRespawnPlayer();
 
 	revive setPerk( "specialty_pistoldeath", true );
 	revive.beingRevived = false;
-	
+
 	// reviveEnt delete();
 }
 
@@ -6655,6 +6655,140 @@ bot_gtnw()
 /*
 	Bots play oneflag
 */
+bot_oneflag_loop()
+{
+	myTeam = self.pers[ "team" ];
+	otherTeam = getOtherTeam( myTeam );
+
+	if ( myteam == game["attackers"] )
+	{
+		myzone = level.capZones[myteam];
+		theirflag = level.teamFlags[otherTeam];
+
+		if ( self isFlagCarrier() )
+		{
+			//go cap
+			origin = myzone.curorigin;
+
+			self.bot_lock_goal = true;
+			self SetScriptGoal( origin, 32 );
+
+			evt = self waittill_any_return( "goal", "bad_path", "new_goal" );
+
+			wait 1;
+
+			if ( evt != "new_goal" )
+				self ClearScriptGoal();
+
+			self.bot_lock_goal = false;
+			return;
+		}
+
+		carrier = theirflag.carrier;
+
+		if ( !isDefined( carrier ) ) //if no one has enemy flag
+		{
+			self bot_cap_get_flag( theirflag );
+			return;
+		}
+
+		//escort them
+
+		if ( self HasScriptGoal() )
+			return;
+
+		origin = carrier.origin;
+
+		if ( DistanceSquared( origin, self.origin ) <= 1024 * 1024 )
+			return;
+
+		self SetScriptGoal( origin, 256 );
+		self thread bot_escort_obj( theirflag, carrier );
+
+		if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+			self ClearScriptGoal();
+	}
+	else
+	{
+		myflag = level.teamFlags[myteam];
+		theirzone = level.capZones[otherTeam];
+
+		if ( !myflag maps\mp\gametypes\_gameobjects::isHome() )
+		{
+			carrier = myflag.carrier;
+
+			if ( !isDefined( carrier ) ) //someone doesnt has our flag
+			{
+				self bot_cap_get_flag( myflag );
+				return;
+			}
+
+			if ( self HasScriptGoal() )
+				return;
+
+			if ( !isDefined( theirzone.bots ) )
+				theirzone.bots = 0;
+
+			origin = theirzone.curorigin;
+
+			if ( theirzone.bots > 2 || randomInt( 100 ) < 45 )
+			{
+				//kill carrier
+				if ( carrier hasPerk( "specialty_coldblooded" ) )
+					return;
+
+				origin = carrier.origin;
+
+				self SetScriptGoal( origin, 64 );
+				self thread bot_escort_obj( myflag, carrier );
+
+				if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+					self ClearScriptGoal();
+
+				return;
+			}
+
+			self thread bot_inc_bots( theirzone );
+
+			//camp their zone
+			if ( DistanceSquared( origin, self.origin ) <= 1024 * 1024 )
+			{
+				wait 4;
+				self notify( "bot_inc_bots" );
+				theirzone.bots--;
+				return;
+			}
+
+			self SetScriptGoal( origin, 256 );
+			self thread bot_inc_bots( theirzone );
+			self thread bot_escort_obj( myflag, carrier );
+
+			if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+				self ClearScriptGoal();
+		}
+		else
+		{
+			// is home, lets hang around and protect
+			if ( self HasScriptGoal() )
+				return;
+
+			origin = myflag.curorigin;
+
+			if ( DistanceSquared( origin, self.origin ) <= 1024 * 1024 )
+				return;
+
+			self SetScriptGoal( origin, 256 );
+			self thread bot_get_obj( myflag );
+
+			if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+				self ClearScriptGoal();
+		}
+	}
+}
+
+/*
+	Bots play oneflag
+*/
 bot_oneflag()
 {
 	self endon( "death" );
@@ -6676,102 +6810,7 @@ bot_oneflag()
 		if ( !isDefined( level.capZones ) || !isDefined( level.teamFlags ) )
 			continue;
 
-		/*  if(isDefined(level.capZones) && isDefined(level.teamFlags))
-			{
-				if(self.pers["team"] == game["attackers"])//attacking
-				{
-					if(isDefined(self.carryFlag))//has flag
-					{
-						self.bots_objDoing = "cap";
-						self thread bots\talk::bots_oneflag_capFlag();
-						self bots_goToLoc(level.capZones[self.team].trigger.origin, ::bots_nullFunc, 0, 0, 0);
-						self.bots_objDoing = "none";
-						self thread bots\talk::bots_oneflag_doneCap();
-					}
-					else//doesn't have flag
-					{
-						if(!isDefined(level.teamFlags[game["defenders"]].carrier))//no one has flag
-						{
-							self.bots_objDoing = "flag";
-							self thread bots\talk::bots_oneflag_getFlag();
-							self bots_goToLoc(level.teamFlags[game["defenders"]].trigger.origin, ::bots_oneFlagGet, 0, 0, 0);
-							self.bots_objDoing = "none";
-							self thread bots\talk::bots_oneflag_doneGetFlag();
-						}
-						else
-						{
-							if(self.bots_traitRandom)
-							{
-								self thread bots\talk::bots_oneflag_protectCarrier(level.teamFlags[game["defenders"]].carrier);
-								self bots_goFollow(level.teamFlags[game["defenders"]].carrier, 30, false);
-							}
-							else
-							{
-								self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_nullFunc, 0, 0, 0);
-							}
-						}
-					}
-				}
-				else//defending
-				{
-					if(isDefined(level.teamFlags[self.team].carrier))//some one has flag
-					{
-						if(self.bots_traitRandom < 2)
-						{
-							self thread bots\talk::bots_oneflag_killCarrier(level.teamFlags[self.team].carrier);//kill carrier
-							self bots_goFollow(level.teamFlags[self.team].carrier, 30, false);
-						}
-						else
-						{
-							wps = bots_getWaypointsNear(level.capZones[game["attackers"]].trigger.origin, randomFloatRange(100,1000));
-							wp = undefined;
-							if(wps.size > 0)
-							{
-								wp = wps[randomint(wps.size)];
-							}
-							if(isDefined(wp))
-							{
-								self thread bots\talk::bots_oneflag_protectCapzone();//hang around cap zone
-
-								self bots_goToLoc(level.waypoints[wp].origin, ::bots_defendOneFlagCap, 0, 0, 0);
-							}
-							else
-							{
-								self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_defendOneFlagCap, 0, 0, 0);
-							}
-						}
-					}
-					else
-					{
-						if(level.teamFlags[self.team] maps\mp\gametypes\_gameobjects::isHome())
-						{
-							wps = bots_getWaypointsNear(level.teamFlags[self.team].trigger.origin, randomFloatRange(100,1000));
-							wp = undefined;//hang around flag area
-							if(wps.size > 0)
-							{
-								wp = wps[randomint(wps.size)];
-							}
-							if(isDefined(wp))
-							{
-								self thread bots\talk::bots_oneflag_protectFlag();
-
-								self bots_goToLoc(level.waypoints[wp].origin, ::bots_defendOneFlag, 0, 0, 0);
-							}
-							else
-							{
-								self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_defendOneFlag, 0, 0, 0);
-							}
-						}
-						else
-						{
-							self.bots_objDoing = "flag";
-							self thread bots\talk::bots_oneflag_returnFlag();//return flag
-							self bots_campAtEnt(level.teamFlags[self.team].trigger, false, ::bots_oneFlagGetDefend, 0, 0, 0);
-							self.bots_objDoing = "none";
-							self thread bots\talk::bots_oneflag_returnFlagDone();
-						}
-					}
-				}*/
+		self bot_oneflag_loop();
 	}
 }
 
