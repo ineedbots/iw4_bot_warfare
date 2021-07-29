@@ -116,6 +116,7 @@ resetBotVars()
 	self.bot.stop_move = false;
 	self.bot.greedy_path = false;
 	self.bot.climbing = false;
+	self.bot.wantsprint = false;
 	self.bot.last_next_wp = -1;
 	self.bot.last_second_next_wp = -1;
 
@@ -613,6 +614,9 @@ doBotMovement_loop( data )
 	}
 
 	// move!
+	if ( self.bot.wantsprint && self.bot.issprinting )
+		dir = ( 127, dir[1], 0 );
+
 	self botMovement( int( dir[0] ), int( dir[1] ) );
 }
 
@@ -770,6 +774,25 @@ stance_loop()
 		return;
 
 	self thread sprint();
+	self thread setBotWantSprint();
+}
+
+/*
+	Stops the sprint fix when goal is completed
+*/
+setBotWantSprint()
+{
+	self endon( "disconnect" );
+	self endon( "death" );
+
+	self notify( "setBotWantSprint" );
+	self endon( "setBotWantSprint" );
+
+	self.bot.wantsprint = true;
+
+	self waittill( "kill_goal" );
+
+	self.bot.wantsprint = false;
 }
 
 /*
@@ -1471,7 +1494,7 @@ aim_loop()
 					if ( conedot > 0.999 && lengthsquared( aimoffset ) < 0.05 )
 						self thread bot_lookat( aimpos, 0.05 );
 					else
-						self thread bot_lookat( aimpos, aimspeed, target getVelocity() );
+						self thread bot_lookat( aimpos, aimspeed, target getVelocity(), true );
 				}
 				else
 				{
@@ -2110,7 +2133,12 @@ movetowards( goal )
 	timeslow = 0;
 	time = 0;
 
-	while ( distanceSquared( self.origin, goal ) > level.bots_goalDistance )
+	if ( self.bot.issprinting )
+		tempGoalDist = level.bots_goalDistance * 2;
+	else
+		tempGoalDist = level.bots_goalDistance;
+
+	while ( distanceSquared( self.origin, goal ) > tempGoalDist )
 	{
 		self botMoveTo( goal );
 
@@ -2151,6 +2179,11 @@ movetowards( goal )
 			timeslow += 50;
 		else
 			timeslow = 0;
+
+		if ( self.bot.issprinting )
+			tempGoalDist = level.bots_goalDistance * 2;
+		else
+			tempGoalDist = level.bots_goalDistance;
 
 		if ( stucks == 2 )
 			self notify( "bad_path_internal" );
@@ -2537,7 +2570,7 @@ botGetThirdPersonOffset( angles )
 /*
 	Bots will look at the pos
 */
-bot_lookat( pos, time, vel )
+bot_lookat( pos, time, vel, doAimPredict )
 {
 	self notify( "bots_aim_overlap" );
 	self endon( "bots_aim_overlap" );
@@ -2551,6 +2584,9 @@ bot_lookat( pos, time, vel )
 
 	if ( !isDefined( pos ) )
 		return;
+
+	if ( !isDefined( doAimPredict ) )
+		doAimPredict = false;
 
 	if ( !isDefined( time ) )
 		time = 0.05;
@@ -2567,9 +2603,13 @@ bot_lookat( pos, time, vel )
 
 	myEye = self GetEye(); // get our eye pos
 	myEye += self botGetThirdPersonOffset( myAngle ); // account for third person
-	myEye += ( self getVelocity() * 0.05 ) * ( steps - 1 ); // account for our velocity
 
-	pos += ( vel * 0.05 ) * ( steps - 1 ); // add the velocity vector
+	if ( doAimPredict )
+	{
+		myEye += ( self getVelocity() * 0.05 ) * ( steps - 1 ); // account for our velocity
+
+		pos += ( vel * 0.05 ) * ( steps - 1 ); // add the velocity vector
+	}
 
 	angles = VectorToAngles( ( pos - myEye ) - anglesToForward( myAngle ) );
 
