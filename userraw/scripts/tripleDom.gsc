@@ -45,6 +45,12 @@ watchFlags()
 				team = "axis";
 		}
 
+		if ( game["teamScores"]["axis"] < game["teamScores"]["allies"] && team == "axis" )
+			continue;
+
+		if ( game["teamScores"]["allies"] < game["teamScores"]["axis"] && team == "allies" )
+			continue;
+
 		if ( team != "none" )
 		{
 			for ( i = 0; i < level.domFlags.size; i++ )
