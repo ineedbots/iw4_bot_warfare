@@ -170,12 +170,16 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
   - Still TODOs (some required in-engine)
     - A variable leak in _menu
+    - Recoil for bots
+    - Improve/speed up unreachable spot detection
     - Use proper activate button for bombs, carepackages, etc
     - Proper weapon swaps, including altmode
     - Complete cut/unfinished gamemodes and features
     - Pick up weapons from ground
     - Use static turrets in maps
     - Proper use of pred missile
+    - Improve bot revenge system
+    - Have bots do random actions while waiting at an objective
 
 - v2.0.1
   - Reduced bots crouching
