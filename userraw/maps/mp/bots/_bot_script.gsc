@@ -5860,6 +5860,18 @@ bot_cap()
 }
 
 /*
+	Gets the carriers ent num
+*/
+getCarrierEntNum()
+{
+	carrierNum = -1;
+	if (isDefined(self.carrier))
+		carrierNum = self.carrier getEntityNumber();
+
+	return carrierNum;
+}
+
+/*
 	Bots go and get the flag
 */
 bot_cap_get_flag( flag )
@@ -5875,12 +5887,30 @@ bot_cap_get_flag( flag )
 
 	evt = self waittill_any_return( "goal", "bad_path", "new_goal" );
 
-	wait 1;
-
-	self.bot_lock_goal = false;
-
 	if ( evt != "new_goal" )
 		self ClearScriptGoal();
+
+	if ( evt != "goal" )
+	{
+		self.bot_lock_goal = false;
+		return;
+	}
+
+	self SetScriptGoal( self.origin, 64 );
+	curCarrier = flag getCarrierEntNum();
+
+	while ( curCarrier == flag getCarrierEntNum() && self isTouching( flag.trigger ) )
+	{
+		cur = flag.curProgress;
+		wait 0.5;
+
+		if ( flag.curProgress == cur )
+			break;//some enemy is near us, kill him
+	}
+
+	self ClearScriptGoal();
+
+	self.bot_lock_goal = false;
 }
 
 /*
