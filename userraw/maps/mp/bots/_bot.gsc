@@ -35,6 +35,9 @@ init()
 	if ( getDvar( "bots_main_waitForHostTime" ) == "" )
 		setDvar( "bots_main_waitForHostTime", 10.0 ); //how long to wait to wait for the host player
 
+	if ( getDvar( "bots_main_kickBotsAtEnd" ) == "" )
+		setDvar( "bots_main_kickBotsAtEnd", false ); //kicks the bots at game end
+
 	if ( getDvar( "bots_manage_add" ) == "" )
 		setDvar( "bots_manage_add", 0 ); //amount of bots to add to the game
 
@@ -122,6 +125,9 @@ init()
 	if ( getDvar( "bots_play_ads" ) == "" ) //bot ads
 		setDvar( "bots_play_ads", true );
 
+	if ( getDvar( "bots_play_aim" ) == "" )
+		setDvar( "bots_play_aim", true );
+
 	if ( !isDefined( game["botWarfare"] ) )
 		game["botWarfare"] = true;
 
@@ -202,6 +208,16 @@ handleBots()
 		wait 0.05;
 
 	setDvar( "bots_manage_add", getBotArray().size );
+
+	if ( !getDvarInt( "bots_main_kickBotsAtEnd" ) )
+		return;
+
+	bots = getBotArray();
+
+	for ( i = 0; i < bots.size; i++ )
+	{
+		kick( bots[i] getEntityNumber(), "EXE_PLAYERKICKED" );
+	}
 }
 
 /*
