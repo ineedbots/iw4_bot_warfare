@@ -12,6 +12,9 @@
 		- onemanarmyRefillsTubes <bool>
 			false - (default) One Man Army does not refill the gl attachment
 			true - it does
+
+		- fix_onemanarmyFlareBug <bool>
+			true - (default) fixes it
 */
 
 #include common_scripts\utility;
@@ -199,6 +202,9 @@ init()
 
 	setDvarIfUninitialized( "onemanarmyRefillsTubes", false );
 	level.onemanarmyRefillsTubes = getDvarInt( "onemanarmyRefillsTubes" );
+
+	setDvarIfUninitialized( "fix_onemanarmyFlareBug", true );
+	level.fix_onemanarmyFlareBug = getDvarInt( "fix_onemanarmyFlareBug" );
 
 	initPerkDvars();
 

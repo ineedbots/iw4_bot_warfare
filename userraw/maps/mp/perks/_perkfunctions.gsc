@@ -629,8 +629,12 @@ selectOneManArmyClass()
 	level endon ( "game_ended" );
 	
 	self _disableWeaponSwitch();
-	self _disableOffhandWeapons();
-	self _disableUsability();
+
+	if (level.fix_onemanarmyFlareBug)
+	{
+		self _disableOffhandWeapons();
+		self _disableUsability();
+	}
 	
 	self openPopupMenu( game["menu_onemanarmy"] );
 	
@@ -639,22 +643,34 @@ selectOneManArmyClass()
 	self waittill ( "menuresponse", menu, className );
 
 	self _enableWeaponSwitch();
-	self _enableOffhandWeapons();
-	self _enableUsability();
+	
+	if (level.fix_onemanarmyFlareBug)
+	{
+		self _enableOffhandWeapons();
+		self _enableUsability();
+	}
 	
 	if ( className == "back" || !isOneManArmyMenu( menu ) || self isUsingRemote() )
 	{
 		if ( self getCurrentWeapon() == "onemanarmy_mp" )
 		{
 			self _disableWeaponSwitch();
-			self _disableOffhandWeapons();
-			self _disableUsability();
+
+			if (level.fix_onemanarmyFlareBug)
+			{
+					self _disableOffhandWeapons();
+					self _disableUsability();
+			}
 
 			self switchToWeapon( self getLastWeapon() );
 			self waittill ( "weapon_change" );
 			self _enableWeaponSwitch();
-			self _enableOffhandWeapons();
-			self _enableUsability();
+
+			if (level.fix_onemanarmyFlareBug)
+			{
+					self _enableOffhandWeapons();
+					self _enableUsability();
+			}
 		}
 		return;
 	}	
