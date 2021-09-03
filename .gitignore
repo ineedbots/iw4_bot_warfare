@@ -2,6 +2,7 @@
 /*
 
 # Files to not ignore
+!/.vscode
 !/.gitignore
 !/z_devserver.bat
 !/z_dev.bat

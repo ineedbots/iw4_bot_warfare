@@ -1,0 +1,8 @@
+{
+    "astyle.astylerc": "${workspaceRoot}/.astylerc",
+    "astyle.additional_languages": [
+        "gsc"
+    ],
+    "editor.defaultFormatter": "chiehyu.vscode-astyle",
+    "editor.formatOnSave": true
+}

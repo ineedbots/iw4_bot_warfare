@@ -40,6 +40,9 @@ async function doDeploy() {
       await exec(`git clone ${repo_url} && cd ${repo_name} && git submodule update --init --recursive`)
 
       printToConsole('Cloned!')
+      printToConsole('Deploying...')
+      await exec('deploy.bat')
+      printToConsole('Deployed!')
     } catch (f) {
       printToConsole(f, true)
     }
