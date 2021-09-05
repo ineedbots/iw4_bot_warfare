@@ -4,12 +4,7 @@
 # Files to not ignore
 !/.vscode
 !/.gitignore
-!/z_devserver.bat
-!/z_dev.bat
-!/z_serverdev.bat
 !/z_server.bat
-!/z_bots.bat
-!/z_client.bat
 !/z_server_pvbrust.bat
 !/z_server_pvbvote.bat
 
