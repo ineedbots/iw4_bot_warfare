@@ -1,1 +1,0 @@
-start "" "%~dp0iw4x.exe" -nosteam -console -dump -scriptablehttp +set sv_lanonly "1" +set r_fullscreen "0" +set fs_game "mods/dev" +set developer "1" +set developer_script "1" +set cg_drawfps "4" +set cg_drawsnapshot "1" +set thereisacow "1" +set sv_cheats "1" +set drawlagometer "1" +set r_mode "1024x768" +connect 127.0.0.1
