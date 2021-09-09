@@ -1,9 +1,12 @@
-# Ignore everything in repository root 
+# Ignore everything in repository root
 /*
 
 # Files to not ignore
 !/.vscode
 !/.gitignore
+!/.editorconfig
+!/.gitattributes
+
 !/z_server.bat
 !/z_server_pvbrust.bat
 !/z_server_pvbvote.bat
