@@ -44,7 +44,6 @@ initHPdraw()
 {
 	self.drawHP = self createFontString( "default", 1.2 );
 	self.drawHP setPoint( "BOTTOMRIGHT", "BOTTOMRIGHT", -150, -20 );
-	self thread destoryHPdraw();
 
 	self.drawSpeed = self createFontString( "default", 1.2 );
 	self.drawSpeed setPoint( "BOTTOMRIGHT", "BOTTOMRIGHT", -150, -10 );
