@@ -6,7 +6,7 @@ set gamepath=%cd%
 ::Rate to check if server is hung
 set check_rate=300
 ::Server log location
-set log_path=%gamepath%\userraw\server
+set log_path=%gamepath%\userraw\logs\server
 set log_file=games_mp.log
 
 title IW4x MP - %name% - Server watchdog
