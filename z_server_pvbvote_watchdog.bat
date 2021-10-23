@@ -1,12 +1,12 @@
 @echo off
 ::Name of the server's title
-set name=IW4x Bot Warfare Server
+set name=IW4x Bot Warfare PvB Vote
 ::Only change this when you don't want to keep the bat files in the game folder. MOST WON'T NEED TO EDIT THIS!
 set gamepath=%cd%
 ::Rate to check if server is hung
 set check_rate=300
 ::Server log location
-set log_path=%gamepath%\userraw\logs
+set log_path=%gamepath%\mods\pvb\logs
 set log_file=console_mp.log
 
 title IW4x MP - %name% - Server watchdog
