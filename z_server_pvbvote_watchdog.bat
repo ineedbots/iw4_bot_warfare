@@ -6,8 +6,8 @@ set gamepath=%cd%
 ::Rate to check if server is hung
 set check_rate=300
 ::Server log location
-set log_path=%gamepath%\mods\pvb\logs
-set log_file=console_mp.log
+set log_path=%gamepath%\mods\pvb\logs\pvbvote
+set log_file=games_mp.log
 
 title IW4x MP - %name% - Server watchdog
 echo Visit plutonium.pw / Join the Discord (a6JM2Tv) for NEWS and Updates!
