@@ -1,6 +1,6 @@
 @echo off
 ::Name of the server's title
-set name=IW4x Bot Warfare PvB Vote
+set name=Bot Warfare Players vs bots Mapvote 10x
 ::Only change this when you don't want to keep the bat files in the game folder. MOST WON'T NEED TO EDIT THIS!
 set gamepath=%cd%
 ::Rate to check if server is hung
