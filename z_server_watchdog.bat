@@ -8,7 +8,7 @@ set server_title_regex=Bot Warfare 24/7 Rust 10x
 ::Only change this when you don't want to keep the bat files in the game folder. MOST WON'T NEED TO EDIT THIS!
 set gamepath=%cd%
 ::Rate to check if server is hung
-set check_rate=3
+set check_rate=300
 ::Server log location
 set log_path=%gamepath%\userraw\logs\server
 set log_file=games_mp.log
