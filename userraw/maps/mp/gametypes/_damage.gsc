@@ -1460,7 +1460,7 @@ Callback_PlayerDamage_internal( eInflictor, eAttacker, victim, iDamage, iDFlags,
 
 		if ( attackerIsNPC && isDefined( eAttacker.gunner ) )
 			damager = eAttacker.gunner;
-		else if( level.extraDamageFeedback && isDefined( eAttacker.owner ) )
+		else if( level.extraDamageFeedback && isDefined( eAttacker ) && isDefined( eAttacker.owner ) )
 			damager = eAttacker.owner;
 		else
 			damager = eAttacker;
