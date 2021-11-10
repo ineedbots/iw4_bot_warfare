@@ -1647,7 +1647,7 @@ finishPlayerDamageWrapper( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 			eAttacker.owner thread doPrintDamage( iDamage, sHitLoc, iDFlags );
 	}
 	
-	if( level.extraDamageFeedback )
+	if( isDefined( eAttacker ) && level.extraDamageFeedback )
 	{
 		if( sWeapon == "nuke_mp" )
 		{
@@ -1663,7 +1663,7 @@ finishPlayerDamageWrapper( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 
 		if( sHitLoc == "head" || sHitLoc == "helmet" )
 		{
-			if ( isDefined( eAttacker ) && isPlayer( eAttacker ) )
+			if ( isPlayer( eAttacker ) )
 				eAttacker playLocalSound( "bullet_impact_headshot_2" );
 			else if( isDefined( eAttacker.owner ) && isPlayer( eAttacker.owner ) )
 				eAttacker.owner playLocalSound( "bullet_impact_headshot_2" );
