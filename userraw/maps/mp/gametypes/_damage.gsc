@@ -1641,7 +1641,7 @@ finishPlayerDamageWrapper( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 			if ( !isDefined( eInflictor ) )
 				self thread doPrintDamage( iDamage, sHitLoc, iDFlags );
 		}
-		if ( isPlayer( eAttacker ) && eAttacker.printDamage )
+		else if ( isPlayer( eAttacker ) && eAttacker.printDamage )
 			eAttacker thread doPrintDamage( iDamage, sHitLoc, iDFlags );
 		else if( isDefined( eAttacker.owner ) && isPlayer( eAttacker.owner ) && eAttacker.owner.printDamage )
 			eAttacker.owner thread doPrintDamage( iDamage, sHitLoc, iDFlags );
