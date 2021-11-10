@@ -1572,7 +1572,7 @@ setClaymoreTeamHeadIcon( team )
 {
 	self endon( "death" );
 	
-	if ( self.weaponname == "claymore_mp" && !level.allowExtendedClaymoreTrace )
+	if ( isDefined( self.weaponname ) && self.weaponname == "claymore_mp" && !level.allowExtendedClaymoreTrace )
 	{
 		self waittill( "missile_stuck" );
 		self waittill( "claymore_trace_fixed" );

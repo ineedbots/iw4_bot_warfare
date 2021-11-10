@@ -702,8 +702,11 @@ giveKillstreakWeapon( weapon )
 		self takeWeapon( item );
 	}
 	
-	self _giveWeapon( weapon, 0 );
-	self _setActionSlot( 4, "weapon", weapon );
+	if ( isDefined( weapon ) && weapon != "" )
+	{
+		self _giveWeapon( weapon, 0 );
+		self _setActionSlot( 4, "weapon", weapon );
+	}
 }
 
 

@@ -1594,14 +1594,16 @@ Callback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, s
 
 doPrintDamage(dmg, hitloc, flags)
 {
+	self endon( "disconnect" );
+
 	huddamage = newclienthudelem(self);
-  huddamage.alignx = "center";
-  huddamage.horzalign = "center";
-  huddamage.x = 10;
-  huddamage.y = 235;
-  huddamage.fontscale = 1.6;
-  huddamage.font = "objective";
-  huddamage setvalue(dmg);
+	huddamage.alignx = "center";
+	huddamage.horzalign = "center";
+	huddamage.x = 10;
+	huddamage.y = 235;
+	huddamage.fontscale = 1.6;
+	huddamage.font = "objective";
+	huddamage setvalue(dmg);
 
 	if ((flags & level.iDFLAGS_RADIUS) != 0)
 		huddamage.color = (0.25, 0.25, 0.25);
@@ -1609,23 +1611,24 @@ doPrintDamage(dmg, hitloc, flags)
 	if ((flags & level.iDFLAGS_PENETRATION) != 0)
 		huddamage.color = (1, 1, 0.25);
 
-  if (hitloc == "head")
-    huddamage.color = (1, 0.25, 0.25);
+	if (hitloc == "head")
+		huddamage.color = (1, 0.25, 0.25);
 
-  huddamage moveovertime(1);
-  huddamage fadeovertime(1);
-  huddamage.alpha = 0;
-  huddamage.x = randomIntRange(25, 70);
+	huddamage moveovertime(1);
+	huddamage fadeovertime(1);
+	huddamage.alpha = 0;
+	huddamage.x = randomIntRange(25, 70);
 
 	val = 1;
 	if (cointoss())
 		val = -1;
 	
-  huddamage.y = 235 + randomIntRange(25, 70) * val;
+	huddamage.y = 235 + randomIntRange(25, 70) * val;
 
-  wait 1;
+	wait 1;
 
-	huddamage destroy();
+	if ( isDefined( huddamage ) )
+		huddamage destroy();
 }
 
 
@@ -1633,10 +1636,15 @@ finishPlayerDamageWrapper( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 {
 	if( level.allowPrintDamage )
 	{
-		if ( isDefined( eAttacker ) && isPlayer( eAttacker ) && eAttacker.printDamage )
-			eAttacker thread doPrintDamage(iDamage, sHitLoc, iDFlags);
+		if ( !isDefined( eAttacker ) )
+		{
+			if ( !isDefined( eInflictor ) )
+				self thread doPrintDamage( iDamage, sHitLoc, iDFlags );
+		}
+		if ( isPlayer( eAttacker ) && eAttacker.printDamage )
+			eAttacker thread doPrintDamage( iDamage, sHitLoc, iDFlags );
 		else if( isDefined( eAttacker.owner ) && isPlayer( eAttacker.owner ) && eAttacker.owner.printDamage )
-			eAttacker.owner thread doPrintDamage(iDamage, sHitLoc, iDFlags);
+			eAttacker.owner thread doPrintDamage( iDamage, sHitLoc, iDFlags );
 	}
 	
 	if( level.extraDamageFeedback )
