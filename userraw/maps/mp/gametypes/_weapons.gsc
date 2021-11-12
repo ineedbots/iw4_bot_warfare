@@ -2689,6 +2689,42 @@ detach_hip_weapon()
 }
 
 
+FixHideTagList( hideTagList, stowWeapon )
+{
+	answer = [];
+
+	for ( i = 0; i < hideTagList.size; i++ )
+	{
+		tag = hideTagList[ i ];
+
+		if ( stowWeapon == "weapon_ak74u" )
+		{
+			if ( tag == "tag_reflex_sight" || tag == "tag_acog" || tag == "tag_ak47_mount" )
+				continue;
+		}
+		else if ( stowWeapon == "weapon_ak47_classic" )
+		{
+			if ( tag == "tag_reflex_sight" || tag == "tag_acog" || tag == "tag_ak47_mount" )
+				continue;
+		}
+		else if ( stowWeapon == "worldmodel_bo2_peacekeeper" )
+		{
+			if ( tag == "tag_holo" || tag == "tag_reflex" || tag == "tag_silencer" )
+				continue;
+		}
+		else if ( stowWeapon == "weapon_beretta" )
+		{
+			if ( tag == "tag_knife" )
+				continue;
+		}
+
+		answer[ answer.size ] = tag;
+	}
+
+	return answer;
+}
+
+
 stow_on_back()
 {
 	prof_begin( "stow_on_back" );
@@ -2778,6 +2814,8 @@ stow_on_back()
 		prof_end( "stow_on_back" );
 		return;
 	}
+	
+	hideTagList = FixHideTagList( hideTagList, self.tag_stowed_back );
 
 	for ( i = 0; i < hideTagList.size; i++ )
 		self HidePart( hideTagList[ i ], self.tag_stowed_back );
@@ -2815,6 +2853,8 @@ stow_on_hip()
 	
 	if ( !isDefined( hideTagList ) )
 		return;
+
+	hideTagList = FixHideTagList( hideTagList, self.tag_stowed_hip );
 	
 	for ( i = 0; i < hideTagList.size; i++ )
 		self HidePart( hideTagList[ i ], self.tag_stowed_hip );

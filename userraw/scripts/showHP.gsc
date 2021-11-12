@@ -36,8 +36,12 @@ destoryHPdraw()
 {
 	self endon( "disconnect" );
 	self waittill( "death" );
-	self.drawHP destroy();
-	self.drawSpeed destroy();
+
+	if ( isDefined( self.drawHP ) )
+		self.drawHP destroy();
+
+	if ( isDefined( self.drawSpeed ) )
+		self.drawSpeed destroy();
 }
 
 initHPdraw()

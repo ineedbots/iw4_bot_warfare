@@ -231,8 +231,10 @@ waitForChangeTeam()
 	for ( ;; )
 	{
 		self waittill ( "joined_team" );
-		clearKillstreaks();
-		self clearUsingRemote();
+		self clearKillstreaks();
+
+		if ( self isUsingRemote() )
+			self clearUsingRemote();
 	}
 }
 
@@ -861,7 +863,9 @@ clearRideIntro( delay )
 destroyOnEvents(elem)
 {
 	self waittill_either("disconnect", "start_killstreak_hud");
-	elem destroy();
+
+	if ( isDefined( elem ) )
+		elem destroy();
 }
 
 initKillstreakHud(inity)
