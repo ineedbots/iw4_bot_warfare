@@ -1579,6 +1579,9 @@ setClaymoreTeamHeadIcon( team )
 	}
 	else
 		wait 0.05;
+
+	if ( !isDefined( self ) )
+		return;
 	
 	if ( isDefined( self.entityHeadIcon ) )
 	{
