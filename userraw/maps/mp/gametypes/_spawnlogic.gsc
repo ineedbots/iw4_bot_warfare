@@ -609,6 +609,8 @@ getSpawnpoint_NearTeam( spawnpoints, favoredspawnpoints )
 	obj = spawnstruct();
 	
 	alliedDistanceWeight = 2;
+	if ( getDVar( "scr_alliedDistanceWeight" ) != "" )
+		alliedDistanceWeight = getDVarFloat( "scr_alliedDistanceWeight" );
 	
 	//prof_begin(" spawn_basicsumdists");
 	myTeam = self.team;
