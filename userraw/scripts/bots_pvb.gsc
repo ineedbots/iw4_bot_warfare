@@ -24,64 +24,68 @@ init()
 
 watchSniper()
 {
-	if (getDvar("bot_sniperCheck") == "")
+	if ( getDvar( "bot_sniperCheck" ) == "" )
 		return;
 
-	for (;;)
+	for ( ;; )
 	{
 		wait 15;
 
 		numPlayers = 0;
 		numSnipers = 0;
 
-		for(i = 0; i < level.players.size; i++)
+		for ( i = 0; i < level.players.size; i++ )
 		{
 			player = level.players[i];
-			if (player is_bot())
+
+			if ( player is_bot() )
 				continue;
 
-			if (!isDefined(player.team))
+			if ( !isDefined( player.team ) )
 				continue;
 
 			numPlayers++;
 
-			if (isDefined(player.isSniper) && player.isSniper)
+			if ( isDefined( player.isSniper ) && player.isSniper )
 				numSnipers++;
 		}
 
-		if (numPlayers > 0)
+		if ( numPlayers > 0 )
 		{
-			if (numSnipers / numPlayers >= 0.5)
-				setDvar("bots_sniperLoadout", 1);
+			if ( numSnipers / numPlayers >= 0.5 )
+				setDvar( "bots_sniperLoadout", 1 );
 			else
-				setDvar("bots_sniperLoadout", 0);
+				setDvar( "bots_sniperLoadout", 0 );
 		}
 	}
 }
 
 watchNuke()
 {
-	setDvar("scr_spawnpointfavorweight", "");
-	level waittill( "nuke_death" );
-	setDvar("scr_spawnpointfavorweight", "499999");
+	setDvar( "scr_spawnpointfavorweight", "" );
+
+	for ( i = 0; i < 3; i++ )
+		level waittill( "nuke_death" );
+
+	setDvar( "scr_spawnpointfavorweight", "499999" );
 }
 
 watchBoxmap()
 {
-	if (getDvar("mapname") == "iw4_credits")
-		setDvar("scr_spawnsimple", 1);
+	if ( getDvar( "mapname" ) == "iw4_credits" )
+		setDvar( "scr_spawnsimple", 1 );
 	else
-		setDvar("scr_spawnsimple", 0);
+		setDvar( "scr_spawnsimple", 0 );
 }
 
 watchBotCrackedClass()
 {
-	if(getDvar("bot_pvb_helper_customBotClassTeam") == "")
-		setDvar("bot_pvb_helper_customBotClassTeam", "");
+	if ( getDvar( "bot_pvb_helper_customBotClassTeam" ) == "" )
+		setDvar( "bot_pvb_helper_customBotClassTeam", "" );
 
-	for (;;)
+	for ( ;; )
 	{
-		level waittill("bot_connected", bot);
+		level waittill( "bot_connected", bot );
 
 		bot thread watchBotLoadout();
 	}
@@ -89,20 +93,20 @@ watchBotCrackedClass()
 
 watchBotLoadout()
 {
-	self endon("disconnect");
+	self endon( "disconnect" );
 
-	random = randomInt(2);
+	random = randomInt( 2 );
 
-	for (;;)
+	for ( ;; )
 	{
-		self waittill("bot_giveLoadout");
+		self waittill( "bot_giveLoadout" );
 
-		team = getDvar("bot_pvb_helper_customBotClassTeam");
+		team = getDvar( "bot_pvb_helper_customBotClassTeam" );
 
-		if (team == "")
+		if ( team == "" )
 			continue;
 
-		if (self.team != team)
+		if ( self.team != team )
 			continue;
 
 		// clear perks and weapons
@@ -121,7 +125,8 @@ watchBotLoadout()
 		self maps\mp\perks\_perks::givePerk( "semtex_mp" );
 
 		twoStreak = "helicopter_minigun";
-		if (random)
+
+		if ( random )
 			twoStreak = "ac130";
 
 		self maps\mp\gametypes\_class::setKillstreaks( "harrier_airstrike", twoStreak, "nuke" );
@@ -137,27 +142,29 @@ watchBotLoadout()
 
 watchTeams()
 {
-	if(getDvar("bot_pvb_helper_noPlayersOnTeam") == "")
-		setDvar("bot_pvb_helper_noPlayersOnTeam", "");
+	if ( getDvar( "bot_pvb_helper_noPlayersOnTeam" ) == "" )
+		setDvar( "bot_pvb_helper_noPlayersOnTeam", "" );
 
-	for (;;)
+	for ( ;; )
 	{
 		wait 1;
-		
-		if (getDvar("bot_pvb_helper_noPlayersOnTeam") == "")
+
+		if ( getDvar( "bot_pvb_helper_noPlayersOnTeam" ) == "" )
 			continue;
 
-		team = getDvar("bot_pvb_helper_noPlayersOnTeam");
-		for(i = 0; i < level.players.size; i++)
+		team = getDvar( "bot_pvb_helper_noPlayersOnTeam" );
+
+		for ( i = 0; i < level.players.size; i++ )
 		{
 			player = level.players[i];
-			if (player is_bot())
+
+			if ( player is_bot() )
 				continue;
 
-			if (player.team != team)
+			if ( player.team != team )
 				continue;
 
-			if (team == "axis")
+			if ( team == "axis" )
 				player [[level.allies]]();
 			else
 				player [[level.axis]]();
@@ -167,40 +174,42 @@ watchTeams()
 
 onBotSayVar()
 {
-	SetDvar("bot_say", "");
-	for (;;)
+	SetDvar( "bot_say", "" );
+
+	for ( ;; )
 	{
 		wait 0.05;
 
-		toSay = GetDvar("bot_say");
-		if (toSay == "")
+		toSay = GetDvar( "bot_say" );
+
+		if ( toSay == "" )
 			continue;
 
-		bot = random(getBotArray());
+		bot = random( getBotArray() );
 
-		if (!isDefined(bot))
+		if ( !isDefined( bot ) )
 			continue;
 
-		SetDvar("bot_say", "");
-		bot sayall(toSay);
+		SetDvar( "bot_say", "" );
+		bot sayall( toSay );
 	}
 }
 
 onSomeoneSaid()
 {
-	for (;;)
+	for ( ;; )
 	{
-		level waittill("say", string, player);
+		level waittill( "say", string, player );
 
-		PrintConsole(player.name + ": ^7" + string + "\n");
+		PrintConsole( player.name + ": ^7" + string + "\n" );
 	}
 }
 
 onBotConnected()
 {
-	for (;;)
+	for ( ;; )
 	{
-		level waittill("bot_connected", bot);
+		level waittill( "bot_connected", bot );
 
 		bot thread setBotPing();
 	}
@@ -208,12 +217,12 @@ onBotConnected()
 
 setBotPing()
 {
-	self endon("disconnect");
+	self endon( "disconnect" );
 
-	for (;;)
+	for ( ;; )
 	{
 		wait 0.05;
 
-		self SetPing(randomIntRange(40, 60));
+		self SetPing( randomIntRange( 40, 60 ) );
 	}
 }
