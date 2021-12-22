@@ -4,5 +4,11 @@
         "gsc"
     ],
     "editor.defaultFormatter": "chiehyu.vscode-astyle",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+		"editor.quickSuggestions": {
+			"other": true,
+			"comments": true,
+			"strings": true
+		},
+		"vscode-codscript.use_builtin_completionItems": false
 }
