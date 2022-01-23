@@ -18,6 +18,7 @@ echo Visit plutonium.pw / Join the Discord (a6JM2Tv) for NEWS and Updates!
 echo (%date%)  -  (%time%) %name% server watchdog start.
 
 ::https://superuser.com/questions/699769/batch-file-last-modification-time-with-seconds
+dir "%log_path%"\"%log_file%" > nul
 for /f "delims=" %%i in ('"forfiles /p "%log_path%" /m "%log_file%" /c "cmd /c echo @ftime" "') do set modif_time_temp=%%i
 
 :Server
@@ -25,6 +26,7 @@ for /f "delims=" %%i in ('"forfiles /p "%log_path%" /m "%log_file%" /c "cmd /c e
 
 	timeout /t %check_rate% /nobreak > nul
 
+	dir "%log_path%"\"%log_file%" > nul
 	for /f "delims=" %%i in ('"forfiles /p "%log_path%" /m "%log_file%" /c "cmd /c echo @ftime" "') do set modif_time_temp=%%i
 
 	if "%modif_time_temp%" == "%modif_time%" (

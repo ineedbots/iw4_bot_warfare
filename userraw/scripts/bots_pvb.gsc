@@ -30,6 +30,7 @@ watchSniper()
 	for ( ;; )
 	{
 		wait 15;
+		logPrint("keepalive\n");
 
 		numPlayers = 0;
 		numSnipers = 0;
