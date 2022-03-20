@@ -6853,6 +6853,43 @@ bot_oneflag()
 /*
 	Bots play arena
 */
+bot_arena_loop()
+{
+	flag = level.arenaFlag;
+	myTeam = self.team;
+
+	self.bot_lock_goal = true;
+	self SetScriptGoal( flag.trigger.origin, 64 );
+
+	event = self waittill_any_return( "goal", "bad_path", "new_goal" );
+
+	if ( event != "new_goal" )
+		self ClearScriptGoal();
+
+	if ( event != "goal" || !self isTouching( flag.trigger ) )
+	{
+		self.bot_lock_goal = false;
+		return;
+	}
+
+	self SetScriptGoal( self.origin, 64 );
+
+	while ( self isTouching( flag.trigger ) && flag.ownerTeam != myTeam )
+	{
+		cur = flag.curProgress;
+		wait 0.5;
+
+		if ( cur == flag.curProgress )
+			break;//no prog made, enemy must be capping
+	}
+
+	self ClearScriptGoal();
+	self.bot_lock_goal = false;
+}
+
+/*
+	Bots play arena
+*/
 bot_arena()
 {
 	self endon( "death" );
@@ -6871,34 +6908,10 @@ bot_arena()
 			continue;
 		}
 
-		/*  case "arena"://iw's hidden gametypes.
-			if(isDefined(level.arenaFlag))
-			{
-				self.bots_objDoing = "flag";
-				self thread bots\talk::bots_arena_capFlag();
-				self bots_campAtEnt(level.arenaFlag.trigger, false, ::bots_nullFunc, 0, 0, 0);
-				self.bots_objDoing = "none";
-				self thread bots\talk::bots_arena_capFlagDone();
-			}
-			else
-			{
-				wps = bots_getWaypointsNear(level.bots_goalPoint.origin, level.bots_goalRad);
-				wp = undefined;
-				if(wps.size > 0)
-				{
-					wp = wps[randomint(wps.size)];
-				}
-				if(isDefined(wp) && self.bots_traitRandom != 3)
-				{
-					self bots_goToLoc(level.waypoints[wp].origin, ::bots_nullFunc, 0, 0, 0);
-				}
-				else
-				{
-					self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_nullFunc, 0, 0, 0);
-				}
-			}
-		    break;
-		*/
+		if ( !isDefined( level.arenaFlag ) )
+			continue;
+
+		self bot_arena_loop();
 	}
 }
 
