@@ -3552,7 +3552,7 @@ bot_turret_think_loop()
 		if ( isDefined( tempTurret.owner ) && tempTurret.owner == self )
 			continue;
 
-		if ( tempTurret.team == self.pers["team"] && level.teamBased )
+		if ( level.teamBased && tempTurret.team == myteam )
 			continue;
 
 		if ( !bulletTracePassed( myEye, tempTurret.origin + ( 0, 0, 15 ), false, tempTurret ) )
