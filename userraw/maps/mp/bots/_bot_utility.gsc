@@ -121,6 +121,14 @@ BotPressAttack( time )
 }
 
 /*
+	Bots will crouch
+*/
+BotCrouch()
+{
+	self maps\mp\bots\_bot_internal::crouch();
+}
+
+/*
 	Returns a random number thats different everytime it changes target
 */
 BotGetTargetRandom()
