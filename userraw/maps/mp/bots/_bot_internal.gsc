@@ -734,6 +734,9 @@ stance_loop()
 	if ( toStance == "stand" && randomInt( 100 ) <= self.pers["bots"]["behavior"]["crouch"] )
 		toStance = "crouch";
 
+	if ( self.hasRiotShieldEquipped && isDefined( self.bot.target ) && isDefined( self.bot.target.entity ) && isPlayer( self.bot.target.entity ) )
+		toStance = "crouch";
+
 	if ( toStance == "climb" )
 	{
 		self.bot.climbing = true;
