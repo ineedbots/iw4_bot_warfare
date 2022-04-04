@@ -2854,7 +2854,6 @@ bot_watch_riot_weapons_loop()
 	threat = self GetThreat();
 	dist = DistanceSquared( threat.origin, self.origin );
 	curWeap = self GetCurrentWeapon();
-	self BotCrouch();
 
 	if ( randomInt( 2 ) )
 	{
