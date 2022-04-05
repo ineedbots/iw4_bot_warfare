@@ -117,6 +117,9 @@ onStartGameType()
 
 	allowed[0] = "vip";
 	allowed[1] = "sd";
+	allowed[2] = "airdrop_pallet";
+	allowed[3] = "gtnw";
+	allowed[4] = "gtnw_zone";
 	//maps\mp\gametypes\_rank::registerScoreInfo( "capture", 200 );
 
 	maps\mp\gametypes\_gameobjects::main(allowed);
@@ -321,21 +324,25 @@ setupVip ( vipPlayer )
 
 extractionZone()
 {
-	extractionZone = getEntArray("extraction_vip", "targetname");
+	extractionZones = getEntArray("extraction_vip", "targetname");
 
 	// check to see if zone is available.
-	if ( !isDefined( extractionZone ) )
+	if ( !extractionZones.size )
 	{
 		println("WARNING: no extraction zone specified" );
 
 		printLn( "^1Not enough extraction zones found in level!" );
-		maps\mp\gametypes\_callbacksetup::AbortLevel();
-		return;
-	}
-	else
-		level.extractionZone = extractionZone;
 
-	trigger = level.extractionZone[0];
+		extractionZones = getEntArray( "gtnw_zone", "targetname" );
+
+		if (!extractionZones.size)
+		{
+			maps\mp\gametypes\_callbacksetup::AbortLevel();
+			return;
+		}
+	}
+
+	trigger = extractionZones[0];
 	if ( isDefined( trigger.target ) )
 	{
 		visuals[0] = getEnt( trigger.target, "targetname" );
