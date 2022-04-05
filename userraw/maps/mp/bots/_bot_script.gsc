@@ -6916,6 +6916,86 @@ bot_arena()
 }
 
 /*
+	bot_vip_loop
+
+	For those wondering why i call a function for these loops like this
+	its because, the variables created in this function will be free'd once the function exits,
+	if it was in the infinite loop, the function never exits, thus the variables are never free'd
+
+	This isnt leaking variables, but freeing variables that will no longer be used, an optimization of sorts
+*/
+bot_vip_loop()
+{
+	vip = undefined;
+
+	for ( i = 0; i < level.players.size; i++ )
+	{
+		player = level.players[i];
+
+		if ( !isReallyAlive( player ) )
+			continue;
+
+		if ( isDefined( self.isVip ) && self.isVip )
+			vip = player;
+	}
+
+	if ( self.team == game["defenders"] )
+	{
+		if ( isDefined( self.isVip ) && self.isVip )
+		{
+			if ( isDefined( level.extractionZone ) && !isDefined( level.extractionTime ) )
+			{
+				// go to extraction zone
+				self.bot_lock_goal = true;
+				self SetScriptGoal( level.extractionZone.trigger.origin, 32 );
+
+				evt = self waittill_any_return( "goal", "bad_path", "new_goal" );
+
+				wait 1;
+
+				if ( evt != "new_goal" )
+					self ClearScriptGoal();
+
+				self.bot_lock_goal = false;
+			}
+		}
+		else if ( isDefined( vip ) )
+		{
+			// protect the vip
+			if ( DistanceSquared( vip.origin, self.origin ) <= 1024 * 1024 )
+				return;
+
+			self SetScriptGoal( vip.origin, 256 );
+
+			if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+				self ClearScriptGoal();
+		}
+	}
+	else
+	{
+		if ( isDefined( level.extractionZone ) && !isDefined( level.extractionTime ) && self BotGetRandom() < 65 )
+		{
+			// camp the extraction zone
+			if ( DistanceSquared( level.extractionZone.trigger.origin, self.origin ) <= 1024 * 1024 )
+				return;
+
+			self SetScriptGoal( level.extractionZone.trigger.origin, 256 );
+
+			if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+				self ClearScriptGoal();
+		}
+		else if ( isDefined( vip ) )
+		{
+			// kill the vip
+			self SetScriptGoal( vip.origin, 32 );
+
+			if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+				self ClearScriptGoal();
+		}
+	}
+}
+
+/*
 	Bots play arena
 */
 bot_vip()
@@ -6936,121 +7016,6 @@ bot_vip()
 			continue;
 		}
 
-		/*  case "vip"://maybe used at gaming events. (ya right, this is not even finished)
-			if(isDefined(level.extractionZone))
-			{
-				if(self.team == game["defenders"])
-				{
-					if(isDefined(self.isVip) && self.isVip)
-					{
-						if(!isDefined(level.extractionTime))
-						{
-							self.bots_objDoing = "vip";
-							self thread bots\talk::bots_vip_extract();
-							self bots_goToLoc(level.extractionZone.trigger.origin, ::bots_nullFunc, 0, 0, 0);
-							if(distance(level.extractionZone.trigger.origin, self.origin) <= level.bots_useNear)
-								level.extractionZone [[level.extractionZone.onUse]](self);
-
-							self thread bots\talk::bots_vip_extractDone();
-							self.bots_objDoing = "none";
-						}
-						else
-						{
-							wps = bots_getWaypointsNear(level.bots_goalPoint.origin, level.bots_goalRad);
-							wp = undefined;
-							if(wps.size > 0)
-							{
-								wp = wps[randomint(wps.size)];
-							}
-							if(isDefined(wp) && self.bots_traitRandom != 3)
-							{
-								self bots_goToLoc(level.waypoints[wp].origin, ::bots_nullFunc, 0, 0, 0);
-							}
-							else
-							{
-								self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_nullFunc, 0, 0, 0);
-							}
-						}
-					}
-					else
-					{
-						if(self.bots_traitRandom)
-						{
-							tarPlay = undefined;
-							foreach(player in level.players)
-							{
-								if(!isDefined(player.isVip) || !player.isVip)
-									continue;
-
-								if(!bots_isReallyAlive(player))
-									continue;
-
-								tarPlay = player;
-								break;
-							}
-
-							self thread bots\talk::bots_vip_protect(tarPlay);
-							self bots_goFollow(tarPlay, 30, false);
-						}
-						else
-						{
-							wps = bots_getWaypointsNear(level.bots_goalPoint.origin, level.bots_goalRad);
-							wp = undefined;
-							if(wps.size > 0)
-							{
-								wp = wps[randomint(wps.size)];
-							}
-							if(isDefined(wp) && self.bots_traitRandom != 3)
-							{
-								self bots_goToLoc(level.waypoints[wp].origin, ::bots_nullFunc, 0, 0, 0);
-							}
-							else
-							{
-								self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_nullFunc, 0, 0, 0);
-							}
-						}
-					}
-				}
-				else
-				{
-					tarPlay = undefined;
-					foreach(player in level.players)
-					{
-						if(!isDefined(player.isVip) || !player.isVip)
-							continue;
-
-						if(!bots_isReallyAlive(player))
-							continue;
-
-						tarPlay = player;
-						break;
-					}
-
-					if((!isDefined(level.extractionTime) || self.bots_traitRandom < 2) && isDefined(tarPlay))
-					{
-						self thread bots\talk::bots_vip_kill(tarPlay);
-						self bots_goFollow(tarPlay, 30, false);
-					}
-					else
-					{
-						wps = bots_getWaypointsNear(level.extractionZone.trigger.origin, randomFloatRange(100,1000));
-						wp = undefined;
-						if(wps.size > 0)
-						{
-							wp = wps[randomint(wps.size)];
-						}
-						if(isDefined(wp) && self.bots_traitRandom != 3)
-						{
-							self thread bots\talk::bots_vip_hangaround();
-							self bots_goToLoc(level.waypoints[wp].origin, ::bots_nullFunc, 0, 0, 0);
-						}
-						else
-						{
-							self bots_goToLoc(level.waypoints[randomint(level.waypointCount)].origin, ::bots_nullFunc, 0, 0, 0);
-						}
-					}
-				}
-			}
-		    break;*/
+		self bot_vip_loop();
 	}
 }
