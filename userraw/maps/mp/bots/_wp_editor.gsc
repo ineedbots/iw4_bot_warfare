@@ -499,6 +499,23 @@ checkForWarnings()
 		if ( !isDefined( level.waypoints[i].angles ) && ( level.waypoints[i].type == "claymore" || level.waypoints[i].type == "tube" || ( level.waypoints[i].type == "crouch" && level.waypoints[i].children.size == 1 ) || level.waypoints[i].type == "climb" || level.waypoints[i].type == "grenade" ) )
 			self iprintln( "WARNING: waypoint " + i + " angles is undefined" );
 	}
+
+	// check reachability, assume bidirectional graph
+
+	wpIdx = randomInt( level.waypointCount );
+
+	for ( i = 0; i < level.waypointCount; i++ )
+	{
+		if ( i % 5 == 0 )
+			wait 0.05;
+
+		astar = AStarSearch( level.waypoints[wpIdx].origin, level.waypoints[i].origin, undefined, true );
+
+		if ( astar.size <= 0 )
+			self iprintln( "WARNING: waypoint " + wpIdx + " has no path to waypoint " + i );
+	}
+
+	self iprintln( "Waypoint warnings check completed." );
 }
 
 UnLinkWaypoint( nwp )
