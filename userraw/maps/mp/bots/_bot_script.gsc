@@ -2099,7 +2099,7 @@ bot_think_camp_loop()
 	if ( ret != "goal" )
 		return;
 
-	self thread killCampAfterTime( randomIntRange( 10, 20 ) );
+	self thread killCampAfterTime( randomIntRange( 30, 90 ) );
 	self CampAtSpot( campSpot.origin, campSpot.origin + AnglesToForward( campSpot.angles ) * 2048 );
 }
 
@@ -2134,7 +2134,16 @@ killCampAfterTime( time )
 	self endon( "disconnect" );
 	self endon( "kill_camp_bot" );
 
-	wait time + 0.05;
+	timeleft = maps\mp\gametypes\_gamelogic::getTimeRemaining() / 1000;
+	while ( time > 0 && timeleft >= 60 )
+	{
+		wait 1;
+		timeleft = maps\mp\gametypes\_gamelogic::getTimeRemaining() / 1000;
+		time--;
+	}
+
+	wait 0.05;
+
 	self ClearScriptGoal();
 	self ClearScriptAimPos();
 
