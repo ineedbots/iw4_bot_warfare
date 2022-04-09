@@ -124,6 +124,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Bots sprint more
   - Improved bots sight on enemies
 	- Bots play hidden gamemodes like one-flag and arena
+	- Bots do random actions while waiting at an objective
 
 - v2.0.1
   - Reduced bots crouching
@@ -159,7 +160,6 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 	- Use static turrets in maps
 	- Proper use of pred missile
 	- Improve bot revenge system
-	- Have bots do random actions while waiting at an objective
 	- Better bot difficulty management
 	- Setup a bot chatter system
 
