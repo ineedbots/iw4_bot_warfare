@@ -2145,11 +2145,11 @@ movetowards( goal )
 	{
 		self botMoveTo( goal );
 
-		if ( time > 3500 )
+		if ( time > 3000 )
 		{
 			time = 0;
 
-			if ( distanceSquared( self.origin, lastOri ) < 128 )
+			if ( distanceSquared( self.origin, lastOri ) < 32 * 32 )
 			{
 				self thread knife();
 				wait 0.5;
@@ -2161,6 +2161,9 @@ movetowards( goal )
 				self botMoveTo( randomDir );
 				wait stucks;
 				self stand();
+
+				self.bot.last_next_wp = -1;
+				self.bot.last_second_next_wp = -1;
 			}
 
 			lastOri = self.origin;
@@ -2169,10 +2172,21 @@ movetowards( goal )
 		{
 			self thread doMantle();
 		}
-		else if ( time > 2500 )
+		else if ( time == 2000 )
 		{
-			if ( distanceSquared( self.origin, lastOri ) < 128 )
+			if ( distanceSquared( self.origin, lastOri ) < 32 * 32 )
 				self crouch();
+		}
+		else if ( time == 1750 )
+		{
+			if ( distanceSquared( self.origin, lastOri ) < 32 * 32 )
+			{
+				// check if directly above or below
+				if ( abs( goal[2] - self.origin[2] ) > 64 && getConeDot( goal + ( 1, 1, 0 ), self.origin + ( -1, -1, 0 ), VectorToAngles( ( goal[0], goal[1], self.origin[2] ) - self.origin ) ) < 0.64 && DistanceSquared2D(self.origin, goal) < 32 * 32 )
+				{
+					stucks = 2;
+				}
+			}
 		}
 
 		wait 0.05;
@@ -2188,7 +2202,7 @@ movetowards( goal )
 		else
 			tempGoalDist = level.bots_goalDistance;
 
-		if ( stucks == 2 )
+		if ( stucks >= 2 )
 			self notify( "bad_path_internal" );
 	}
 
