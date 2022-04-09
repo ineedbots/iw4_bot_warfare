@@ -2135,6 +2135,7 @@ killCampAfterTime( time )
 	self endon( "kill_camp_bot" );
 
 	timeleft = maps\mp\gametypes\_gamelogic::getTimeRemaining() / 1000;
+
 	while ( time > 0 && timeleft >= 60 )
 	{
 		wait 1;
@@ -3797,6 +3798,8 @@ bot_crate_think_loop( data )
 			return;
 	}
 
+	self BotRandomStance();
+
 	self _DisableWeapon();
 	self BotFreezeControls( true );
 
@@ -4342,6 +4345,7 @@ bot_killstreak_think_loop( data )
 			if ( !isDefined( location ) )
 				return;
 
+			self BotRandomStance();
 			self setUsingRemote( "remotemissile" );
 			self thread clear_remote_on_death();
 			self BotStopMoving( true );
@@ -4390,6 +4394,7 @@ bot_killstreak_think_loop( data )
 			if ( isDefined( level.ac130player ) || level.ac130InUse )
 				return;
 
+			self BotRandomStance();
 			self BotStopMoving( true );
 			self changeToWeapon( ksWeap );
 			self BotStopMoving( false );
@@ -4404,6 +4409,7 @@ bot_killstreak_think_loop( data )
 			if ( isDefined( level.chopper ) )
 				return;
 
+			self BotRandomStance();
 			self BotStopMoving( true );
 			self changeToWeapon( ksWeap );
 			self BotStopMoving( false );
@@ -4547,6 +4553,127 @@ bot_killstreak_think()
 	{
 		self bot_killstreak_think_loop( data );
 	}
+}
+
+/*
+	Bots do random stance
+*/
+BotRandomStance()
+{
+	if ( randomInt( 100 ) < 80 )
+		self BotSetStance( "prone" );
+	else if ( randomInt( 100 ) < 60 )
+		self BotSetStance( "crouch" );
+	else
+		self BotSetStance( "stand" );
+}
+
+/*
+	Bots will use a random equipment
+*/
+BotUseRandomEquipment()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+
+	nade = undefined;
+
+	// in mw2, can only one of these...
+	if ( self GetAmmoCount( "claymore_mp" ) )
+		nade = "claymore_mp";
+
+	if ( self GetAmmoCount( "flare_mp" ) )
+		nade = "flare_mp";
+
+	if ( self GetAmmoCount( "c4_mp" ) )
+		nade = "c4_mp";
+
+	if ( !isDefined( nade ) )
+		return;
+
+	self botThrowGrenade( nade, 0.05 );
+}
+
+/*
+	Bots will look at a random thing
+*/
+BotLookAtRandomThing( obj_target )
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+
+	if ( self HasScriptAimPos() )
+		return;
+
+	rand = RandomInt( 100 );
+
+	nearestEnemy = undefined;
+
+	for ( i = 0; i < level.players.size; i++ )
+	{
+		player = level.players[i];
+
+		if ( !isDefined( player ) || !isDefined( player.team ) )
+			continue;
+
+		if ( !isAlive( player ) )
+			continue;
+
+		if ( level.teamBased && self.team == player.team )
+			continue;
+
+		if ( !isDefined( nearestEnemy ) || DistanceSquared( self.origin, player.origin ) < DistanceSquared( self.origin, nearestEnemy.origin ) )
+		{
+			nearestEnemy = player;
+		}
+	}
+
+	origin = ( 0, 0, self GetEyeHeight() );
+
+	if ( isDefined( nearestEnemy ) && DistanceSquared( self.origin, nearestEnemy.origin ) < 1024 * 1024 && rand < 40 )
+		origin += ( nearestEnemy.origin[0], nearestEnemy.origin[1], self.origin[2] );
+	else if ( isDefined( obj_target ) && rand < 50 )
+		origin += ( obj_target.origin[0], obj_target.origin[1], self.origin[2] );
+	else if ( rand < 85 )
+		origin += self.origin + AnglesToForward( ( 0, self.angles[1] - 180, 0 ) ) * 1024;
+	else
+		origin += self.origin + AnglesToForward( ( 0, RandomInt( 360 ), 0 ) ) * 1024;
+
+	self SetScriptAimPos( origin );
+	wait 2;
+	self ClearScriptAimPos();
+}
+
+/*
+	Bots will do stuff while waiting for objective
+*/
+bot_do_random_action_for_objective( obj_target )
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self notify( "bot_do_random_action_for_objective" );
+	self endon( "bot_do_random_action_for_objective" );
+
+	if ( !isDefined( self.bot_random_obj_action ) )
+	{
+		self.bot_random_obj_action = true;
+
+		if ( randomInt( 100 ) < 80 )
+			self thread BotUseRandomEquipment();
+
+		if ( randomInt( 100 ) < 75 )
+			self thread BotLookAtRandomThing( obj_target );
+	}
+	else
+	{
+		if ( self GetStance() != "prone" && randomInt( 100 ) < 15 )
+			self BotSetStance( "prone" );
+		else if ( randomInt( 100 ) < 5 )
+			self thread BotLookAtRandomThing( obj_target );
+	}
+
+	wait 2;
+	self.bot_random_obj_action = undefined;
 }
 
 /*
@@ -4805,6 +4932,8 @@ bot_dom_cap_think_loop()
 
 		if ( flag.useObj.curProgress == cur )
 			break;//some enemy is near us, kill him
+
+		self thread bot_do_random_action_for_objective( flag );
 	}
 
 	self ClearScriptGoal();
@@ -4933,6 +5062,8 @@ bot_hq_loop()
 
 			if ( cur == gameobj.curProgress )
 				break;//no prog made, enemy must be capping
+
+			self thread bot_do_random_action_for_objective( gameobj.trigger );
 		}
 
 		self ClearScriptGoal();
@@ -5150,6 +5281,7 @@ bot_sab_loop()
 			return;
 		}
 
+		self BotRandomStance();
 		self SetScriptGoal( self.origin, 64 );
 
 		self bot_use_bomb_thread( site );
@@ -5267,6 +5399,7 @@ bot_sab_loop()
 			return;
 		}
 
+		self BotRandomStance();
 		self SetScriptGoal( self.origin, 64 );
 
 		self bot_use_bomb_thread( site );
@@ -5468,6 +5601,7 @@ bot_sd_defenders_loop( data )
 		return;
 	}
 
+	self BotRandomStance();
 	self SetScriptGoal( self.origin, 64 );
 
 	self bot_use_bomb_thread( defuse );
@@ -5679,6 +5813,7 @@ bot_sd_attackers_loop( data )
 		return;
 	}
 
+	self BotRandomStance();
 	self SetScriptGoal( self.origin, 64 );
 
 	self bot_use_bomb_thread( plant );
@@ -6167,6 +6302,7 @@ bot_dem_attackers_loop()
 		return;
 	}
 
+	self BotRandomStance();
 	self SetScriptGoal( self.origin, 64 );
 
 	self bot_use_bomb_thread( plant );
@@ -6395,6 +6531,7 @@ bot_dem_defenders_loop()
 		return;
 	}
 
+	self BotRandomStance();
 	self SetScriptGoal( self.origin, 64 );
 
 	self bot_use_bomb_thread( defuse );
@@ -6634,6 +6771,8 @@ bot_gtnw_loop()
 
 			if ( cur == level.nukeSite.curProgress )
 				break;//no prog made, enemy must be capping
+
+			self thread bot_do_random_action_for_objective( trigger );
 		}
 
 		self ClearScriptGoal();
@@ -6890,6 +7029,8 @@ bot_arena_loop()
 
 		if ( cur == flag.curProgress )
 			break;//no prog made, enemy must be capping
+
+		self thread bot_do_random_action_for_objective( flag.trigger );
 	}
 
 	self ClearScriptGoal();

@@ -73,6 +73,27 @@ is_bot()
 }
 
 /*
+	Set the bot's stance
+*/
+BotSetStance( stance )
+{
+	switch ( stance )
+	{
+		case "stand":
+			self maps\mp\bots\_bot_internal::stand();
+			break;
+
+		case "crouch":
+			self maps\mp\bots\_bot_internal::crouch();
+			break;
+
+		case "prone":
+			self maps\mp\bots\_bot_internal::prone();
+			break;
+	}
+}
+
+/*
 	Bot changes to the weap
 */
 BotChangeToWeapon( weap )
