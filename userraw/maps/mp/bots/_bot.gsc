@@ -80,6 +80,12 @@ init()
 	if ( getDvar( "bots_skill_allies_med" ) == "" )
 		setDvar( "bots_skill_allies_med", 0 );
 
+	if ( getDvar( "bots_skill_min" ) == "" )
+		setDvar( "bots_skill_min", 1 );
+
+	if ( getDvar( "bots_skill_max" ) == "" )
+		setDvar( "bots_skill_max", 7 );
+
 	if ( getDvar( "bots_loadout_reasonable" ) == "" ) //filter out the bad 'guns' and perks
 		setDvar( "bots_loadout_reasonable", false );
 
@@ -610,6 +616,18 @@ diffBots_loop()
 
 			player.pers["bots"]["skill"]["base"] = var_skill;
 		}
+	}
+
+	playercount = level.players.size;
+
+	for ( i = 0; i < playercount; i++ )
+	{
+		player = level.players[i];
+
+		if ( !player is_bot() )
+			continue;
+
+		player.pers["bots"]["skill"]["base"] = clamp(player.pers["bots"]["skill"]["base"], GetDvarInt("bots_skill_min"), GetDvarInt("bots_skill_max"));
 	}
 }
 
