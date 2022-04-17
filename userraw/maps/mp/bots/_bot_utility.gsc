@@ -235,7 +235,7 @@ BotStopMoving( what )
 */
 BotNotifyBotChat( msg, a, b, c, d, e, f, g )
 {
-	self notify( "bot_chat_" + msg, a, b, c, d, e, f, g );
+	self notify( "bot_chat", msg, a, b, c, d, e, f, g );
 }
 
 /*

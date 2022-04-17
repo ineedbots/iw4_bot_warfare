@@ -30,7 +30,7 @@ onBotConnected()
 	{
 		level waittill( "bot_connected", bot );
 
-		bot thread start_chat_threads();
+		bot thread start_chat_watch();
 	}
 }
 
@@ -57,161 +57,189 @@ BotDoChat( chance, string, isTeam )
 /*
 	Starts things for the bot
 */
-start_chat_threads()
-{
-	self endon( "disconnect" );
-
-	self thread bot_chat_revive_watch();
-	self thread bot_chat_killcam_watch();
-	self thread bot_chat_stuck_watch();
-}
-
-/*
-	Revive
-*/
-bot_chat_revive_watch()
+start_chat_watch()
 {
 	self endon( "disconnect" );
 
 	for ( ;; )
 	{
-		self waittill( "bot_chat_revive", state, revive );
+		self waittill( "bot_chat", msg, a, b, c, d, e, f, g );
 
-		switch ( state )
+		switch ( msg )
 		{
-			case "go":
-				switch ( randomInt( 1 ) )
-				{
-					case 0:
-						self BotDoChat( 10, "i am going to revive " + revive.name );
-						break;
-				}
-
+			case "revive":
+				self bot_chat_revive_watch( a, b, c, d, e, f, g );
 				break;
 
-			case "start":
-				switch ( randomInt( 1 ) )
-				{
-					case 0:
-						self BotDoChat( 10, "i am reviving " + revive.name );
-						break;
-				}
-
+			case "killcam":
+				self bot_chat_killcam_watch( a, b, c, d, e, f, g );
 				break;
 
-			case "stop":
-				switch ( randomInt( 1 ) )
-				{
-					case 0:
-						self BotDoChat( 10, "i revived " + revive.name );
-						break;
-				}
+			case "stuck":
+				self bot_chat_stuck_watch( a, b, c, d, e, f, g );
+				break;
 
+			case "tube":
+				self bot_chat_tube_watch( a, b, c, d, e, f, g );
 				break;
 		}
+	}
+}
+
+/*
+	Revive
+*/
+bot_chat_revive_watch( state, revive, c, d, e, f, g )
+{
+	switch ( state )
+	{
+		case "go":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "i am going to revive " + revive.name );
+					break;
+			}
+
+			break;
+
+		case "start":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "i am reviving " + revive.name );
+					break;
+			}
+
+			break;
+
+		case "stop":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "i revived " + revive.name );
+					break;
+			}
+
+			break;
 	}
 }
 
 /*
 	Killcam
 */
-bot_chat_killcam_watch()
+bot_chat_killcam_watch( state, b, c, d, e, f, g )
 {
-	self endon( "disconnect" );
-
-	for ( ;; )
+	switch ( state )
 	{
-		self waittill( "bot_chat_killcam", state );
+		case "start":
+			switch ( randomInt( 2 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "WTF?!?!?!! Dude youre a hacker and a half!!" );
+					break;
 
-		switch ( state )
-		{
-			case "start":
-				switch ( randomInt( 2 ) )
-				{
-					case 0:
-						self BotDoChat( 10, "WTF?!?!?!! Dude youre a hacker and a half!!" );
-						break;
+				case 1:
+					self BotDoChat( 10, "Haa! Got my fraps ready, time to watch this killcam." );
+					break;
+			}
 
-					case 1:
-						self BotDoChat( 10, "Haa! Got my fraps ready, time to watch this killcam." );
-						break;
-				}
+			break;
 
-				break;
+		case "stop":
+			switch ( randomInt( 2 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "Wow... Im reporting you!!!" );
+					break;
 
-			case "stop":
-				switch ( randomInt( 2 ) )
-				{
-					case 0:
-						self BotDoChat( 10, "Wow... Im reporting you!!!" );
-						break;
+				case 1:
+					self BotDoChat( 10, "Got it on fraps!" );
+					break;
+			}
 
-					case 1:
-						self BotDoChat( 10, "Got it on fraps!" );
-						break;
-				}
-
-				break;
-		}
+			break;
 	}
 }
 
 /*
 	Stuck
 */
-bot_chat_stuck_watch()
+bot_chat_stuck_watch( a, b, c, d, e, f, g )
 {
-	self endon( "disconnect" );
+	sayLength = randomintRange( 5, 30 );
+	msg = "";
 
-	for ( ;; )
+	for ( i = 0; i < sayLength; i++ )
 	{
-		self waittill( "bot_chat_stuck" );
-
-		sayLength = randomintRange( 5, 30 );
-		msg = "";
-
-		for ( i = 0; i < sayLength; i++ )
+		switch ( randomint( 9 ) )
 		{
-			switch ( randomint( 9 ) )
+			case 0:
+				msg = msg + "w";
+				break;
+
+			case 1:
+				msg = msg + "s";
+				break;
+
+			case 2:
+				msg = msg + "d";
+				break;
+
+			case 3:
+				msg = msg + "a";
+				break;
+
+			case 4:
+				msg = msg + " ";
+				break;
+
+			case 5:
+				msg = msg + "W";
+				break;
+
+			case 6:
+				msg = msg + "S";
+				break;
+
+			case 7:
+				msg = msg + "D";
+				break;
+
+			case 8:
+				msg = msg + "A";
+				break;
+		}
+	}
+
+	self BotDoChat( 50, msg );
+}
+
+/*
+	Tube
+*/
+bot_chat_tube_watch( state, tubeWp, tubeWeap, d, e, f, g )
+{
+	switch ( state )
+	{
+		case "go":
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					msg = msg + "w";
-					break;
-
-				case 1:
-					msg = msg + "s";
-					break;
-
-				case 2:
-					msg = msg + "d";
-					break;
-
-				case 3:
-					msg = msg + "a";
-					break;
-
-				case 4:
-					msg = msg + " ";
-					break;
-
-				case 5:
-					msg = msg + "W";
-					break;
-
-				case 6:
-					msg = msg + "S";
-					break;
-
-				case 7:
-					msg = msg + "D";
-					break;
-
-				case 8:
-					msg = msg + "A";
+					self BotDoChat( 10, "i am going to go tube" );
 					break;
 			}
-		}
 
-		self BotDoChat( 50, msg );
+			break;
+
+		case "start":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "i tubed" );
+					break;
+			}
+
+			break;
 	}
 }
