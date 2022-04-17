@@ -1040,6 +1040,8 @@ doKillcamStuff()
 	self endon( "disconnect" );
 	self endon( "killcam_ended" );
 
+	self BotNotifyBotChat("killcam", "start");
+
 	wait 0.5 + randomInt( 3 );
 
 	if ( randomInt( 100 ) > 25 )
@@ -1048,6 +1050,8 @@ doKillcamStuff()
 	wait 0.1;
 
 	self notify( "abort_killcam" );
+
+	self BotNotifyBotChat("killcam", "stop");
 }
 
 /*
