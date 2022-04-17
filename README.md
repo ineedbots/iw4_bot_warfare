@@ -82,6 +82,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 | bots_main_menu                   | Enable the in-game menu for hosts.                                                          | true          |
 | bots_main_debug                  | Enable the in-game waypoint editor.                                                         | false         |
 | bots_main_kickBotsAtEnd          | Kick the bots at the end of a match.                                                        | false         |
+| bots_main_chat                   | The rate bots will chat at, set to 0 to disable.                                            | 1.0           |
 | bots_manage_add                  | Amount of bots to add to the game, once bots are added, resets back to `0`.                 | 0             |
 | bots_manage_fill                 | Amount of players/bots (look at `bots_manage_fill_mode`) to maintain in the match.          | 0             |
 | bots_manage_fill_mode            | `bots_manage_fill` players/bots counting method.<ul><li>`0` - counts both players and bots.</li><li>`1` - only counts bots.</li></ul> | 0 |
@@ -96,6 +97,8 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 | bots_skill_axis_med              | When `bots_skill` is set to `8`, the amount of medium difficulty bots to set on the axis team. The remaining bots on the team will be set to easy difficulty. | 0 |
 | bots_skill_allies_hard           | When `bots_skill` is set to `8`, the amount of hard difficulty bots to set on the allies team. | 0          |
 | bots_skill_allies_med            | When `bots_skill` is set to `8`, the amount of medium difficulty bots to set on the allies team. The remaining bots on the team will be set to easy difficulty. | 0 |
+| bots_skill_min                   | The minimum difficulty level for the bots.                                                     | 1          |
+| bots_skill_max                   | The maximum difficulty level for the bots.                                                     | 7          |
 | bots_loadout_reasonable          | If the bots should filter bad performing create-a-class selections.                            | false      |
 | bots_loadout_allow_op            | If the bots should be able to use overpowered and annoying create-a-class selections.          | true       |
 | bots_loadout_rank                | What rank to set the bots.<ul><li>`-1` - Average of all players in the match.</li><li>`0` - All random.</li><li>`1` or higher - Sets the bots' rank to this.</li></ul> | -1 |
@@ -123,8 +126,11 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Fixed bots aim in third person
   - Bots sprint more
   - Improved bots sight on enemies
-	- Bots play hidden gamemodes like one-flag and arena
-	- Bots do random actions while waiting at an objective
+  - Bots play hidden gamemodes like one-flag and arena
+  - Bots do random actions while waiting at an objective
+  - Improved bots from getting stuck
+  - Bot chatter system, bots_main_chat
+  - Better bot difficulty management, bots_skill_min and bots_skill_max
 
 - v2.0.1
   - Reduced bots crouching
@@ -150,23 +156,19 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Initial reboot release
 
 
-- Still TODOs (some required in-engine)
-	- A variable leak in _menu
-	- Recoil for bots
-	- Improve/speed up unreachable spot detection
-	- Use proper activate button for bombs, carepackages, etc
-	- Proper weapon swaps, including altmode
-	- Pick up weapons from ground
-	- Use static turrets in maps
-	- Proper use of pred missile
-	- Improve bot revenge system
-	- Better bot difficulty management
-	- Setup a bot chatter system
+- TODOs (some required in-engine)
+  - A variable leak in _menu
+  - Recoil for bots
+  - Use proper activate button for bombs, carepackages, etc
+  - Proper weapon swaps, including altmode
+  - Pick up weapons from ground
+  - Use static turrets in maps
+  - Proper use of pred missile
 
 ## Credits
 - IW4x Team - https://github.com/XLabsProject/iw4x-client
 - CoD4x Team - https://github.com/callofduty4x/CoD4x_Server
-- INeedGames(me) - http://www.moddb.com/mods/bot-warfare
+- INeedGames - http://www.moddb.com/mods/bot-warfare
 - tinkie101 - https://web.archive.org/web/20120326060712/http://alteriw.net/viewtopic.php?f=72&t=4869
 - PeZBot team - http://www.moddb.com/mods/pezbot
 - apdonato - http://rsebots.blogspot.ca/
