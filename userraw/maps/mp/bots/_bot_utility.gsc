@@ -231,6 +231,14 @@ BotStopMoving( what )
 }
 
 /*
+	Notify the bot chat message
+*/
+BotNotifyBotChat( msg, a, b, c, d, e, f, g )
+{
+	self notify( "bot_chat_" + msg, a, b, c, d, e, f, g );
+}
+
+/*
 	Returns if the bot has a script goal.
 	(like t5 gsc bot)
 */
@@ -779,19 +787,6 @@ Round( x )
 	}
 	else
 		return y;
-}
-
-/*
-	Rounds up the given value.
-*/
-RoundUp( floatVal )
-{
-	i = int( floatVal );
-
-	if ( i != floatVal )
-		return i + 1;
-	else
-		return i;
 }
 
 /*
