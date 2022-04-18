@@ -530,6 +530,26 @@ connected()
 	self thread onDisconnect();
 
 	level notify( "bot_connected", self );
+
+	self thread watchBotDebugEvent();
+}
+
+/*
+	DEBUG
+*/
+watchBotDebugEvent()
+{
+	self endon( "disconnect" );
+
+	for ( ;; )
+	{
+		self waittill( "bot_event", msg, str, b, c, d, e, f, g );
+
+		if ( msg == "debug" && GetDvarInt( "bots_main_debug" ) )
+		{
+			PrintConsole( "Bot Warfare debug: " + self.name + ": " + str );
+		}
+	}
 }
 
 /*
