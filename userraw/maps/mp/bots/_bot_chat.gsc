@@ -173,7 +173,7 @@ start_chat_watch()
 
 	for ( ;; )
 	{
-		self waittill( "bot_chat", msg, a, b, c, d, e, f, g );
+		self waittill( "bot_event", msg, a, b, c, d, e, f, g );
 
 		switch ( msg )
 		{

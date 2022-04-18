@@ -2159,7 +2159,7 @@ movetowards( goal )
 
 				randomDir = self getRandomLargestStafe( stucks );
 
-				self BotNotifyBotChat("stuck");
+				self BotNotifyBotEvent("stuck");
 
 				self botMoveTo( randomDir );
 				wait stucks;

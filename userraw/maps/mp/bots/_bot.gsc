@@ -414,7 +414,7 @@ onCarepackageCaptured()
 
 	if ( isDefined( self.owner ) && self.owner is_bot() )
 	{
-		self.owner BotNotifyBotChat( "crate_cap", "captured", self, player );
+		self.owner BotNotifyBotEvent( "crate_cap", "captured", self, player );
 	}
 }
 

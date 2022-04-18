@@ -233,9 +233,9 @@ BotStopMoving( what )
 /*
 	Notify the bot chat message
 */
-BotNotifyBotChat( msg, a, b, c, d, e, f, g )
+BotNotifyBotEvent( msg, a, b, c, d, e, f, g )
 {
-	self notify( "bot_chat", msg, a, b, c, d, e, f, g );
+	self notify( "bot_event", msg, a, b, c, d, e, f, g );
 }
 
 /*
