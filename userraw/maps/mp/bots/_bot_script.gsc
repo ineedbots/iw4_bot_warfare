@@ -2106,7 +2106,9 @@ bot_think_camp_loop()
 	if ( !isDefined( campSpot ) )
 		return;
 
-	self BotNotifyBotChat( "camp", "go", campSpot );
+	time = randomIntRange( 30, 90 );
+
+	self BotNotifyBotChat( "camp", "go", campSpot, time );
 
 	self SetScriptGoal( campSpot.origin, 16 );
 
@@ -2118,12 +2120,12 @@ bot_think_camp_loop()
 	if ( ret != "goal" )
 		return;
 
-	self BotNotifyBotChat( "camp", "start", campSpot );
+	self BotNotifyBotChat( "camp", "start", campSpot, time );
 
-	self thread killCampAfterTime( randomIntRange( 30, 90 ) );
+	self thread killCampAfterTime( time );
 	self CampAtSpot( campSpot.origin, campSpot.origin + AnglesToForward( campSpot.angles ) * 2048 );
 
-	self BotNotifyBotChat( "camp", "stop", campSpot );
+	self BotNotifyBotChat( "camp", "stop", campSpot, time );
 }
 
 /*

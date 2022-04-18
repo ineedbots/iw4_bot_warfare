@@ -208,6 +208,10 @@ start_chat_watch()
 			case "follow_threat":
 				self thread bot_chat_follow_threat_watch( a, b, c, d, e, f, g );
 				break;
+
+			case "camp":
+				self thread bot_chat_camp_watch( a, b, c, d, e, f, g );
+				break;
 		}
 	}
 }
@@ -1915,6 +1919,71 @@ bot_chat_follow_threat_watch( state, threat, c, d, e, f, g )
 			break;
 
 		case "stop":
+			break;
+	}
+}
+
+/*
+	bot_chat_follow_threat_watch( a, b, c, d, e, f, g )
+*/
+bot_chat_camp_watch( state, wp, time, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "go":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "going to camp for " + time + " seconds" );
+					break;
+
+				case 1:
+					self BotDoChat( 25, "time to go camp!" );
+					break;
+
+				case 2:
+					self BotDoChat( 25, "rofl im going to camp" );
+					break;
+			}
+
+			break;
+
+		case "start":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "well im camping... this is fun!" );
+					break;
+
+				case 1:
+					self BotDoChat( 25, "lol im camping, hope i kill someone" );
+					break;
+
+				case 2:
+					self BotDoChat( 25, "im camping! i guess ill wait " + time + " before moving again" );
+					break;
+			}
+
+			break;
+
+		case "stop":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "finished camping.." );
+					break;
+
+				case 1:
+					self BotDoChat( 25, "wow that was a load of camping!" );
+					break;
+
+				case 2:
+					self BotDoChat( 25, "well its been over " + time + " seconds, i guess ill stop camping" );
+					break;
+			}
+
 			break;
 	}
 }
