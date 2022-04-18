@@ -2794,7 +2794,7 @@ botGiveLoadout( team, class, allowCopycat )
 
 	if ( !allowOp )
 	{
-		loadoutDeathstreak = "specialty_none";
+		loadoutDeathstreak = "specialty_null";
 
 		if ( loadoutPrimary == "riotshield" )
 			loadoutPrimary = "m4";
@@ -2806,10 +2806,10 @@ botGiveLoadout( team, class, allowCopycat )
 			loadoutPrimaryAttachment = "none";
 
 		if ( loadoutPerk2 == "specialty_coldblooded" )
-			loadoutPerk2 = "specialty_none";
+			loadoutPerk2 = "specialty_null";
 
 		if ( loadoutPerk3 == "specialty_localjammer" )
-			loadoutPerk3 = "specialty_none";
+			loadoutPerk3 = "specialty_null";
 	}
 
 
