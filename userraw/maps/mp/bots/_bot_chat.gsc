@@ -212,6 +212,10 @@ start_chat_watch()
 			case "camp":
 				self thread bot_chat_camp_watch( a, b, c, d, e, f, g );
 				break;
+
+			case "follow":
+				self thread bot_chat_follow_watch( a, b, c, d, e, f, g );
+				break;
 		}
 	}
 }
@@ -1924,7 +1928,7 @@ bot_chat_follow_threat_watch( state, threat, c, d, e, f, g )
 }
 
 /*
-	bot_chat_follow_threat_watch( a, b, c, d, e, f, g )
+	bot_chat_camp_watch( a, b, c, d, e, f, g )
 */
 bot_chat_camp_watch( state, wp, time, d, e, f, g )
 {
@@ -1981,6 +1985,49 @@ bot_chat_camp_watch( state, wp, time, d, e, f, g )
 
 				case 2:
 					self BotDoChat( 25, "well its been over " + time + " seconds, i guess ill stop camping" );
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_follow_watch( a, b, c, d, e, f, g )
+*/
+bot_chat_follow_watch( state, player, time, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "start":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "well im going to follow " + player.name + " for " + time + " seconds" );
+					break;
+
+				case 1:
+					self BotDoChat( 25, "Lets go together " + player.name + " <3 :)" );
+					break;
+
+				case 2:
+					self BotDoChat( 25, "lets be butt buddies " + player.name + " and ill follow you!" );
+					break;
+			}
+
+			break;
+
+		case "stop":
+			switch ( randomint( 2 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "well that was fun following " + player.name + " for " + time + " seconds" );
+					break;
+
+				case 1:
+					self BotDoChat( 25, "im done following that guy" );
 					break;
 			}
 

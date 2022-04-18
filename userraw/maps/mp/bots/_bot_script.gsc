@@ -2251,12 +2251,14 @@ bot_think_follow_loop()
 	if ( !isDefined( toFollow ) )
 		return;
 
-	self BotNotifyBotChat( "follow", "start", toFollow );
+	time = randomIntRange( 10, 20 );
 
-	self thread killFollowAfterTime( randomIntRange( 10, 20 ) );
+	self BotNotifyBotChat( "follow", "start", toFollow, time );
+
+	self thread killFollowAfterTime( time );
 	self followPlayer( toFollow );
 
-	self BotNotifyBotChat( "follow", "stop", toFollow );
+	self BotNotifyBotChat( "follow", "stop", toFollow, time );
 }
 
 /*
