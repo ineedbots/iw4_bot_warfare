@@ -41,7 +41,7 @@ BotDoChat( chance, string, isTeam )
 {
 	mod = getDvarFloat( "bots_main_chat" );
 
-	if ( mod <= 0.0 || chance <= 0 )
+	if ( mod <= 0.0 )
 		return;
 
 	if ( chance >= 100 || mod >= 100.0 ||
@@ -61,9 +61,80 @@ start_chat_threads()
 {
 	self endon( "disconnect" );
 
+	self thread start_onnuke_call();
+	self thread start_random_chat();
 	self thread start_chat_watch();
 	self thread start_killed_watch();
 	self thread start_death_watch();
+	self thread start_endgame_watch();
+
+	self thread start_startgame_watch();
+}
+
+/*
+	Nuke gets called
+*/
+start_onnuke_call()
+{
+	self endon( "disconnect" );
+
+	for ( ;; )
+	{
+		while ( !isDefined( level.nukeIncoming ) && !isDefined( level.moabIncoming ) )
+			wait 0.05 + randomInt( 4 );
+
+		self thread bot_onnukecall_watch();
+
+		wait level.nukeTimer + 5;
+	}
+}
+
+/*
+	death
+*/
+start_death_watch()
+{
+	self endon( "disconnect" );
+
+	for ( ;; )
+	{
+		self waittill( "death" );
+
+		self thread bot_chat_death_watch( self.lastAttacker, self.bots_lastKS );
+
+		self.bots_lastKS = 0;
+	}
+}
+
+/*
+	start_endgame_watch
+*/
+start_endgame_watch()
+{
+	self endon( "disconnect" );
+
+	level waittill ( "game_ended" );
+
+	self thread endgame_chat();
+}
+
+/*
+	Random chatting
+*/
+start_random_chat()
+{
+	self endon( "disconnect" );
+
+	for ( ;; )
+	{
+		wait 1;
+
+		if ( randomInt( 100 ) < 1 )
+		{
+			if ( randomInt( 100 ) < 1 && isReallyAlive( self ) )
+				self thread doQuickMessage();
+		}
+	}
 }
 
 /*
@@ -90,6 +161,695 @@ start_killed_watch()
 		self.bots_lastKS = self.pers["cur_kill_streak"];
 
 		self thread bot_chat_killed_watch( self.lastKilledPlayer );
+	}
+}
+
+/*
+	Starts things for the bot
+*/
+start_chat_watch()
+{
+	self endon( "disconnect" );
+
+	for ( ;; )
+	{
+		self waittill( "bot_chat", msg, a, b, c, d, e, f, g );
+
+		switch ( msg )
+		{
+			case "revive":
+				self thread bot_chat_revive_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "killcam":
+				self thread bot_chat_killcam_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "stuck":
+				self thread bot_chat_stuck_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "tube":
+				self thread bot_chat_tube_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "killstreak":
+				self thread bot_chat_killstreak_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "crate_cap":
+				self thread bot_chat_crate_cap_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "attack_vehicle":
+				self thread bot_chat_attack_vehicle_watch( a, b, c, d, e, f, g );
+				break;
+		}
+	}
+}
+
+/*
+	start_startgame_watch
+*/
+start_startgame_watch()
+{
+	self endon( "disconnect" );
+
+	wait( randomint( 5 ) + randomint( 5 ) );
+
+	switch ( level.gametype )
+	{
+		case "war":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 15, "TEEEEEEEEAM, DEEEEAAAAAATHMAAAAATCH!!" );
+					break;
+
+				case 1:
+					self BotDoChat( 15, "Lets get em guys, wipe the floor with them." );
+					break;
+
+				case 2:
+					self BotDoChat( 15, "Yeeeesss master..." );
+					break;
+			}
+
+			break;
+
+		case "dom":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 15, "Yaaayy!! I LOVE DOMINATION!!!!" );
+					break;
+
+				case 1:
+					self BotDoChat( 15, "Lets cap the flags and them." );
+					break;
+
+				case 2:
+					self BotDoChat( 15, "Yeeeesss master..." );
+					break;
+			}
+
+			break;
+
+		case "sd":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 15, "Ahhhh! I'm scared! No respawning!" );
+					break;
+
+				case 1:
+					self BotDoChat( 15, "Lets get em guys, wipe the floor with them." );
+					break;
+
+				case 2:
+					self BotDoChat( 15, "Yeeeesss master..." );
+					break;
+			}
+
+			break;
+
+		case "dd":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 15, "Try not to get spawn killed." );
+					break;
+
+				case 1:
+					self BotDoChat( 15, "OK we need a plan. Nah lets just kill." );
+					break;
+
+				case 2:
+					self BotDoChat( 15, "Yeeeesss master..." );
+					break;
+			}
+
+			break;
+
+		case "sab":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 15, "Soccer/Football! Lets play it!" );
+					break;
+
+				case 1:
+					self BotDoChat( 15, "Who plays sab these days." );
+					break;
+
+				case 2:
+					self BotDoChat( 15, "I do not know what to say." );
+					break;
+			}
+
+			break;
+
+		case "ctf":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 15, "Halo style" );
+					break;
+
+				case 1:
+					self BotDoChat( 15, "I'm going cap all the flags." );
+					break;
+
+				case 2:
+					self BotDoChat( 15, "NO IM CAPPING IT" );
+					break;
+			}
+
+			break;
+
+		case "dm":
+			switch ( randomint( 3 ) )
+			{
+				case 0:
+					self BotDoChat( 15, "DEEEEAAAAAATHMAAAAATCH!!" );
+					break;
+
+				case 1:
+					self BotDoChat( 15, "IM GOING TO KILL U ALL" );
+					break;
+
+				case 2:
+					self BotDoChat( 15, "lol sweet. time to camp." );
+					break;
+			}
+
+			break;
+
+		case "koth":
+			self BotDoChat( 15, "HQ TIME!" );
+			break;
+
+		case "gtnw":
+			self BotDoChat( 15, "global thermonuclear warfare!!!!!!!" );
+			break;
+	}
+}
+
+/*
+	Does quick cod4 style message
+*/
+doQuickMessage()
+{
+	self endon( "disconnect" );
+	self endon( "death" );
+
+	if ( !isDefined( self.talking ) || !self.talking )
+	{
+		self.talking = true;
+		soundalias = "";
+		saytext = "";
+		wait 2;
+		self.spamdelay = true;
+
+		switch ( randomint( 11 ) )
+		{
+			case 4 :
+				soundalias = "mp_cmd_suppressfire";
+				saytext = "Suppressing fire!";
+				break;
+
+			case 5 :
+				soundalias = "mp_cmd_followme";
+				saytext = "Follow Me!";
+				break;
+
+			case 6 :
+				soundalias = "mp_stm_enemyspotted";
+				saytext = "Enemy spotted!";
+				break;
+
+			case 7 :
+				soundalias = "mp_cmd_fallback";
+				saytext = "Fall back!";
+				break;
+
+			case 8 :
+				soundalias = "mp_stm_needreinforcements";
+				saytext = "Need reinforcements!";
+				break;
+		}
+
+		if ( soundalias != "" && saytext != "" )
+		{
+			self maps\mp\gametypes\_quickmessages::saveHeadIcon();
+			self maps\mp\gametypes\_quickmessages::doQuickMessage( soundalias, saytext );
+			wait 2;
+			self maps\mp\gametypes\_quickmessages::restoreHeadIcon();
+		}
+		else
+		{
+			if ( randomint( 100 ) < 1 )
+				self BotDoChat( 1, maps\mp\bots\_bot_utility::keyCodeToString( 2 ) + maps\mp\bots\_bot_utility::keyCodeToString( 17 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 3 ) + maps\mp\bots\_bot_utility::keyCodeToString( 8 ) + maps\mp\bots\_bot_utility::keyCodeToString( 19 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 19 ) + maps\mp\bots\_bot_utility::keyCodeToString( 14 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 8 ) + maps\mp\bots\_bot_utility::keyCodeToString( 13 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 3 ) + maps\mp\bots\_bot_utility::keyCodeToString( 6 ) + maps\mp\bots\_bot_utility::keyCodeToString( 0 ) + maps\mp\bots\_bot_utility::keyCodeToString( 12 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 18 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 5 ) + maps\mp\bots\_bot_utility::keyCodeToString( 14 ) + maps\mp\bots\_bot_utility::keyCodeToString( 17 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 1 ) + maps\mp\bots\_bot_utility::keyCodeToString( 14 ) + maps\mp\bots\_bot_utility::keyCodeToString( 19 ) + maps\mp\bots\_bot_utility::keyCodeToString( 18 ) + maps\mp\bots\_bot_utility::keyCodeToString( 26 ) );
+		}
+
+		self.spamdelay = undefined;
+		wait randomint( 5 );
+		self.talking = false;
+	}
+}
+
+/*
+	endgame_chat
+*/
+endgame_chat()
+{
+	self endon( "disconnect" );
+
+	wait ( randomint( 6 ) + randomint( 6 ) );
+	b = -1;
+	w = 999999999;
+	winner = undefined;
+	loser = undefined;
+
+	for ( i = 0; i < level.players.size; i++ )
+	{
+		player = level.players[i];
+
+		if ( player.pers["score"] > b )
+		{
+			winner = player;
+			b = player.pers["score"];
+		}
+
+		if ( player.pers["score"] < w )
+		{
+			loser = player;
+			w = player.pers["score"];
+		}
+	}
+
+	if ( level.teamBased )
+	{
+		winningteam = maps\mp\gametypes\_gamescore::getWinningTeam();
+
+		if ( self.pers["team"] == winningteam )
+		{
+			switch ( randomint( 21 ) )
+			{
+				case 0:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha what a game" );
+					break;
+
+				case 1:
+					self BotDoChat( 20, "xDDDDDDDDDD LOL HAHAHA FUN!" );
+					break;
+
+				case 3:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "That was fun" );
+					break;
+
+				case 4:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol my team always wins!" );
+					break;
+
+				case 5:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha if i am on " + winningteam + " my team always wins!" );
+					break;
+
+				case 2:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg" );
+					break;
+
+				case 6:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "GGA, our team was awesome!" );
+					break;
+
+				case 7:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers["team"] + " always wins!!" );
+					break;
+
+				case 8:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "WOW that was EPIC!" );
+					break;
+
+				case 9:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Hackers lost haha noobs" );
+					break;
+
+				case 10:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice game!! Good job team!" );
+					break;
+
+				case 11:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "GGA, Well done team!" );
+					break;
+
+				case 12:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL! camper noobs lose" );
+					break;
+
+				case 13:
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "owned." );
+					break;
+
+				case 14:
+					self BotDoChat( 20, "lool we won!!" );
+					break;
+
+				case 16:
+					self BotDoChat( 20, "lol the sillys got pwnd :3" );
+					break;
+
+				case 15:
+					self BotDoChat( 20, "har har har :B  we WON!" );
+					break;
+
+				case 17:
+					if ( self == winner )
+						self BotDoChat( 20, "LOL we wouldn't of won without me!" );
+					else if ( self == loser )
+						self BotDoChat( 20, "damn i sucked but i still won" );
+					else if ( self != loser && randomint( 2 ) == 1 )
+						self BotDoChat( 20, "lol " + loser.name + " sucked hard!" );
+					else if ( self != winner )
+						self BotDoChat( 20, "wow " + winner.name + " did very well!" );
+
+					break;
+
+				case 18:
+					if ( self == winner )
+						self BotDoChat( 20, "I'm the VERY BEST!" );
+					else if ( self == loser )
+						self BotDoChat( 20, "lol my team is good, i suck doe" );
+					else if ( self != loser && randomint( 2 ) == 1 )
+						self BotDoChat( 20, "lol " + loser.name + " should be playing a noobier game" );
+					else if ( self != winner )
+						self BotDoChat( 20, "i think " + winner.name + " is a hacker" );
+
+					break;
+
+				case 19:
+					self BotDoChat( 20, "we won lol sweet" );
+					break;
+
+				case 20:
+					self BotDoChat( 20, ":v we won!" );
+					break;
+			}
+		}
+		else
+		{
+			if ( winningteam != "none" )
+			{
+				switch ( randomint( 21 ) )
+				{
+					case 0:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Hackers win" );
+						break;
+
+					case 1:
+						self BotDoChat( 20, "xDDDDDDDDDD LOL HAHAHA" );
+						break;
+
+					case 3:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "That wasn't fun" );
+						break;
+
+					case 4:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Wow my team SUCKS!" );
+						break;
+
+					case 5:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers["team"] + " always loses!!" );
+						break;
+
+					case 2:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg" );
+						break;
+
+					case 6:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "bg" );
+						break;
+
+					case 7:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vbg" );
+						break;
+
+					case 8:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "WOW that was EPIC!" );
+						break;
+
+					case 9:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Good game" );
+						break;
+
+					case 10:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Bad game" );
+						break;
+
+					case 11:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "very bad game" );
+						break;
+
+					case 12:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "campers win" );
+						break;
+
+					case 13:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "CAMPER NOOBS!!" );
+						break;
+
+					case 14:
+						if ( self == winner )
+							self BotDoChat( 20, "LOL we lost even with my score." );
+						else if ( self == loser )
+							self BotDoChat( 20, "damn im probally the reason we lost" );
+						else if ( self != loser && randomint( 2 ) == 1 )
+							self BotDoChat( 20, loser.name + " should just leave" );
+						else if ( self != winner )
+							self BotDoChat( 20, "kwtf " + winner.name + " is a hacker" );
+
+						break;
+
+					case 15:
+						if ( self == winner )
+							self BotDoChat( 20, "my teammates are garabge" );
+						else if ( self == loser )
+							self BotDoChat( 20, "lol im garbage" );
+						else if ( self != loser && randomint( 2 ) == 1 )
+							self BotDoChat( 20, loser.name + " sux" );
+						else if ( self != winner )
+							self BotDoChat( 20, winner.name + " is a noob!" );
+
+						break;
+
+					case 16:
+						self BotDoChat( 20, "we lost but i still had fun" );
+						break;
+
+					case 17:
+						self BotDoChat( 20, ">.> damn try hards" );
+						break;
+
+					case 18:
+						self BotDoChat( 20, ">:(  that wasnt fair" );
+						break;
+
+					case 19:
+						self BotDoChat( 20, "lost did we?" );
+						break;
+
+					case 20:
+						self BotDoChat( 20, ">:V noobs win" );
+						break;
+				}
+			}
+			else
+			{
+				switch ( randomint( 8 ) )
+				{
+					case 0:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg" );
+						break;
+
+					case 1:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "bg" );
+						break;
+
+					case 2:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vbg" );
+						break;
+
+					case 3:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vgg" );
+						break;
+
+					case 4:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg no rm" );
+						break;
+
+					case 5:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "ggggggggg" );
+						break;
+
+					case 6:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "good game" );
+						break;
+
+					case 7:
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gee gee" );
+						break;
+				}
+			}
+		}
+	}
+	else
+	{
+		switch ( randomint( 20 ) )
+		{
+			case 0:
+				if ( self == winner )
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha Suck it, you all just got pwnd!" );
+				else if ( self == loser )
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol i Sucked in this game, just look at my score!" );
+				else if ( self != loser && randomint( 2 ) == 1 )
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gga, Bad luck " + loser.name );
+				else if ( self != winner )
+					self BotDoChat( 20, "This game sucked, " + winner.name + " is such a hacker!!" );
+
+				break;
+
+			case 1:
+				if ( self == winner )
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL i just wasted you all!! Whoot whoot!" );
+				else if ( self == loser )
+					self BotDoChat( 20, "GGA i suck, Nice score " + winner.name );
+				else if ( self != loser && randomint( 2 ) == 1 )
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Rofl, " + loser.name + " dude, you suck!!" );
+				else if ( self != winner )
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice Score " + winner.name + ", how did you get to be so good?" );
+
+				break;
+
+			case 2:
+				if ( self == winner )
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL i just wasted you all!! Whoot whoot!" );
+				else if ( self == loser )
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "nice wallhacks " + winner.name );
+				else if ( self != loser && randomint( 2 ) == 1 )
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol atleast i did better then " + loser.name );
+				else if ( self != winner )
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "lolwtf " + winner.name );
+
+				break;
+
+			case 3:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gee gee" );
+				break;
+
+			case 4:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "WOW that was EPIC!" );
+				break;
+
+			case 5:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice Game!" );
+				break;
+
+			case 6:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "good game" );
+				break;
+
+			case 7:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gga  c  u  all later" );
+				break;
+
+			case 8:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "bg" );
+				break;
+
+			case 9:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "GG" );
+				break;
+
+			case 10:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg" );
+				break;
+
+			case 11:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vbg" );
+				break;
+
+			case 12:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gga" );
+				break;
+
+			case 13:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "BG" );
+				break;
+
+			case 14:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "stupid map" );
+				break;
+
+			case 15:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "ffa sux" );
+				break;
+
+			case 16:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + ":3 i had fun" );
+				break;
+
+			case 17:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + ":P nubs are playin" );
+				break;
+
+			case 18:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "nub nub nub thx 4 the nubs" );
+				break;
+
+			case 19:
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "damn campers" );
+				break;
+		}
+	}
+}
+
+/*
+	bot_onnukecall_watch
+*/
+bot_onnukecall_watch()
+{
+	self endon( "disconnect" );
+
+	switch ( randomint( 4 ) )
+	{
+		case 0:
+			if ( level.nukeInfo.player != self )
+				self BotDoChat( 30, "Wow who got a nuke?" );
+			else
+				self BotDoChat( 30, "NUUUUUUKKKKKKEEEEEE!!!! :D" );
+
+			break;
+
+		case 1:
+			if ( level.nukeInfo.player != self )
+				self BotDoChat( 30, "lol " + level.nukeInfo.player.name + " is a hacker" );
+			else
+				self BotDoChat( 30, "im the best!" );
+
+			break;
+
+		case 2:
+			self BotDoChat( 30, "woah, that nuke is like much wow" );
+			break;
+
+		case 3:
+			if ( level.nukeInfo.team != self.team )
+				self BotDoChat( 30, "man my team sucks ):" );
+			else
+				self BotDoChat( 30, "man my team is good lol" );
+
+			break;
 	}
 }
 
@@ -313,7 +1073,9 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 40:
-			message = ( "Man, I sure love my " + getBaseWeaponName( victim.attackerData[self.guid].weapon ) + "!" );
+			if ( isDefined( victim.attackerData[self.guid] ) && isDefined( victim.attackerData[self.guid].weapon ) )
+				message = ( "Man, I sure love my " + getBaseWeaponName( victim.attackerData[self.guid].weapon ) + "!" );
+
 			break;
 
 		case 41:
@@ -322,24 +1084,7 @@ bot_chat_killed_watch( victim )
 	}
 
 	wait ( randomint( 3 ) + 1 );
-	self BotDoChat( 10, message );
-}
-
-/*
-	death
-*/
-start_death_watch()
-{
-	self endon( "disconnect" );
-
-	for ( ;; )
-	{
-		self waittill( "death" );
-
-		self thread bot_chat_death_watch( self.lastAttacker, self.bots_lastKS );
-
-		self.bots_lastKS = 0;
-	}
+	self BotDoChat( 5, message );
 }
 
 /*
@@ -598,7 +1343,9 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 60:
-			message = "Wow! Nice " + getBaseWeaponName( self.attackerData[killer.guid].weapon ) + " you got there, " + killer.name + "!";
+			if ( isDefined( self.attackerData[killer.guid] ) && isDefined( self.attackerData[killer.guid].weapon ) )
+				message = "Wow! Nice " + getBaseWeaponName( self.attackerData[killer.guid].weapon ) + " you got there, " + killer.name + "!";
+
 			break;
 
 		case 61:
@@ -631,39 +1378,7 @@ bot_chat_death_watch( killer, last_ks )
 	}
 
 	wait ( randomint( 3 ) + 1 );
-	self BotDoChat( 15, message );
-}
-
-/*
-	Starts things for the bot
-*/
-start_chat_watch()
-{
-	self endon( "disconnect" );
-
-	for ( ;; )
-	{
-		self waittill( "bot_chat", msg, a, b, c, d, e, f, g );
-
-		switch ( msg )
-		{
-			case "revive":
-				self thread bot_chat_revive_watch( a, b, c, d, e, f, g );
-				break;
-
-			case "killcam":
-				self thread bot_chat_killcam_watch( a, b, c, d, e, f, g );
-				break;
-
-			case "stuck":
-				self thread bot_chat_stuck_watch( a, b, c, d, e, f, g );
-				break;
-
-			case "tube":
-				self thread bot_chat_tube_watch( a, b, c, d, e, f, g );
-				break;
-		}
-	}
+	self BotDoChat( 8, message );
 }
 
 /*
@@ -720,7 +1435,7 @@ bot_chat_killcam_watch( state, b, c, d, e, f, g )
 			switch ( randomInt( 2 ) )
 			{
 				case 0:
-					self BotDoChat( 3, "WTF?!?!?!! Dude youre a hacker and a half!!" );
+					self BotDoChat( 2, "WTF?!?!?!! Dude youre a hacker and a half!!" );
 					break;
 
 				case 1:
@@ -734,11 +1449,11 @@ bot_chat_killcam_watch( state, b, c, d, e, f, g )
 			switch ( randomInt( 2 ) )
 			{
 				case 0:
-					self BotDoChat( 3, "Wow... Im reporting you!!!" );
+					self BotDoChat( 1, "Wow... Im reporting you!!!" );
 					break;
 
 				case 1:
-					self BotDoChat( 2, "Got it on fraps!" );
+					self BotDoChat( 1, "Got it on fraps!" );
 					break;
 			}
 
@@ -828,6 +1543,357 @@ bot_chat_tube_watch( state, tubeWp, tubeWeap, d, e, f, g )
 					break;
 			}
 
+			break;
+	}
+}
+
+/*
+	bot_chat_killstreak_watch( streakName, b, c, d, e, f, g )
+*/
+bot_chat_killstreak_watch( state, streakName, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "call":
+			switch ( streakName )
+			{
+				case "helicopter_flares":
+					switch ( randomint( 1 ) )
+					{
+						case 0:
+							self BotDoChat( 100, "Nice! I got the paves!" );
+							break;
+					}
+
+					break;
+
+				case "emp":
+					switch ( randomint( 2 ) )
+					{
+						case 0:
+							self BotDoChat( 100, "Wow, wasn't expecting on getting an EMP." );
+							break;
+
+						case 1:
+							self BotDoChat( 100, "You don't see an EMP everyday!" );
+							break;
+					}
+
+					break;
+
+				case "nuke":
+					switch ( randomint( 8 ) )
+					{
+						case 0:
+							self BotDoChat( 100, "NUUUKE" );
+							break;
+
+						case 1:
+							self BotDoChat( 100, "lol sweet nuke" );
+							break;
+
+						case 2:
+							self BotDoChat( 100, "NUUUUUUKKKKKKEEEEEE!!!!" );
+							break;
+
+						case 3:
+							self BotDoChat( 100, "YEEEEEEEES!!" );
+							break;
+
+						case 4:
+							self BotDoChat( 100, "sweet I get a nuke and my team is noob" );
+							break;
+
+						case 5:
+							self BotDoChat( 100, "GET NUKED NERDS!!!!" );
+							break;
+
+						case 6:
+							self BotDoChat( 100, "NUKEM NOW!!!! NUKEEEEE!" );
+							break;
+
+						case 7:
+							self BotDoChat( 100, "Get nuked kids!" );
+							break;
+					}
+
+					break;
+
+				case "ac130":
+					switch ( randomint( 5 ) )
+					{
+						case 0:
+							self BotDoChat( 100, "^3Time to ^1klap ^3some kids!" );
+							break;
+
+						case 1:
+							self BotDoChat( 100, "Stingers are not welcome! AC130 rules all!" );
+							break;
+
+						case 2:
+							self BotDoChat( 100, "Bahahahahahaaa! Time to rule the map with AC130!" );
+							break;
+
+						case 3:
+							self BotDoChat( 100, "ac130 Madness!" );
+							break;
+
+						case 4:
+							self BotDoChat( 100, "Say hello to my little friend, ^6AC130!" );
+							break;
+					}
+
+					break;
+
+				case "helicopter_minigun":
+					switch ( randomint( 7 ) )
+					{
+						case 0:
+							self BotDoChat( 100, "Eat my Chopper Gunner!!" );
+							break;
+
+						case 1:
+							self BotDoChat( 100, "and here comes the ^1PAIN!" );
+							break;
+
+						case 2:
+							self BotDoChat( 100, "Awwwww Yeah! Time to create choas in 40 seconds flat." );
+							break;
+
+						case 3:
+							self BotDoChat( 100, "Woot! Got my chopper gunner!" );
+							break;
+
+						case 4:
+							self BotDoChat( 100, "Wewt got my choppa!" );
+							break;
+
+						case 5:
+							self BotDoChat( 100, "Time to spawn kill with the OP chopper!" );
+							break;
+
+						case 6:
+							self BotDoChat( 100, "GET TO DA CHOPPA!!" );
+							break;
+					}
+
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	self thread bot_chat_crate_cap_watch( a, b, c, d, e, f, g )
+*/
+bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "go":
+			switch ( randomint( 2 ) )
+			{
+				case 0:
+					if ( aircare.owner == self )
+						self BotDoChat( 25, "going to my carepackage" );
+					else
+						self BotDoChat( 25, "going to " + aircare.owner.name + "'s carepackage" );
+
+					break;
+
+				case 1:
+					self BotDoChat( 25, "going to this carepackage" );
+					break;
+			}
+
+			break;
+
+		case "start":
+			switch ( randomint( 2 ) )
+			{
+				case 0:
+					if ( aircare.owner == self )
+						self BotDoChat( 10, "taking my carepackage" );
+					else
+						self BotDoChat( 10, "taking " + aircare.owner.name + "'s carepackage" );
+
+					break;
+
+				case 1:
+					self BotDoChat( 10, "taking this carepackage" );
+					break;
+			}
+
+			break;
+
+		case "stop":
+			if ( aircare.owner == self )
+			{
+				switch ( randomint( 6 ) )
+				{
+					case 0:
+						self BotDoChat( 10, "Pheww... Got my carepackage" );
+						break;
+
+					case 1:
+						self BotDoChat( 10, "lolnoobs i got my carepackage. what now!?" );
+						break;
+
+					case 2:
+						self BotDoChat( 10, "holy cow! that was a close one!" );
+						break;
+
+					case 3:
+						self BotDoChat( 10, "lol u sillys. i got my care package" );
+						break;
+
+					case 4:
+						self BotDoChat( 10, ":3 i got my package" );
+						break;
+
+					case 5:
+						self BotDoChat( 10, ":3 i got my " + aircare.crateType );
+						break;
+				}
+			}
+			else
+			{
+				switch ( randomint( 5 ) )
+				{
+					case 0:
+						self BotDoChat( 10, "LOL! (10-101) I took " + aircare.owner.name + "'s carepackage." );
+						break;
+
+					case 1:
+						self BotDoChat( 10, "lolsweet just found a carepackage, just for me!" );
+						break;
+
+					case 2:
+						self BotDoChat( 10, "I heard " + aircare.owner.name + " owed me a carepackage. Thanks lol." );
+						break;
+
+					case 3:
+						self BotDoChat( 10, ">;3 i took your care package! xDD" );
+						break;
+
+					case 4:
+						self BotDoChat( 10, "hahaah jajaja i took your " + aircare.crateType );
+						break;
+				}
+			}
+
+			break;
+
+		case "captured":
+			switch ( randomint( 5 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "sad... gf carepackage" );
+					break;
+
+				case 1:
+					self BotDoChat( 10, "WTF MAN! THAT WAS MINE." );
+					break;
+
+				case 2:
+					self BotDoChat( 10, "Wow wtf " + player.name + ", i worked hard for that carepackage..." );
+					break;
+
+				case 3:
+					self BotDoChat( 10, ">.< " + player.name + ", fine take my skill package." );
+					break;
+
+				case 4:
+					self BotDoChat( 10, "Wow! there goes my " + aircare.crateType + "!" );
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_attack_vehicle_watch( a, b, c, d, e, f, g )
+*/
+bot_chat_attack_vehicle_watch( state, vehicle, rocketAmmo, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "start":
+			switch ( randomint( 14 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "Not on my watch..." );
+					break;
+
+				case 1:
+					self BotDoChat( 25, "Take down aircraft I am" );
+					break;
+
+				case 2:
+					self BotDoChat( 25, "^" + ( randomint( 6 ) + 1 ) + "i hate killstreaks" );
+					break;
+
+				case 3:
+					self BotDoChat( 25, "Killstreaks ruin this game!!" );
+					break;
+
+				case 4:
+					self BotDoChat( 25, "killstreaks sux" );
+					break;
+
+				case 5:
+					self BotDoChat( 25, "keep the killstreaks comin'" );
+					break;
+
+				case 6:
+					self BotDoChat( 25, "lol see that killstreak? its going to go BOOM!" );
+					break;
+
+				case 7:
+					self BotDoChat( 25, "^" + ( randomint( 6 ) + 1 ) + "Lol I bet that noob used hardline to get that streak." );
+					break;
+
+				case 8:
+					self BotDoChat( 25, "WOW HOW DO YOU GET THAT?? ITS GONE NOW." );
+					break;
+
+				case 9:
+					self BotDoChat( 25, "HAHA say goodbye to your killstreak" );
+					break;
+
+				case 10:
+					self BotDoChat( 25, "All your effort is gone now." );
+					break;
+
+				case 11:
+					self BotDoChat( 25, "I hope there are flares on that killstreak." );
+					break;
+
+				case 12:
+					self BotDoChat( 25, "lol u silly, i'm taking down killstreaks :3 xDD" );
+					break;
+
+				case 13:
+					weap = rocketAmmo;
+
+					if ( !isDefined( weap ) )
+						weap = self getCurrentWeapon();
+
+					self BotDoChat( 25, "Im going to takedown your ks with my " + getBaseWeaponName( weap ) );
+					break;
+			}
+
+			break;
+
+		case "stop":
 			break;
 	}
 }

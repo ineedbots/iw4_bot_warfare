@@ -4159,14 +4159,14 @@ bot_target_vehicle_loop()
 	if ( !isDefined( target ) )
 		return;
 
-	self BotNotifyBotChat( "attack_vehicle", "start", target );
+	self BotNotifyBotChat( "attack_vehicle", "start", target, rocketAmmo );
 
 	self SetScriptEnemy( target, ( 0, 0, 0 ) );
 	self bot_attack_vehicle( target );
 	self ClearScriptEnemy();
 	self notify( "bot_force_check_switch" );
 
-	self BotNotifyBotChat( "attack_vehicle", "stop", target );
+	self BotNotifyBotChat( "attack_vehicle", "stop", target, rocketAmmo );
 }
 
 /*

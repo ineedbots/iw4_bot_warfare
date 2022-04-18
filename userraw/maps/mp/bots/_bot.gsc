@@ -399,6 +399,23 @@ doNotifyOnAirdrop()
 
 	self.doingPhysics = false;
 	self.owner notify( "crate_physics_done" );
+
+	self thread onCarepackageCaptured();
+}
+
+/*
+	Waits to be captured
+*/
+onCarepackageCaptured()
+{
+	self endon( "death" );
+
+	self waittill( "captured", player );
+
+	if ( isDefined( self.owner ) && self.owner is_bot() )
+	{
+		self.owner BotNotifyBotChat( "crate_cap", "captured", self, player );
+	}
 }
 
 /*
@@ -627,7 +644,7 @@ diffBots_loop()
 		if ( !player is_bot() )
 			continue;
 
-		player.pers["bots"]["skill"]["base"] = int(clamp(player.pers["bots"]["skill"]["base"], GetDvarInt("bots_skill_min"), GetDvarInt("bots_skill_max")));
+		player.pers["bots"]["skill"]["base"] = int( clamp( player.pers["bots"]["skill"]["base"], GetDvarInt( "bots_skill_min" ), GetDvarInt( "bots_skill_max" ) ) );
 	}
 }
 
