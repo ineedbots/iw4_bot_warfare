@@ -204,6 +204,10 @@ start_chat_watch()
 			case "attack_vehicle":
 				self thread bot_chat_attack_vehicle_watch( a, b, c, d, e, f, g );
 				break;
+
+			case "follow_threat":
+				self thread bot_chat_follow_threat_watch( a, b, c, d, e, f, g );
+				break;
 		}
 	}
 }
@@ -1891,6 +1895,23 @@ bot_chat_attack_vehicle_watch( state, vehicle, rocketAmmo, d, e, f, g )
 					break;
 			}
 
+			break;
+
+		case "stop":
+			break;
+	}
+}
+
+/*
+	bot_chat_follow_threat_watch( a, b, c, d, e, f, g )
+*/
+bot_chat_follow_threat_watch( state, threat, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "start":
 			break;
 
 		case "stop":
