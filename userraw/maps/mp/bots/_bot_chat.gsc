@@ -216,6 +216,18 @@ start_chat_watch()
 			case "follow":
 				self thread bot_chat_follow_watch( a, b, c, d, e, f, g );
 				break;
+
+			case "equ":
+				self thread bot_chat_equ_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "nade":
+				self thread bot_chat_nade_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "jav":
+				self thread bot_chat_jav_watch( a, b, c, d, e, f, g );
+				break;
 		}
 	}
 }
@@ -1562,7 +1574,7 @@ bot_chat_tube_watch( state, tubeWp, tubeWeap, d, e, f, g )
 /*
 	bot_chat_killstreak_watch( streakName, b, c, d, e, f, g )
 */
-bot_chat_killstreak_watch( state, streakName, c, d, e, f, g )
+bot_chat_killstreak_watch( state, streakName, campSpot, d, e, f, g )
 {
 	self endon( "disconnect" );
 
@@ -1694,6 +1706,9 @@ bot_chat_killstreak_watch( state, streakName, c, d, e, f, g )
 					break;
 			}
 
+			break;
+
+		case "camp":
 			break;
 	}
 }
@@ -2031,6 +2046,85 @@ bot_chat_follow_watch( state, player, time, d, e, f, g )
 					break;
 			}
 
+			break;
+	}
+}
+
+/*
+	bot_chat_equ_watch
+*/
+bot_chat_equ_watch( state, wp, weap, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "go":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "going to place a " + getBaseWeaponName( weap ) );
+					break;
+			}
+
+			break;
+
+		case "start":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "placed a " + getBaseWeaponName( weap ) );
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_nade_watch
+*/
+bot_chat_nade_watch( state, wp, weap, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "go":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "going to throw a " + getBaseWeaponName( weap ) );
+					break;
+			}
+
+			break;
+
+		case "start":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "threw a " + getBaseWeaponName( weap ) );
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_jav_watch
+*/
+bot_chat_jav_watch( state, wp, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "go":
+			break;
+
+		case "start":
 			break;
 	}
 }
