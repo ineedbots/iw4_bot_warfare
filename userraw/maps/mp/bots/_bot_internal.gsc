@@ -2061,6 +2061,7 @@ doWalkScriptNotify()
 */
 doWalk( goal, dist, isScriptGoal )
 {
+	level endon ( "game_ended" );
 	self endon( "kill_goal" );
 	self endon( "goal_internal" ); //so that the watchOnGoal notify can happen same frame, not a frame later
 
