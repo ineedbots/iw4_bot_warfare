@@ -627,7 +627,7 @@ diffBots_loop()
 		if ( !player is_bot() )
 			continue;
 
-		player.pers["bots"]["skill"]["base"] = clamp(player.pers["bots"]["skill"]["base"], GetDvarInt("bots_skill_min"), GetDvarInt("bots_skill_max"));
+		player.pers["bots"]["skill"]["base"] = int(clamp(player.pers["bots"]["skill"]["base"], GetDvarInt("bots_skill_min"), GetDvarInt("bots_skill_max")));
 	}
 }
 
