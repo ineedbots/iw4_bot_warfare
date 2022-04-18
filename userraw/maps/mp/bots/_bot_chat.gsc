@@ -240,6 +240,26 @@ start_chat_watch()
 			case "tbag":
 				self thread bot_chat_tbag_watch( a, b, c, d, e, f, g );
 				break;
+
+			case "revenge":
+				self thread bot_chat_revenge_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "heard_target":
+				self thread bot_chat_heard_target_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "uav_target":
+				self thread bot_chat_uav_target_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "attack_equ":
+				self thread bot_chat_attack_equ_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "turret_attack":
+				self thread bot_chat_turret_attack_watch( a, b, c, d, e, f, g );
+				break;
 		}
 	}
 }
@@ -2269,6 +2289,166 @@ bot_chat_rage_watch( state, b, c, d, e, f, g )
 					break;
 			}
 
+			break;
+	}
+}
+
+/*
+	bot_chat_revenge_watch
+*/
+bot_chat_revenge_watch( state, loc, killer, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "start":
+			switch ( randomint( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "Im going to check out my death location." );
+					break;
+			}
+
+			break;
+
+		case "stop":
+			switch ( randomint( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "i checked out my deathlocation..." );
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_heard_target_watch
+*/
+bot_chat_heard_target_watch( state, heard, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "start":
+			switch ( randomint( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 5, "I think I hear " + heard.name + "..." );
+					break;
+			}
+
+			break;
+
+		case "stop":
+			switch ( randomint( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 5, "Well i checked out " + heard.name + "'s location..." );
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_uav_target_watch
+*/
+bot_chat_uav_target_watch( state, heard, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "start":
+			break;
+
+		case "stop":
+			break;
+	}
+}
+
+/*
+	bot_chat_turret_attack_watch
+*/
+bot_chat_turret_attack_watch( state, turret, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "go":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "going to this sentry..." );
+					break;
+			}
+
+			break;
+
+		case "start":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "attacking this sentry..." );
+					break;
+			}
+
+			break;
+
+		case "stop":
+			break;
+	}
+}
+
+/*
+	bot_chat_attack_equ_watch
+*/
+bot_chat_attack_equ_watch( state, equ, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "go_ti":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "going to this ti..." );
+					break;
+			}
+
+			break;
+
+		case "camp_ti":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "lol im camping this ti!" );
+					break;
+			}
+
+			break;
+
+		case "trigger_ti":
+			switch ( randomInt( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 10, "lol i destoryed this ti!" );
+					break;
+			}
+
+			break;
+
+		case "start":
+			break;
+
+		case "stop":
 			break;
 	}
 }
