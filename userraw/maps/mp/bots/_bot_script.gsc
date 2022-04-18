@@ -18,11 +18,14 @@ added()
 {
 	self endon( "disconnect" );
 
-	self setPlayerData( "experience", self bot_get_rank() );
-	self setPlayerData( "prestige", self bot_get_prestige() );
+	if ( !getDvarInt( "developer_script" ) )
+	{
+		self setPlayerData( "experience", self bot_get_rank() );
+		self setPlayerData( "prestige", self bot_get_prestige() );
 
-	self setPlayerData( "cardTitle", random( getCardTitles() ) );
-	self setPlayerData( "cardIcon", random( getCardIcons() ) );
+		self setPlayerData( "cardTitle", random( getCardTitles() ) );
+		self setPlayerData( "cardIcon", random( getCardIcons() ) );
+	}
 
 	self setClasses();
 	self setKillstreaks();
@@ -737,21 +740,24 @@ setClasses()
 		if ( perk1 != "specialty_bling" || !isDefined( self.pers["bots"]["unlocks"]["upgraded_specialty_bling"] ) )
 			secondaryAtts[1] = "none";
 
-		self setPlayerData( "customClasses", i, "weaponSetups", 0, "weapon", primary );
-		self setPlayerData( "customClasses", i, "weaponSetups", 0, "attachment", 0, primaryAtts[0] );
-		self setPlayerData( "customClasses", i, "weaponSetups", 0, "attachment", 1, primaryAtts[1] );
-		self setPlayerData( "customClasses", i, "weaponSetups", 0, "camo", primaryCamo );
+		if ( !getDvarInt( "developer_script" ) )
+		{
+			self setPlayerData( "customClasses", i, "weaponSetups", 0, "weapon", primary );
+			self setPlayerData( "customClasses", i, "weaponSetups", 0, "attachment", 0, primaryAtts[0] );
+			self setPlayerData( "customClasses", i, "weaponSetups", 0, "attachment", 1, primaryAtts[1] );
+			self setPlayerData( "customClasses", i, "weaponSetups", 0, "camo", primaryCamo );
 
-		self setPlayerData( "customClasses", i, "weaponSetups", 1, "weapon", secondary );
-		self setPlayerData( "customClasses", i, "weaponSetups", 1, "attachment", 0, secondaryAtts[0] );
-		self setPlayerData( "customClasses", i, "weaponSetups", 1, "attachment", 1, secondaryAtts[1] );
+			self setPlayerData( "customClasses", i, "weaponSetups", 1, "weapon", secondary );
+			self setPlayerData( "customClasses", i, "weaponSetups", 1, "attachment", 0, secondaryAtts[0] );
+			self setPlayerData( "customClasses", i, "weaponSetups", 1, "attachment", 1, secondaryAtts[1] );
 
-		self setPlayerData( "customClasses", i, "perks", 0, equipment );
-		self setPlayerData( "customClasses", i, "perks", 1, perk1 );
-		self setPlayerData( "customClasses", i, "perks", 2, perk2 );
-		self setPlayerData( "customClasses", i, "perks", 3, perk3 );
-		self setPlayerData( "customClasses", i, "perks", 4, deathstreak );
-		self setPlayerData( "customClasses", i, "specialGrenade", tactical );
+			self setPlayerData( "customClasses", i, "perks", 0, equipment );
+			self setPlayerData( "customClasses", i, "perks", 1, perk1 );
+			self setPlayerData( "customClasses", i, "perks", 2, perk2 );
+			self setPlayerData( "customClasses", i, "perks", 3, perk3 );
+			self setPlayerData( "customClasses", i, "perks", 4, deathstreak );
+			self setPlayerData( "customClasses", i, "specialGrenade", tactical );
+		}
 	}
 }
 
@@ -871,9 +877,12 @@ setKillstreaks()
 	if ( killstreaks[2] == "" )
 		killstreaks[2] = "predator_missile";
 
-	self setPlayerData( "killstreaks", 0, killstreaks[0] );
-	self setPlayerData( "killstreaks", 1, killstreaks[1] );
-	self setPlayerData( "killstreaks", 2, killstreaks[2] );
+	if ( !getDvarInt( "developer_script" ) )
+	{
+		self setPlayerData( "killstreaks", 0, killstreaks[0] );
+		self setPlayerData( "killstreaks", 1, killstreaks[1] );
+		self setPlayerData( "killstreaks", 2, killstreaks[2] );
+	}
 }
 
 /*
@@ -1040,7 +1049,7 @@ doKillcamStuff()
 	self endon( "disconnect" );
 	self endon( "killcam_ended" );
 
-	self BotNotifyBotChat("killcam", "start");
+	self BotNotifyBotChat( "killcam", "start" );
 
 	wait 0.5 + randomInt( 3 );
 
@@ -1051,7 +1060,7 @@ doKillcamStuff()
 
 	self notify( "abort_killcam" );
 
-	self BotNotifyBotChat("killcam", "stop");
+	self BotNotifyBotChat( "killcam", "stop" );
 }
 
 /*
@@ -5508,7 +5517,7 @@ bot_sab_loop()
 		}
 
 		// lets go defuse
-			self BotNotifyBotChat( "sab", "go", "defuse" );
+		self BotNotifyBotChat( "sab", "go", "defuse" );
 
 		self.bot_lock_goal = true;
 

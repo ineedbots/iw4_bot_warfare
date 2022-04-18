@@ -16,15 +16,15 @@ init()
 initBufferedStats()
 {
 	self.bufferedStats = [];
-	self.bufferedStats[ "totalShots" ] = self getPlayerData( "totalShots" );	
-	self.bufferedStats[ "accuracy" ] = self getPlayerData( "accuracy" );	
-	self.bufferedStats[ "misses" ] = self getPlayerData( "misses" );	
-	self.bufferedStats[ "hits" ] = self getPlayerData( "hits" );	
-	self.bufferedStats[ "timePlayedAllies" ] = self getPlayerData( "timePlayedAllies" );	
-	self.bufferedStats[ "timePlayedOpfor" ] = self getPlayerData( "timePlayedOpfor" );	
-	self.bufferedStats[ "timePlayedOther" ] = self getPlayerData( "timePlayedOther" );	
-	self.bufferedStats[ "timePlayedTotal" ] = self getPlayerData( "timePlayedTotal" );	
-	
+	self.bufferedStats[ "totalShots" ] = self getPlayerData( "totalShots" );
+	self.bufferedStats[ "accuracy" ] = self getPlayerData( "accuracy" );
+	self.bufferedStats[ "misses" ] = self getPlayerData( "misses" );
+	self.bufferedStats[ "hits" ] = self getPlayerData( "hits" );
+	self.bufferedStats[ "timePlayedAllies" ] = self getPlayerData( "timePlayedAllies" );
+	self.bufferedStats[ "timePlayedOpfor" ] = self getPlayerData( "timePlayedOpfor" );
+	self.bufferedStats[ "timePlayedOther" ] = self getPlayerData( "timePlayedOther" );
+	self.bufferedStats[ "timePlayedTotal" ] = self getPlayerData( "timePlayedTotal" );
+
 	self.bufferedChildStats = [];
 	self.bufferedChildStats[ "round" ] = [];
 	self.bufferedChildStats[ "round" ][ "timePlayed" ] = self getPlayerData( "round", "timePlayed" );
@@ -60,10 +60,13 @@ Sets the value of the named stat
 statSet( dataName, value )
 {
 	assert( !isDefined( self.bufferedStats[ dataName ] ) ); // should use statGetBuffered consistently with statSetBuffered
-	
+
 	if ( !self rankingEnabled() )
 		return;
-	
+
+	if (getDvarInt("developer_script"))
+		return;
+
 	self SetPlayerData( dataName, value );
 }
 
@@ -75,12 +78,15 @@ Adds the passed value to the value of the named stat
 =============
 */
 statAdd( dataName, value )
-{	
+{
 	assert( !isDefined( self.bufferedStats[ dataName ] ) ); // should use statGetBuffered consistently with statSetBuffered
-	
+
 	if ( !self rankingEnabled() )
 		return;
-	
+
+	if (getDvarInt("developer_script"))
+		return;
+
 	curValue = self GetPlayerData( dataName );
 	self SetPlayerData( dataName, value + curValue );
 }
@@ -96,7 +102,10 @@ statSetChild( parent, child, value )
 {
 	if ( !self rankingEnabled() )
 		return;
-	
+
+	if (getDvarInt("developer_script"))
+		return;
+
 	self SetPlayerData( parent, child, value );
 }
 
@@ -107,7 +116,10 @@ statAddChild( parent, child, value )
 
 	if ( !self rankingEnabled() )
 		return;
-	
+
+	if (getDvarInt("developer_script"))
+		return;
+
 	curValue = self GetPlayerData( parent, child );
 	self SetPlayerData( parent, child, curValue + value );
 }
@@ -116,7 +128,7 @@ statAddChild( parent, child, value )
 statGetChildBuffered( parent, child )
 {
 	assert( isDefined( self.bufferedChildStats[ parent ][ child ] ) );
-	
+
 	return self.bufferedChildStats[ parent ][ child ];
 }
 
@@ -124,7 +136,7 @@ statGetChildBuffered( parent, child )
 statSetChildBuffered( parent, child, value )
 {
 	assert( isDefined( self.bufferedChildStats[ parent ][ child ] ) );
-	
+
 	if ( !self rankingEnabled() )
 		return;
 
@@ -138,7 +150,7 @@ statAddChildBuffered( parent, child, value )
 
 	if ( !self rankingEnabled() )
 		return;
-	
+
 	curValue = statGetChildBuffered( parent, child );
 	statSetChildBuffered( parent, child, curValue + value );
 }
@@ -154,7 +166,7 @@ Returns the value of the named stat
 statGetBuffered( dataName )
 {
 	assert( isDefined( self.bufferedStats[ dataName ] ) );
-	
+
 	return self.bufferedStats[ dataName ];
 }
 
@@ -171,7 +183,7 @@ statSetBuffered( dataName, value )
 
 	if ( !self rankingEnabled() )
 		return;
-	
+
 	self.bufferedStats[ dataName ] = value;
 }
 
@@ -183,12 +195,12 @@ Adds the passed value to the value of the named stat
 =============
 */
 statAddBuffered( dataName, value )
-{	
+{
 	assert( isDefined( self.bufferedStats[ dataName ] ) );
 
 	if ( !self rankingEnabled() )
 		return;
-	
+
 	curValue = statGetBuffered( dataName );
 	statSetBuffered( dataName, curValue + value );
 }
@@ -198,7 +210,7 @@ updateBufferedStats()
 {
 	// give the first player time to connect
 	wait ( 0.15 );
-	
+
 	nextToUpdate = 0;
 	while ( !level.gameEnded )
 	{
@@ -211,9 +223,9 @@ updateBufferedStats()
 
 		wait ( 2.0 );
 	}
-	
+
 	foreach ( player in level.players )
-		player writeBufferedStats();	
+		player writeBufferedStats();
 }
 
 
@@ -221,7 +233,7 @@ writeBufferedStats()
 {
 	if (getDvarInt("developer_script"))
 		return;
-	
+
 	foreach ( statName, statVal in self.bufferedStats )
 	{
 		self setPlayerData( statName, statVal );
