@@ -228,6 +228,18 @@ start_chat_watch()
 			case "jav":
 				self thread bot_chat_jav_watch( a, b, c, d, e, f, g );
 				break;
+
+			case "throwback":
+				self thread bot_chat_throwback_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "rage":
+				self thread bot_chat_rage_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "tbag":
+				self thread bot_chat_tbag_watch( a, b, c, d, e, f, g );
+				break;
 		}
 	}
 }
@@ -376,6 +388,19 @@ start_startgame_watch()
 		case "gtnw":
 			self BotDoChat( 15, "global thermonuclear warfare!!!!!!!" );
 			break;
+	}
+
+	wait 2;
+
+	// check for nuke in killstreaks
+	if ( false )
+	{
+		switch ( randomint( 1 ) )
+		{
+			case 0:
+				self BotDoChat( 25, "I WILL TRY AND GET A NUKE!!!" );
+				break;
+		}
 	}
 }
 
@@ -1841,6 +1866,16 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			}
 
 			break;
+
+		case "unreachable":
+			switch ( randomint( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "i cant reach that carepackage!" );
+					break;
+			}
+
+			break;
 	}
 }
 
@@ -2125,6 +2160,115 @@ bot_chat_jav_watch( state, wp, c, d, e, f, g )
 			break;
 
 		case "start":
+			break;
+	}
+}
+
+/*
+	bot_chat_throwback_watch
+*/
+bot_chat_throwback_watch( state, nade, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "start":
+			switch ( randomint( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "i am going to throw back the grenade!" );
+					break;
+			}
+
+			break;
+
+		case "stop":
+			switch ( randomint( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 25, "i threw back the grenade!" );
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_tbag_watch
+*/
+bot_chat_tbag_watch( state, who, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "go":
+			switch ( randomint( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 50, "Im going to go tBag XD" );
+					break;
+			}
+
+			break;
+
+		case "start":
+			switch ( randomint( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 50, "Im going to tBag XD" );
+					break;
+			}
+
+			break;
+
+		case "stop":
+			switch ( randomint( 1 ) )
+			{
+				case 0:
+					self BotDoChat( 50, "Awwww yea... How do you like that? XD" );
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_rage_watch
+*/
+bot_chat_rage_watch( state, b, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( state )
+	{
+		case "start":
+			switch ( randomint( 5 ) )
+			{
+				case 0:
+					self BotDoChat( 80, "K this is not going as I planned." );
+					break;
+
+				case 1:
+					self BotDoChat( 80, "Screw this! I'm out." );
+					break;
+
+				case 2:
+					self BotDoChat( 80, "Have fun being owned." );
+					break;
+
+				case 3:
+					self BotDoChat( 80, "MY TEAM IS GARBAGE!" );
+					break;
+
+				case 4:
+					self BotDoChat( 80, "kthxbai hackers" );
+					break;
+			}
+
 			break;
 	}
 }

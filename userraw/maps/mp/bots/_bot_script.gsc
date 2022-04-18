@@ -3874,7 +3874,12 @@ bot_crate_think_loop( data )
 			self ClearScriptGoal();
 
 		if ( path != "goal" || !isDefined( crate ) || DistanceSquared( self.origin, crate.origin ) > radius * radius )
+		{
+			if ( isDefined( crate ) && path == "bad_path" )
+				self BotNotifyBotEvent( "crate_cap", "unreachable", crate );
+
 			return;
+		}
 	}
 
 	self BotNotifyBotEvent( "crate_cap", "start", crate );
