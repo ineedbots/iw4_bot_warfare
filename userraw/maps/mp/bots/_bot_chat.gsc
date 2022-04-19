@@ -1772,14 +1772,14 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			{
 				case 0:
 					if ( aircare.owner == self )
-						self BotDoChat( 25, "going to my carepackage" );
+						self BotDoChat( 5, "going to my carepackage" );
 					else
-						self BotDoChat( 25, "going to " + aircare.owner.name + "'s carepackage" );
+						self BotDoChat( 5, "going to " + aircare.owner.name + "'s carepackage" );
 
 					break;
 
 				case 1:
-					self BotDoChat( 25, "going to this carepackage" );
+					self BotDoChat( 5, "going to this carepackage" );
 					break;
 			}
 
@@ -1790,14 +1790,14 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			{
 				case 0:
 					if ( aircare.owner == self )
-						self BotDoChat( 10, "taking my carepackage" );
+						self BotDoChat( 15, "taking my carepackage" );
 					else
-						self BotDoChat( 10, "taking " + aircare.owner.name + "'s carepackage" );
+						self BotDoChat( 15, "taking " + aircare.owner.name + "'s carepackage" );
 
 					break;
 
 				case 1:
-					self BotDoChat( 10, "taking this carepackage" );
+					self BotDoChat( 15, "taking this carepackage" );
 					break;
 			}
 
