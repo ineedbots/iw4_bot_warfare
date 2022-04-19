@@ -3891,7 +3891,7 @@ bot_crate_think_loop( data )
 
 	waitTime = 3;
 
-	if ( isDefined( crate.owner ) && crate.owner == self )
+	if ( !isDefined( crate.owner ) || crate.owner == self )
 		waitTime = 0.5;
 
 	crate waittill_notify_or_timeout( "captured", waitTime );

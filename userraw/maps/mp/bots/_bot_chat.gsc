@@ -170,6 +170,7 @@ start_killed_watch()
 start_chat_watch()
 {
 	self endon( "disconnect" );
+	level endon ( "game_ended" );
 
 	for ( ;; )
 	{
@@ -931,41 +932,37 @@ bot_chat_streak( streakCount )
 
 	if ( streakCount == 25 )
 	{
-		if ( GetDvarInt( "bots_loadout_allow_op" ) )
+		if ( self.pers["lastEarnedStreak"] == "nuke" )
 		{
-			if ( self.pers["lastEarnedStreak"] == "nuke" )
+			switch ( randomint( 5 ) )
 			{
-				switch ( randomint( 5 ) )
-				{
-					case 0:
-						self BotDoChat( 100, "I GOT A NUKE!!" );
-						break;
+				case 0:
+					self BotDoChat( 100, "I GOT A NUKE!!" );
+					break;
 
-					case 1:
-						self BotDoChat( 100, "NUKEEEEEEEEEEEEEEEEE" );
-						break;
+				case 1:
+					self BotDoChat( 100, "NUKEEEEEEEEEEEEEEEEE" );
+					break;
 
-					case 2:
-						self BotDoChat( 100, "25 killstreak!!!" );
-						break;
+				case 2:
+					self BotDoChat( 100, "25 killstreak!!!" );
+					break;
 
-					case 3:
-						self BotDoChat( 100, "NNNNNUUUUUUUUUUKKKKEEE!!! UWDHAWIDMIOGHE" );
-						break;
+				case 3:
+					self BotDoChat( 100, "NNNNNUUUUUUUUUUKKKKEEE!!! UWDHAWIDMIOGHE" );
+					break;
 
-					case 4:
-						self BotDoChat( 100, "You guys are getting nuuuuuuked~ x3" );
-						break;
-				}
-			}
-			else
-			{
-				self BotDoChat( 100, "Come on! I would of had a nuke but I don't got it set..." );
+				case 4:
+					self BotDoChat( 100, "You guys are getting nuuuuuuked~ x3" );
+					break;
 			}
 		}
 		else
 		{
-			self BotDoChat( 100, "WOW.. I could have a nuke but dumb admin disabled it for bots." );
+			if ( GetDvarInt( "bots_loadout_allow_op" ) )
+				self BotDoChat( 100, "Come on! I would of had a nuke but I don't got it set..." );
+			else
+				self BotDoChat( 100, "WOW.. I could have a nuke but dumb admin disabled it for bots." );
 		}
 	}
 }
@@ -976,6 +973,9 @@ bot_chat_streak( streakCount )
 bot_chat_killed_watch( victim )
 {
 	self endon( "disconnect" );
+
+	if ( !isDefined( victim ) || !isDefined( victim.name ) )
+		return;
 
 	message = "";
 
@@ -1162,6 +1162,9 @@ bot_chat_killed_watch( victim )
 bot_chat_death_watch( killer, last_ks )
 {
 	self endon( "disconnect" );
+
+	if ( !isDefined( killer ) || !isDefined( killer.name ) )
+		return;
 
 	message = "";
 
@@ -1771,7 +1774,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			switch ( randomint( 2 ) )
 			{
 				case 0:
-					if ( aircare.owner == self )
+					if ( !isDefined( aircare.owner ) || aircare.owner == self )
 						self BotDoChat( 5, "going to my carepackage" );
 					else
 						self BotDoChat( 5, "going to " + aircare.owner.name + "'s carepackage" );
@@ -1789,7 +1792,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			switch ( randomint( 2 ) )
 			{
 				case 0:
-					if ( aircare.owner == self )
+					if ( !isDefined( aircare.owner ) || aircare.owner == self )
 						self BotDoChat( 15, "taking my carepackage" );
 					else
 						self BotDoChat( 15, "taking " + aircare.owner.name + "'s carepackage" );
@@ -1804,7 +1807,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			break;
 
 		case "stop":
-			if ( aircare.owner == self )
+			if ( !isDefined( aircare.owner ) || aircare.owner == self )
 			{
 				switch ( randomint( 6 ) )
 				{

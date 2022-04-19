@@ -366,9 +366,6 @@ addNotifyOnAirdrops_loop()
 	{
 		airdrop = dropCrates[i];
 
-		if ( !isDefined( airdrop.owner ) )
-			continue;
-
 		if ( isDefined( airdrop.doingPhysics ) )
 			continue;
 
@@ -398,7 +395,9 @@ doNotifyOnAirdrop()
 	self waittill( "physics_finished" );
 
 	self.doingPhysics = false;
-	self.owner notify( "crate_physics_done" );
+
+	if ( isDefined( self.owner ) )
+		self.owner notify( "crate_physics_done" );
 
 	self thread onCarepackageCaptured();
 }
