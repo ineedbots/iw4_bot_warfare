@@ -655,6 +655,8 @@ diffBots_loop()
 	}
 
 	playercount = level.players.size;
+	min_diff = GetDvarInt( "bots_skill_min" );
+	max_diff = GetDvarInt( "bots_skill_max" );
 
 	for ( i = 0; i < playercount; i++ )
 	{
@@ -663,7 +665,7 @@ diffBots_loop()
 		if ( !player is_bot() )
 			continue;
 
-		player.pers["bots"]["skill"]["base"] = int( clamp( player.pers["bots"]["skill"]["base"], GetDvarInt( "bots_skill_min" ), GetDvarInt( "bots_skill_max" ) ) );
+		player.pers["bots"]["skill"]["base"] = int( clamp( player.pers["bots"]["skill"]["base"], min_diff, max_diff ) );
 	}
 }
 
