@@ -2159,7 +2159,7 @@ movetowards( goal )
 
 				randomDir = self getRandomLargestStafe( stucks );
 
-				self BotNotifyBotEvent("stuck");
+				self BotNotifyBotEvent( "stuck" );
 
 				self botMoveTo( randomDir );
 				wait stucks;
@@ -2185,7 +2185,7 @@ movetowards( goal )
 			if ( distanceSquared( self.origin, lastOri ) < 32 * 32 )
 			{
 				// check if directly above or below
-				if ( abs( goal[2] - self.origin[2] ) > 64 && getConeDot( goal + ( 1, 1, 0 ), self.origin + ( -1, -1, 0 ), VectorToAngles( ( goal[0], goal[1], self.origin[2] ) - self.origin ) ) < 0.64 && DistanceSquared2D(self.origin, goal) < 32 * 32 )
+				if ( abs( goal[2] - self.origin[2] ) > 64 && getConeDot( goal + ( 1, 1, 0 ), self.origin + ( -1, -1, 0 ), VectorToAngles( ( goal[0], goal[1], self.origin[2] ) - self.origin ) ) < 0.64 && DistanceSquared2D( self.origin, goal ) < 32 * 32 )
 				{
 					stucks = 2;
 				}
@@ -2633,29 +2633,31 @@ bot_lookat( pos, time, vel, doAimPredict )
 
 	angles = VectorToAngles( ( pos - myEye ) - anglesToForward( myAngle ) );
 
-	X = ( angles[0] - myAngle[0] );
-
-	while ( X > 170.0 )
-		X = X - 360.0;
-
-	while ( X < -170.0 )
-		X = X + 360.0;
-
+	X = AngleClamp180( angles[0] - myAngle[0] );
 	X = X / steps;
 
-	Y = ( angles[1] - myAngle[1] );
-
-	while ( Y > 180.0 )
-		Y = Y - 360.0;
-
-	while ( Y < -180.0 )
-		Y = Y + 360.0;
-
+	Y = AngleClamp180( angles[1] - myAngle[1] );
 	Y = Y / steps;
 
 	for ( i = 0; i < steps; i++ )
 	{
-		myAngle = ( myAngle[0] + X, myAngle[1] + Y, 0 );
+		newX = myAngle[0] + X;
+
+		while ( newX < 0 )
+			newX += 360.0;
+
+		while ( newX >= 360.0 )
+			newX -= 360.0;
+
+		newY = myAngle[1] + Y;
+
+		while ( newY < 0 )
+			newY += 360.0;
+
+		while ( newY >= 360.0 )
+			newY -= 360.0;
+
+		myAngle = ( newX, newY, 0 );
 		self setPlayerAngles( myAngle );
 		wait 0.05;
 	}
