@@ -164,6 +164,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Pick up weapons from ground
   - Use static turrets in maps
   - Proper use of pred missile
+  - Bots in ac130 have viewport issues (engine)
 
 ## Credits
 - IW4x Team - https://github.com/XLabsProject/iw4x-client
