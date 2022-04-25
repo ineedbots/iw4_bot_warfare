@@ -472,8 +472,30 @@ spawned()
 	self thread walk();
 	self thread watchHoldBreath();
 	self thread watchGrenadeFire();
+	self thread watchPickupGun();
 
 	self notify( "bot_spawned" );
+}
+
+/*
+	watchPickupGun
+*/
+watchPickupGun()
+{
+	self endon( "disconnect" );
+	self endon( "death" );
+
+	for ( ;; )
+	{
+		wait 1;
+
+		weap = self GetCurrentWeapon();
+
+		if ( weap != "none" && self GetAmmoCount( weap ) )
+			continue;
+
+		self thread use( 0.5 );
+	}
 }
 
 /*
@@ -682,6 +704,7 @@ grenade_danager_loop()
 		if ( !bulletTracePassed( myEye, frag.origin, false, frag.grenade ) )
 			continue;
 
+		self BotNotifyBotEvent( "throwback", "stop", frag );
 		self thread frag();
 		break;
 	}
@@ -1435,8 +1458,13 @@ aim_loop()
 
 			if ( self.bot.isfraggingafter || self.bot.issmokingafter )
 				nadeAimOffset = dist / 3000;
-			else if ( curweap != "none" && weaponClass( curweap ) == "grenade" )
-				nadeAimOffset = dist / 16000;
+			else if ( curweap != "none" && ( weaponClass( curweap ) == "grenade" || curweap == "throwingknife_mp" ) )
+			{
+				if ( getWeaponClass( curweap ) == "weapon_projectile" )
+					nadeAimOffset = dist / 16000;
+				else
+					nadeAimOffset = dist / 3000;
+			}
 
 			if ( no_trace_time && ( !isDefined( self.bot.after_target ) || self.bot.after_target != target ) )
 			{
@@ -1572,8 +1600,13 @@ aim_loop()
 
 		if ( self.bot.isfraggingafter || self.bot.issmokingafter )
 			nadeAimOffset = dist / 3000;
-		else if ( curweap != "none" && weaponClass( curweap ) == "grenade" )
-			nadeAimOffset = dist / 16000;
+		else if ( curweap != "none" && ( weaponClass( curweap ) == "grenade" || curweap == "throwingknife_mp" ) )
+		{
+			if ( getWeaponClass( curweap ) == "weapon_projectile" )
+				nadeAimOffset = dist / 16000;
+			else
+				nadeAimOffset = dist / 3000;
+		}
 
 		aimpos = last_pos + ( 0, 0, self getEyeHeight() + nadeAimOffset );
 
@@ -1725,6 +1758,9 @@ canAds( dist, curweap )
 
 	if ( curweap == "none" )
 		return false;
+
+	if ( curweap == "c4_mp" )
+		return RandomInt( 2 );
 
 	if ( !getDvarInt( "bots_play_ads" ) )
 		return false;

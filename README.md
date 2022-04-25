@@ -161,10 +161,8 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Recoil for bots
   - Use proper activate button for bombs, carepackages, etc
   - Proper weapon swaps, including altmode
-  - Pick up weapons from ground
   - Use static turrets in maps
   - Proper use of pred missile
-  - Bots in ac130 have viewport issues (engine)
 
 ## Credits
 - IW4x Team - https://github.com/XLabsProject/iw4x-client
