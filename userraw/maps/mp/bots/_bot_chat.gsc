@@ -261,6 +261,46 @@ start_chat_watch()
 			case "turret_attack":
 				self thread bot_chat_turret_attack_watch( a, b, c, d, e, f, g );
 				break;
+
+			case "dom":
+				self thread bot_chat_dom_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "hq":
+				self thread bot_chat_hq_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "sab":
+				self thread bot_chat_sab_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "sd":
+				self thread bot_chat_sd_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "cap":
+				self thread bot_chat_cap_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "dem":
+				self thread bot_chat_dem_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "gtnw":
+				self thread bot_chat_gtnw_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "oneflag":
+				self thread bot_chat_oneflag_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "arena":
+				self thread bot_chat_arena_watch( a, b, c, d, e, f, g );
+				break;
+
+			case "vip":
+				self thread bot_chat_vip_watch( a, b, c, d, e, f, g );
+				break;
 		}
 	}
 }
@@ -2452,6 +2492,498 @@ bot_chat_attack_equ_watch( state, equ, c, d, e, f, g )
 			break;
 
 		case "stop":
+			break;
+	}
+}
+
+/*
+	bot_chat_dom_watch
+*/
+bot_chat_dom_watch( state, sub_state, flag, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( sub_state )
+	{
+		case "spawnkill":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "defend":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "cap":
+			switch ( state )
+			{
+				case "go":
+					break;
+
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_hq_watch
+*/
+bot_chat_hq_watch( state, sub_state, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( sub_state )
+	{
+		case "cap":
+			switch ( state )
+			{
+				case "go":
+					break;
+
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "defend":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_sab_watch
+*/
+bot_chat_sab_watch( state, sub_state, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( sub_state )
+	{
+		case "bomb":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "defuser":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "planter":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "plant":
+			switch ( state )
+			{
+				case "go":
+					break;
+
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "defuse":
+			switch ( state )
+			{
+				case "go":
+					break;
+
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_sd_watch
+*/
+bot_chat_sd_watch( state, sub_state, obj, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( sub_state )
+	{
+		case "bomb":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "defuser":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "planter":
+			site = obj;
+
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "plant":
+			site = obj;
+
+			switch ( state )
+			{
+				case "go":
+					break;
+
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "defuse":
+			switch ( state )
+			{
+				case "go":
+					break;
+
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_cap_watch
+*/
+bot_chat_cap_watch( state, sub_state, obj, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( sub_state )
+	{
+		case "their_flag":
+			flag = obj;
+
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "my_flag":
+			flag = obj;
+
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "cap":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_dem_watch
+*/
+bot_chat_dem_watch( state, sub_state, obj, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( sub_state )
+	{
+		case "defuser":
+			site = obj;
+
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "planter":
+			site = obj;
+
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "plant":
+			site = obj;
+
+			switch ( state )
+			{
+				case "go":
+					break;
+
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "defuse":
+			site = obj;
+
+			switch ( state )
+			{
+				case "go":
+					break;
+
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_gtnw_watch
+*/
+bot_chat_gtnw_watch( state, sub_state, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( sub_state )
+	{
+		case "cap":
+			switch ( state )
+			{
+				case "go":
+					break;
+
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_oneflag_watch
+*/
+bot_chat_oneflag_watch( state, sub_state, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( sub_state )
+	{
+		case "cap":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "their_flag":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+
+		case "my_flag":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_arena_watch
+*/
+bot_chat_arena_watch( state, sub_state, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( sub_state )
+	{
+		case "cap":
+			switch ( state )
+			{
+				case "go":
+					break;
+
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
+			break;
+	}
+}
+
+/*
+	bot_chat_vip_watch
+*/
+bot_chat_vip_watch( state, sub_state, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+
+	switch ( sub_state )
+	{
+		case "cap":
+			switch ( state )
+			{
+				case "start":
+					break;
+
+				case "stop":
+					break;
+			}
+
 			break;
 	}
 }
