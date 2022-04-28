@@ -453,8 +453,7 @@ start_startgame_watch()
 
 	wait 2;
 
-	// check for nuke in killstreaks
-	if ( false )
+	if ( self hasKillstreak( "nuke" ) )
 	{
 		switch ( randomint( 1 ) )
 		{
@@ -463,6 +462,21 @@ start_startgame_watch()
 				break;
 		}
 	}
+}
+
+/*
+	Has killstreak?
+*/
+hasKillstreak( streakname )
+{
+	loadoutKillstreak1 = self getPlayerData( "killstreaks", 0 );
+	loadoutKillstreak2 = self getPlayerData( "killstreaks", 1 );
+	loadoutKillstreak3 = self getPlayerData( "killstreaks", 2 );
+
+	if ( loadoutKillstreak1 == streakname || loadoutKillstreak2 == streakname || loadoutKillstreak3 == streakname )
+		return true;
+
+	return false;
 }
 
 /*
