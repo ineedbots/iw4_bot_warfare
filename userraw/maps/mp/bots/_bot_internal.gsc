@@ -489,6 +489,9 @@ watchPickupGun()
 	{
 		wait 1;
 
+		if ( self UseButtonPressed() )
+			continue;
+
 		weap = self GetCurrentWeapon();
 
 		if ( weap != "none" && self GetAmmoCount( weap ) )
@@ -2430,12 +2433,12 @@ use( time )
 	if ( !isDefined( time ) )
 		time = 0.05;
 
-	self botAction( "+use" );
+	self botAction( "+activate" );
 
 	if ( time )
 		wait time;
 
-	self botAction( "-use" );
+	self botAction( "-activate" );
 }
 
 /*
