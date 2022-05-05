@@ -320,15 +320,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 15, "TEEEEEEEEAM, DEEEEAAAAAATHMAAAAATCH!!" );
+					self BotDoChat( 7, "TEEEEEEEEAM, DEEEEAAAAAATHMAAAAATCH!!" );
 					break;
 
 				case 1:
-					self BotDoChat( 15, "Lets get em guys, wipe the floor with them." );
+					self BotDoChat( 7, "Lets get em guys, wipe the floor with them." );
 					break;
 
 				case 2:
-					self BotDoChat( 15, "Yeeeesss master..." );
+					self BotDoChat( 7, "Yeeeesss master..." );
 					break;
 			}
 
@@ -338,15 +338,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 15, "Yaaayy!! I LOVE DOMINATION!!!!" );
+					self BotDoChat( 7, "Yaaayy!! I LOVE DOMINATION!!!!" );
 					break;
 
 				case 1:
-					self BotDoChat( 15, "Lets cap the flags and them." );
+					self BotDoChat( 7, "Lets cap the flags and them." );
 					break;
 
 				case 2:
-					self BotDoChat( 15, "Yeeeesss master..." );
+					self BotDoChat( 7, "Yeeeesss master..." );
 					break;
 			}
 
@@ -356,15 +356,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 15, "Ahhhh! I'm scared! No respawning!" );
+					self BotDoChat( 7, "Ahhhh! I'm scared! No respawning!" );
 					break;
 
 				case 1:
-					self BotDoChat( 15, "Lets get em guys, wipe the floor with them." );
+					self BotDoChat( 7, "Lets get em guys, wipe the floor with them." );
 					break;
 
 				case 2:
-					self BotDoChat( 15, "Yeeeesss master..." );
+					self BotDoChat( 7, "Yeeeesss master..." );
 					break;
 			}
 
@@ -374,15 +374,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 15, "Try not to get spawn killed." );
+					self BotDoChat( 7, "Try not to get spawn killed." );
 					break;
 
 				case 1:
-					self BotDoChat( 15, "OK we need a plan. Nah lets just kill." );
+					self BotDoChat( 7, "OK we need a plan. Nah lets just kill." );
 					break;
 
 				case 2:
-					self BotDoChat( 15, "Yeeeesss master..." );
+					self BotDoChat( 7, "Yeeeesss master..." );
 					break;
 			}
 
@@ -392,15 +392,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 15, "Soccer/Football! Lets play it!" );
+					self BotDoChat( 7, "Soccer/Football! Lets play it!" );
 					break;
 
 				case 1:
-					self BotDoChat( 15, "Who plays sab these days." );
+					self BotDoChat( 7, "Who plays sab these days." );
 					break;
 
 				case 2:
-					self BotDoChat( 15, "I do not know what to say." );
+					self BotDoChat( 7, "I do not know what to say." );
 					break;
 			}
 
@@ -410,15 +410,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 15, "Halo style" );
+					self BotDoChat( 7, "Halo style" );
 					break;
 
 				case 1:
-					self BotDoChat( 15, "I'm going cap all the flags." );
+					self BotDoChat( 7, "I'm going cap all the flags." );
 					break;
 
 				case 2:
-					self BotDoChat( 15, "NO IM CAPPING IT" );
+					self BotDoChat( 7, "NO IM CAPPING IT" );
 					break;
 			}
 
@@ -428,26 +428,26 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 15, "DEEEEAAAAAATHMAAAAATCH!!" );
+					self BotDoChat( 7, "DEEEEAAAAAATHMAAAAATCH!!" );
 					break;
 
 				case 1:
-					self BotDoChat( 15, "IM GOING TO KILL U ALL" );
+					self BotDoChat( 7, "IM GOING TO KILL U ALL" );
 					break;
 
 				case 2:
-					self BotDoChat( 15, "lol sweet. time to camp." );
+					self BotDoChat( 7, "lol sweet. time to camp." );
 					break;
 			}
 
 			break;
 
 		case "koth":
-			self BotDoChat( 15, "HQ TIME!" );
+			self BotDoChat( 7, "HQ TIME!" );
 			break;
 
 		case "gtnw":
-			self BotDoChat( 15, "global thermonuclear warfare!!!!!!!" );
+			self BotDoChat( 7, "global thermonuclear warfare!!!!!!!" );
 			break;
 	}
 
@@ -1561,11 +1561,11 @@ bot_chat_killcam_watch( state, b, c, d, e, f, g )
 			switch ( randomInt( 2 ) )
 			{
 				case 0:
-					self BotDoChat( 2, "WTF?!?!?!! Dude youre a hacker and a half!!" );
+					self BotDoChat( 1, "WTF?!?!?!! Dude youre a hacker and a half!!" );
 					break;
 
 				case 1:
-					self BotDoChat( 2, "Haa! Got my fraps ready, time to watch this killcam." );
+					self BotDoChat( 1, "Haa! Got my fraps ready, time to watch this killcam." );
 					break;
 			}
 
@@ -1639,7 +1639,7 @@ bot_chat_stuck_watch( a, b, c, d, e, f, g )
 		}
 	}
 
-	self BotDoChat( 50, msg );
+	self BotDoChat( 20, msg );
 }
 
 /*
@@ -1969,55 +1969,55 @@ bot_chat_attack_vehicle_watch( state, vehicle, rocketAmmo, d, e, f, g )
 			switch ( randomint( 14 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "Not on my watch..." );
+					self BotDoChat( 10, "Not on my watch..." );
 					break;
 
 				case 1:
-					self BotDoChat( 25, "Take down aircraft I am" );
+					self BotDoChat( 10, "Take down aircraft I am" );
 					break;
 
 				case 2:
-					self BotDoChat( 25, "^" + ( randomint( 6 ) + 1 ) + "i hate killstreaks" );
+					self BotDoChat( 10, "^" + ( randomint( 6 ) + 1 ) + "i hate killstreaks" );
 					break;
 
 				case 3:
-					self BotDoChat( 25, "Killstreaks ruin this game!!" );
+					self BotDoChat( 10, "Killstreaks ruin this game!!" );
 					break;
 
 				case 4:
-					self BotDoChat( 25, "killstreaks sux" );
+					self BotDoChat( 10, "killstreaks sux" );
 					break;
 
 				case 5:
-					self BotDoChat( 25, "keep the killstreaks comin'" );
+					self BotDoChat( 10, "keep the killstreaks comin'" );
 					break;
 
 				case 6:
-					self BotDoChat( 25, "lol see that killstreak? its going to go BOOM!" );
+					self BotDoChat( 10, "lol see that killstreak? its going to go BOOM!" );
 					break;
 
 				case 7:
-					self BotDoChat( 25, "^" + ( randomint( 6 ) + 1 ) + "Lol I bet that noob used hardline to get that streak." );
+					self BotDoChat( 10, "^" + ( randomint( 6 ) + 1 ) + "Lol I bet that noob used hardline to get that streak." );
 					break;
 
 				case 8:
-					self BotDoChat( 25, "WOW HOW DO YOU GET THAT?? ITS GONE NOW." );
+					self BotDoChat( 10, "WOW HOW DO YOU GET THAT?? ITS GONE NOW." );
 					break;
 
 				case 9:
-					self BotDoChat( 25, "HAHA say goodbye to your killstreak" );
+					self BotDoChat( 10, "HAHA say goodbye to your killstreak" );
 					break;
 
 				case 10:
-					self BotDoChat( 25, "All your effort is gone now." );
+					self BotDoChat( 10, "All your effort is gone now." );
 					break;
 
 				case 11:
-					self BotDoChat( 25, "I hope there are flares on that killstreak." );
+					self BotDoChat( 10, "I hope there are flares on that killstreak." );
 					break;
 
 				case 12:
-					self BotDoChat( 25, "lol u silly, i'm taking down killstreaks :3 xDD" );
+					self BotDoChat( 10, "lol u silly, i'm taking down killstreaks :3 xDD" );
 					break;
 
 				case 13:
@@ -2026,7 +2026,7 @@ bot_chat_attack_vehicle_watch( state, vehicle, rocketAmmo, d, e, f, g )
 					if ( !isDefined( weap ) )
 						weap = self getCurrentWeapon();
 
-					self BotDoChat( 25, "Im going to takedown your ks with my " + getBaseWeaponName( weap ) );
+					self BotDoChat( 10, "Im going to takedown your ks with my " + getBaseWeaponName( weap ) );
 					break;
 			}
 
@@ -2067,15 +2067,15 @@ bot_chat_camp_watch( state, wp, time, d, e, f, g )
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "going to camp for " + time + " seconds" );
+					self BotDoChat( 10, "going to camp for " + time + " seconds" );
 					break;
 
 				case 1:
-					self BotDoChat( 25, "time to go camp!" );
+					self BotDoChat( 10, "time to go camp!" );
 					break;
 
 				case 2:
-					self BotDoChat( 25, "rofl im going to camp" );
+					self BotDoChat( 10, "rofl im going to camp" );
 					break;
 			}
 
@@ -2085,15 +2085,15 @@ bot_chat_camp_watch( state, wp, time, d, e, f, g )
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "well im camping... this is fun!" );
+					self BotDoChat( 10, "well im camping... this is fun!" );
 					break;
 
 				case 1:
-					self BotDoChat( 25, "lol im camping, hope i kill someone" );
+					self BotDoChat( 10, "lol im camping, hope i kill someone" );
 					break;
 
 				case 2:
-					self BotDoChat( 25, "im camping! i guess ill wait " + time + " before moving again" );
+					self BotDoChat( 10, "im camping! i guess ill wait " + time + " before moving again" );
 					break;
 			}
 
@@ -2103,15 +2103,15 @@ bot_chat_camp_watch( state, wp, time, d, e, f, g )
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "finished camping.." );
+					self BotDoChat( 10, "finished camping.." );
 					break;
 
 				case 1:
-					self BotDoChat( 25, "wow that was a load of camping!" );
+					self BotDoChat( 10, "wow that was a load of camping!" );
 					break;
 
 				case 2:
-					self BotDoChat( 25, "well its been over " + time + " seconds, i guess ill stop camping" );
+					self BotDoChat( 10, "well its been over " + time + " seconds, i guess ill stop camping" );
 					break;
 			}
 
@@ -2132,15 +2132,15 @@ bot_chat_follow_watch( state, player, time, d, e, f, g )
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "well im going to follow " + player.name + " for " + time + " seconds" );
+					self BotDoChat( 10, "well im going to follow " + player.name + " for " + time + " seconds" );
 					break;
 
 				case 1:
-					self BotDoChat( 25, "Lets go together " + player.name + " <3 :)" );
+					self BotDoChat( 10, "Lets go together " + player.name + " <3 :)" );
 					break;
 
 				case 2:
-					self BotDoChat( 25, "lets be butt buddies " + player.name + " and ill follow you!" );
+					self BotDoChat( 10, "lets be butt buddies " + player.name + " and ill follow you!" );
 					break;
 			}
 
@@ -2150,11 +2150,11 @@ bot_chat_follow_watch( state, player, time, d, e, f, g )
 			switch ( randomint( 2 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "well that was fun following " + player.name + " for " + time + " seconds" );
+					self BotDoChat( 10, "well that was fun following " + player.name + " for " + time + " seconds" );
 					break;
 
 				case 1:
-					self BotDoChat( 25, "im done following that guy" );
+					self BotDoChat( 10, "im done following that guy" );
 					break;
 			}
 
@@ -2175,7 +2175,7 @@ bot_chat_equ_watch( state, wp, weap, d, e, f, g )
 			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "going to place a " + getBaseWeaponName( weap ) );
+					self BotDoChat( 10, "going to place a " + getBaseWeaponName( weap ) );
 					break;
 			}
 
@@ -2185,7 +2185,7 @@ bot_chat_equ_watch( state, wp, weap, d, e, f, g )
 			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "placed a " + getBaseWeaponName( weap ) );
+					self BotDoChat( 10, "placed a " + getBaseWeaponName( weap ) );
 					break;
 			}
 
@@ -2206,7 +2206,7 @@ bot_chat_nade_watch( state, wp, weap, d, e, f, g )
 			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "going to throw a " + getBaseWeaponName( weap ) );
+					self BotDoChat( 10, "going to throw a " + getBaseWeaponName( weap ) );
 					break;
 			}
 
@@ -2216,7 +2216,7 @@ bot_chat_nade_watch( state, wp, weap, d, e, f, g )
 			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "threw a " + getBaseWeaponName( weap ) );
+					self BotDoChat( 10, "threw a " + getBaseWeaponName( weap ) );
 					break;
 			}
 
@@ -2254,7 +2254,7 @@ bot_chat_throwback_watch( state, nade, c, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "i am going to throw back the grenade!" );
+					self BotDoChat( 10, "i am going to throw back the grenade!" );
 					break;
 			}
 
@@ -2264,7 +2264,7 @@ bot_chat_throwback_watch( state, nade, c, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "i threw back the grenade!" );
+					self BotDoChat( 10, "i threw back the grenade!" );
 					break;
 			}
 
@@ -2442,7 +2442,7 @@ bot_chat_turret_attack_watch( state, turret, c, d, e, f, g )
 			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "going to this sentry..." );
+					self BotDoChat( 5, "going to this sentry..." );
 					break;
 			}
 
@@ -2452,7 +2452,7 @@ bot_chat_turret_attack_watch( state, turret, c, d, e, f, g )
 			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "attacking this sentry..." );
+					self BotDoChat( 5, "attacking this sentry..." );
 					break;
 			}
 
