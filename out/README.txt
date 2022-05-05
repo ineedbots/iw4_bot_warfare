@@ -1,4 +1,4 @@
-# IW4x Bot Warfare v2.0.0
+# IW4x Bot Warfare v2.1.0
 Bot Warfare is a GSC mod for the IW4x project.
 
 It aims to add playable AI to the multiplayer games of Modern Warfare 2.
@@ -23,6 +23,21 @@ You can find the GitHub containing more info at https://github.com/ineedbots/iw4
 - Pressing the menu button again closes menus.
 
 ## Changelog
+- v2.1.0
+  - Bot chatter system, bots_main_chat
+  - Greatly reduce script variable usage
+  - Fix bots slowly reacting in remote streaks
+  - Improved bots mantling and stuck
+  - Improved bots aim
+  - Fix some runtime errors
+  - Fixed bots aim in third person
+  - Bots sprint more
+  - Improved bots sight on enemies
+  - Bots play hidden gamemodes like one-flag and arena
+  - Bots do random actions while waiting at an objective
+  - Improved bots from getting stuck
+  - Better bot difficulty management, bots_skill_min and bots_skill_max
+
 - v2.0.1
   - Reduced bots crouching
   - Increased bots sprinting
@@ -45,6 +60,16 @@ You can find the GitHub containing more info at https://github.com/ineedbots/iw4
 
 - v2.0.0
   - Initial reboot release
+
+
+- TODOs
+  - A variable leak in _menu (script)
+  - Recoil for bots (engine, maybe script)
+  - Use proper activate button for bombs, carepackages, etc (script, use +activate)
+  - Proper weapon swaps, including altmode (engine, then script)
+  - Use static turrets in maps (script)
+  - Proper use of pred missile (script and engine)
+  - Fix testclient view angle clamping (messes with ac130 and chopper gunner) (engine)
 
 ## Credits
 - IW4x Team - https://github.com/XLabsProject/iw4x-client

@@ -117,7 +117,8 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 | bots_play_aim                    | If the bots can aim.                                                                           | true       |
 
 ## Changelog
-- v2.0.2
+- v2.1.0
+  - Bot chatter system, bots_main_chat
   - Greatly reduce script variable usage
   - Fix bots slowly reacting in remote streaks
   - Improved bots mantling and stuck
@@ -129,7 +130,6 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Bots play hidden gamemodes like one-flag and arena
   - Bots do random actions while waiting at an objective
   - Improved bots from getting stuck
-  - Bot chatter system, bots_main_chat
   - Better bot difficulty management, bots_skill_min and bots_skill_max
 
 - v2.0.1
@@ -156,13 +156,14 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Initial reboot release
 
 
-- TODOs (some required in-engine)
-  - A variable leak in _menu
-  - Recoil for bots
-  - Use proper activate button for bombs, carepackages, etc
-  - Proper weapon swaps, including altmode
-  - Use static turrets in maps
-  - Proper use of pred missile
+- TODOs
+  - A variable leak in _menu (script)
+  - Recoil for bots (engine, maybe script)
+  - Use proper activate button for bombs, carepackages, etc (script, use +activate)
+  - Proper weapon swaps, including altmode (engine, then script)
+  - Use static turrets in maps (script)
+  - Proper use of pred missile (script and engine)
+  - Fix testclient view angle clamping (messes with ac130 and chopper gunner) (engine)
 
 ## Credits
 - IW4x Team - https://github.com/XLabsProject/iw4x-client
