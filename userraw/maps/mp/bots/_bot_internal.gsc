@@ -819,7 +819,7 @@ setBotWantSprint()
 
 	self.bot.wantsprint = true;
 
-	self waittill( "kill_goal" );
+	self waittill_notify_or_timeout( "kill_goal", 10 );
 
 	self.bot.wantsprint = false;
 }

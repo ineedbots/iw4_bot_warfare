@@ -4617,7 +4617,7 @@ bot_killstreak_think_loop( data )
 				case "emp":
 					self BotStopMoving( true );
 
-					self BotNotifyBotEvent( "killstreak", "call", streakName );
+					self BotNotifyBotEvent( "killstreak", "call", streakName, location, directionYaw );
 
 					if ( self changeToWeapon( ksWeap ) )
 					{
