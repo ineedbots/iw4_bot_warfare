@@ -1676,7 +1676,7 @@ bot_chat_tube_watch( state, tubeWp, tubeWeap, d, e, f, g )
 /*
 	bot_chat_killstreak_watch( streakName, b, c, d, e, f, g )
 */
-bot_chat_killstreak_watch( state, streakName, campSpot, d, e, f, g )
+bot_chat_killstreak_watch( state, streakName, c, directionYaw, e, f, g )
 {
 	self endon( "disconnect" );
 
@@ -1685,6 +1685,8 @@ bot_chat_killstreak_watch( state, streakName, campSpot, d, e, f, g )
 		case "call":
 			switch ( streakName )
 			{
+				location = c;
+
 				case "helicopter_flares":
 					switch ( randomint( 1 ) )
 					{
@@ -1811,6 +1813,7 @@ bot_chat_killstreak_watch( state, streakName, campSpot, d, e, f, g )
 			break;
 
 		case "camp":
+			campSpot = c;
 			break;
 	}
 }
