@@ -6153,7 +6153,11 @@ bot_cap_loop()
 
 		if ( !isDefined( carrier ) ) //if no one has enemy flag
 		{
+			self BotNotifyBotEvent( "cap", "start", "their_flag", theirflag );
+
 			self bot_cap_get_flag( theirflag );
+
+			self BotNotifyBotEvent( "cap", "stop", "their_flag", theirflag );
 			return;
 		}
 
