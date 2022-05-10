@@ -1683,10 +1683,10 @@ bot_chat_killstreak_watch( state, streakName, c, directionYaw, e, f, g )
 	switch ( state )
 	{
 		case "call":
+			location = c;
+
 			switch ( streakName )
 			{
-				location = c;
-
 				case "helicopter_flares":
 					switch ( randomint( 1 ) )
 					{
