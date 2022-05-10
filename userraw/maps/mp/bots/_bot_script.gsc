@@ -4411,6 +4411,8 @@ bot_killstreak_think_loop( data )
 			if ( DistanceSquared( self.origin, forwardTrace["position"] ) < 1000 * 1000 && self.pers["bots"]["skill"]["base"] > 3 )
 				return;
 
+			self BotNotifyBotEvent( "killstreak", "call", streakName );
+
 			self BotStopMoving( true );
 			self SetScriptAimPos( forwardTrace["position"] );
 
@@ -4420,8 +4422,6 @@ bot_killstreak_think_loop( data )
 				self ClearScriptAimPos();
 				return;
 			}
-
-			self BotNotifyBotEvent( "killstreak", "call", streakName );
 
 			wait 1;
 			self notify( "place_sentry" );
@@ -4441,6 +4441,8 @@ bot_killstreak_think_loop( data )
 			if ( !isDefined( location ) )
 				return;
 
+			self BotNotifyBotEvent( "killstreak", "call", streakName, location );
+
 			self BotRandomStance();
 			self setUsingRemote( "remotemissile" );
 			self thread clear_remote_on_death();
@@ -4453,8 +4455,6 @@ bot_killstreak_think_loop( data )
 				self BotStopMoving( false );
 				return;
 			}
-
-			self BotNotifyBotEvent( "killstreak", "call", streakName );
 
 			wait 1;
 			self notify( "bot_clear_remote_on_death" );
@@ -4546,6 +4546,8 @@ bot_killstreak_think_loop( data )
 			if ( !bulletTracePassed( forwardTrace["position"], forwardTrace["position"] + ( 0, 0, 2048 ), false, self ) && self.pers["bots"]["skill"]["base"] > 3 )
 				return;
 
+			self BotNotifyBotEvent( "killstreak", "call", streakName );
+
 			self BotStopMoving( true );
 			self SetScriptAimPos( forwardTrace["position"] );
 
@@ -4555,8 +4557,6 @@ bot_killstreak_think_loop( data )
 				self ClearScriptAimPos();
 				return;
 			}
-
-			self BotNotifyBotEvent( "killstreak", "call", streakName );
 
 			self thread fire_current_weapon();
 
