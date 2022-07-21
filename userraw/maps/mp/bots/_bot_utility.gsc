@@ -31,7 +31,7 @@ doHostCheck()
 
 	if ( getDvar( "bots_main_firstIsHost" ) != "0" )
 	{
-		PrintConsole( "WARNING: bots_main_firstIsHost is enabled\n" );
+		iw4x_PrintConsole( "WARNING: bots_main_firstIsHost is enabled\n" );
 
 		if ( getDvar( "bots_main_firstIsHost" ) == "1" )
 		{
@@ -883,7 +883,7 @@ getWaypointLinesFromFile( filename )
 	result = spawnStruct();
 	result.lines = [];
 
-	waypointStr = fileRead( filename );
+	waypointStr = iw4x_fileRead( filename );
 
 	if ( !isDefined( waypointStr ) )
 		return result;
@@ -918,7 +918,7 @@ readWpsFromFile( mapname )
 	waypoints = [];
 	filename = "waypoints/" + mapname + "_wp.csv";
 
-	if ( !fileExists( filename ) )
+	if ( !iw4x_fileExists( filename ) )
 		return waypoints;
 
 	res = getWaypointLinesFromFile( filename );
@@ -926,7 +926,7 @@ readWpsFromFile( mapname )
 	if ( !res.lines.size )
 		return waypoints;
 
-	PrintConsole( "Attempting to read waypoints from " + filename + "\n" );
+	iw4x_PrintConsole( "Attempting to read waypoints from " + filename + "\n" );
 
 	waypointCount = int( res.lines[0] );
 
@@ -960,7 +960,7 @@ load_waypoints()
 	if ( wps.size )
 	{
 		level.waypoints = wps;
-		PrintConsole( "Loaded " + wps.size + " waypoints from csv.\n" );
+		iw4x_PrintConsole( "Loaded " + wps.size + " waypoints from csv.\n" );
 	}
 	else
 	{
@@ -1220,7 +1220,7 @@ load_waypoints()
 		}
 
 		if ( level.waypoints.size )
-			PrintConsole( "Loaded " + level.waypoints.size + " waypoints from script.\n" );
+			iw4x_PrintConsole( "Loaded " + level.waypoints.size + " waypoints from script.\n" );
 	}
 
 	if ( !level.waypoints.size )

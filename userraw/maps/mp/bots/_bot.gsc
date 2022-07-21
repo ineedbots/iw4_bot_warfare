@@ -546,7 +546,7 @@ watchBotDebugEvent()
 
 		if ( msg == "debug" && GetDvarInt( "bots_main_debug" ) )
 		{
-			PrintConsole( "Bot Warfare debug: " + self.name + ": " + str );
+			iw4x_PrintConsole( "Bot Warfare debug: " + self.name + ": " + str );
 		}
 	}
 }
