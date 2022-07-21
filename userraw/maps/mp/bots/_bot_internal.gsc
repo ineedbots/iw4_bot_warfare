@@ -142,7 +142,7 @@ resetBotVars()
 
 	self.bot.rand = randomInt( 100 );
 
-	self botStop();
+	self iw4x_botStop();
 }
 
 /*
@@ -642,7 +642,7 @@ doBotMovement_loop( data )
 	if ( self.bot.wantsprint && self.bot.issprinting )
 		dir = ( 127, dir[1], 0 );
 
-	self botMovement( int( dir[0] ), int( dir[1] ) );
+	self iw4x_botMovement( int( dir[0] ), int( dir[1] ) );
 }
 
 /*
@@ -2307,9 +2307,9 @@ getRandomLargestStafe( dist )
 holdbreath( what )
 {
 	if ( what )
-		self botAction( "+holdbreath" );
+		self iw4x_botAction( "+holdbreath" );
 	else
-		self botAction( "-holdbreath" );
+		self iw4x_botAction( "-holdbreath" );
 }
 
 /*
@@ -2322,9 +2322,9 @@ sprint()
 	self notify( "bot_sprint" );
 	self endon( "bot_sprint" );
 
-	self botAction( "+sprint" );
+	self iw4x_botAction( "+sprint" );
 	wait 0.05;
-	self botAction( "-sprint" );
+	self iw4x_botAction( "-sprint" );
 }
 
 /*
@@ -2340,9 +2340,9 @@ knife()
 	self.bot.isknifing = true;
 	self.bot.isknifingafter = true;
 
-	self botAction( "+melee" );
+	self iw4x_botAction( "+melee" );
 	wait 0.05;
-	self botAction( "-melee" );
+	self iw4x_botAction( "-melee" );
 
 	self.bot.isknifing = false;
 
@@ -2361,9 +2361,9 @@ reload()
 	self notify( "bot_reload" );
 	self endon( "bot_reload" );
 
-	self botAction( "+reload" );
+	self iw4x_botAction( "+reload" );
 	wait 0.05;
-	self botAction( "-reload" );
+	self iw4x_botAction( "-reload" );
 }
 
 /*
@@ -2379,14 +2379,14 @@ frag( time )
 	if ( !isDefined( time ) )
 		time = 0.05;
 
-	self botAction( "+frag" );
+	self iw4x_botAction( "+frag" );
 	self.bot.isfragging = true;
 	self.bot.isfraggingafter = true;
 
 	if ( time )
 		wait time;
 
-	self botAction( "-frag" );
+	self iw4x_botAction( "-frag" );
 	self.bot.isfragging = false;
 
 	wait 1.25;
@@ -2406,14 +2406,14 @@ smoke( time )
 	if ( !isDefined( time ) )
 		time = 0.05;
 
-	self botAction( "+smoke" );
+	self iw4x_botAction( "+smoke" );
 	self.bot.issmoking = true;
 	self.bot.issmokingafter = true;
 
 	if ( time )
 		wait time;
 
-	self botAction( "-smoke" );
+	self iw4x_botAction( "-smoke" );
 	self.bot.issmoking = false;
 
 	wait 1.25;
@@ -2433,12 +2433,12 @@ use( time )
 	if ( !isDefined( time ) )
 		time = 0.05;
 
-	self botAction( "+activate" );
+	self iw4x_botAction( "+activate" );
 
 	if ( time )
 		wait time;
 
-	self botAction( "-activate" );
+	self iw4x_botAction( "-activate" );
 }
 
 /*
@@ -2449,9 +2449,9 @@ fire( what )
 	self notify( "bot_fire" );
 
 	if ( what )
-		self botAction( "+fire" );
+		self iw4x_botAction( "+fire" );
 	else
-		self botAction( "-fire" );
+		self iw4x_botAction( "-fire" );
 }
 
 /*
@@ -2467,12 +2467,12 @@ pressFire( time )
 	if ( !isDefined( time ) )
 		time = 0.05;
 
-	self botAction( "+fire" );
+	self iw4x_botAction( "+fire" );
 
 	if ( time )
 		wait time;
 
-	self botAction( "-fire" );
+	self iw4x_botAction( "-fire" );
 }
 
 /*
@@ -2483,9 +2483,9 @@ ads( what )
 	self notify( "bot_ads" );
 
 	if ( what )
-		self botAction( "+ads" );
+		self iw4x_botAction( "+ads" );
 	else
-		self botAction( "-ads" );
+		self iw4x_botAction( "-ads" );
 }
 
 /*
@@ -2501,12 +2501,12 @@ pressADS( time )
 	if ( !isDefined( time ) )
 		time = 0.05;
 
-	self botAction( "+ads" );
+	self iw4x_botAction( "+ads" );
 
 	if ( time )
 		wait time;
 
-	self botAction( "-ads" );
+	self iw4x_botAction( "-ads" );
 }
 
 /*
@@ -2528,9 +2528,9 @@ jump()
 		wait 1;
 	}
 
-	self botAction( "+gostand" );
+	self iw4x_botAction( "+gostand" );
 	wait 0.05;
-	self botAction( "-gostand" );
+	self iw4x_botAction( "-gostand" );
 }
 
 /*
@@ -2541,8 +2541,8 @@ stand()
 	if ( self IsUsingRemote() )
 		return;
 
-	self botAction( "-gocrouch" );
-	self botAction( "-goprone" );
+	self iw4x_botAction( "-gocrouch" );
+	self iw4x_botAction( "-goprone" );
 }
 
 /*
@@ -2553,8 +2553,8 @@ crouch()
 	if ( self IsUsingRemote() )
 		return;
 
-	self botAction( "+gocrouch" );
-	self botAction( "-goprone" );
+	self iw4x_botAction( "+gocrouch" );
+	self iw4x_botAction( "-goprone" );
 }
 
 /*
@@ -2565,8 +2565,8 @@ prone()
 	if ( self IsUsingRemote() || self.hasRiotShieldEquipped )
 		return;
 
-	self botAction( "-gocrouch" );
-	self botAction( "+goprone" );
+	self iw4x_botAction( "-gocrouch" );
+	self iw4x_botAction( "+goprone" );
 }
 
 /*
@@ -2576,12 +2576,12 @@ changeToWeap( weap )
 {
 	if ( maps\mp\gametypes\_weapons::isAltModeWeapon( weap ) )
 	{
-		self botWeapon( "" );
+		self iw4x_botWeapon( "" );
 		self setSpawnWeapon( weap );
 		return;
 	}
 
-	self botWeapon( weap );
+	self iw4x_botWeapon( weap );
 }
 
 /*

@@ -202,7 +202,7 @@ onSomeoneSaid()
 	{
 		level waittill( "say", string, player );
 
-		PrintConsole( player.name + ": ^7" + string + "\n" );
+		iw4x_PrintConsole( player.name + ": ^7" + string + "\n" );
 	}
 }
 
@@ -224,6 +224,6 @@ setBotPing()
 	{
 		wait 0.05;
 
-		self SetPing( randomIntRange( 40, 60 ) );
+		self iw4x_SetPing( randomIntRange( 40, 60 ) );
 	}
 }

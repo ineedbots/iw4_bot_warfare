@@ -16,18 +16,18 @@ doVersionCheck()
 
 	if ( !isDefined( remoteVersion ) )
 	{
-		PrintConsole( "Error getting remote version of Bot Warfare.\n" );
+		iw4x_PrintConsole( "Error getting remote version of Bot Warfare.\n" );
 		return false;
 	}
 
 	if ( level.bw_VERSION != remoteVersion )
 	{
-		PrintConsole( "There is a new version of Bot Warfare!\n" );
-		PrintConsole( "You are on version " + level.bw_VERSION + " but " + remoteVersion + " is available!\n" );
+		iw4x_PrintConsole( "There is a new version of Bot Warfare!\n" );
+		iw4x_PrintConsole( "You are on version " + level.bw_VERSION + " but " + remoteVersion + " is available!\n" );
 		return false;
 	}
 
-	PrintConsole( "You are on the latest version of Bot Warfare!\n" );
+	iw4x_PrintConsole( "You are on the latest version of Bot Warfare!\n" );
 	return true;
 }
 
@@ -39,7 +39,7 @@ getRemoteWaypoints( mapname )
 	url = "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/" + mapname + "_wp.csv";
 	filename = "waypoints/" + mapname + "_wp.csv";
 
-	PrintConsole( "Attempting to get remote waypoints from " + url + "\n" );
+	iw4x_PrintConsole( "Attempting to get remote waypoints from " + url + "\n" );
 	res = getLinesFromUrl( url, filename );
 
 	if ( !res.lines.size )
@@ -48,7 +48,7 @@ getRemoteWaypoints( mapname )
 	waypointCount = int( res.lines[0] );
 
 	waypoints = [];
-	PrintConsole( "Loading remote waypoints...\n" );
+	iw4x_PrintConsole( "Loading remote waypoints...\n" );
 
 	for ( i = 1; i <= waypointCount; i++ )
 	{
@@ -62,7 +62,7 @@ getRemoteWaypoints( mapname )
 	if ( waypoints.size )
 	{
 		level.waypoints = waypoints;
-		PrintConsole( "Loaded " + waypoints.size + " waypoints from remote.\n" );
+		iw4x_PrintConsole( "Loaded " + waypoints.size + " waypoints from remote.\n" );
 	}
 }
 
@@ -71,7 +71,7 @@ getRemoteWaypoints( mapname )
 */
 getRemoteVersion()
 {
-	request = httpGet( "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/version.txt" );
+	request = iw4x_httpGet( "https://raw.githubusercontent.com/ineedbots/iw4x_waypoints/master/version.txt" );
 
 	if ( !isDefined( request ) )
 		return undefined;
@@ -92,7 +92,7 @@ getLinesFromUrl( url, filename )
 	result = spawnStruct();
 	result.lines = [];
 
-	request = httpGet( url );
+	request = iw4x_httpGet( url );
 
 	if ( !isDefined( request ) )
 		return result;
@@ -102,7 +102,7 @@ getLinesFromUrl( url, filename )
 	if ( !success )
 		return result;
 
-	fileWrite( filename, data, "write" );
+	iw4x_fileWrite( filename, data, "write" );
 
 	line = "";
 
