@@ -790,16 +790,6 @@ Round( x )
 }
 
 /*
-	converts a string into a float
-*/
-float( num )
-{
-	setdvar( "temp_dvar_bot_util", num );
-
-	return GetDvarFloat( "temp_dvar_bot_util" );
-}
-
-/*
 	Tokenizes a string (strtok has limits...) (only one char tok)
 */
 tokenizeLine( line, tok )
@@ -844,7 +834,7 @@ parseTokensIntoWaypoint( tokens )
 
 	orgStr = tokens[0];
 	orgToks = strtok( orgStr, " " );
-	waypoint.origin = ( float( orgToks[0] ), float( orgToks[1] ), float( orgToks[2] ) );
+	waypoint.origin = ( CastFloat( orgToks[0] ), CastFloat( orgToks[1] ), CastFloat( orgToks[2] ) );
 
 	childStr = tokens[1];
 	childToks = strtok( childStr, " " );
@@ -861,7 +851,7 @@ parseTokensIntoWaypoint( tokens )
 	if ( isDefined( anglesStr ) && anglesStr != "" )
 	{
 		anglesToks = strtok( anglesStr, " " );
-		waypoint.angles = ( float( anglesToks[0] ), float( anglesToks[1] ), float( anglesToks[2] ) );
+		waypoint.angles = ( CastFloat( anglesToks[0] ), CastFloat( anglesToks[1] ), CastFloat( anglesToks[2] ) );
 	}
 
 	javStr = tokens[4];
@@ -869,7 +859,7 @@ parseTokensIntoWaypoint( tokens )
 	if ( isDefined( javStr ) && javStr != "" )
 	{
 		javToks = strtok( javStr, " " );
-		waypoint.jav_point = ( float( javToks[0] ), float( javToks[1] ), float( javToks[2] ) );
+		waypoint.jav_point = ( CastFloat( javToks[0] ), CastFloat( javToks[1] ), CastFloat( javToks[2] ) );
 	}
 
 	return waypoint;

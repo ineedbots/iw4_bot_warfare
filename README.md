@@ -13,6 +13,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 - [Documentation](#Documentation)
 - [Changelog](#Changelog)
 - [Credits](#Credits)
+- [Contact](#Contact)
 
 ## Features
 - A Waypoint Editor for creating and modifying bot's waypoints of traversing the map. Have a look at [Using the Waypoint editor](/userraw/bw-assets/wpedit.md).
@@ -168,7 +169,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 ## Credits
 - IW4x Team - https://github.com/XLabsProject/iw4x-client
 - CoD4x Team - https://github.com/callofduty4x/CoD4x_Server
-- INeedGames - http://www.moddb.com/mods/bot-warfare
+- INeedGames (Original Creator) - http://www.moddb.com/mods/bot-warfare
 - tinkie101 - https://web.archive.org/web/20120326060712/http://alteriw.net/viewtopic.php?f=72&t=4869
 - PeZBot team - http://www.moddb.com/mods/pezbot
 - apdonato - http://rsebots.blogspot.ca/
@@ -178,3 +179,8 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 Feel free to use code, host on other sites, host on servers, mod it and merge mods with it, just give credit where credit is due!
 	-INeedGames/INeedBot(s) @ ineedbots@outlook.com
+
+## Contact
+If you need help using this version of bot warfare that is *not* developed by INeedGames, please do *not* attempt to contact him for support queries.
+
+You may find help here: https://discord.gg/sKeVmR3
