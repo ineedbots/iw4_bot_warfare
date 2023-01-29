@@ -1,4 +1,0 @@
-Whitehouse()
-{
-	return [];
-}

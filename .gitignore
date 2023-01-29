@@ -39,3 +39,6 @@ missingasset.csv
 userraw/scripts/_commands.gsc
 userraw/scripts/_customcallbacks.gsc
 userraw/scripts/bots_custom.gsc
+
+bots.txt
+z_svr_bots.iwd
