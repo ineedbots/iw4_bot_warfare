@@ -1,0 +1,4 @@
+Arcadia()
+{
+	return [];
+}
