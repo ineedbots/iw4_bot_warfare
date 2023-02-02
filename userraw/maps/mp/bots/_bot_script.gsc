@@ -25,6 +25,18 @@ added()
 
 		self setPlayerData( "cardTitle", random( getCardTitles() ) );
 		self setPlayerData( "cardIcon", random( getCardIcons() ) );
+
+		if ( getDvar("bots_customtitle") == "" )
+			exec("set customtitle \"" + getDvar("bots_customtitle") + "\"");
+
+		if ( getDvar("bots_customclantag") != "" )
+			self SetClanTag( getDvar("bots_customclantag") );
+			// exec("seta clanName \"" + getDvar( "bots_clantag" ) + "\"");
+
+		if ( getDvar("bots_randomping") != "" ) {
+			self SetPing( randomInt(0,999) );
+		} else if ( getDvar("bots_customping") != "" )
+			self SetPing( getDvarInt("bots_customping") );
 	}
 
 	self setClasses();
