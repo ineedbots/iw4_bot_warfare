@@ -13,6 +13,7 @@
 !/z_server_pvbrust_watchdog.bat
 !/z_server_pvbvote.bat
 !/z_server_pvbvote_watchdog.bat
+!/Generate-Botnames.ps1
 
 # Folder to not ignore
 !/userraw
@@ -24,6 +25,7 @@
 !/README.md
 !/out
 !/translate/
+!/botnames/
 
 !/.astylerc
 !/z_deploy.bat
@@ -41,3 +43,4 @@ missingasset.csv
 userraw/scripts/_commands.gsc
 userraw/scripts/_customcallbacks.gsc
 userraw/scripts/bots_custom.gsc
+botnames/*.txt
