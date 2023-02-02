@@ -23,11 +23,13 @@
 !/main/pvbvote.cfg
 !/README.md
 !/out
+!/translate/
 
 !/.astylerc
 !/z_deploy.bat
 !/deploy.bat
 !/deploy.js
+
 
 *.zip
 *.log
