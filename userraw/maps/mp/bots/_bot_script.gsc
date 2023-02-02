@@ -26,17 +26,17 @@ added()
 		self setPlayerData( "cardTitle", random( getCardTitles() ) );
 		self setPlayerData( "cardIcon", random( getCardIcons() ) );
 
-		if ( getDvar("bots_customtitle") == "" )
-			exec("set customtitle \"" + getDvar("bots_customtitle") + "\"");
+		if ( getDvar("bots_custom_title") == "" )
+			exec("set customtitle \"" + getDvar("bots_custom_title") + "\"");
 
-		if ( getDvar("bots_customclantag") != "" )
-			self SetClanTag( getDvar("bots_customclantag") );
-			// exec("seta clanName \"" + getDvar( "bots_clantag" ) + "\"");
+		if ( getDvar("bots_custom_clantag") != "" )
+			self SetClanTag( getDvar("bots_custom_clantag") );
+		 // exec("seta clanName \"" + getDvar( "bots_custom_clantag" ) + "\"");
 
-		if ( getDvar("bots_randomping") != "" ) {
-			self SetPing( randomInt(0,999) );
-		} else if ( getDvar("bots_customping") != "" )
-			self SetPing( getDvarInt("bots_customping") );
+		if ( getDvar("bots_random_ping") != "" ) {
+			self SetPing( randomInt(getDvarInt("bots_custom_ping_min"),getDvarInt("bots_custom_ping_max")) );
+		} else if ( getDvarInt("bots_custom_ping") < 0 )
+			self SetPing( getDvarInt("bots_custom_ping") );
 	}
 
 	self setClasses();

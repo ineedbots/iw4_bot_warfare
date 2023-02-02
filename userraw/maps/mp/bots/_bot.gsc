@@ -134,6 +134,22 @@ init()
 	if ( getDvar( "bots_play_aim" ) == "" )
 		setDvar( "bots_play_aim", true );
 
+	if ( getDvar( "bots_custom_title" ) == "" )
+		setDvar( "bots_custom_title", "" );
+
+	if ( getDvar( "bots_custom_clantag" ) == "" )
+		setDvar( "bots_custom_clantag", "" );
+
+	if ( getDvar( "bots_custom_ping" ) == "" )
+		setDvar( "bots_custom_ping", -1 );
+
+	if ( getDvar( "bots_random_ping" ) == "" )
+		setDvar( "bots_random_ping", false );
+	if ( getDvar( "bots_random_ping_min" ) == "" )
+		setDvar( "bots_random_ping_min", 0 );
+	if ( getDvar( "bots_random_ping_max" ) == "" )
+		setDvar( "bots_random_ping_max", 999 );
+
 	if ( !isDefined( game["botWarfare"] ) )
 		game["botWarfare"] = true;
 
