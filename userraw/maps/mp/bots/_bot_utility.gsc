@@ -873,29 +873,28 @@ getWaypointLinesFromFile( filename )
 	result = spawnStruct();
 	result.lines = [];
 
-	waypointStr = fileRead( filename );
-
-	if ( !isDefined( waypointStr ) )
-		return result;
-
-	line = "";
-
-	for ( i = 0; i < waypointStr.size; i++ )
+	if ( openFile( filename, "read" ) == -1 )
 	{
-		c = waypointStr[i];
-
-		if ( c == "\n" )
-		{
-			result.lines[result.lines.size] = line;
-
-			line = "";
-			continue;
-		}
-
-		line += c;
+		return result;
 	}
 
-	result.lines[result.lines.size] = line;
+	while ( true )
+	{
+		line = readStream();
+		if ( !isDefined( line ) )
+		{
+			break;
+		}
+
+		result.lines[result.lines.size] = line;
+	}
+
+	printConsole("EOF reached. Parsing of " + filename + " ended\n");
+
+	if ( closeFile() )
+	{
+		printConsole("CloseFile failed.\n");
+	}
 
 	return result;
 }
