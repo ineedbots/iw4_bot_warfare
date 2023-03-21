@@ -54,7 +54,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - ... And pretty much everything you expect a Combat Training bot to have
 
 ## Installation
-0. Make sure that [IW4x](https://xlabs.dev/support_iw4x_client.html) is installed, updated and working properly. (IW4x v0.6.1+)
+0. Make sure that [IW4x](https://xlabs.dev/support_iw4x_client.html) is installed, updated and working properly. (IW4x v0.7.9+)
     - Download the [latest release](https://github.com/XLabsProject/iw4x_bot_warfare/releases) of Bot Warfare.
 1. Locate your IW4x install folder.
 2. Move the files/folders found in 'Move files to root of IW4x folder' from the Bot Warfare release archive you downloaded into the root of your IW4x install folder.
@@ -117,46 +117,6 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 | bots_play_ads                    | If the bots can aim down sights.                                                               | true       |
 | bots_play_aim                    | If the bots can aim.                                                                           | true       |
 
-## Changelog
-- v2.1.0
-  - Bot chatter system, bots_main_chat
-  - Greatly reduce script variable usage
-  - Fix bots slowly reacting in remote streaks
-  - Improved bots mantling and stuck
-  - Improved bots aim
-  - Fix some runtime errors
-  - Fixed bots aim in third person
-  - Bots sprint more
-  - Improved bots sight on enemies
-  - Bots play hidden gamemodes like one-flag and arena
-  - Bots do random actions while waiting at an objective
-  - Improved bots from getting stuck
-  - Better bot difficulty management, bots_skill_min and bots_skill_max
-
-- v2.0.1
-  - Reduced bots crouching
-  - Increased bots sprinting
-  - Improved bots mantling, crouching and knifing glass when needed
-  - Fixed possible script runtime errors
-  - Fixed demolition spawn killing
-  - Improved domination
-  - Bots use explosives more if they have it
-  - Fixed bots moving their player when using remote
-  - Bots aim slower when ads'ing
-  - Fixed bots holding breath
-  - Bots are more smart when waiting for carepackages
-  - Improved and fixed various waypoints for maps
-  - Fixed bots rubberbanding movement when their goal changes
-  - Added bots quickscoping with snipers
-  - Added bots reload canceling and fast swaps
-  - Bots use C4
-  - Improved revenge
-  - Bots can swap weapons on spawn more likely
-
-- v2.0.0
-  - Initial reboot release
-
-
 - TODOs
   - A variable leak in _menu (script)
   - Recoil for bots (engine, maybe script)
@@ -164,7 +124,6 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Proper weapon swaps, including altmode (engine, then script)
   - Use static turrets in maps (script)
   - Proper use of pred missile (script and engine)
-  - Fix testclient view angle clamping (messes with ac130 and chopper gunner) (engine)
 
 ## Credits
 - IW4x Team - https://github.com/XLabsProject/iw4x-client

@@ -1,4 +1,4 @@
-# IW4x Bot Warfare v2.1.0
+# IW4x Bot Warfare v2.2.0
 Bot Warfare is a GSC mod for the IW4x project.
 
 It aims to add playable AI to the multiplayer games of Modern Warfare 2.
@@ -6,7 +6,7 @@ It aims to add playable AI to the multiplayer games of Modern Warfare 2.
 You can find the GitHub containing more info at https://github.com/ineedbots/iw4x_bot_warfare
 
 ## Installation
-0. Make sure that IW4x is installed, updated and working properly. (IW4x v0.6.1+)
+0. Make sure that IW4x is installed, updated and working properly. (IW4x v0.7.9+)
 1. Locate your IW4x install folder.
 2. Move the files/folders found in 'Move files to root of IW4x folder' from the Bot Warfare release archive you downloaded into the root of your IW4x install folder.
     - The folder/file structure should follow as '.IW4x game folder\mods\bots\z_svr_bots.iwd'.
@@ -22,46 +22,6 @@ You can find the GitHub containing more info at https://github.com/ineedbots/iw4
 
 - Pressing the menu button again closes menus.
 
-## Changelog
-- v2.1.0
-  - Bot chatter system, bots_main_chat
-  - Greatly reduce script variable usage
-  - Fix bots slowly reacting in remote streaks
-  - Improved bots mantling and stuck
-  - Improved bots aim
-  - Fix some runtime errors
-  - Fixed bots aim in third person
-  - Bots sprint more
-  - Improved bots sight on enemies
-  - Bots play hidden gamemodes like one-flag and arena
-  - Bots do random actions while waiting at an objective
-  - Improved bots from getting stuck
-  - Better bot difficulty management, bots_skill_min and bots_skill_max
-
-- v2.0.1
-  - Reduced bots crouching
-  - Increased bots sprinting
-  - Improved bots mantling, crouching and knifing glass when needed
-  - Fixed possible script runtime errors
-  - Fixed demolition spawn killing
-  - Improved domination
-  - Bots use explosives more if they have it
-  - Fixed bots moving their player when using remote
-  - Bots aim slower when ads'ing
-  - Fixed bots holding breath
-  - Bots are more smart when waiting for carepackages
-  - Improved and fixed various waypoints for maps
-  - Fixed bots rubberbanding movement when their goal changes
-  - Added bots quickscoping with snipers
-  - Added bots reload canceling and fast swaps
-  - Bots use C4
-  - Improved revenge
-  - Bots can swap weapons on spawn more likely
-
-- v2.0.0
-  - Initial reboot release
-
-
 - TODOs
   - A variable leak in _menu (script)
   - Recoil for bots (engine, maybe script)
@@ -69,7 +29,6 @@ You can find the GitHub containing more info at https://github.com/ineedbots/iw4
   - Proper weapon swaps, including altmode (engine, then script)
   - Use static turrets in maps (script)
   - Proper use of pred missile (script and engine)
-  - Fix testclient view angle clamping (messes with ac130 and chopper gunner) (engine)
 
 ## Credits
 - IW4x Team - https://github.com/XLabsProject/iw4x-client

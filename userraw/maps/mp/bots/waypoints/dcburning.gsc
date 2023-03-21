@@ -1,4 +1,0 @@
-DCBurning()
-{
-	return [];
-}

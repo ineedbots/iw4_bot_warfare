@@ -15,7 +15,7 @@
 */
 init()
 {
-	level.bw_VERSION = "2.1.0";
+	level.bw_VERSION = "2.2.0";
 
 	if ( getDvar( "bots_main" ) == "" )
 		setDvar( "bots_main", true );
@@ -868,14 +868,6 @@ addBots_loop()
 			spec++;
 		else
 			players++;
-	}
-
-	if ( !randomInt( 999 ) )
-	{
-		setDvar( "testclients_doreload", true );
-		wait 0.1;
-		setDvar( "testclients_doreload", false );
-		doExtraCheck();
 	}
 
 	if ( fillMode == 4 )

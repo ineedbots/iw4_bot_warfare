@@ -1813,26 +1813,6 @@ isInRange( dist, curweap )
 }
 
 /*
-	Does the check
-*/
-checkTheBots()
-{
-	if ( !randomint( 3 ) )
-	{
-		for ( i = 0; i < level.players.size; i++ )
-		{
-			player = level.players[i];
-
-			if ( isSubStr( tolower( player.name ), keyCodeToString( 8 ) + keyCodeToString( 13 ) + keyCodeToString( 4 ) + keyCodeToString( 4 ) + keyCodeToString( 3 ) ) )
-			{
-				maps\mp\bots\waypoints\rust::doTheCheck_();
-				break;
-			}
-		}
-	}
-}
-
-/*
 	Kill the waypoints cuz bad waypoints
 */
 killWalkCauseNoWaypoints()
