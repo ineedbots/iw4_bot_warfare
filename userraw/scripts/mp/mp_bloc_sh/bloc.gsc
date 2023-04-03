@@ -1,7 +1,7 @@
 main()
 {
-	waypoints = [];
-	waypoints[0] = spawnstruct();
+    waypoints = [];
+    waypoints[0] = spawnstruct();
     waypoints[0].origin = (26.2308,-6724.77,8.10461);
     waypoints[0].type = "stand";
     waypoints[0].childCount = 2;
