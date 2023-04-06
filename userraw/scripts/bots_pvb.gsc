@@ -5,8 +5,6 @@
 
 init()
 {
-	level thread onBotConnected();
-
 	level thread onSomeoneSaid();
 
 	level thread onBotSayVar();
@@ -203,27 +201,5 @@ onSomeoneSaid()
 		level waittill( "say", string, player );
 
 		PrintConsole( player.name + ": ^7" + string + "\n" );
-	}
-}
-
-onBotConnected()
-{
-	for ( ;; )
-	{
-		level waittill( "bot_connected", bot );
-
-		bot thread setBotPing();
-	}
-}
-
-setBotPing()
-{
-	self endon( "disconnect" );
-
-	for ( ;; )
-	{
-		wait 0.05;
-
-		self SetPing( randomIntRange( 40, 60 ) );
 	}
 }

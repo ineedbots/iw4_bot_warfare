@@ -1,4 +1,4 @@
-# IW4x Bot Warfare v2.3.0
+# IW4x Bot Warfare v2.3.1
 Bot Warfare is a GSC mod for the IW4x project.
 
 It aims to add playable AI to the multiplayer games of Modern Warfare 2.
