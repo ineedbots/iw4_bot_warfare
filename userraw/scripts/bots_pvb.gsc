@@ -5,8 +5,6 @@
 
 init()
 {
-	level thread onSomeoneSaid();
-
 	level thread onBotSayVar();
 
 	level thread watchTeams();
@@ -191,15 +189,5 @@ onBotSayVar()
 
 		SetDvar( "bot_say", "" );
 		bot sayall( toSay );
-	}
-}
-
-onSomeoneSaid()
-{
-	for ( ;; )
-	{
-		level waittill( "say", string, player );
-
-		PrintConsole( player.name + ": ^7" + string + "\n" );
 	}
 }
