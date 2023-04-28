@@ -77,7 +77,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 |----------------------------------|---------------------------------------------------------------------------------------------|--------------:|
 | bots_main                        | Enable this mod.                                                                            | 1             |
 | bots_main_firstIsHost            | The first player to connect will be given host.                                             | 0             |
-| bots_main_GUIDs                  | A comma separated list of GUIDs of players who will be given host.                          | ""            |
+| bots_main_GUIDs                  | A comma separated list of GUIDs of players who will be given host.                          |               |
 | bots_main_waitForHostTime        | How many seconds to wait for the host player to connect before adding bots to the match.    | 10            |
 | bots_main_menu                   | Enable the in-game menu for hosts.                                                          | 1             |
 | bots_main_debug                  | Enable the in-game waypoint editor.                                                         | 0             |
