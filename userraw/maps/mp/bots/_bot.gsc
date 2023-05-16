@@ -1,6 +1,6 @@
 /*
 	_bot
-	Author: INeedGames
+	Author: INeedGames, diamante0018
 	Date: 09/26/2020
 	The entry point and manager of the bots.
 */
@@ -15,7 +15,7 @@
 */
 init()
 {
-	level.bw_VERSION = "2.3.2";
+	level.bw_VERSION = "2.3.3";
 
 	if ( getDvar( "bots_main" ) == "" )
 		setDvar( "bots_main", true );
