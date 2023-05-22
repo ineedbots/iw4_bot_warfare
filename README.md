@@ -1,6 +1,6 @@
 ![GitHub Logo](/userraw/bw-assets/bw-logo.png)
 
-# IW4x Bot Warfare
+# 💀 Bot Warfare
 Bot Warfare is a GSC mod for the 💀.
 
 It aims to add playable AI to the multiplayer games of Modern Warfare 2.
