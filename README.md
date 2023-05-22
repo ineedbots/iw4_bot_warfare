@@ -1,7 +1,7 @@
 ![GitHub Logo](/userraw/bw-assets/bw-logo.png)
 
 # IW4x Bot Warfare
-Bot Warfare is a GSC mod for the [IW4x project](https://github.com/XLabsProject/iw4x-client).
+Bot Warfare is a GSC mod for the 💀.
 
 It aims to add playable AI to the multiplayer games of Modern Warfare 2.
 
@@ -166,7 +166,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Fix testclient view angle clamping (messes with ac130 and chopper gunner) (engine)
 
 ## Credits
-- IW4x Team - https://github.com/XLabsProject/iw4x-client
+- IW4x Team
 - CoD4x Team - https://github.com/callofduty4x/CoD4x_Server
 - INeedGames - http://www.moddb.com/mods/bot-warfare
 - tinkie101 - https://web.archive.org/web/20120326060712/http://alteriw.net/viewtopic.php?f=72&t=4869
