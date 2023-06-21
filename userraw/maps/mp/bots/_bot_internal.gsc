@@ -1134,21 +1134,36 @@ target_loop()
 			else
 			{
 				targetHead = player getTagOrigin( "j_head" );
+				if (!isDefined(targetHead))
+					continue;
 				targetAnkleLeft = player getTagOrigin( "j_ankle_le" );
+				if (!isDefined(targetAnkleLeft))
+					continue;
 				targetAnkleRight = player getTagOrigin( "j_ankle_ri" );
+				if (!isDefined(targetAnkleRight))
+					continue;
 
 				traceHead = bulletTrace( myEye, targetHead, false, undefined );
 				traceAnkleLeft = bulletTrace( myEye, targetAnkleLeft, false, undefined );
 				traceAnkleRight = bulletTrace( myEye, targetAnkleRight, false, undefined );
 
-				canTargetPlayer = ( ( sightTracePassed( myEye, targetHead, false, undefined ) ||
-				            sightTracePassed( myEye, targetAnkleLeft, false, undefined ) ||
-				            sightTracePassed( myEye, targetAnkleRight, false, undefined ) )
+				sightTracePassedHead = sightTracePassed( myEye, targetHead, false, undefined );
+				if (!isDefined(sightTracePassedHead))
+					sightTracePassedHead = false;
+				sightTracePassedAnkleLeft = sightTracePassed( myEye, targetAnkleLeft, false, undefined );
+				if (!isDefined(sightTracePassedAnkleLeft))
+					sightTracePassedAnkleLeft = false;
+				sightTracePassedAnkleRight = sightTracePassed( myEye, targetAnkleRight, false, undefined );
+				if (!isDefined(sightTracePassedAnkleRight))
+					sightTracePassedAnkleRight = false;
 
-				        && ( ( traceHead["fraction"] >= 1.0 || traceHead["surfacetype"] == "glass" ) ||
-				            ( traceAnkleLeft["fraction"] >= 1.0 || traceAnkleLeft["surfacetype"] == "glass" ) ||
-				            ( traceAnkleRight["fraction"] >= 1.0 || traceAnkleRight["surfacetype"] == "glass" ) )
+				traceHeadFractionOrGlass = ( traceHead["fraction"] >= 1.0 || traceHead["surfacetype"] == "glass" );
+				traceAnkleLeftFractionOrGlass = ( traceAnkleLeft["fraction"] >= 1.0 || traceAnkleLeft["surfacetype"] == "glass" );
+				traceAnkleRightFractionOrGlass = ( traceAnkleRight["fraction"] >= 1.0 || traceAnkleRight["surfacetype"] == "glass" );
 
+				canTargetPlayer = (
+						( sightTracePassedHead || sightTracePassedAnkleLeft || sightTracePassedAnkleRight )
+				        && ( traceHeadFractionOrGlass || traceAnkleLeftFractionOrGlass || traceAnkleRightFractionOrGlass )
 				        && ( ignoreSmoke ||
 				            SmokeTrace( myEye, player.origin, level.smokeRadius ) ||
 				            daDist < level.bots_maxKnifeDistance * 4 )
