@@ -12,8 +12,7 @@
 
 init()
 {
-	if ( getDvar( "bots_main_debug" ) == "" )
-		setDvar( "bots_main_debug", 0 );
+	setDvarIfUninitialized( "bots_main_debug", 0);
 
 	if ( !getDVarint( "bots_main_debug" ) )
 		return;
@@ -27,25 +26,18 @@ init()
 		exitLevel( false );
 	}
 
-	setDvar( "bots_main", 0 );
-	setdvar( "bots_main_menu", 0 );
-	setdvar( "bots_manage_fill_mode", 0 );
-	setdvar( "bots_manage_fill", 0 );
-	setdvar( "bots_manage_add", 0 );
-	setdvar( "bots_manage_fill_kick", 1 );
-	setDvar( "bots_manage_fill_spec", 1 );
+	setDvarIfUninitialized( "bots_main", 0 );
+	setDvarIfUninitialized( "bots_main_menu", 0 );
+	setDvarIfUninitialized( "bots_manage_fill_mode", 0 );
+	setDvarIfUninitialized( "bots_manage_fill", 0 );
+	setDvarIfUninitialized( "bots_manage_add", 0 );
+	setDvarIfUninitialized( "bots_manage_fill_kick", 1 );
+	setDvarIfUninitialized( "bots_manage_fill_spec", 1 );
 
-	if ( getDvar( "bots_main_debug_distance" ) == "" )
-		setDvar( "bots_main_debug_distance", 512.0 );
-
-	if ( getDvar( "bots_main_debug_cone" ) == "" )
-		setDvar( "bots_main_debug_cone", 0.65 );
-
-	if ( getDvar( "bots_main_debug_minDist" ) == "" )
-		setDvar( "bots_main_debug_minDist", 32.0 );
-
-	if ( getDvar( "bots_main_debug_drawThrough" ) == "" )
-		setDvar( "bots_main_debug_drawThrough", false );
+	setDvarIfUninitialized( "bots_main_debug_distance", 512.0);
+	setDvarIfUninitialized( "bots_main_debug_cone", 0.65);
+	setDvarIfUninitialized( "bots_main_debug_minDist", 32.0);
+	setDvarIfUninitialized( "bots_main_debug_drawThrough", false);
 
 	setDvar( "player_sustainAmmo", 1 );
 
@@ -77,7 +69,7 @@ StartDev()
 	self.nearest = -1;
 
 	self takeAllWeapons();
-	self giveWeapon( "m16_gl_mp" ); //to knife windows
+	self giveWeapon( "defaultweapon_mp" ); //to knife windows
 	self giveWeapon( "javelin_mp" ); //to mark jav spots
 	self SetOffhandPrimaryClass( "other" );
 	self giveWeapon( "semtex_mp" );
@@ -108,12 +100,12 @@ sayExtras()
 	self endon( "disconnect" );
 	self endon( "death" );
 	self iprintln( "Before adding waypoints, holding buttons:" );
-	wait 4;
+	wait 8;
 	self iprintln( "ADS - climb" );
 	self iprintln( "Use + Attack - tube" );
 	self iprintln( "Attack - grenade" );
 	self iprintln( "Use - claymore" );
-	wait 4;
+	wait 8;
 	self iprintln( "Else the waypoint will be your stance." );
 	self iprintln( "Making a crouch waypoint with only one link..." );
 	self iprintln( "Makes a camping waypoint." );
@@ -365,34 +357,34 @@ watchSaveWaypointsCommand()
 	{
 		self waittill( "[{+actionslot 1}]" );
 
-		self checkForWarnings();
+		// self checkForWarnings();
 		wait 1;
 
-		logprint( "***********ABiliTy's WPDump**************\n\n" );
-		logprint( "\n\n\n\n" );
-		mpnm = getMapName( getdvar( "mapname" ) );
-		logprint( "\n\n" + mpnm + "()\n{\n/*" );
-		logprint( "*/waypoints = [];\n/*" );
+		// logprint( "***********ABiliTy's WPDump**************\n\n" );
+		// logprint( "\n\n\n\n" );
+		// mpnm = getMapName( getdvar( "mapname" ) );
+		// logprint( "\n\n" + mpnm + "()\n{\n/*" );
+		// logprint( "*/waypoints = [];\n/*" );
 
-		for ( i = 0; i < level.waypointCount; i++ )
-		{
-			logprint( "*/waypoints[" + i + "] = spawnstruct();\n/*" );
-			logprint( "*/waypoints[" + i + "].origin = " + level.waypoints[i].origin + ";\n/*" );
-			logprint( "*/waypoints[" + i + "].type = \"" + level.waypoints[i].type + "\";\n/*" );
+		// for ( i = 0; i < level.waypointCount; i++ )
+		// {
+		// 	logprint( "*/waypoints[" + i + "] = spawnstruct();\n/*" );
+		// 	logprint( "*/waypoints[" + i + "].origin = " + level.waypoints[i].origin + ";\n/*" );
+		// 	logprint( "*/waypoints[" + i + "].type = \"" + level.waypoints[i].type + "\";\n/*" );
 
-			for ( c = 0; c < level.waypoints[i].children.size; c++ )
-			{
-				logprint( "*/waypoints[" + i + "].children[" + c + "] = " + level.waypoints[i].children[c] + ";\n/*" );
-			}
+		// 	for ( c = 0; c < level.waypoints[i].children.size; c++ )
+		// 	{
+		// 		logprint( "*/waypoints[" + i + "].children[" + c + "] = " + level.waypoints[i].children[c] + ";\n/*" );
+		// 	}
 
-			if ( isDefined( level.waypoints[i].angles ) && ( level.waypoints[i].type == "claymore" || level.waypoints[i].type == "tube" || ( level.waypoints[i].type == "crouch" && level.waypoints[i].children.size == 1 ) || level.waypoints[i].type == "climb" || level.waypoints[i].type == "grenade" ) )
-				logprint( "*/waypoints[" + i + "].angles = " + level.waypoints[i].angles + ";\n/*" );
+		// 	if ( isDefined( level.waypoints[i].angles ) && ( level.waypoints[i].type == "claymore" || level.waypoints[i].type == "tube" || ( level.waypoints[i].type == "crouch" && level.waypoints[i].children.size == 1 ) || level.waypoints[i].type == "climb" || level.waypoints[i].type == "grenade" ) )
+		// 		logprint( "*/waypoints[" + i + "].angles = " + level.waypoints[i].angles + ";\n/*" );
 
-			if ( isDefined( level.waypoints[i].jav_point ) && level.waypoints[i].type == "javelin" )
-				logprint( "*/waypoints[" + i + "].jav_point = " + level.waypoints[i].jav_point + ";\n/*" );
-		}
+		// 	if ( isDefined( level.waypoints[i].jav_point ) && level.waypoints[i].type == "javelin" )
+		// 		logprint( "*/waypoints[" + i + "].jav_point = " + level.waypoints[i].jav_point + ";\n/*" );
+		// }
 
-		logprint( "*/return waypoints;\n}\n\n\n\n" );
+		// logprint( "*/return waypoints;\n}\n\n\n\n" );
 
 		filename = "waypoints/" + getdvar( "mapname" ) + "_wp.csv";
 
@@ -428,7 +420,7 @@ watchSaveWaypointsCommand()
 			else
 				str += ",";
 
-			PrintLn( str );
+			// PrintLn( str );
 			fileWrite( filename, str + "\n", "append" );
 		}
 
@@ -451,11 +443,20 @@ LoadWaypoints()
 
 checkForWarnings()
 {
-	if ( level.waypointCount <= 0 )
+	if ( level.waypointCount <= 1 ) {
 		self iprintln( "WARNING: waypointCount is " + level.waypointCount );
+		return;
+	}
 
-	if ( level.waypointCount != level.waypoints.size )
+	if ( level.waypoints.size <= 1 ) {
+		self iprintln( "WARNING: level.waypoints.size is " + level.waypointCount );
+		return;
+	}
+
+	if ( level.waypointCount != level.waypoints.size ) {
 		self iprintln( "WARNING: waypointCount is not " + level.waypoints.size );
+		return;
+	}
 
 	for ( i = 0; i < level.waypointCount; i++ )
 	{

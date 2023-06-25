@@ -830,8 +830,9 @@ isStrStart( string1, subStr )
 */
 parseTokensIntoWaypoint( tokens )
 {
+	if ( tokens.size != 6 )
+		return undefined;
 	waypoint = spawnStruct();
-
 	orgStr = tokens[0];
 	orgToks = strtok( orgStr, " " );
 	waypoint.origin = ( float( orgToks[0] ), float( orgToks[1] ), float( orgToks[2] ) );
@@ -924,6 +925,10 @@ readWpsFromFile( mapname )
 		tokens = tokenizeLine( res.lines[i], "," );
 
 		waypoint = parseTokensIntoWaypoint( tokens );
+		if (!isDefined(waypoint)) {
+			PrintConsole( "ERROR while parsing Waypoint: " + res.lines[i] + "\n" );
+			continue;
+		}
 
 		waypoints[i - 1] = waypoint;
 	}
