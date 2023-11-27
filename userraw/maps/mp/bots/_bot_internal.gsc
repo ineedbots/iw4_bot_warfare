@@ -233,11 +233,6 @@ onWeaponChange()
 		self.bot.cur_weap_dist_multi = SetWeaponDistMulti( newWeapon );
 		self.bot.is_cur_sniper = IsWeapSniper( newWeapon );
 		self.bot.is_cur_akimbo = isSubStr( newWeapon, "_akimbo_" );
-
-		if ( newWeapon == "none" )
-			continue;
-
-		self changeToWeap( newWeapon );
 	}
 }
 
@@ -303,37 +298,6 @@ sprint_watch()
 /*
 	When the bot enters laststand, we fix the weapons
 */
-onLastStand_loop()
-{
-	while ( !self inLastStand() )
-		wait 0.05;
-
-	self notify( "kill_goal" );
-
-	if ( !self inFinalStand() && !self IsUsingRemote() )
-	{
-		pistol = undefined;
-		weaponsList = self GetWeaponsListPrimaries();
-
-		for ( i = 0; i < weaponsList.size; i++ )
-		{
-			weapon = weaponsList[i];
-
-			if ( maps\mp\gametypes\_weapons::isSideArm( weapon ) )
-				pistol = weapon;
-		}
-
-		if ( isDefined( pistol ) )
-			self changeToWeap( pistol );
-	}
-
-	while ( self inLastStand() )
-		wait 0.05;
-}
-
-/*
-	When the bot enters laststand, we fix the weapons
-*/
 onLastStand()
 {
 	self endon( "disconnect" );
@@ -341,7 +305,13 @@ onLastStand()
 
 	while ( true )
 	{
-		self onLastStand_loop();
+		while ( !self inLastStand() )
+			wait 0.05;
+
+		self notify( "kill_goal" );
+
+		while ( self inLastStand() )
+			wait 0.05;
 	}
 }
 
@@ -366,25 +336,16 @@ watchUsingRemote()
 		if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && level.chopper.gunner == self )
 		{
 			self watchUsingMinigun();
-
-			if ( isReallyAlive( self ) )
-			{
-				self changeToWeap( self getLastWeapon() );
-				self.bot.targets = [];
-			}
 		}
 
 		if ( isDefined( level.ac130Player ) && level.ac130player == self )
 		{
 			self thread watchAc130Weapon();
 			self watchUsingAc130();
-
-			if ( isReallyAlive( self ) )
-			{
-				self changeToWeap( self getLastWeapon() );
-				self.bot.targets = [];
-			}
 		}
+
+		self.bot.targets = [];
+		self notify( "kill_goal" );
 	}
 }
 
@@ -2574,13 +2535,6 @@ prone()
 */
 changeToWeap( weap )
 {
-	if ( maps\mp\gametypes\_weapons::isAltModeWeapon( weap ) )
-	{
-		self botWeapon( "" );
-		self setSpawnWeapon( weap );
-		return;
-	}
-
 	self botWeapon( weap );
 }
 
@@ -2700,4 +2654,12 @@ bot_lookat( pos, time, vel, doAimPredict )
 		self setPlayerAngles( myAngle );
 		wait 0.05;
 	}
+}
+
+/*
+	Bot change weap
+*/
+botWeapon( weap )
+{
+	self switchToWeapon( weap );
 }

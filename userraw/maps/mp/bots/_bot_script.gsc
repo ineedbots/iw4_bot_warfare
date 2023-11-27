@@ -1812,116 +1812,12 @@ bot_go_defuse( plant )
 }
 
 /*
-	Creates a bomb use thread and waits for an output
+	Waits for the bot to stop moving
 */
-bot_use_bomb_thread( bomb )
+bot_wait_stop_move()
 {
-	self thread bot_use_bomb( bomb );
-	self waittill_any( "bot_try_use_fail", "bot_try_use_success" );
-}
-
-/*
-	Waits for the time to call bot_try_use_success or fail
-*/
-bot_bomb_use_time( wait_time )
-{
-	level endon( "game_ended" );
-	self endon( "death" );
-	self endon( "disconnect" );
-	self endon( "bot_try_use_fail" );
-	self endon( "bot_try_use_success" );
-
-	self waittill( "bot_try_use_weapon" );
-
-	wait 0.05;
-	elapsed = 0;
-
-	while ( wait_time > elapsed )
-	{
-		wait 0.05;//wait first so waittill can setup
-		elapsed += 0.05;
-
-		if ( self InLastStand() )
-		{
-			self notify( "bot_try_use_fail" );
-			return;//needed?
-		}
-	}
-
-	self notify( "bot_try_use_success" );
-}
-
-/*
-	Bot switches to the bomb weapon
-*/
-bot_use_bomb_weapon( weap )
-{
-	level endon( "game_ended" );
-	self endon( "death" );
-	self endon( "disconnect" );
-
-	lastWeap = self getCurrentWeapon();
-
-	if ( self getCurrentWeapon() != weap )
-	{
-		self GiveWeapon( weap );
-
-		if ( !self ChangeToWeapon( weap ) )
-		{
-			self notify( "bot_try_use_fail" );
-			return;
-		}
-	}
-	else
-	{
-		wait 0.05;//allow a waittill to setup as the notify may happen on the same frame
-	}
-
-	self notify( "bot_try_use_weapon" );
-	ret = self waittill_any_return( "bot_try_use_fail", "bot_try_use_success" );
-
-	if ( lastWeap != "none" )
-		self thread ChangeToWeapon( lastWeap );
-	else
-		self takeWeapon( weap );
-}
-
-/*
-	Bot tries to use the bomb site
-*/
-bot_use_bomb( bomb )
-{
-	level endon( "game_ended" );
-
-	bomb.inUse = true;
-
-	myteam = self.team;
-
-	self BotFreezeControls( true );
-
-	bomb [[bomb.onBeginUse]]( self );
-
-	self clientClaimTrigger( bomb.trigger );
-	self.claimTrigger = bomb.trigger;
-
-	self thread bot_bomb_use_time( bomb.useTime / 1000 );
-	self thread bot_use_bomb_weapon( bomb.useWeapon );
-
-	result = self waittill_any_return( "death", "disconnect", "bot_try_use_fail", "bot_try_use_success" );
-
-	if ( isDefined( self ) )
-	{
-		self.claimTrigger = undefined;
-		self BotFreezeControls( false );
-	}
-
-	bomb [[bomb.onEndUse]]( myteam, self, ( result == "bot_try_use_success" ) );
-	bomb.trigger releaseClaimedTrigger();
-
-	if ( result == "bot_try_use_success" )
-		bomb [[bomb.onUse]]( self );
-
-	bomb.inUse = false;
+	while ( !self isOnGround() || lengthSquared( self getVelocity() ) > 1 )
+		wait 0.25;
 }
 
 /*
@@ -3228,8 +3124,7 @@ bot_equipment_kill_think_loop()
 		if ( isDefined( target ) )
 		{
 			self BotNotifyBotEvent( "attack_equ", "trigger_ti", target );
-
-			target.enemyTrigger notify( "trigger", self );
+			self thread BotPressUse();
 		}
 
 		return;
@@ -3861,7 +3756,7 @@ bot_crate_think_loop( data )
 
 		self.bot_lock_goal = true;
 
-		radius = GetDvarFloat( "player_useRadius" );
+		radius = GetDvarFloat( "player_useRadius" ) - 16;
 		self SetScriptGoal( crate.origin, radius );
 		self thread bot_inc_bots( crate, true );
 		self thread bots_watch_touch_obj( crate );
@@ -3886,27 +3781,21 @@ bot_crate_think_loop( data )
 
 	self BotRandomStance();
 
-	self _DisableWeapon();
 	self BotFreezeControls( true );
+	self bot_wait_stop_move();
 
-	waitTime = 3;
+	waitTime = 3.25;
 
 	if ( !isDefined( crate.owner ) || crate.owner == self )
-		waitTime = 0.5;
+		waitTime = 0.75;
 
-	crate waittill_notify_or_timeout( "captured", waitTime );
+	self thread BotPressUse( waitTime );
+	wait waitTime;
 
-	self _EnableWeapon();
 	self BotFreezeControls( false );
 
-	self notify( "bot_force_check_switch" );
-
-	if ( !isDefined( crate ) )
-		return;
-
+	// check if actually captured it?
 	self BotNotifyBotEvent( "crate_cap", "stop", crate );
-
-	crate notify ( "captured", self );
 }
 
 /*
@@ -4429,8 +4318,6 @@ bot_killstreak_think_loop( data )
 			self notify( "cancel_sentry" );
 			wait 0.5;
 
-			self thread changeToWeapon( curWeap );
-
 			self BotStopMoving( false );
 			self ClearScriptAimPos();
 		}
@@ -4455,6 +4342,9 @@ bot_killstreak_think_loop( data )
 				self BotStopMoving( false );
 				return;
 			}
+
+			wait 0.05;
+			self thread ChangeToWeapon( ksWeap ); // prevent script from changing back
 
 			wait 1;
 			self notify( "bot_clear_remote_on_death" );
@@ -4485,7 +4375,6 @@ bot_killstreak_think_loop( data )
 
 			wait 1;
 			self BotFreezeControls( false );
-			self thread changeToWeapon( curWeap );
 		}
 		else if ( streakName == "ac130" )
 		{
@@ -4497,12 +4386,9 @@ bot_killstreak_think_loop( data )
 			self BotRandomStance();
 			self BotStopMoving( true );
 			self changeToWeapon( ksWeap );
-			self BotStopMoving( false );
 
 			wait 3;
-
-			if ( !isDefined( level.ac130player ) || level.ac130player != self )
-				self thread changeToWeapon( curWeap );
+			self BotStopMoving( false );
 		}
 		else if ( streakName == "helicopter_minigun" )
 		{
@@ -4514,12 +4400,9 @@ bot_killstreak_think_loop( data )
 			self BotRandomStance();
 			self BotStopMoving( true );
 			self changeToWeapon( ksWeap );
-			self BotStopMoving( false );
 
 			wait 3;
-
-			if ( !isDefined( level.chopper ) || !isDefined( level.chopper.gunner ) || level.chopper.gunner != self )
-				self thread changeToWeapon( curWeap );
+			self BotStopMoving( false );
 		}
 	}
 	else
@@ -4563,7 +4446,6 @@ bot_killstreak_think_loop( data )
 			ret = self waittill_any_timeout( 5, "grenade_fire" );
 
 			self notify( "stop_firing_weapon" );
-			self thread changeToWeapon( curWeap );
 
 			if ( ret == "timeout" )
 			{
@@ -4632,8 +4514,6 @@ bot_killstreak_think_loop( data )
 
 							self BotFreezeControls( false );
 						}
-
-						self thread changeToWeapon( curWeap );
 					}
 
 					self BotStopMoving( false );
@@ -5421,9 +5301,11 @@ bot_sab_loop()
 
 		self BotRandomStance();
 		self SetScriptGoal( self.origin, 64 );
+		self bot_wait_stop_move();
 
-		self bot_use_bomb_thread( site );
-		wait 1;
+		waitTime = ( site.useTime / 1000 ) + 2.5;
+		self thread BotPressUse( waitTime );
+		wait waitTime;
 
 		self ClearScriptGoal();
 		self.bot_lock_goal = false;
@@ -5549,10 +5431,11 @@ bot_sab_loop()
 
 		self BotRandomStance();
 		self SetScriptGoal( self.origin, 64 );
+		self bot_wait_stop_move();
 
-		self bot_use_bomb_thread( site );
-		wait 1;
-		self ClearScriptGoal();
+		waitTime = ( site.useTime / 1000 ) + 2.5;
+		self thread BotPressUse( waitTime );
+		wait waitTime;
 
 		self.bot_lock_goal = false;
 
@@ -5765,9 +5648,12 @@ bot_sd_defenders_loop( data )
 
 	self BotRandomStance();
 	self SetScriptGoal( self.origin, 64 );
+	self bot_wait_stop_move();
 
-	self bot_use_bomb_thread( defuse );
-	wait 1;
+	waitTime = ( defuse.useTime / 1000 ) + 2.5;
+	self thread BotPressUse( waitTime );
+	wait waitTime;
+
 	self ClearScriptGoal();
 	self.bot_lock_goal = false;
 
@@ -5991,9 +5877,11 @@ bot_sd_attackers_loop( data )
 
 	self BotRandomStance();
 	self SetScriptGoal( self.origin, 64 );
+	self bot_wait_stop_move();
 
-	self bot_use_bomb_thread( plant );
-	wait 1;
+	waitTime = ( plant.useTime / 1000 ) + 2.5;
+	self thread BotPressUse( waitTime );
+	wait waitTime;
 
 	self ClearScriptGoal();
 	self.bot_lock_goal = false;
@@ -6514,9 +6402,11 @@ bot_dem_attackers_loop()
 
 	self BotRandomStance();
 	self SetScriptGoal( self.origin, 64 );
+	self bot_wait_stop_move();
 
-	self bot_use_bomb_thread( plant );
-	wait 1;
+	waitTime = ( plant.useTime / 1000 ) + 2.5;
+	self thread BotPressUse( waitTime );
+	wait waitTime;
 
 	self ClearScriptGoal();
 
@@ -6753,9 +6643,11 @@ bot_dem_defenders_loop()
 
 	self BotRandomStance();
 	self SetScriptGoal( self.origin, 64 );
+	self bot_wait_stop_move();
 
-	self bot_use_bomb_thread( defuse );
-	wait 1;
+	waitTime = ( defuse.useTime / 1000 ) + 2.5;
+	self thread BotPressUse( waitTime );
+	wait waitTime;
 
 	self ClearScriptGoal();
 
@@ -6891,37 +6783,14 @@ bot_think_revive_loop()
 
 	self BotNotifyBotEvent( "revive", "start", revive );
 
-	self _DisableWeapon();
 	self BotFreezeControls( true );
+	self bot_wait_stop_move();
 
-	wait 3;
+	waitTime = 3.25;
+	self thread BotPressUse( waitTime );
+	wait waitTime;
 
-	self _EnableWeapon();
 	self BotFreezeControls( false );
-
-	if ( !isDefined( revive ) || distanceSquared( self.origin, revive.origin ) >= 100 * 100 || !revive inLastStand() || revive isBeingRevived() || !isAlive( revive ) )
-		return;
-
-	self thread maps\mp\gametypes\_hud_message::SplashNotifyDelayed( "reviver", 200 );
-	self thread maps\mp\gametypes\_rank::giveRankXP( "reviver", 200 );
-
-	revive.lastStand = undefined;
-	revive clearLowerMessage( "last_stand" );
-
-	if ( revive _hasPerk( "specialty_lightweight" ) )
-		revive.moveSpeedScaler = 1.07;
-	else
-		revive.moveSpeedScaler = 1;
-
-	revive.maxHealth = 100;
-
-	revive maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
-	revive maps\mp\gametypes\_playerlogic::lastStandRespawnPlayer();
-
-	revive setPerk( "specialty_pistoldeath", true );
-	revive.beingRevived = false;
-
-	// reviveEnt delete();
 
 	self BotNotifyBotEvent( "revive", "stop", revive );
 }
