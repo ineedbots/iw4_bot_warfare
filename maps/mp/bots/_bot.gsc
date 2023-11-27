@@ -3,6 +3,17 @@
 	Author: INeedGames
 	Date: 09/26/2020
 	The entry point and manager of the bots.
+
+	Non-canon bootstrapped from <searchpath>/scripts/*.gsc::init
+	Non-canon bot behavior; controlled through gsc built-ins
+	Non-canon built-ins:
+		PrintConsole(<string>)
+		FS_FileTest(<file name>) -> bool, base path is <searchpath>/scriptdata
+		FS_FileRead(<file name>) -> string, base path is <searchpath>/scriptdata
+		FS_FileWrite(<file name>, <contents>, <mode ("append", "write")>), base path is <searchpath>/scriptdata
+		<client> botStop()
+		<client> botAction(<action string (+ or - then action like frag or smoke)>)
+		<client> botMovement(<int left>, <int forward>)
 */
 
 #include common_scripts\utility;

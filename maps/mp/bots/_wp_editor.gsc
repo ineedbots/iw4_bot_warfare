@@ -399,7 +399,7 @@ watchSaveWaypointsCommand()
 		PrintLn( "********* Start Bot Warfare WPDump *********" );
 		PrintLn( level.waypointCount );
 
-		fileWrite( filename, level.waypointCount + "\n", "write" );
+		fs_filewrite( filename, level.waypointCount + "\n", "write" );
 
 		for ( i = 0; i < level.waypointCount; i++ )
 		{
@@ -429,7 +429,7 @@ watchSaveWaypointsCommand()
 				str += ",";
 
 			PrintLn( str );
-			fileWrite( filename, str + "\n", "append" );
+			fs_filewrite( filename, str + "\n", "append" );
 		}
 
 		PrintLn( "\n\n\n\n\n\n" );

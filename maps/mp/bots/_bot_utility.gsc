@@ -883,7 +883,8 @@ getWaypointLinesFromFile( filename )
 	result = spawnStruct();
 	result.lines = [];
 
-	waypointStr = fileRead( filename );
+	// todo read line by line
+	waypointStr = fs_fileread( filename );
 
 	if ( !isDefined( waypointStr ) )
 		return result;
@@ -918,7 +919,7 @@ readWpsFromFile( mapname )
 	waypoints = [];
 	filename = "waypoints/" + mapname + "_wp.csv";
 
-	if ( !fileExists( filename ) )
+	if ( !fs_testfile( filename ) )
 		return waypoints;
 
 	res = getWaypointLinesFromFile( filename );

@@ -54,7 +54,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 ## Installation
 0. Make sure that [IW4]() is installed, updated and working properly.
-    - Download the [latest release](https://github.com/ineedbots/iw4x_bot_warfare/releases) of Bot Warfare.
+    - Download the [latest release](https://github.com/ineedbots/iw4_bot_warfare/releases) of Bot Warfare.
 1. Locate your IW4 install folder.
 2. Move the files/folders found in 'Move files to root of IW4 folder' from the Bot Warfare release archive you downloaded into the root of your IW4 install folder.
     - The folder/file structure should follow as '.IW4 game folder\mods\bots\z_svr_bots.iwd'.

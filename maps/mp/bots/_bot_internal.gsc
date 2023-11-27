@@ -2659,7 +2659,7 @@ bot_lookat( pos, time, vel, doAimPredict )
 /*
 	Bot change weap
 */
-botWeapona( weap )
+botWeapon( weap )
 {
 	self switchToWeapon( weap );
 }
