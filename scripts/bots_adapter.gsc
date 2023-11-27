@@ -23,6 +23,7 @@ do_printconsole( s )
 
 do_filewrite( file, contents, mode )
 {
+	file = "scriptdata/" + file;
 	FileWrite( file, contents, mode );
 }
 
@@ -34,6 +35,7 @@ do_fileread( file )
 
 do_fileexists( file )
 {
+	file = "scriptdata/" + file;
 	return FileExists( file );
 }
 
