@@ -28,6 +28,7 @@ do_filewrite( file, contents, mode )
 
 do_fileread( file )
 {
+	file = "scriptdata/" + file;
 	return FileRead( file );
 }
 
