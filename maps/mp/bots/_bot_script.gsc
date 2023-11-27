@@ -52,6 +52,7 @@ connected()
 	self thread onSpawned();
 
 	self thread onDeath();
+	self thread onGiveLoadout();
 
 	self thread onKillcam();
 
@@ -1469,6 +1470,35 @@ onDeath()
 		self waittill( "death" );
 
 		self.wantSafeSpawn = true;
+	}
+}
+
+/*
+	Watches when the bot is given a loadout
+*/
+onGiveLoadout_loop()
+{
+	class = self.class;
+
+	if ( isDefined( self.bot_oma_class ) )
+		class = self.bot_oma_class;
+
+	self botGiveLoadout( self.team, class, !isDefined( self.bot_oma_class ) );
+	self.bot_oma_class = undefined;
+}
+
+/*
+	Watches when the bot is given a loadout
+*/
+onGiveLoadout()
+{
+	self endon( "disconnect" );
+
+	for ( ;; )
+	{
+		self waittill( "giveLoadout" );
+
+		self onGiveLoadout_loop();
 	}
 }
 
