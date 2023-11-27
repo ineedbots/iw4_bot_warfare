@@ -1,4 +1,0 @@
-AfghanCaves()
-{
-	return [];
-}

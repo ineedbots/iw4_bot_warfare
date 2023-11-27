@@ -1,41 +1,6 @@
-# Ignore everything in repository root
-/*
-
-# Files to not ignore
-!/.vscode
-!/.gitignore
-!/.editorconfig
-!/.gitattributes
-
-!/z_server.bat
-!/z_server_watchdog.bat
-!/z_server_pvbrust.bat
-!/z_server_pvbrust_watchdog.bat
-!/z_server_pvbvote.bat
-!/z_server_pvbvote_watchdog.bat
-
-# Folder to not ignore
-!/userraw
-!/main/
-/main/*
-!/main/server.cfg
-!/main/pvbrust.cfg
-!/main/pvbvote.cfg
-!/README.md
-!/out
-
-!/.astylerc
-!/z_deploy.bat
-!/deploy.bat
-!/deploy.js
-
 *.zip
 *.log
 *.stat
 logs/
 demos/
-images/
 missingasset.csv
-userraw/scripts/_commands.gsc
-userraw/scripts/_customcallbacks.gsc
-userraw/scripts/bots_custom.gsc

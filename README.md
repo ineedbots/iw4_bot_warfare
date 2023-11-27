@@ -1,11 +1,11 @@
-![GitHub Logo](/userraw/bw-assets/bw-logo.png)
+![GitHub Logo](/bw-assets/bw-logo.png)
 
-# 💀 Bot Warfare
-Bot Warfare is a GSC mod for the 💀.
+# IW4 Bot Warfare
+Bot Warfare is a GSC mod for IW4.
 
 It aims to add playable AI to the multiplayer games of Modern Warfare 2.
 
-You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfare/downloads/iw4x-bot-warfare-latest).
+You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfare/downloads/iw4-bot-warfare-latest).
 
 ## Contents
 - [Features](#Features)
@@ -15,7 +15,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 - [Credits](#Credits)
 
 ## Features
-- A Waypoint Editor for creating and modifying bot's waypoints of traversing the map. Have a look at [Using the Waypoint editor](/userraw/bw-assets/wpedit.md).
+- A Waypoint Editor for creating and modifying bot's waypoints of traversing the map. Have a look at [Using the Waypoint editor](/bw-assets/wpedit.md).
 
 - A clean and nice menu, you can edit every bot DVAR within in-game.
 
@@ -23,7 +23,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 - This mod does not edit ANY stock .gsc files, meaning EVERY other mod is compatible with this mod. Mod doesn't add anything unnecessary, what you see is what you get.
 
-- Loading waypoints from CSV files, and if the CSV file is missing, will download the CSV from [this repo](https://github.com/ineedbots/iw4x_waypoints) automatically.
+- Loading waypoints from CSV files found at [this repo](https://github.com/ineedbots/iw4_waypoints).
 
 - Adds AI clients to multiplayer games to simulate playing real players. (essentially Combat Training for MW2)
   - Bots move around the maps with native engine input. (all normal maps, most to all custom maps)
@@ -53,11 +53,11 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - ... And pretty much everything you expect a Combat Training bot to have
 
 ## Installation
-0. Make sure that [IW4x](https://xlabs.dev/support_iw4x_client.html) is installed, updated and working properly. (IW4x v0.6.1)
+0. Make sure that [IW4]() is installed, updated and working properly.
     - Download the [latest release](https://github.com/ineedbots/iw4x_bot_warfare/releases) of Bot Warfare.
-1. Locate your IW4x install folder.
-2. Move the files/folders found in 'Move files to root of IW4x folder' from the Bot Warfare release archive you downloaded into the root of your IW4x install folder.
-    - The folder/file structure should follow as '.IW4x game folder\mods\bots\z_svr_bots.iwd'.
+1. Locate your IW4 install folder.
+2. Move the files/folders found in 'Move files to root of IW4 folder' from the Bot Warfare release archive you downloaded into the root of your IW4 install folder.
+    - The folder/file structure should follow as '.IW4 game folder\mods\bots\z_svr_bots.iwd'.
 3. The mod is now installed, now run your game.
     - If you are a dedicated server, you will need to set the DVAR 'fs_game' to 'mods/bots'
     - If you are not a dedicated server, open the 'Mods' option from the main menu of the game and select 'bots' and then 'Launch'.
@@ -157,16 +157,13 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 
 
 - TODOs
-  - A variable leak in _menu (script)
+  - A variable leak in _menu
   - Recoil for bots (engine, maybe script)
-  - Use proper activate button for bombs, carepackages, etc (script, use +activate)
-  - Proper weapon swaps, including altmode (engine, then script)
-  - Use static turrets in maps (script)
-  - Proper use of pred missile (script and engine)
-  - Fix testclient view angle clamping (messes with ac130 and chopper gunner) (engine)
+  - Use static turrets in maps
+  - Proper use of pred missile
 
 ## Credits
-- IW4x Team
+- IW4x Team - 💀
 - CoD4x Team - https://github.com/callofduty4x/CoD4x_Server
 - INeedGames - http://www.moddb.com/mods/bot-warfare
 - tinkie101 - https://web.archive.org/web/20120326060712/http://alteriw.net/viewtopic.php?f=72&t=4869
