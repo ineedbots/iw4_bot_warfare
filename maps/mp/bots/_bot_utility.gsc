@@ -3,11 +3,100 @@
 	Author: INeedGames
 	Date: 09/26/2020
 	The shared functions for bots
+
+	Notes for engine
+		obv the old bot behavior should be changed to use gsc built-ins to control bots
+		isItemUnlocked should only check for levels for testclients, everything else should return true
+		setSpawnWeapon and switchToWeapon should be modified to work for testclients
 */
 
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
+
+/*
+	Prints to console without dev script on
+*/
+BotBuiltinPrintConsole( s )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins["printconsole"] ) )
+	{
+		[[ level.bot_builtins["printconsole" ]]]( s );
+	}
+}
+
+/*
+	Writes to the file, mode can be "append" or "write"
+*/
+BotBuiltinFileWrite( file, contents, mode )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins["filewrite"] ) )
+	{
+		[[ level.bot_builtins["filewrite" ]]]( file, contents, mode );
+	}
+}
+
+/*
+	Returns the whole file as a string
+*/
+BotBuiltinFileRead( file )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins["fileread"] ) )
+	{
+		return [[ level.bot_builtins["fileread" ]]]( file );
+	}
+
+	return undefined;
+}
+
+/*
+	Test if a file exists
+*/
+BotBuiltinFileExists( file )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins["fileexists"] ) )
+	{
+		return [[ level.bot_builtins["fileexists" ]]]( file );
+	}
+
+	return false;
+}
+
+/*
+	Bot action, does a bot action
+	<client> botAction(<action string (+ or - then action like frag or smoke)>)
+*/
+BotBuiltinBotAction( action )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins["botaction"] ) )
+	{
+		self [[ level.bot_builtins["botaction" ]]]( action );
+	}
+}
+
+/*
+	Clears the bot from movement and actions
+	<client> botStop()
+*/
+BotBuiltinBotStop()
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins["botstop"] ) )
+	{
+		self [[ level.bot_builtins["botstop" ]]]();
+	}
+}
+
+/*
+	Sets the bot's movement
+	<client> botMovement(<int left>, <int forward>)
+*/
+BotBuiltinBotMovement( left, forward )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins["botmovement"] ) )
+	{
+		self [[ level.bot_builtins["botmovement" ]]]( left, forward );
+	}
+}
 
 /*
 	Returns if player is the host
@@ -31,7 +120,7 @@ doHostCheck()
 
 	if ( getDvar( "bots_main_firstIsHost" ) != "0" )
 	{
-		PrintConsole( "WARNING: bots_main_firstIsHost is enabled\n" );
+		BotBuiltinPrintConsole( "WARNING: bots_main_firstIsHost is enabled\n" );
 
 		if ( getDvar( "bots_main_firstIsHost" ) == "1" )
 		{
@@ -91,14 +180,6 @@ BotSetStance( stance )
 			self maps\mp\bots\_bot_internal::prone();
 			break;
 	}
-}
-
-/*
-	Bot changes to the weap
-*/
-BotChangeToWeapon( weap )
-{
-	self maps\mp\bots\_bot_internal::changeToWeap( weap );
 }
 
 /*
@@ -884,7 +965,7 @@ getWaypointLinesFromFile( filename )
 	result.lines = [];
 
 	// todo read line by line
-	waypointStr = fs_fileread( filename );
+	waypointStr = BotBuiltinFileRead( filename );
 
 	if ( !isDefined( waypointStr ) )
 		return result;
@@ -919,7 +1000,7 @@ readWpsFromFile( mapname )
 	waypoints = [];
 	filename = "waypoints/" + mapname + "_wp.csv";
 
-	if ( !fs_testfile( filename ) )
+	if ( !BotBuiltinFileExists( filename ) )
 		return waypoints;
 
 	res = getWaypointLinesFromFile( filename );
@@ -927,7 +1008,7 @@ readWpsFromFile( mapname )
 	if ( !res.lines.size )
 		return waypoints;
 
-	PrintConsole( "Attempting to read waypoints from " + filename + "\n" );
+	BotBuiltinPrintConsole( "Attempting to read waypoints from " + filename + "\n" );
 
 	waypointCount = int( res.lines[0] );
 
@@ -961,7 +1042,7 @@ load_waypoints()
 	if ( wps.size )
 	{
 		level.waypoints = wps;
-		PrintConsole( "Loaded " + wps.size + " waypoints from csv.\n" );
+		BotBuiltinPrintConsole( "Loaded " + wps.size + " waypoints from csv.\n" );
 	}
 	else
 	{
@@ -973,12 +1054,12 @@ load_waypoints()
 		}
 
 		if ( level.waypoints.size )
-			PrintConsole( "Loaded " + level.waypoints.size + " waypoints from script.\n" );
+			BotBuiltinPrintConsole( "Loaded " + level.waypoints.size + " waypoints from script.\n" );
 	}
 
 	if ( !level.waypoints.size )
 	{
-		PrintConsole( "No waypoints loaded!" );
+		BotBuiltinPrintConsole( "No waypoints loaded!" );
 	}
 
 	level.waypointCount = level.waypoints.size;
@@ -2445,358 +2526,4 @@ bombPlantedFix( destroyedObj, player )
 	wait 3;
 
 	maps\mp\gametypes\sd::sd_endGame( game["attackers"], game["strings"]["target_destroyed"] );
-}
-
-/*
-	Patches giveLoadout so that it doesn't use IsItemUnlocked
-*/
-botGiveLoadout( team, class, allowCopycat )
-{
-	self endon( "death" );
-
-	self takeAllWeapons();
-
-	primaryIndex = 0;
-
-	// initialize specialty array
-	self.specialty = [];
-
-	if ( !isDefined( allowCopycat ) )
-		allowCopycat = true;
-
-	primaryWeapon = undefined;
-
-	if ( isDefined( self.pers["copyCatLoadout"] ) && self.pers["copyCatLoadout"]["inUse"] && allowCopycat )
-	{
-		self maps\mp\gametypes\_class::setClass( "copycat" );
-		self.class_num = maps\mp\gametypes\_class::getClassIndex( "copycat" );
-
-		clonedLoadout = self.pers["copyCatLoadout"];
-
-		loadoutPrimary = clonedLoadout["loadoutPrimary"];
-		loadoutPrimaryAttachment = clonedLoadout["loadoutPrimaryAttachment"];
-		loadoutPrimaryAttachment2 = clonedLoadout["loadoutPrimaryAttachment2"] ;
-		loadoutPrimaryCamo = clonedLoadout["loadoutPrimaryCamo"];
-		loadoutSecondary = clonedLoadout["loadoutSecondary"];
-		loadoutSecondaryAttachment = clonedLoadout["loadoutSecondaryAttachment"];
-		loadoutSecondaryAttachment2 = clonedLoadout["loadoutSecondaryAttachment2"];
-		loadoutSecondaryCamo = clonedLoadout["loadoutSecondaryCamo"];
-		loadoutEquipment = clonedLoadout["loadoutEquipment"];
-		loadoutPerk1 = clonedLoadout["loadoutPerk1"];
-		loadoutPerk2 = clonedLoadout["loadoutPerk2"];
-		loadoutPerk3 = clonedLoadout["loadoutPerk3"];
-		loadoutOffhand = clonedLoadout["loadoutOffhand"];
-		loadoutDeathStreak = "specialty_copycat";
-	}
-	else if ( isSubstr( class, "custom" ) )
-	{
-		class_num = maps\mp\gametypes\_class::getClassIndex( class );
-		self.class_num = class_num;
-
-		loadoutPrimary = maps\mp\gametypes\_class::cac_getWeapon( class_num, 0 );
-		loadoutPrimaryAttachment = maps\mp\gametypes\_class::cac_getWeaponAttachment( class_num, 0 );
-		loadoutPrimaryAttachment2 = maps\mp\gametypes\_class::cac_getWeaponAttachmentTwo( class_num, 0 );
-		loadoutPrimaryCamo = maps\mp\gametypes\_class::cac_getWeaponCamo( class_num, 0 );
-		loadoutSecondaryCamo = maps\mp\gametypes\_class::cac_getWeaponCamo( class_num, 1 );
-		loadoutSecondary = maps\mp\gametypes\_class::cac_getWeapon( class_num, 1 );
-		loadoutSecondaryAttachment = maps\mp\gametypes\_class::cac_getWeaponAttachment( class_num, 1 );
-		loadoutSecondaryAttachment2 = maps\mp\gametypes\_class::cac_getWeaponAttachmentTwo( class_num, 1 );
-		loadoutSecondaryCamo = maps\mp\gametypes\_class::cac_getWeaponCamo( class_num, 1 );
-		loadoutEquipment = maps\mp\gametypes\_class::cac_getPerk( class_num, 0 );
-		loadoutPerk1 = maps\mp\gametypes\_class::cac_getPerk( class_num, 1 );
-		loadoutPerk2 = maps\mp\gametypes\_class::cac_getPerk( class_num, 2 );
-		loadoutPerk3 = maps\mp\gametypes\_class::cac_getPerk( class_num, 3 );
-		loadoutOffhand = maps\mp\gametypes\_class::cac_getOffhand( class_num );
-		loadoutDeathStreak = maps\mp\gametypes\_class::cac_getDeathstreak( class_num );
-	}
-	else
-	{
-		class_num = maps\mp\gametypes\_class::getClassIndex( class );
-		self.class_num = class_num;
-
-		loadoutPrimary = maps\mp\gametypes\_class::table_getWeapon( level.classTableName, class_num, 0 );
-		loadoutPrimaryAttachment = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classTableName, class_num, 0, 0 );
-		loadoutPrimaryAttachment2 = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classTableName, class_num, 0, 1 );
-		loadoutPrimaryCamo = maps\mp\gametypes\_class::table_getWeaponCamo( level.classTableName, class_num, 0 );
-		loadoutSecondaryCamo = maps\mp\gametypes\_class::table_getWeaponCamo( level.classTableName, class_num, 1 );
-		loadoutSecondary = maps\mp\gametypes\_class::table_getWeapon( level.classTableName, class_num, 1 );
-		loadoutSecondaryAttachment = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classTableName, class_num, 1, 0 );
-		loadoutSecondaryAttachment2 = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classTableName, class_num, 1, 1 );;
-		loadoutSecondaryCamo = maps\mp\gametypes\_class::table_getWeaponCamo( level.classTableName, class_num, 1 );
-		loadoutEquipment = maps\mp\gametypes\_class::table_getEquipment( level.classTableName, class_num, 0 );
-		loadoutPerk1 = maps\mp\gametypes\_class::table_getPerk( level.classTableName, class_num, 1 );
-		loadoutPerk2 = maps\mp\gametypes\_class::table_getPerk( level.classTableName, class_num, 2 );
-		loadoutPerk3 = maps\mp\gametypes\_class::table_getPerk( level.classTableName, class_num, 3 );
-		loadoutOffhand = maps\mp\gametypes\_class::table_getOffhand( level.classTableName, class_num );
-		loadoutDeathstreak = maps\mp\gametypes\_class::table_getDeathstreak( level.classTableName, class_num );
-	}
-
-	if ( loadoutPerk1 != "specialty_bling" )
-	{
-		loadoutPrimaryAttachment2 = "none";
-		loadoutSecondaryAttachment2 = "none";
-	}
-
-	if ( loadoutPerk1 != "specialty_onemanarmy" && loadoutSecondary == "onemanarmy" )
-		loadoutSecondary = maps\mp\gametypes\_class::table_getWeapon( level.classTableName, 10, 1 );
-
-	//loadoutSecondaryCamo = "none";
-
-	// stop default class op'ness
-	allowOp = ( getDvarInt( "bots_loadout_allow_op" ) >= 1 );
-
-	if ( !allowOp )
-	{
-		loadoutDeathstreak = "specialty_null";
-
-		if ( loadoutPrimary == "riotshield" )
-			loadoutPrimary = "m4";
-
-		if ( loadoutSecondary == "at4" )
-			loadoutSecondary = "usp";
-
-		if ( loadoutPrimaryAttachment == "gl" )
-			loadoutPrimaryAttachment = "none";
-
-		if ( loadoutPerk2 == "specialty_coldblooded" )
-			loadoutPerk2 = "specialty_null";
-
-		if ( loadoutPerk3 == "specialty_localjammer" )
-			loadoutPerk3 = "specialty_null";
-	}
-
-
-	if ( level.killstreakRewards )
-	{
-		if ( getDvarInt( "scr_classic" ) == 1 )
-		{
-			loadoutKillstreak1 = "uav";
-			loadoutKillstreak2 = "precision_airstrike";
-			loadoutKillstreak3 = "helicopter";
-		}
-		else
-		{
-			loadoutKillstreak1 = self getPlayerData( "killstreaks", 0 );
-			loadoutKillstreak2 = self getPlayerData( "killstreaks", 1 );
-			loadoutKillstreak3 = self getPlayerData( "killstreaks", 2 );
-		}
-	}
-	else
-	{
-		loadoutKillstreak1 = "none";
-		loadoutKillstreak2 = "none";
-		loadoutKillstreak3 = "none";
-	}
-
-	secondaryName = maps\mp\gametypes\_class::buildWeaponName( loadoutSecondary, loadoutSecondaryAttachment, loadoutSecondaryAttachment2 );
-	self _giveWeapon( secondaryName, int( tableLookup( "mp/camoTable.csv", 1, loadoutSecondaryCamo, 0 ) ) );
-
-	self.loadoutPrimaryCamo = int( tableLookup( "mp/camoTable.csv", 1, loadoutPrimaryCamo, 0 ) );
-	self.loadoutPrimary = loadoutPrimary;
-	self.loadoutSecondary = loadoutSecondary;
-	self.loadoutSecondaryCamo = int( tableLookup( "mp/camoTable.csv", 1, loadoutSecondaryCamo, 0 ) );
-
-	self SetOffhandPrimaryClass( "other" );
-
-	// Action Slots
-	//self _SetActionSlot( 1, "" );
-	self _SetActionSlot( 1, "nightvision" );
-	self _SetActionSlot( 3, "altMode" );
-	self _SetActionSlot( 4, "" );
-
-	// Perks
-	self _clearPerks();
-	self maps\mp\gametypes\_class::_detachAll();
-
-	// these special case giving pistol death have to come before
-	// perk loadout to ensure player perk icons arent overwritten
-	if ( level.dieHardMode )
-		self maps\mp\perks\_perks::givePerk( "specialty_pistoldeath" );
-
-	// only give the deathstreak for the initial spawn for this life.
-	if ( loadoutDeathStreak != "specialty_null" && ( getTime() - self.spawnTime ) < 0.1 )
-	{
-		deathVal = int( tableLookup( "mp/perkTable.csv", 1, loadoutDeathStreak, 6 ) );
-
-		if ( self botGetPerkUpgrade( loadoutPerk1 ) == "specialty_rollover" || self botGetPerkUpgrade( loadoutPerk2 ) == "specialty_rollover" || self botGetPerkUpgrade( loadoutPerk3 ) == "specialty_rollover" )
-			deathVal -= 1;
-
-		if ( self.pers["cur_death_streak"] == deathVal )
-		{
-			self thread maps\mp\perks\_perks::givePerk( loadoutDeathStreak );
-			self thread maps\mp\gametypes\_hud_message::splashNotify( loadoutDeathStreak );
-		}
-		else if ( self.pers["cur_death_streak"] > deathVal )
-		{
-			self thread maps\mp\perks\_perks::givePerk( loadoutDeathStreak );
-		}
-	}
-
-	self botLoadoutAllPerks( loadoutEquipment, loadoutPerk1, loadoutPerk2, loadoutPerk3 );
-
-	self maps\mp\gametypes\_class::setKillstreaks( loadoutKillstreak1, loadoutKillstreak2, loadoutKillstreak3 );
-
-	if ( self hasPerk( "specialty_extraammo", true ) && getWeaponClass( secondaryName ) != "weapon_projectile" )
-		self giveMaxAmmo( secondaryName );
-
-	// Primary Weapon
-	primaryName = maps\mp\gametypes\_class::buildWeaponName( loadoutPrimary, loadoutPrimaryAttachment, loadoutPrimaryAttachment2 );
-	self _giveWeapon( primaryName, self.loadoutPrimaryCamo );
-
-	// fix changing from a riotshield class to a riotshield class during grace period not giving a shield
-	if ( primaryName == "riotshield_mp" && level.inGracePeriod )
-		self notify ( "weapon_change", "riotshield_mp" );
-
-	if ( self hasPerk( "specialty_extraammo", true ) )
-		self giveMaxAmmo( primaryName );
-
-	self setSpawnWeapon( primaryName );
-
-	primaryTokens = strtok( primaryName, "_" );
-	self.pers["primaryWeapon"] = primaryTokens[0];
-
-	// Primary Offhand was given by givePerk (it's your perk1)
-
-	// Secondary Offhand
-	offhandSecondaryWeapon = loadoutOffhand + "_mp";
-
-	if ( loadoutOffhand == "flash_grenade" )
-		self SetOffhandSecondaryClass( "flash" );
-	else
-		self SetOffhandSecondaryClass( "smoke" );
-
-	self giveWeapon( offhandSecondaryWeapon );
-
-	if ( loadOutOffhand == "smoke_grenade" )
-		self setWeaponAmmoClip( offhandSecondaryWeapon, 1 );
-	else if ( loadOutOffhand == "flash_grenade" )
-		self setWeaponAmmoClip( offhandSecondaryWeapon, 2 );
-	else if ( loadOutOffhand == "concussion_grenade" )
-		self setWeaponAmmoClip( offhandSecondaryWeapon, 2 );
-	else
-		self setWeaponAmmoClip( offhandSecondaryWeapon, 1 );
-
-	primaryWeapon = primaryName;
-	self.primaryWeapon = primaryWeapon;
-	self.secondaryWeapon = secondaryName;
-
-	self botPlayerModelForWeapon( self.pers["primaryWeapon"], getBaseWeaponName( secondaryName ) );
-
-	self.isSniper = ( weaponClass( self.primaryWeapon ) == "sniper" );
-
-	self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
-
-	// cac specialties that require loop threads
-	self maps\mp\perks\_perks::cac_selector();
-
-	self notify ( "changed_kit" );
-	self notify( "bot_giveLoadout", allowCopycat );
-}
-
-/*
-	Patches giveLoadout so that it doesn't use IsItemUnlocked
-*/
-botGetPerkUpgrade( perkName )
-{
-	perkUpgrade = tablelookup( "mp/perktable.csv", 1, perkName, 8 );
-
-	if ( perkUpgrade == "" || perkUpgrade == "specialty_null" )
-		return "specialty_null";
-
-	if ( !isDefined( self.pers["bots"]["unlocks"]["upgraded_" + perkName] ) || !self.pers["bots"]["unlocks"]["upgraded_" + perkName] )
-		return "specialty_null";
-
-	return ( perkUpgrade );
-}
-
-/*
-	Patches giveLoadout so that it doesn't use IsItemUnlocked
-*/
-botLoadoutAllPerks( loadoutEquipment, loadoutPerk1, loadoutPerk2, loadoutPerk3 )
-{
-	loadoutEquipment = maps\mp\perks\_perks::validatePerk( 1, loadoutEquipment );
-	loadoutPerk1 = maps\mp\perks\_perks::validatePerk( 1, loadoutPerk1 );
-	loadoutPerk2 = maps\mp\perks\_perks::validatePerk( 2, loadoutPerk2 );
-	loadoutPerk3 = maps\mp\perks\_perks::validatePerk( 3, loadoutPerk3 );
-
-	self maps\mp\perks\_perks::givePerk( loadoutEquipment );
-	self maps\mp\perks\_perks::givePerk( loadoutPerk1 );
-	self maps\mp\perks\_perks::givePerk( loadoutPerk2 );
-	self maps\mp\perks\_perks::givePerk( loadoutPerk3 );
-
-	perks[0] = loadoutPerk1;
-	perks[1] = loadoutPerk2;
-	perks[2] = loadoutPerk3;
-
-	perkUpgrd[0] = tablelookup( "mp/perktable.csv", 1, loadoutPerk1, 8 );
-	perkUpgrd[1] = tablelookup( "mp/perktable.csv", 1, loadoutPerk2, 8 );
-	perkUpgrd[2] = tablelookup( "mp/perktable.csv", 1, loadoutPerk3, 8 );
-
-	for ( i = 0; i < perkUpgrd.size; i++ )
-	{
-		upgrade = perkUpgrd[i];
-		perk = perks[i];
-
-		if ( upgrade == "" || upgrade == "specialty_null" )
-			continue;
-
-		if ( isDefined( self.pers["bots"]["unlocks"]["upgraded_" + perk] ) && self.pers["bots"]["unlocks"]["upgraded_" + perk] )
-			self maps\mp\perks\_perks::givePerk( upgrade );
-	}
-
-}
-
-/*
-	Patches giveLoadout so that it doesn't use IsItemUnlocked
-*/
-botPlayerModelForWeapon( weapon, secondary )
-{
-	team = self.team;
-
-
-	if ( isDefined( game[team + "_model"][weapon] ) )
-	{
-		[[game[team + "_model"][weapon]]]();
-		return;
-	}
-
-
-	weaponClass = tablelookup( "mp/statstable.csv", 4, weapon, 2 );
-
-	switch ( weaponClass )
-	{
-		case "weapon_smg":
-			[[game[team + "_model"]["SMG"]]]();
-			break;
-
-		case "weapon_assault":
-			weaponClass = tablelookup( "mp/statstable.csv", 4, secondary, 2 );
-
-			if ( weaponClass == "weapon_shotgun" )
-				[[game[team + "_model"]["SHOTGUN"]]]();
-			else
-				[[game[team + "_model"]["ASSAULT"]]]();
-
-			break;
-
-		case "weapon_sniper":
-			if ( level.environment != "" && isDefined( self.pers["bots"]["unlocks"]["ghillie"] ) && self.pers["bots"]["unlocks"]["ghillie"] )
-				[[game[team + "_model"]["GHILLIE"]]]();
-			else
-				[[game[team + "_model"]["SNIPER"]]]();
-
-			break;
-
-		case "weapon_lmg":
-			[[game[team + "_model"]["LMG"]]]();
-			break;
-
-		case "weapon_riot":
-			[[game[team + "_model"]["RIOT"]]]();
-			break;
-
-		default:
-			[[game[team + "_model"]["ASSAULT"]]]();
-			break;
-	}
 }

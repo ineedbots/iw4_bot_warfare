@@ -52,7 +52,6 @@ connected()
 	self thread onSpawned();
 
 	self thread onDeath();
-	self thread onGiveLoadout();
 
 	self thread onKillcam();
 
@@ -1474,35 +1473,6 @@ onDeath()
 }
 
 /*
-	Watches when the bot is given a loadout
-*/
-onGiveLoadout_loop()
-{
-	class = self.class;
-
-	if ( isDefined( self.bot_oma_class ) )
-		class = self.bot_oma_class;
-
-	self botGiveLoadout( self.team, class, !isDefined( self.bot_oma_class ) );
-	self.bot_oma_class = undefined;
-}
-
-/*
-	Watches when the bot is given a loadout
-*/
-onGiveLoadout()
-{
-	self endon( "disconnect" );
-
-	for ( ;; )
-	{
-		self waittill( "giveLoadout" );
-
-		self onGiveLoadout_loop();
-	}
-}
-
-/*
 	When the bot spawns.
 */
 onSpawned()
@@ -1849,7 +1819,7 @@ changeToWeapon( weap )
 	if ( !self HasWeapon( weap ) )
 		return false;
 
-	self BotChangeToWeapon( weap );
+	self switchToWeapon( weap );
 
 	if ( self GetCurrentWeapon() == weap )
 		return true;
