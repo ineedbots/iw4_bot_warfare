@@ -23,7 +23,6 @@ Now start a match with the map you want to edit.
 It should be noted that waypoints load in this following order;
 1. check the 'waypoints' folder (FS_Game\waypoints) for a csv file
 2. load the waypoints from GSC (maps\mp\bots\waypoints)
-3. check online at [this repo](https://github.com/ineedbots/iw4x_waypoints) for the waypoints (if dedicated server, or -scriptablehttp flag)
 
 If all fail to load waypoints, then the bots will not know how to navigate the map.
 
@@ -97,5 +96,3 @@ That is it! The waypoints should load next time you start your game!
 
 Your waypoints CSV file will be located at ```FS_Game/waypoints/<mapname>_wp.csv```. (userraw folder if fs_game is blank)
 ![Location](/bw-assets/wp_edit_fil_loc.png)
-
-You can share your waypoints publicly (and can be loaded by other users of Bot Warfare remotely) by making a Pull Request to the [IW4x_Waypoints repo](https://github.com/ineedbots/iw4x_waypoints).
