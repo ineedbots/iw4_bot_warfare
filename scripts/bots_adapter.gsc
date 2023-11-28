@@ -1,12 +1,5 @@
 init()
 {
-	thread setup_builtins();
-}
-
-setup_builtins()
-{
-	waittillframeend;
-
 	level.bot_builtins["printconsole"] = ::do_printconsole;
 	level.bot_builtins["filewrite"] = ::do_filewrite;
 	level.bot_builtins["fileread"] = ::do_fileread;

@@ -6,12 +6,32 @@
 
 	Notes for engine
 		obv the old bot behavior should be changed to use gsc built-ins to control bots
+		bots using objects needs to be fixed
 		setSpawnWeapon and switchToWeapon should be modified to work for testclients
 */
 
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
+
+/*
+	Waits for the built-ins to be defined
+*/
+wait_for_builtins()
+{
+	for ( i = 0; i < 20; i++ )
+	{
+		if ( isDefined( level.bot_builtins ) )
+			return true;
+
+		if ( i < 18 )
+			waittillframeend;
+		else
+			wait 0.05;
+	}
+
+	return false;
+}
 
 /*
 	Prints to console without dev script on

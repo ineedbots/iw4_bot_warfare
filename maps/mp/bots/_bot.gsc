@@ -23,6 +23,9 @@ init()
 	if ( !getDvarInt( "bots_main" ) )
 		return;
 
+	if ( !wait_for_builtins() )
+		PrintLn( "FATAL: NO BUILT-INS FOR BOTS" );
+
 	thread load_waypoints();
 	thread hook_callbacks();
 
