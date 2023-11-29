@@ -545,7 +545,34 @@ watchBotDebugEvent()
 	{
 		self waittill( "bot_event", msg, str, b, c, d, e, f, g );
 
-		if ( msg == "debug" && GetDvarInt( "bots_main_debug" ) )
+		if ( GetDvarInt( "bots_main_debug" ) >= 2 )
+		{
+			big_str = "Bot Warfare debug: " + self.name + ": " + msg;
+
+			if ( isDefined( str ) && isString( str ) )
+				big_str += ", " + str;
+
+			if ( isDefined( b ) && isString( b ) )
+				big_str += ", " + b;
+
+			if ( isDefined( c ) && isString( c ) )
+				big_str += ", " + c;
+
+			if ( isDefined( d ) && isString( d ) )
+				big_str += ", " + d;
+
+			if ( isDefined( e ) && isString( e ) )
+				big_str += ", " + e;
+
+			if ( isDefined( f ) && isString( f ) )
+				big_str += ", " + f;
+
+			if ( isDefined( g ) && isString( g ) )
+				big_str += ", " + g;
+
+			BotBuiltinPrintConsole( big_str );
+		}
+		else if ( msg == "debug" && GetDvarInt( "bots_main_debug" ) )
 		{
 			BotBuiltinPrintConsole( "Bot Warfare debug: " + self.name + ": " + str );
 		}
