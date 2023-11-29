@@ -1912,7 +1912,7 @@ walk()
 	{
 		wait 0.05;
 
-		self botMoveTo( self.origin );
+		self botSetMoveTo( self.origin );
 
 		if ( !getDVarINt( "bots_play_move" ) )
 			continue;
@@ -1927,7 +1927,7 @@ walk()
 		{
 			self.bot.last_next_wp = -1;
 			self.bot.last_second_next_wp = -1;
-			self botMoveTo( self.origin + self GetVelocity() * 500 );
+			self botSetMoveTo( self.origin + self GetVelocity() * 500 );
 			continue;
 		}
 
@@ -1961,7 +1961,7 @@ strafe( target )
 
 	self.bot.last_next_wp = -1;
 	self.bot.last_second_next_wp = -1;
-	self botMoveTo( strafe );
+	self botSetMoveTo( strafe );
 	wait 2;
 	self notify( "kill_goal" );
 }
@@ -2144,7 +2144,7 @@ movetowards( goal )
 
 	while ( distanceSquared( self.origin, goal ) > tempGoalDist )
 	{
-		self botMoveTo( goal );
+		self botSetMoveTo( goal );
 
 		if ( time > 3000 )
 		{
@@ -2161,7 +2161,7 @@ movetowards( goal )
 
 				self BotNotifyBotEvent( "stuck" );
 
-				self botMoveTo( randomDir );
+				self botSetMoveTo( randomDir );
 				wait stucks;
 				self stand();
 
@@ -2533,7 +2533,7 @@ prone()
 /*
 	Bot will move towards here
 */
-botMoveTo( where )
+botSetMoveTo( where )
 {
 	self.bot.moveTo = where;
 }
