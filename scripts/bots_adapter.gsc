@@ -11,7 +11,7 @@ init()
 
 do_printconsole( s )
 {
-	PrintConsole( s );
+	PrintConsole( s + "\n" );
 }
 
 do_filewrite( file, contents, mode )
