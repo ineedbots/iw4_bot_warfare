@@ -140,6 +140,8 @@ resetBotVars()
 	self.bot.is_cur_sniper = false;
 	self.bot.is_cur_akimbo = false;
 
+	self.bot.prio_objective = false;
+
 	self.bot.rand = randomInt( 100 );
 
 	self BotBuiltinBotStop();
@@ -1386,7 +1388,7 @@ aim_loop()
 		return;
 	}
 
-	if ( isDefined( self.bot.target ) && isDefined( self.bot.target.entity ) )
+	if ( isDefined( self.bot.target ) && isDefined( self.bot.target.entity ) && !( self.bot.prio_objective && isDefined( self.bot.script_aimpos ) ) )
 	{
 		no_trace_look_time = self.pers["bots"]["skill"]["no_trace_look_time"];
 		no_trace_time = self.bot.target.no_trace_time;
@@ -1812,7 +1814,7 @@ killWalkCauseNoWaypoints()
 */
 walk_loop()
 {
-	hasTarget = ( ( isDefined( self.bot.target ) && isDefined( self.bot.target.entity ) ) || isDefined( self.bot.jav_loc ) );
+	hasTarget = ( ( isDefined( self.bot.target ) && isDefined( self.bot.target.entity ) && !self.bot.prio_objective ) || isDefined( self.bot.jav_loc ) );
 
 	if ( hasTarget )
 	{

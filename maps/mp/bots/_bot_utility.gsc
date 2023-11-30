@@ -387,6 +387,32 @@ HasBotJavelinLocation()
 }
 
 /*
+	Returns whether the bot has a priority objective
+*/
+HasPriorityObjective()
+{
+	return self.bot.prio_objective;
+}
+
+/*
+	Sets the bot to prioritize the objective over targeting enemies
+*/
+SetPriorityObjective()
+{
+	self.bot.prio_objective = true;
+	self notify( "kill_goal" );
+}
+
+/*
+	Clears the bot's priority objective to allow the bot to target enemies automatically again
+*/
+ClearPriorityObjective()
+{
+	self.bot.prio_objective = false;
+	self notify( "kill_goal" );
+}
+
+/*
 	Sets the aim position of the bot
 */
 SetScriptAimPos( pos )
