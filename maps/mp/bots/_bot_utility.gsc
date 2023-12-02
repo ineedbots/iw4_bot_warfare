@@ -926,34 +926,6 @@ float( num )
 }
 
 /*
-	Tokenizes a string (strtok has limits...) (only one char tok)
-*/
-tokenizeLine( line, tok )
-{
-	tokens = [];
-
-	token = "";
-
-	for ( i = 0; i < line.size; i++ )
-	{
-		c = line[i];
-
-		if ( c == tok )
-		{
-			tokens[tokens.size] = token;
-			token = "";
-			continue;
-		}
-
-		token += c;
-	}
-
-	tokens[tokens.size] = token;
-
-	return tokens;
-}
-
-/*
 	If the string starts with
 */
 isStrStart( string1, subStr )
@@ -1009,7 +981,7 @@ getWaypointLinesFromFile( filename )
 	result = spawnStruct();
 	result.lines = [];
 
-	// todo read line by line
+	// todo read line by line, max string len in gsc is 65535, we are okay for all the waypoints for now
 	waypointStr = BotBuiltinFileRead( filename );
 
 	if ( !isDefined( waypointStr ) )
@@ -1059,7 +1031,7 @@ readWpsFromFile( mapname )
 
 	for ( i = 1; i <= waypointCount; i++ )
 	{
-		tokens = tokenizeLine( res.lines[i], "," );
+		tokens = strtok( res.lines[i], "," );
 
 		waypoint = parseTokensIntoWaypoint( tokens );
 
