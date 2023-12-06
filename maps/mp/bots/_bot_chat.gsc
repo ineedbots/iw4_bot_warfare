@@ -1825,6 +1825,11 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 {
 	self endon( "disconnect" );
 
+	if ( !isDefined( aircare ) )
+	{
+		return;
+	}
+
 	switch ( state )
 	{
 		case "go":
