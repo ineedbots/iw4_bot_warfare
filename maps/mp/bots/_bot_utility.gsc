@@ -995,24 +995,27 @@ getWaypointLinesFromFile( filename )
 	if ( !isDefined( waypointStr ) )
 		return result;
 
-	line = "";
+	linecount = 0;
+	linestart = 0;
 
 	for ( i = 0; i < waypointStr.size; i++ )
 	{
-		c = waypointStr[i];
-
-		if ( c == "\n" )
+		if ( waypointStr[i] == "\n" || waypointStr[i] == "\r" )
 		{
-			result.lines[result.lines.size] = line;
+			result.lines[result.lines.size] = getSubStr( waypointStr, linestart, linestart + linecount );
 
-			line = "";
+			if ( waypointStr[i] == "\r" && i < waypointStr.size - 1 && waypointStr[i + 1] == "\n" )
+				i++;
+
+			linecount = 0;
+			linestart = i + 1;
 			continue;
 		}
 
-		line += c;
+		linecount++;
 	}
 
-	result.lines[result.lines.size] = line;
+	result.lines[result.lines.size] = getSubStr( waypointStr, linestart, linestart + linecount );
 
 	return result;
 }
