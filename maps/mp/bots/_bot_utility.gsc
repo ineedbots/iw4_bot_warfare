@@ -982,42 +982,54 @@ parseTokensIntoWaypoint( tokens )
 }
 
 /*
-	Returns an array of each line
+	Function to extract lines from a file specified by 'filename' and store them in a result structure.
 */
 getWaypointLinesFromFile( filename )
 {
-	result = spawnStruct();
-	result.lines = [];
+    // Create a structure to store the result, including an array to hold individual lines.
+    result = spawnStruct();
+    result.lines = [];
 
-	// todo read line by line, max string len in gsc is 65535, we are okay for all the waypoints for now
-	waypointStr = BotBuiltinFileRead( filename );
+    // Read the entire content of the file into the 'waypointStr' variable.
+    // Note: max string length in GSC is 65535.
+    waypointStr = BotBuiltinFileRead( filename );
 
-	if ( !isDefined( waypointStr ) )
-		return result;
+    // If the file is empty or not defined, return the empty result structure.
+    if ( !isDefined( waypointStr ) )
+        return result;
 
-	linecount = 0;
-	linestart = 0;
+    // Variables to track the current line's character count and starting position.
+    linecount = 0;
+    linestart = 0;
 
-	for ( i = 0; i < waypointStr.size; i++ )
-	{
-		if ( waypointStr[i] == "\n" || waypointStr[i] == "\r" )
-		{
-			result.lines[result.lines.size] = getSubStr( waypointStr, linestart, linestart + linecount );
+    // Iterate through each character in the 'waypointStr'.
+    for ( i = 0; i < waypointStr.size; i++ )
+    {
+        // Check for newline characters '\n' or '\r'.
+        if ( waypointStr[i] == "\n" || waypointStr[i] == "\r" )
+        {
+            // Extract the current line using 'getSubStr' and store it in the result array.
+            result.lines[result.lines.size] = getSubStr( waypointStr, linestart, linestart + linecount );
 
-			if ( waypointStr[i] == "\r" && i < waypointStr.size - 1 && waypointStr[i + 1] == "\n" )
-				i++;
+            // If the newline is '\r\n', skip the next character.
+            if ( waypointStr[i] == "\r" && i < waypointStr.size - 1 && waypointStr[i + 1] == "\n" )
+                i++;
 
-			linecount = 0;
-			linestart = i + 1;
-			continue;
-		}
+            // Reset linecount and update linestart for the next line.
+            linecount = 0;
+            linestart = i + 1;
+            continue;
+        }
 
-		linecount++;
-	}
+        // Increment linecount for the current line.
+        linecount++;
+    }
 
-	result.lines[result.lines.size] = getSubStr( waypointStr, linestart, linestart + linecount );
+    // Store the last line (or the only line if there are no newline characters) in the result array.
+    result.lines[result.lines.size] = getSubStr( waypointStr, linestart, linestart + linecount );
 
-	return result;
+    // Return the result structure containing the array of extracted lines.
+    return result;
 }
 
 /*
