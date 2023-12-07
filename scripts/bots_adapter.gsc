@@ -42,7 +42,7 @@ do_botstop()
 	self BotStop();
 }
 
-do_botmovement( left, forward )
+do_botmovement( forward, right )
 {
-	self BotMovement( left, forward );
+	self BotMovement( forward, right );
 }
