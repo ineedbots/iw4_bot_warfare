@@ -1491,7 +1491,7 @@ aim_loop()
 
 					if ( isDefined( self.bot.knifing_target ) )
 						self thread bot_lookat( target getTagOrigin( "j_spine4" ), 0.05 );
-					else if ( conedot > 0.999 && lengthsquared( aimoffset ) < 0.05 )
+					else if ( !nadeAimOffset && conedot > 0.999 && lengthsquared( aimoffset ) < 0.05 )
 						self thread bot_lookat( aimpos, 0.05 );
 					else
 						self thread bot_lookat( aimpos, aimspeed, target getVelocity(), true );
@@ -1505,7 +1505,7 @@ aim_loop()
 
 					conedot = getConeDot( aimpos, eyePos, angles );
 
-					if ( conedot > 0.999 && lengthsquared( aimoffset ) < 0.05 )
+					if ( !nadeAimOffset && conedot > 0.999 && lengthsquared( aimoffset ) < 0.05 )
 						self thread bot_lookat( aimpos, 0.05 );
 					else
 						self thread bot_lookat( aimpos, aimspeed );
