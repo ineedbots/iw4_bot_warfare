@@ -150,7 +150,7 @@ init()
 	level.bots_minGrenadeDistance *= level.bots_minGrenadeDistance;
 	level.bots_maxGrenadeDistance = 1024;
 	level.bots_maxGrenadeDistance *= level.bots_maxGrenadeDistance;
-	level.bots_maxKnifeDistance = 80;
+	level.bots_maxKnifeDistance = 128;
 	level.bots_maxKnifeDistance *= level.bots_maxKnifeDistance;
 	level.bots_goalDistance = 27.5;
 	level.bots_goalDistance *= level.bots_goalDistance;
