@@ -4618,7 +4618,7 @@ BotLookAtRandomThing( obj_target )
 		}
 	}
 
-	origin = ( 0, 0, self GetEyeHeight() );
+	origin = ( 0, 0, self GetPlayerViewHeight() );
 
 	if ( isDefined( nearestEnemy ) && DistanceSquared( self.origin, nearestEnemy.origin ) < 1024 * 1024 && rand < 40 )
 		origin += ( nearestEnemy.origin[0], nearestEnemy.origin[1], self.origin[2] );

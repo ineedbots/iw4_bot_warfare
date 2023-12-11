@@ -737,16 +737,6 @@ isWeaponDroppable( weap )
 }
 
 /*
-	Returns the height the viewpos is above the origin
-*/
-getEyeHeight()
-{
-	myEye = self getEye();
-
-	return myEye[2] - self.origin[2];
-}
-
-/*
 	Does a notify after a delay
 */
 notifyAfterDelay( delay, not )
