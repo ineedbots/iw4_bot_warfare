@@ -53,7 +53,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - ... And pretty much everything you expect a Combat Training bot to have
 
 ## Installation
-0. Make sure that [IW4]() is installed, updated and working properly.
+0. Make sure that [IW4x](https://alterware.dev/) is installed, updated and working properly.
     - Download the [latest release](https://github.com/ineedbots/iw4_bot_warfare/releases) of Bot Warfare.
 1. Locate your IW4 install folder.
 2. Move the files/folders found in 'Move files to root of IW4 folder' from the Bot Warfare release archive you downloaded into the root of your IW4 install folder.
