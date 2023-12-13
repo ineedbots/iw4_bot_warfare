@@ -752,7 +752,7 @@ getBotToKick()
 {
 	bots = getBotArray();
 
-	if ( !isDefined( bots ) || !isDefined( bots.size ) || bots.size <= 0 || !isArray( bots ) || !isDefined( bots[0] ) )
+	if ( !isDefined( bots ) || !isDefined( bots.size ) || bots.size <= 0 || !isDefined( bots[0] ) )
 		return undefined;
 
 	tokick = undefined;
