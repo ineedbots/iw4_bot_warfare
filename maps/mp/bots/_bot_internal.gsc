@@ -2301,6 +2301,13 @@ do_knife_target( target )
 	self endon( "disconnect" );
 	self endon( "bot_knife" );
 
+	if ( !getDvarInt( "aim_automelee_enabled" ) || !self isOnGround() || self GetStance() == "prone" || self InLastStand() )
+	{
+		self.bot.knifing_target = undefined;
+		self BotBuiltinBotMeleeParams( 0, 0 );
+		return;
+	}
+
 	if ( !isDefined( target ) || !isPlayer( target ) )
 	{
 		self.bot.knifing_target = undefined;
