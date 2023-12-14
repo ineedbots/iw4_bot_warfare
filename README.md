@@ -1,7 +1,7 @@
 ![GitHub Logo](/bw-assets/bw-logo.png)
 
 # IW4 Bot Warfare
-Bot Warfare is a GSC mod for IW4.
+Bot Warfare is a GSC mod for [IW4x](https://alterware.dev/).
 
 It aims to add playable AI to the multiplayer games of Modern Warfare 2.
 
@@ -53,7 +53,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - ... And pretty much everything you expect a Combat Training bot to have
 
 ## Installation
-0. Make sure that [IW4]() is installed, updated and working properly.
+0. Make sure that [IW4x](https://alterware.dev/) is installed, updated and working properly.
     - Download the [latest release](https://github.com/ineedbots/iw4_bot_warfare/releases) of Bot Warfare.
 1. Locate your IW4 install folder.
 2. Move the files/folders found in 'Move files to root of IW4 folder' from the Bot Warfare release archive you downloaded into the root of your IW4 install folder.
@@ -163,7 +163,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
   - Proper use of pred missile
 
 ## Credits
-- IW4x Team - 💀
+- IW4x Team - https://github.com/iw4x/iw4x-client
 - CoD4x Team - https://github.com/callofduty4x/CoD4x_Server
 - INeedGames - http://www.moddb.com/mods/bot-warfare
 - tinkie101 - https://web.archive.org/web/20120326060712/http://alteriw.net/viewtopic.php?f=72&t=4869
