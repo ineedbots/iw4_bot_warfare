@@ -1483,7 +1483,9 @@ onGiveLoadout_loop()
 	if ( isDefined( self.bot_oma_class ) )
 		class = self.bot_oma_class;
 
-	self botGiveLoadout( self.team, class, !isDefined( self.bot_oma_class ) );
+	if ( allowClassChoiceUtil() )
+		self botGiveLoadout( self.team, class, !isDefined( self.bot_oma_class ) );
+
 	self.bot_oma_class = undefined;
 }
 
