@@ -630,7 +630,14 @@ getValidTube()
 */
 allowClassChoiceUtil()
 {
-	return true;
+	allowed = int( tableLookup( "mp/gametypesTable.csv", 0, level.gameType, 4 ) );
+
+	if ( !isDefined( allowed ) )
+	{
+		return true;
+	}
+
+	return allowed;
 }
 
 /*
@@ -638,7 +645,14 @@ allowClassChoiceUtil()
 */
 allowTeamChoiceUtil()
 {
-	return true;
+	allowed = int( tableLookup( "mp/gametypesTable.csv", 0, level.gameType, 5 ) );
+
+	if ( !isDefined( allowed ) )
+	{
+		return true;
+	}
+
+	return allowed;
 }
 
 /*
