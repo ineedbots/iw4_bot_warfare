@@ -5441,6 +5441,7 @@ bot_sab_loop()
 		self thread BotPressUse( waitTime );
 		wait waitTime;
 
+		self ClearScriptGoal();
 		self.bot_lock_goal = false;
 
 		self BotNotifyBotEvent( "sab", "stop", "defuse" );
