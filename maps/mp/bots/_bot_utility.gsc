@@ -628,7 +628,7 @@ getValidTube()
 /*
 	iw5
 */
-allowClassChoice()
+allowClassChoiceUtil()
 {
 	return true;
 }
@@ -636,7 +636,7 @@ allowClassChoice()
 /*
 	iw5
 */
-allowTeamChoice()
+allowTeamChoiceUtil()
 {
 	return true;
 }
