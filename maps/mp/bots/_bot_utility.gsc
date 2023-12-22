@@ -1023,11 +1023,11 @@ RaySphereIntersect( start, end, spherePos, radius )
 	}
 
 	mu1 = ( 0 - b + sqrt( bb4ac ) ) / ( 2 * a );
-	//mu2 = (0-b - sqrt(bb4ac)) / (2 * a);
+	// mu2 = (0-b - sqrt(bb4ac)) / (2 * a);
 
 	// intersection points of the sphere
 	ip1 = start + mu1 * dp;
-	//ip2 = start + mu2 * dp;
+	// ip2 = start + mu2 * dp;
 
 	myDist = DistanceSquared( start, end );
 
@@ -1992,7 +1992,7 @@ _WaypointsToKDTree( waypoints, dem )
 		heap HeapRemove();
 	}
 
-	median = int( sorted.size / 2 ); //use divide and conq
+	median = int( sorted.size / 2 ); // use divide and conq
 
 	left = [];
 	right = [];
@@ -2089,7 +2089,7 @@ KDTree()
 /*
 	Called on a KDTree. Will insert the object into the KDTree.
 */
-KDTreeInsert( data ) //as long as what you insert has a .origin attru, it will work.
+KDTreeInsert( data ) // as long as what you insert has a .origin attru, it will work.
 {
 	self.root = self _KDTreeInsert( self.root, data, 0, -2147483647, -2147483647, -2147483647, 2147483647, 2147483647, 2147483647 );
 }
@@ -2503,9 +2503,9 @@ GetNearestWaypoint( pos )
 */
 AStarSearch( start, goal, team, greedy_path )
 {
-	open = NewHeap( ::ReverseHeapAStar ); //heap
-	openset = [];//set for quick lookup
-	closed = [];//set for quick lookup
+	open = NewHeap( ::ReverseHeapAStar ); // heap
+	openset = []; // set for quick lookup
+	closed = []; // set for quick lookup
 
 
 	startWp = getNearestWaypoint( start );
@@ -2549,26 +2549,26 @@ AStarSearch( start, goal, team, greedy_path )
 
 
 	node = spawnStruct();
-	node.g = 0; //path dist so far
-	node.h = DistanceSquared( level.waypoints[ startWp ].origin, level.waypoints[ goalWp ].origin ); //herustic, distance to goal for path finding
+	node.g = 0; // path dist so far
+	node.h = DistanceSquared( level.waypoints[ startWp ].origin, level.waypoints[ goalWp ].origin ); // herustic, distance to goal for path finding
 	node.f = node.h + node.g; // combine path dist and heru, use reverse heap to sort the priority queue by this attru
 	node.index = startWp;
-	node.parent = undefined; //we are start, so we have no parent
+	node.parent = undefined; // we are start, so we have no parent
 
-	//push node onto queue
+	// push node onto queue
 	openset[ node.index + "" ] = node;
 	open HeapInsert( node );
 
-	//while the queue is not empty
+	// while the queue is not empty
 	while ( open.data.size )
 	{
-		//pop bestnode from queue
+		// pop bestnode from queue
 		bestNode = open.data[ 0 ];
 		open HeapRemove();
 		openset[ bestNode.index + "" ] = undefined;
 		wp = level.waypoints[ bestNode.index ];
 
-		//check if we made it to the goal
+		// check if we made it to the goal
 		if ( bestNode.index == goalWp )
 		{
 			path = [];
@@ -2585,7 +2585,7 @@ AStarSearch( start, goal, team, greedy_path )
 					level.waypointUsage[ team ][ bestNode.index + "" ]++;
 				}
 
-				//construct path
+				// construct path
 				path[ path.size ] = bestNode.index;
 
 				bestNode = bestNode.parent;
@@ -2594,7 +2594,7 @@ AStarSearch( start, goal, team, greedy_path )
 			return path;
 		}
 
-		//for each child of bestnode
+		// for each child of bestnode
 		for ( i = wp.children.size - 1; i >= 0; i-- )
 		{
 			child = wp.children[ i ];
@@ -2608,7 +2608,7 @@ AStarSearch( start, goal, team, greedy_path )
 
 				if ( isDefined( level.waypointUsage[ team ][ child + "" ] ) )
 				{
-					temppen = level.waypointUsage[ team ][ child + "" ]; //consider how many bots are taking this path
+					temppen = level.waypointUsage[ team ][ child + "" ]; // consider how many bots are taking this path
 				}
 
 				if ( temppen > 1 )
@@ -2623,10 +2623,10 @@ AStarSearch( start, goal, team, greedy_path )
 				penalty += 4;
 			}
 
-			//calc the total path we have took
-			newg = bestNode.g + DistanceSquared( wp.origin, childWp.origin ) * penalty; //bots on same team's path are more expensive
+			// calc the total path we have took
+			newg = bestNode.g + DistanceSquared( wp.origin, childWp.origin ) * penalty; // bots on same team's path are more expensive
 
-			//check if this child is in open or close with a g value less than newg
+			// check if this child is in open or close with a g value less than newg
 			inopen = isDefined( openset[ child + "" ] );
 
 			if ( inopen && openset[ child + "" ].g <= newg )
@@ -2662,13 +2662,13 @@ AStarSearch( start, goal, team, greedy_path )
 			node.f = node.g + node.h;
 			node.index = child;
 
-			//check if in closed, remove it
+			// check if in closed, remove it
 			if ( inclosed )
 			{
 				closed[ child + "" ] = undefined;
 			}
 
-			//check if not in open, add it
+			// check if not in open, add it
 			if ( !inopen )
 			{
 				open HeapInsert( node );
@@ -2676,7 +2676,7 @@ AStarSearch( start, goal, team, greedy_path )
 			}
 		}
 
-		//done with children, push onto closed
+		// done with children, push onto closed
 		closed[ bestNode.index + "" ] = bestNode;
 	}
 
@@ -2768,7 +2768,7 @@ onUsePlantObjectFix( player )
 	if ( !self maps\mp\gametypes\_gameobjects::isFriendlyTeam( player.pers[ "team" ] ) )
 	{
 		level thread bombPlantedFix( self, player );
-		//player logString( "bomb planted: " + self.label );
+		// player logString( "bomb planted: " + self.label );
 
 		// disable all bomb zones except this one
 		for ( index = 0; index < level.bombZones.size; index++ )
@@ -2784,7 +2784,7 @@ onUsePlantObjectFix( player )
 		player playSound( "mp_bomb_plant" );
 		player notify ( "bomb_planted" );
 
-		//if ( !level.hardcoreMode )
+		// if ( !level.hardcoreMode )
 		//	iPrintLn( &"MP_EXPLOSIVES_PLANTED_BY", player );
 
 		leaderDialog( "bomb_planted" );
@@ -3029,7 +3029,7 @@ botGiveLoadout( team, class, allowCopycat )
 		loadoutSecondary = maps\mp\gametypes\_class::table_getWeapon( level.classTableName, 10, 1 );
 	}
 
-	//loadoutSecondaryCamo = "none";
+	// loadoutSecondaryCamo = "none";
 
 	// stop default class op'ness
 	allowOp = ( getDvarInt( "bots_loadout_allow_op" ) >= 1 );
@@ -3098,7 +3098,7 @@ botGiveLoadout( team, class, allowCopycat )
 	self SetOffhandPrimaryClass( "other" );
 
 	// Action Slots
-	//self _SetActionSlot( 1, "" );
+	// self _SetActionSlot( 1, "" );
 	self _SetActionSlot( 1, "nightvision" );
 	self _SetActionSlot( 3, "altMode" );
 	self _SetActionSlot( 4, "" );

@@ -37,77 +37,77 @@ init()
 
 	if ( getDvar( "bots_main_GUIDs" ) == "" )
 	{
-		setDvar( "bots_main_GUIDs", "" ); //guids of players who will be given host powers, comma seperated
+		setDvar( "bots_main_GUIDs", "" ); // guids of players who will be given host powers, comma seperated
 	}
 
 	if ( getDvar( "bots_main_firstIsHost" ) == "" )
 	{
-		setDvar( "bots_main_firstIsHost", false ); //first play to connect is a host
+		setDvar( "bots_main_firstIsHost", false ); // first play to connect is a host
 	}
 
 	if ( getDvar( "bots_main_waitForHostTime" ) == "" )
 	{
-		setDvar( "bots_main_waitForHostTime", 10.0 ); //how long to wait to wait for the host player
+		setDvar( "bots_main_waitForHostTime", 10.0 ); // how long to wait to wait for the host player
 	}
 
 	if ( getDvar( "bots_main_kickBotsAtEnd" ) == "" )
 	{
-		setDvar( "bots_main_kickBotsAtEnd", false ); //kicks the bots at game end
+		setDvar( "bots_main_kickBotsAtEnd", false ); // kicks the bots at game end
 	}
 
 	if ( getDvar( "bots_manage_add" ) == "" )
 	{
-		setDvar( "bots_manage_add", 0 ); //amount of bots to add to the game
+		setDvar( "bots_manage_add", 0 ); // amount of bots to add to the game
 	}
 
 	if ( getDvar( "bots_manage_fill" ) == "" )
 	{
-		setDvar( "bots_manage_fill", 0 ); //amount of bots to maintain
+		setDvar( "bots_manage_fill", 0 ); // amount of bots to maintain
 	}
 
 	if ( getDvar( "bots_manage_fill_spec" ) == "" )
 	{
-		setDvar( "bots_manage_fill_spec", true ); //to count for fill if player is on spec team
+		setDvar( "bots_manage_fill_spec", true ); // to count for fill if player is on spec team
 	}
 
 	if ( getDvar( "bots_manage_fill_mode" ) == "" )
 	{
-		setDvar( "bots_manage_fill_mode", 0 ); //fill mode, 0 adds everyone, 1 just bots, 2 maintains at maps, 3 is 2 with 1
+		setDvar( "bots_manage_fill_mode", 0 ); // fill mode, 0 adds everyone, 1 just bots, 2 maintains at maps, 3 is 2 with 1
 	}
 
 	if ( getDvar( "bots_manage_fill_kick" ) == "" )
 	{
-		setDvar( "bots_manage_fill_kick", false ); //kick bots if too many
+		setDvar( "bots_manage_fill_kick", false ); // kick bots if too many
 	}
 
 	if ( getDvar( "bots_team" ) == "" )
 	{
-		setDvar( "bots_team", "autoassign" ); //which team for bots to join
+		setDvar( "bots_team", "autoassign" ); // which team for bots to join
 	}
 
 	if ( getDvar( "bots_team_amount" ) == "" )
 	{
-		setDvar( "bots_team_amount", 0 ); //amount of bots on axis team
+		setDvar( "bots_team_amount", 0 ); // amount of bots on axis team
 	}
 
 	if ( getDvar( "bots_team_force" ) == "" )
 	{
-		setDvar( "bots_team_force", false ); //force bots on team
+		setDvar( "bots_team_force", false ); // force bots on team
 	}
 
 	if ( getDvar( "bots_team_mode" ) == "" )
 	{
-		setDvar( "bots_team_mode", 0 ); //counts just bots when 1
+		setDvar( "bots_team_mode", 0 ); // counts just bots when 1
 	}
 
 	if ( getDvar( "bots_skill" ) == "" )
 	{
-		setDvar( "bots_skill", 0 ); //0 is random, 1 is easy 7 is hard, 8 is custom, 9 is completely random
+		setDvar( "bots_skill", 0 ); // 0 is random, 1 is easy 7 is hard, 8 is custom, 9 is completely random
 	}
 
 	if ( getDvar( "bots_skill_axis_hard" ) == "" )
 	{
-		setDvar( "bots_skill_axis_hard", 0 ); //amount of hard bots on axis team
+		setDvar( "bots_skill_axis_hard", 0 ); // amount of hard bots on axis team
 	}
 
 	if ( getDvar( "bots_skill_axis_med" ) == "" )
@@ -135,12 +135,12 @@ init()
 		setDvar( "bots_skill_max", 7 );
 	}
 
-	if ( getDvar( "bots_loadout_reasonable" ) == "" ) //filter out the bad 'guns' and perks
+	if ( getDvar( "bots_loadout_reasonable" ) == "" ) // filter out the bad 'guns' and perks
 	{
 		setDvar( "bots_loadout_reasonable", false );
 	}
 
-	if ( getDvar( "bots_loadout_allow_op" ) == "" ) //allows jug, marty and laststand
+	if ( getDvar( "bots_loadout_allow_op" ) == "" ) // allows jug, marty and laststand
 	{
 		setDvar( "bots_loadout_allow_op", true );
 	}
@@ -155,57 +155,57 @@ init()
 		setDvar( "bots_loadout_prestige", -1 );
 	}
 
-	if ( getDvar( "bots_play_move" ) == "" ) //bots move
+	if ( getDvar( "bots_play_move" ) == "" ) // bots move
 	{
 		setDvar( "bots_play_move", true );
 	}
 
-	if ( getDvar( "bots_play_knife" ) == "" ) //bots knife
+	if ( getDvar( "bots_play_knife" ) == "" ) // bots knife
 	{
 		setDvar( "bots_play_knife", true );
 	}
 
-	if ( getDvar( "bots_play_fire" ) == "" ) //bots fire
+	if ( getDvar( "bots_play_fire" ) == "" ) // bots fire
 	{
 		setDvar( "bots_play_fire", true );
 	}
 
-	if ( getDvar( "bots_play_nade" ) == "" ) //bots grenade
+	if ( getDvar( "bots_play_nade" ) == "" ) // bots grenade
 	{
 		setDvar( "bots_play_nade", true );
 	}
 
-	if ( getDvar( "bots_play_take_carepackages" ) == "" ) //bots take carepackages
+	if ( getDvar( "bots_play_take_carepackages" ) == "" ) // bots take carepackages
 	{
 		setDvar( "bots_play_take_carepackages", true );
 	}
 
-	if ( getDvar( "bots_play_obj" ) == "" ) //bots play the obj
+	if ( getDvar( "bots_play_obj" ) == "" ) // bots play the obj
 	{
 		setDvar( "bots_play_obj", true );
 	}
 
-	if ( getDvar( "bots_play_camp" ) == "" ) //bots camp and follow
+	if ( getDvar( "bots_play_camp" ) == "" ) // bots camp and follow
 	{
 		setDvar( "bots_play_camp", true );
 	}
 
-	if ( getDvar( "bots_play_jumpdrop" ) == "" ) //bots jump and dropshot
+	if ( getDvar( "bots_play_jumpdrop" ) == "" ) // bots jump and dropshot
 	{
 		setDvar( "bots_play_jumpdrop", true );
 	}
 
-	if ( getDvar( "bots_play_target_other" ) == "" ) //bot target non play ents (vehicles)
+	if ( getDvar( "bots_play_target_other" ) == "" ) // bot target non play ents (vehicles)
 	{
 		setDvar( "bots_play_target_other", true );
 	}
 
-	if ( getDvar( "bots_play_killstreak" ) == "" ) //bot use killstreaks
+	if ( getDvar( "bots_play_killstreak" ) == "" ) // bot use killstreaks
 	{
 		setDvar( "bots_play_killstreak", true );
 	}
 
-	if ( getDvar( "bots_play_ads" ) == "" ) //bot ads
+	if ( getDvar( "bots_play_ads" ) == "" ) // bot ads
 	{
 		setDvar( "bots_play_ads", true );
 	}

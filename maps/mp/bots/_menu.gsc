@@ -503,7 +503,7 @@ ShowOptionOn( variable )
 			if ( isDefined( self.Curs[ self.SubMenu ][ variable ] ) && isDefined( self.MenuText ) && isDefined( self.MenuText[ self.Curs[ self.SubMenu ][ variable ] ] ) )
 			{
 				self.MenuText[ self.Curs[ self.SubMenu ][ variable ] ].fontscale = 2.0;
-				//self.MenuText[ self.Curs[ self.SubMenu ][ variable ] ].color = (randomInt(256)/255, randomInt(256)/255, randomInt(256)/255);
+				// self.MenuText[ self.Curs[ self.SubMenu ][ variable ] ].color = (randomInt(256)/255, randomInt(256)/255, randomInt(256)/255);
 				color = ( 6 / 255, 69 / 255, 173 + randomIntRange( -5, 5 ) / 255 );
 
 				if ( int( time * 4 ) % 2 )
@@ -530,7 +530,7 @@ ShowOptionOn( variable )
 			if ( isDefined( self.Curs[ self.SubMenu ][ variable ] ) && isDefined( self.MenuTextY ) && isDefined( self.MenuTextY[ self.Curs[ self.SubMenu ][ variable ] ] ) )
 			{
 				self.MenuTextY[ self.Curs[ self.SubMenu ][ variable ] ].fontscale = 2.0;
-				//self.MenuTextY[ self.Curs[ self.SubMenu ][ variable ] ].color = (randomInt(256)/255, randomInt(256)/255, randomInt(256)/255);
+				// self.MenuTextY[ self.Curs[ self.SubMenu ][ variable ] ].color = (randomInt(256)/255, randomInt(256)/255, randomInt(256)/255);
 				color = ( 6 / 255, 69 / 255, 173 + randomIntRange( -5, 5 ) / 255 );
 
 				if ( int( time * 4 ) % 2 )

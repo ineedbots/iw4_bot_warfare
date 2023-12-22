@@ -89,8 +89,8 @@ StartDev()
 	self.nearest = -1;
 
 	self takeAllWeapons();
-	self giveWeapon( "m16_gl_mp" ); //to knife windows
-	self giveWeapon( "javelin_mp" ); //to mark jav spots
+	self giveWeapon( "m16_gl_mp" ); // to knife windows
+	self giveWeapon( "javelin_mp" ); // to mark jav spots
 	self SetOffhandPrimaryClass( "other" );
 	self giveWeapon( "semtex_mp" );
 	self _clearperks();
