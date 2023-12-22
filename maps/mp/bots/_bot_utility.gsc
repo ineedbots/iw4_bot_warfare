@@ -553,7 +553,7 @@ HasThreat()
 */
 IsDefusing()
 {
-	return ( isDefined( self.isDefusing ) && self.isDefusing );
+	return ( isDefined( self.isdefusing ) && self.isdefusing );
 }
 
 /*
@@ -561,7 +561,7 @@ IsDefusing()
 */
 isPlanting()
 {
-	return ( isDefined( self.isPlanting ) && self.isPlanting );
+	return ( isDefined( self.isplanting ) && self.isplanting );
 }
 
 /*
@@ -569,7 +569,7 @@ isPlanting()
 */
 isBombCarrier()
 {
-	return ( isDefined( self.isBombCarrier ) && self.isBombCarrier );
+	return ( isDefined( self.isbombcarrier ) && self.isbombcarrier );
 }
 
 /*
@@ -577,7 +577,7 @@ isBombCarrier()
 */
 isInUse()
 {
-	return ( isDefined( self.inUse ) && self.inUse );
+	return ( isDefined( self.inuse ) && self.inuse );
 }
 
 /*
@@ -585,7 +585,7 @@ isInUse()
 */
 inLastStand()
 {
-	return ( isDefined( self.lastStand ) && self.lastStand );
+	return ( isDefined( self.laststand ) && self.laststand );
 }
 
 /*
@@ -593,7 +593,7 @@ inLastStand()
 */
 isBeingRevived()
 {
-	return ( isDefined( self.beingRevived ) && self.beingRevived );
+	return ( isDefined( self.beingrevived ) && self.beingrevived );
 }
 
 /*
@@ -601,7 +601,7 @@ isBeingRevived()
 */
 inFinalStand()
 {
-	return ( isDefined( self.inFinalStand ) && self.inFinalStand );
+	return ( isDefined( self.infinalstand ) && self.infinalstand );
 }
 
 /*
@@ -609,7 +609,7 @@ inFinalStand()
 */
 isFlagCarrier()
 {
-	return ( isDefined( self.carryFlag ) && self.carryFlag );
+	return ( isDefined( self.carryflag ) && self.carryflag );
 }
 
 /*
@@ -617,7 +617,7 @@ isFlagCarrier()
 */
 IsStunned()
 {
-	return ( isdefined( self.concussionEndTime ) && self.concussionEndTime > gettime() );
+	return ( isdefined( self.concussionendtime ) && self.concussionendtime > gettime() );
 }
 
 /*
@@ -625,7 +625,7 @@ IsStunned()
 */
 isArtShocked()
 {
-	return ( isDefined( self.beingArtilleryShellshocked ) && self.beingArtilleryShellshocked );
+	return ( isDefined( self.beingartilleryshellshocked ) && self.beingartilleryshellshocked );
 }
 
 /*
@@ -658,7 +658,7 @@ getValidTube()
 */
 allowClassChoiceUtil()
 {
-	entry = tableLookup( "mp/gametypesTable.csv", 0, level.gameType, 4 );
+	entry = tableLookup( "mp/gametypesTable.csv", 0, level.gametype, 4 );
 
 	if ( !isDefined( entry ) || entry == "" )
 	{
@@ -673,7 +673,7 @@ allowClassChoiceUtil()
 */
 allowTeamChoiceUtil()
 {
-	entry = tableLookup( "mp/gametypesTable.csv", 0, level.gameType, 5 );
+	entry = tableLookup( "mp/gametypesTable.csv", 0, level.gametype, 5 );
 
 	if ( !isDefined( entry ) || entry == "" )
 	{
@@ -1053,9 +1053,9 @@ RaySphereIntersect( start, end, spherePos, radius )
 */
 SmokeTrace( start, end, rad )
 {
-	for ( i = level.bots_smokeList.count - 1; i >= 0; i-- )
+	for ( i = level.bots_smokelist.count - 1; i >= 0; i-- )
 	{
-		nade = level.bots_smokeList.data[ i ];
+		nade = level.bots_smokelist.data[ i ];
 
 		if ( nade.state != "smoking" )
 		{
@@ -1282,10 +1282,10 @@ readWpsFromFile( mapname )
 */
 load_waypoints()
 {
-	level.waypointCount = 0;
-	level.waypointUsage = [];
-	level.waypointUsage[ "allies" ] = [];
-	level.waypointUsage[ "axis" ] = [];
+	level.waypointcount = 0;
+	level.waypointusage = [];
+	level.waypointusage[ "allies" ] = [];
+	level.waypointusage[ "axis" ] = [];
 
 	if ( !isDefined( level.waypoints ) )
 	{
@@ -1321,9 +1321,9 @@ load_waypoints()
 		BotBuiltinPrintConsole( "No waypoints loaded!" );
 	}
 
-	level.waypointCount = level.waypoints.size;
+	level.waypointcount = level.waypoints.size;
 
-	for ( i = 0; i < level.waypointCount; i++ )
+	for ( i = 0; i < level.waypointcount; i++ )
 	{
 		if ( !isDefined( level.waypoints[ i ].children ) || !isDefined( level.waypoints[ i ].children.size ) )
 		{
@@ -1340,7 +1340,7 @@ load_waypoints()
 			level.waypoints[ i ].type = "crouch";
 		}
 
-		level.waypoints[ i ].childCount = undefined;
+		level.waypoints[ i ].childcount = undefined;
 	}
 }
 
@@ -1422,7 +1422,7 @@ getWaypointsOfType( type )
 {
 	answer = [];
 
-	for ( i = 0; i < level.waypointCount; i++ )
+	for ( i = 0; i < level.waypointcount; i++ )
 	{
 		wp = level.waypoints[ i ];
 
@@ -2425,21 +2425,21 @@ ReverseHeapAStar( item, item2 )
 */
 RemoveWaypointUsage( wp, team )
 {
-	if ( !isDefined( level.waypointUsage ) )
+	if ( !isDefined( level.waypointusage ) )
 	{
 		return;
 	}
 
-	if ( !isDefined( level.waypointUsage[ team ][ wp + "" ] ) )
+	if ( !isDefined( level.waypointusage[ team ][ wp + "" ] ) )
 	{
 		return;
 	}
 
-	level.waypointUsage[ team ][ wp + "" ]--;
+	level.waypointusage[ team ][ wp + "" ]--;
 
-	if ( level.waypointUsage[ team ][ wp + "" ] <= 0 )
+	if ( level.waypointusage[ team ][ wp + "" ] <= 0 )
 	{
-		level.waypointUsage[ team ][ wp + "" ] = undefined;
+		level.waypointusage[ team ][ wp + "" ] = undefined;
 	}
 }
 
@@ -2451,7 +2451,7 @@ GetNearestWaypointWithSight( pos )
 	candidate = undefined;
 	dist = 2147483647;
 
-	for ( i = 0; i < level.waypointCount; i++ )
+	for ( i = 0; i < level.waypointcount; i++ )
 	{
 		if ( !bulletTracePassed( pos + ( 0, 0, 15 ), level.waypoints[ i ].origin + ( 0, 0, 15 ), false, undefined ) )
 		{
@@ -2480,7 +2480,7 @@ GetNearestWaypoint( pos )
 	candidate = undefined;
 	dist = 2147483647;
 
-	for ( i = 0; i < level.waypointCount; i++ )
+	for ( i = 0; i < level.waypointcount; i++ )
 	{
 		curdis = DistanceSquared( level.waypoints[ i ].origin, pos );
 
@@ -2575,14 +2575,14 @@ AStarSearch( start, goal, team, greedy_path )
 
 			while ( isDefined( bestNode ) )
 			{
-				if ( isdefined( team ) && isDefined( level.waypointUsage ) )
+				if ( isdefined( team ) && isDefined( level.waypointusage ) )
 				{
-					if ( !isDefined( level.waypointUsage[ team ][ bestNode.index + "" ] ) )
+					if ( !isDefined( level.waypointusage[ team ][ bestNode.index + "" ] ) )
 					{
-						level.waypointUsage[ team ][ bestNode.index + "" ] = 0;
+						level.waypointusage[ team ][ bestNode.index + "" ] = 0;
 					}
 
-					level.waypointUsage[ team ][ bestNode.index + "" ]++;
+					level.waypointusage[ team ][ bestNode.index + "" ]++;
 				}
 
 				// construct path
@@ -2602,13 +2602,13 @@ AStarSearch( start, goal, team, greedy_path )
 
 			penalty = 1;
 
-			if ( !greedy_path && isdefined( team ) && isDefined( level.waypointUsage ) )
+			if ( !greedy_path && isdefined( team ) && isDefined( level.waypointusage ) )
 			{
 				temppen = 1;
 
-				if ( isDefined( level.waypointUsage[ team ][ child + "" ] ) )
+				if ( isDefined( level.waypointusage[ team ][ child + "" ] ) )
 				{
-					temppen = level.waypointUsage[ team ][ child + "" ]; // consider how many bots are taking this path
+					temppen = level.waypointusage[ team ][ child + "" ]; // consider how many bots are taking this path
 				}
 
 				if ( temppen > 1 )
@@ -2771,30 +2771,30 @@ onUsePlantObjectFix( player )
 		// player logString( "bomb planted: " + self.label );
 
 		// disable all bomb zones except this one
-		for ( index = 0; index < level.bombZones.size; index++ )
+		for ( index = 0; index < level.bombzones.size; index++ )
 		{
-			if ( level.bombZones[ index ] == self )
+			if ( level.bombzones[ index ] == self )
 			{
 				continue;
 			}
 
-			level.bombZones[ index ] maps\mp\gametypes\_gameobjects::disableObject();
+			level.bombzones[ index ] maps\mp\gametypes\_gameobjects::disableObject();
 		}
 
 		player playSound( "mp_bomb_plant" );
 		player notify ( "bomb_planted" );
 
-		// if ( !level.hardcoreMode )
+		// if ( !level.hardcoremode )
 		//	iPrintLn( &"MP_EXPLOSIVES_PLANTED_BY", player );
 
 		leaderDialog( "bomb_planted" );
 
 		level thread teamPlayerCardSplash( "callout_bombplanted", player );
 
-		level.bombOwner = player;
+		level.bombowner = player;
 		player thread maps\mp\gametypes\_hud_message::SplashNotify( "plant", maps\mp\gametypes\_rank::getScoreInfoValue( "plant" ) );
 		player thread maps\mp\gametypes\_rank::giveRankXP( "plant" );
-		player.bombPlantedTime = getTime();
+		player.bombplantedtime = getTime();
 		maps\mp\gametypes\_gamescore::givePlayerScore( "plant", player );
 		player incPlayerStat( "bombsplanted", 1 );
 		player thread maps\mp\_matchdata::logGameEvent( "plant", player.origin );
@@ -2807,30 +2807,30 @@ onUsePlantObjectFix( player )
 bombPlantedFix( destroyedObj, player )
 {
 	maps\mp\gametypes\_gamelogic::pauseTimer();
-	level.bombPlanted = true;
+	level.bombplanted = true;
 
 	destroyedObj.visuals[ 0 ] thread maps\mp\gametypes\_gamelogic::playTickingSound();
-	level.tickingObject = destroyedObj.visuals[ 0 ];
+	level.tickingobject = destroyedObj.visuals[ 0 ];
 
-	level.timeLimitOverride = true;
-	setGameEndTime( int( gettime() + ( level.bombTimer * 1000 ) ) );
+	level.timelimitoverride = true;
+	setGameEndTime( int( gettime() + ( level.bombtimer * 1000 ) ) );
 	setDvar( "ui_bomb_timer", 1 );
 
-	if ( !level.multiBomb )
+	if ( !level.multibomb )
 	{
-		level.sdBomb maps\mp\gametypes\_gameobjects::allowCarry( "none" );
-		level.sdBomb maps\mp\gametypes\_gameobjects::setVisibleTeam( "none" );
-		level.sdBomb maps\mp\gametypes\_gameobjects::setDropped();
-		level.sdBombModel = level.sdBomb.visuals[ 0 ];
+		level.sdbomb maps\mp\gametypes\_gameobjects::allowCarry( "none" );
+		level.sdbomb maps\mp\gametypes\_gameobjects::setVisibleTeam( "none" );
+		level.sdbomb maps\mp\gametypes\_gameobjects::setDropped();
+		level.sdbombmodel = level.sdbomb.visuals[ 0 ];
 	}
 	else
 	{
 
 		for ( index = 0; index < level.players.size; index++ )
 		{
-			if ( isDefined( level.players[ index ].carryIcon ) )
+			if ( isDefined( level.players[ index ].carryicon ) )
 			{
-				level.players[ index ].carryIcon destroyElem();
+				level.players[ index ].carryicon destroyElem();
 			}
 		}
 
@@ -2841,9 +2841,9 @@ bombPlantedFix( destroyedObj, player )
 		forward = vectornormalize( forward - common_scripts\utility::vector_multiply( trace[ "normal" ], vectordot( forward, trace[ "normal" ] ) ) );
 		dropAngles = vectortoangles( forward );
 
-		level.sdBombModel = spawn( "script_model", trace[ "position" ] );
-		level.sdBombModel.angles = dropAngles;
-		level.sdBombModel setModel( "prop_suitcase_bomb" );
+		level.sdbombmodel = spawn( "script_model", trace[ "position" ] );
+		level.sdbombmodel.angles = dropAngles;
+		level.sdbombmodel setModel( "prop_suitcase_bomb" );
 	}
 
 	destroyedObj maps\mp\gametypes\_gameobjects::allowUse( "none" );
@@ -2857,12 +2857,12 @@ bombPlantedFix( destroyedObj, player )
 	label = destroyedObj maps\mp\gametypes\_gameobjects::getLabel();
 
 	// create a new object to defuse with.
-	trigger = destroyedObj.bombDefuseTrig;
-	trigger.origin = level.sdBombModel.origin;
+	trigger = destroyedObj.bombdefusetrig;
+	trigger.origin = level.sdbombmodel.origin;
 	visuals = [];
 	defuseObject = maps\mp\gametypes\_gameobjects::createUseObject( game[ "defenders" ], trigger, visuals, ( 0, 0, 32 ) );
 	defuseObject maps\mp\gametypes\_gameobjects::allowUse( "friendly" );
-	defuseObject maps\mp\gametypes\_gameobjects::setUseTime( level.defuseTime );
+	defuseObject maps\mp\gametypes\_gameobjects::setUseTime( level.defusetime );
 	defuseObject maps\mp\gametypes\_gameobjects::setUseText( &"MP_DEFUSING_EXPLOSIVE" );
 	defuseObject maps\mp\gametypes\_gameobjects::setUseHintText( &"PLATFORM_HOLD_TO_DEFUSE_EXPLOSIVES" );
 	defuseObject maps\mp\gametypes\_gameobjects::setVisibleTeam( "any" );
@@ -2871,27 +2871,27 @@ bombPlantedFix( destroyedObj, player )
 	defuseObject maps\mp\gametypes\_gameobjects::set3DIcon( "friendly", "waypoint_defuse" + label );
 	defuseObject maps\mp\gametypes\_gameobjects::set3DIcon( "enemy", "waypoint_defend" + label );
 	defuseObject.label = label;
-	defuseObject.onBeginUse = maps\mp\gametypes\sd::onBeginUse;
-	defuseObject.onEndUse = maps\mp\gametypes\sd::onEndUse;
-	defuseObject.onUse = maps\mp\gametypes\sd::onUseDefuseObject;
-	defuseObject.useWeapon = "briefcase_bomb_defuse_mp";
+	defuseObject.onbeginuse = maps\mp\gametypes\sd::onBeginUse;
+	defuseObject.onenduse = maps\mp\gametypes\sd::onEndUse;
+	defuseObject.onuse = maps\mp\gametypes\sd::onUseDefuseObject;
+	defuseObject.useweapon = "briefcase_bomb_defuse_mp";
 
-	level.defuseObject = defuseObject;
+	level.defuseobject = defuseObject;
 
 	maps\mp\gametypes\sd::BombTimerWait();
 	setDvar( "ui_bomb_timer", 0 );
 
 	destroyedObj.visuals[ 0 ] maps\mp\gametypes\_gamelogic::stopTickingSound();
 
-	if ( level.gameEnded || level.bombDefused )
+	if ( level.gameended || level.bombdefused )
 	{
 		return;
 	}
 
-	level.bombExploded = true;
+	level.bombexploded = true;
 
-	explosionOrigin = level.sdBombModel.origin;
-	level.sdBombModel hide();
+	explosionOrigin = level.sdbombmodel.origin;
+	level.sdbombmodel hide();
 
 	if ( isdefined( player ) )
 	{
@@ -2912,14 +2912,14 @@ bombPlantedFix( destroyedObj, player )
 
 	thread playSoundinSpace( "exp_suitcase_bomb_main", explosionOrigin );
 
-	if ( isDefined( destroyedObj.exploderIndex ) )
+	if ( isDefined( destroyedObj.exploderindex ) )
 	{
-		exploder( destroyedObj.exploderIndex );
+		exploder( destroyedObj.exploderindex );
 	}
 
-	for ( index = 0; index < level.bombZones.size; index++ )
+	for ( index = 0; index < level.bombzones.size; index++ )
 	{
-		level.bombZones[ index ] maps\mp\gametypes\_gameobjects::disableObject();
+		level.bombzones[ index ] maps\mp\gametypes\_gameobjects::disableObject();
 	}
 
 	defuseObject maps\mp\gametypes\_gameobjects::disableObject();
@@ -3001,21 +3001,21 @@ botGiveLoadout( team, class, allowCopycat )
 		class_num = maps\mp\gametypes\_class::getClassIndex( class );
 		self.class_num = class_num;
 
-		loadoutPrimary = maps\mp\gametypes\_class::table_getWeapon( level.classTableName, class_num, 0 );
-		loadoutPrimaryAttachment = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classTableName, class_num, 0, 0 );
-		loadoutPrimaryAttachment2 = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classTableName, class_num, 0, 1 );
-		loadoutPrimaryCamo = maps\mp\gametypes\_class::table_getWeaponCamo( level.classTableName, class_num, 0 );
-		loadoutSecondaryCamo = maps\mp\gametypes\_class::table_getWeaponCamo( level.classTableName, class_num, 1 );
-		loadoutSecondary = maps\mp\gametypes\_class::table_getWeapon( level.classTableName, class_num, 1 );
-		loadoutSecondaryAttachment = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classTableName, class_num, 1, 0 );
-		loadoutSecondaryAttachment2 = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classTableName, class_num, 1, 1 );;
-		loadoutSecondaryCamo = maps\mp\gametypes\_class::table_getWeaponCamo( level.classTableName, class_num, 1 );
-		loadoutEquipment = maps\mp\gametypes\_class::table_getEquipment( level.classTableName, class_num, 0 );
-		loadoutPerk1 = maps\mp\gametypes\_class::table_getPerk( level.classTableName, class_num, 1 );
-		loadoutPerk2 = maps\mp\gametypes\_class::table_getPerk( level.classTableName, class_num, 2 );
-		loadoutPerk3 = maps\mp\gametypes\_class::table_getPerk( level.classTableName, class_num, 3 );
-		loadoutOffhand = maps\mp\gametypes\_class::table_getOffhand( level.classTableName, class_num );
-		loadoutDeathstreak = maps\mp\gametypes\_class::table_getDeathstreak( level.classTableName, class_num );
+		loadoutPrimary = maps\mp\gametypes\_class::table_getWeapon( level.classtablename, class_num, 0 );
+		loadoutPrimaryAttachment = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classtablename, class_num, 0, 0 );
+		loadoutPrimaryAttachment2 = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classtablename, class_num, 0, 1 );
+		loadoutPrimaryCamo = maps\mp\gametypes\_class::table_getWeaponCamo( level.classtablename, class_num, 0 );
+		loadoutSecondaryCamo = maps\mp\gametypes\_class::table_getWeaponCamo( level.classtablename, class_num, 1 );
+		loadoutSecondary = maps\mp\gametypes\_class::table_getWeapon( level.classtablename, class_num, 1 );
+		loadoutSecondaryAttachment = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classtablename, class_num, 1, 0 );
+		loadoutSecondaryAttachment2 = maps\mp\gametypes\_class::table_getWeaponAttachment( level.classtablename, class_num, 1, 1 );;
+		loadoutSecondaryCamo = maps\mp\gametypes\_class::table_getWeaponCamo( level.classtablename, class_num, 1 );
+		loadoutEquipment = maps\mp\gametypes\_class::table_getEquipment( level.classtablename, class_num, 0 );
+		loadoutPerk1 = maps\mp\gametypes\_class::table_getPerk( level.classtablename, class_num, 1 );
+		loadoutPerk2 = maps\mp\gametypes\_class::table_getPerk( level.classtablename, class_num, 2 );
+		loadoutPerk3 = maps\mp\gametypes\_class::table_getPerk( level.classtablename, class_num, 3 );
+		loadoutOffhand = maps\mp\gametypes\_class::table_getOffhand( level.classtablename, class_num );
+		loadoutDeathstreak = maps\mp\gametypes\_class::table_getDeathstreak( level.classtablename, class_num );
 	}
 
 	if ( loadoutPerk1 != "specialty_bling" )
@@ -3026,7 +3026,7 @@ botGiveLoadout( team, class, allowCopycat )
 
 	if ( loadoutPerk1 != "specialty_onemanarmy" && loadoutSecondary == "onemanarmy" )
 	{
-		loadoutSecondary = maps\mp\gametypes\_class::table_getWeapon( level.classTableName, 10, 1 );
+		loadoutSecondary = maps\mp\gametypes\_class::table_getWeapon( level.classtablename, 10, 1 );
 	}
 
 	// loadoutSecondaryCamo = "none";
@@ -3065,7 +3065,7 @@ botGiveLoadout( team, class, allowCopycat )
 	}
 
 
-	if ( level.killstreakRewards )
+	if ( level.killstreakrewards )
 	{
 		if ( getDvarInt( "scr_classic" ) == 1 )
 		{
@@ -3090,10 +3090,10 @@ botGiveLoadout( team, class, allowCopycat )
 	secondaryName = maps\mp\gametypes\_class::buildWeaponName( loadoutSecondary, loadoutSecondaryAttachment, loadoutSecondaryAttachment2 );
 	self _giveWeapon( secondaryName, int( tableLookup( "mp/camoTable.csv", 1, loadoutSecondaryCamo, 0 ) ) );
 
-	self.loadoutPrimaryCamo = int( tableLookup( "mp/camoTable.csv", 1, loadoutPrimaryCamo, 0 ) );
-	self.loadoutPrimary = loadoutPrimary;
-	self.loadoutSecondary = loadoutSecondary;
-	self.loadoutSecondaryCamo = int( tableLookup( "mp/camoTable.csv", 1, loadoutSecondaryCamo, 0 ) );
+	self.loadoutprimarycamo = int( tableLookup( "mp/camoTable.csv", 1, loadoutPrimaryCamo, 0 ) );
+	self.loadoutprimary = loadoutPrimary;
+	self.loadoutsecondary = loadoutSecondary;
+	self.loadoutsecondarycamo = int( tableLookup( "mp/camoTable.csv", 1, loadoutSecondaryCamo, 0 ) );
 
 	self SetOffhandPrimaryClass( "other" );
 
@@ -3109,13 +3109,13 @@ botGiveLoadout( team, class, allowCopycat )
 
 	// these special case giving pistol death have to come before
 	// perk loadout to ensure player perk icons arent overwritten
-	if ( level.dieHardMode )
+	if ( level.diehardmode )
 	{
 		self maps\mp\perks\_perks::givePerk( "specialty_pistoldeath" );
 	}
 
 	// only give the deathstreak for the initial spawn for this life.
-	if ( loadoutDeathStreak != "specialty_null" && ( getTime() - self.spawnTime ) < 0.1 )
+	if ( loadoutDeathStreak != "specialty_null" && ( getTime() - self.spawntime ) < 0.1 )
 	{
 		deathVal = int( tableLookup( "mp/perkTable.csv", 1, loadoutDeathStreak, 6 ) );
 
@@ -3146,10 +3146,10 @@ botGiveLoadout( team, class, allowCopycat )
 
 	// Primary Weapon
 	primaryName = maps\mp\gametypes\_class::buildWeaponName( loadoutPrimary, loadoutPrimaryAttachment, loadoutPrimaryAttachment2 );
-	self _giveWeapon( primaryName, self.loadoutPrimaryCamo );
+	self _giveWeapon( primaryName, self.loadoutprimarycamo );
 
 	// fix changing from a riotshield class to a riotshield class during grace period not giving a shield
-	if ( primaryName == "riotshield_mp" && level.inGracePeriod )
+	if ( primaryName == "riotshield_mp" && level.ingraceperiod )
 	{
 		self notify ( "weapon_change", "riotshield_mp" );
 	}
@@ -3198,12 +3198,12 @@ botGiveLoadout( team, class, allowCopycat )
 	}
 
 	primaryWeapon = primaryName;
-	self.primaryWeapon = primaryWeapon;
-	self.secondaryWeapon = secondaryName;
+	self.primaryweapon = primaryWeapon;
+	self.secondaryweapon = secondaryName;
 
 	self botPlayerModelForWeapon( self.pers[ "primaryWeapon" ], getBaseWeaponName( secondaryName ) );
 
-	self.isSniper = ( weaponClass( self.primaryWeapon ) == "sniper" );
+	self.issniper = ( weaponClass( self.primaryweapon ) == "sniper" );
 
 	self maps\mp\gametypes\_weapons::updateMoveSpeedScale( "primary" );
 

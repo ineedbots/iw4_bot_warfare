@@ -15,7 +15,7 @@
 */
 init()
 {
-	level.bw_VERSION = "2.1.0";
+	level.bw_version = "2.1.0";
 
 	if ( getDvar( "bots_main" ) == "" )
 	{
@@ -220,27 +220,27 @@ init()
 		game[ "botWarfare" ] = true;
 	}
 
-	level.defuseObject = undefined;
-	level.bots_smokeList = List();
-	level.bots_fragList = List();
+	level.defuseobject = undefined;
+	level.bots_smokelist = List();
+	level.bots_fraglist = List();
 
-	level.bots_minSprintDistance = 315;
-	level.bots_minSprintDistance *= level.bots_minSprintDistance;
-	level.bots_minGrenadeDistance = 256;
-	level.bots_minGrenadeDistance *= level.bots_minGrenadeDistance;
-	level.bots_maxGrenadeDistance = 1024;
-	level.bots_maxGrenadeDistance *= level.bots_maxGrenadeDistance;
-	level.bots_maxKnifeDistance = 128;
-	level.bots_maxKnifeDistance *= level.bots_maxKnifeDistance;
-	level.bots_goalDistance = 27.5;
-	level.bots_goalDistance *= level.bots_goalDistance;
-	level.bots_noADSDistance = 200;
-	level.bots_noADSDistance *= level.bots_noADSDistance;
-	level.bots_maxShotgunDistance = 500;
-	level.bots_maxShotgunDistance *= level.bots_maxShotgunDistance;
-	level.bots_listenDist = 100;
+	level.bots_minsprintdistance = 315;
+	level.bots_minsprintdistance *= level.bots_minsprintdistance;
+	level.bots_mingrenadedistance = 256;
+	level.bots_mingrenadedistance *= level.bots_mingrenadedistance;
+	level.bots_maxgrenadedistance = 1024;
+	level.bots_maxgrenadedistance *= level.bots_maxgrenadedistance;
+	level.bots_maxknifedistance = 128;
+	level.bots_maxknifedistance *= level.bots_maxknifedistance;
+	level.bots_goaldistance = 27.5;
+	level.bots_goaldistance *= level.bots_goaldistance;
+	level.bots_noadsdistance = 200;
+	level.bots_noadsdistance *= level.bots_noadsdistance;
+	level.bots_maxshotgundistance = 500;
+	level.bots_maxshotgundistance *= level.bots_maxshotgundistance;
+	level.bots_listendist = 100;
 
-	level.smokeRadius = 255;
+	level.smokeradius = 255;
 
 	level.bots = [];
 
@@ -322,7 +322,7 @@ onPlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon,
 		self maps\mp\bots\_bot_script::onDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset );
 	}
 
-	self [[ level.prevCallbackPlayerDamage ]]( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset );
+	self [[ level.prevcallbackplayerdamage ]]( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset );
 }
 
 /*
@@ -336,7 +336,7 @@ onPlayerKilled( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sH
 		self maps\mp\bots\_bot_script::onKilled( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, timeOffset, deathAnimDuration );
 	}
 
-	self [[ level.prevCallbackPlayerKilled ]]( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, timeOffset, deathAnimDuration );
+	self [[ level.prevcallbackplayerkilled ]]( eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, timeOffset, deathAnimDuration );
 }
 
 /*
@@ -346,11 +346,11 @@ hook_callbacks()
 {
 	level waittill( "prematch_over" ); // iw4madmin waits this long for some reason...
 	wait 0.05; // so we need to be one frame after it sets up its callbacks.
-	level.prevCallbackPlayerDamage = level.callbackPlayerDamage;
-	level.callbackPlayerDamage = ::onPlayerDamage;
+	level.prevcallbackplayerdamage = level.callbackplayerdamage;
+	level.callbackplayerdamage = ::onPlayerDamage;
 
-	level.prevCallbackPlayerKilled = level.callbackPlayerKilled;
-	level.callbackPlayerKilled = ::onPlayerKilled;
+	level.prevcallbackplayerkilled = level.callbackplayerkilled;
+	level.callbackplayerkilled = ::onPlayerKilled;
 }
 
 /*
@@ -360,11 +360,11 @@ fixGamemodes()
 {
 	for ( i = 0; i < 19; i++ )
 	{
-		if ( isDefined( level.bombZones ) && level.gametype == "sd" )
+		if ( isDefined( level.bombzones ) && level.gametype == "sd" )
 		{
-			for ( i = 0; i < level.bombZones.size; i++ )
+			for ( i = 0; i < level.bombzones.size; i++ )
 			{
-				level.bombZones[ i ].onUse = ::onUsePlantObjectFix;
+				level.bombzones[ i ].onuse = ::onUsePlantObjectFix;
 			}
 
 			break;
@@ -377,7 +377,7 @@ fixGamemodes()
 			break;
 		}
 
-		if ( isDefined( level.bombZones ) && level.gametype == "dd" )
+		if ( isDefined( level.bombzones ) && level.gametype == "dd" )
 		{
 			level thread fixDem();
 
@@ -395,20 +395,20 @@ fixDem()
 {
 	for ( ;; )
 	{
-		level.bombAPlanted = level.aPlanted;
-		level.bombBPlanted = level.bPlanted;
+		level.bombaplanted = level.aplanted;
+		level.bombbplanted = level.bplanted;
 
-		for ( i = 0; i < level.bombZones.size; i++ )
+		for ( i = 0; i < level.bombzones.size; i++ )
 		{
-			bombzone = level.bombZones[ i ];
+			bombzone = level.bombzones[ i ];
 
 			if ( isDefined( bombzone.trigger.trigger_off ) )
 			{
-				bombzone.bombExploded = true;
+				bombzone.bombexploded = true;
 			}
 			else
 			{
-				bombzone.bombExploded = undefined;
+				bombzone.bombexploded = undefined;
 			}
 		}
 
@@ -427,14 +427,14 @@ fixKoth()
 	{
 		wait 0.05;
 
-		if ( !isDefined( level.radioObject ) )
+		if ( !isDefined( level.radioobject ) )
 		{
 			continue;
 		}
 
 		for ( i = level.radios.size - 1; i >= 0; i-- )
 		{
-			if ( level.radioObject != level.radios[ i ].gameobject )
+			if ( level.radioobject != level.radios[ i ].gameobject )
 			{
 				continue;
 			}
@@ -443,7 +443,7 @@ fixKoth()
 			break;
 		}
 
-		while ( isDefined( level.radioObject ) && level.radio.gameobject == level.radioObject )
+		while ( isDefined( level.radioobject ) && level.radio.gameobject == level.radioobject )
 		{
 			wait 0.05;
 		}
@@ -461,12 +461,12 @@ addNotifyOnAirdrops_loop()
 	{
 		airdrop = dropCrates[ i ];
 
-		if ( isDefined( airdrop.doingPhysics ) )
+		if ( isDefined( airdrop.doingphysics ) )
 		{
 			continue;
 		}
 
-		airdrop.doingPhysics = true;
+		airdrop.doingphysics = true;
 		airdrop thread doNotifyOnAirdrop();
 	}
 }
@@ -491,7 +491,7 @@ doNotifyOnAirdrop()
 	self endon( "death" );
 	self waittill( "physics_finished" );
 
-	self.doingPhysics = false;
+	self.doingphysics = false;
 
 	if ( isDefined( self.owner ) )
 	{
@@ -525,7 +525,7 @@ onPlayerConnect()
 	{
 		level waittill( "connected", player );
 
-		player.bot_isScrambled = false;
+		player.bot_isscrambled = false;
 
 		player thread onGrenadeFire();
 		player thread onWeaponFired();
@@ -542,7 +542,7 @@ watchScrabler_loop()
 	for ( i = level.players.size - 1; i >= 0; i-- )
 	{
 		player = level.players[ i ];
-		player.bot_isScrambled = false;
+		player.bot_isscrambled = false;
 	}
 
 	for ( i = level.players.size - 1; i >= 0; i-- )
@@ -568,7 +568,7 @@ watchScrabler_loop()
 				continue;
 			}
 
-			if ( level.teamBased && player2.team == player.team )
+			if ( level.teambased && player2.team == player.team )
 			{
 				continue;
 			}
@@ -578,7 +578,7 @@ watchScrabler_loop()
 				continue;
 			}
 
-			player2.bot_isScrambled = true;
+			player2.bot_isscrambled = true;
 		}
 	}
 }
@@ -1222,7 +1222,7 @@ AddToFragList( who )
 
 	grenade thread thinkFrag();
 
-	level.bots_fragList ListAdd( grenade );
+	level.bots_fraglist ListAdd( grenade );
 }
 
 /*
@@ -1239,7 +1239,7 @@ thinkFrag()
 		wait 0.05;
 	}
 
-	level.bots_fragList ListRemove( self );
+	level.bots_fraglist ListRemove( self );
 }
 
 /*
@@ -1254,7 +1254,7 @@ AddToSmokeList()
 
 	grenade thread thinkSmoke();
 
-	level.bots_smokeList ListAdd( grenade );
+	level.bots_smokelist ListAdd( grenade );
 }
 
 /*
@@ -1272,7 +1272,7 @@ thinkSmoke()
 	self.state = "smoking";
 	wait 11.5;
 
-	level.bots_smokeList ListRemove( self );
+	level.bots_smokelist ListRemove( self );
 }
 
 /*

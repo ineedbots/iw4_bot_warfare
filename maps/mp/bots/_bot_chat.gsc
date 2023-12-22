@@ -87,14 +87,14 @@ start_onnuke_call()
 
 	for ( ;; )
 	{
-		while ( !isDefined( level.nukeIncoming ) && !isDefined( level.moabIncoming ) )
+		while ( !isDefined( level.nukeincoming ) && !isDefined( level.moabincoming ) )
 		{
 			wait 0.05 + randomInt( 4 );
 		}
 
 		self thread bot_onnukecall_watch();
 
-		wait level.nukeTimer + 5;
+		wait level.nuketimer + 5;
 	}
 }
 
@@ -109,9 +109,9 @@ start_death_watch()
 	{
 		self waittill( "death" );
 
-		self thread bot_chat_death_watch( self.lastAttacker, self.bots_lastKS );
+		self thread bot_chat_death_watch( self.lastattacker, self.bots_lastks );
 
-		self.bots_lastKS = 0;
+		self.bots_lastks = 0;
 	}
 }
 
@@ -155,23 +155,23 @@ start_killed_watch()
 {
 	self endon( "disconnect" );
 
-	self.bots_lastKS = 0;
+	self.bots_lastks = 0;
 
 	for ( ;; )
 	{
 		self waittill( "killed_enemy" );
 
-		if ( self.bots_lastKS < self.pers[ "cur_kill_streak" ] )
+		if ( self.bots_lastks < self.pers[ "cur_kill_streak" ] )
 		{
-			for ( i = self.bots_lastKS + 1; i <= self.pers[ "cur_kill_streak" ]; i++ )
+			for ( i = self.bots_lastks + 1; i <= self.pers[ "cur_kill_streak" ]; i++ )
 			{
 				self thread bot_chat_streak( i );
 			}
 		}
 
-		self.bots_lastKS = self.pers[ "cur_kill_streak" ];
+		self.bots_lastks = self.pers[ "cur_kill_streak" ];
 
-		self thread bot_chat_killed_watch( self.lastKilledPlayer );
+		self thread bot_chat_killed_watch( self.lastkilledplayer );
 	}
 }
 
@@ -587,7 +587,7 @@ endgame_chat()
 		}
 	}
 
-	if ( level.teamBased )
+	if ( level.teambased )
 	{
 		winningteam = maps\mp\gametypes\_gamescore::getWinningTeam();
 
@@ -1019,7 +1019,7 @@ bot_onnukecall_watch()
 	switch ( randomint( 4 ) )
 	{
 		case 0:
-			if ( level.nukeInfo.player != self )
+			if ( level.nukeinfo.player != self )
 			{
 				self BotDoChat( 30, "Wow who got a nuke?" );
 			}
@@ -1031,9 +1031,9 @@ bot_onnukecall_watch()
 			break;
 
 		case 1:
-			if ( level.nukeInfo.player != self )
+			if ( level.nukeinfo.player != self )
 			{
-				self BotDoChat( 30, "lol " + level.nukeInfo.player.name + " is a hacker" );
+				self BotDoChat( 30, "lol " + level.nukeinfo.player.name + " is a hacker" );
 			}
 			else
 			{
@@ -1047,7 +1047,7 @@ bot_onnukecall_watch()
 			break;
 
 		case 3:
-			if ( level.nukeInfo.team != self.team )
+			if ( level.nukeinfo.team != self.team )
 			{
 				self BotDoChat( 30, "man my team sucks ):" );
 			}
@@ -1285,9 +1285,9 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 40:
-			if ( isDefined( victim.attackerData ) && isDefined( victim.attackerData[ self.guid ] ) && isDefined( victim.attackerData[ self.guid ].weapon ) )
+			if ( isDefined( victim.attackerdata ) && isDefined( victim.attackerdata[ self.guid ] ) && isDefined( victim.attackerdata[ self.guid ].weapon ) )
 			{
-				message = ( "Man, I sure love my " + getBaseWeaponName( victim.attackerData[ self.guid ].weapon ) + "!" );
+				message = ( "Man, I sure love my " + getBaseWeaponName( victim.attackerdata[ self.guid ].weapon ) + "!" );
 			}
 
 			break;
@@ -1566,9 +1566,9 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 60:
-			if ( isDefined( self.attackerData ) && isDefined( self.attackerData[ killer.guid ] ) && isDefined( self.attackerData[ killer.guid ].weapon ) )
+			if ( isDefined( self.attackerdata ) && isDefined( self.attackerdata[ killer.guid ] ) && isDefined( self.attackerdata[ killer.guid ].weapon ) )
 			{
-				message = "Wow! Nice " + getBaseWeaponName( self.attackerData[ killer.guid ].weapon ) + " you got there, " + killer.name + "!";
+				message = "Wow! Nice " + getBaseWeaponName( self.attackerdata[ killer.guid ].weapon ) + " you got there, " + killer.name + "!";
 			}
 
 			break;
@@ -2001,7 +2001,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 						break;
 
 					case 5:
-						self BotDoChat( 10, ":3 i got my " + aircare.crateType );
+						self BotDoChat( 10, ":3 i got my " + aircare.cratetype );
 						break;
 				}
 			}
@@ -2026,7 +2026,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 						break;
 
 					case 4:
-						self BotDoChat( 10, "hahaah jajaja i took your " + aircare.crateType );
+						self BotDoChat( 10, "hahaah jajaja i took your " + aircare.cratetype );
 						break;
 				}
 			}
@@ -2053,7 +2053,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 					break;
 
 				case 4:
-					self BotDoChat( 10, "Wow! there goes my " + aircare.crateType + "!" );
+					self BotDoChat( 10, "Wow! there goes my " + aircare.cratetype + "!" );
 					break;
 			}
 

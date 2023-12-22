@@ -45,7 +45,7 @@ watchPlayers()
 				continue;
 			}
 
-			if ( isDefined( player.menuInit ) && player.menuInit )
+			if ( isDefined( player.menuinit ) && player.menuinit )
 			{
 				continue;
 			}
@@ -58,17 +58,17 @@ watchPlayers()
 kill_menu()
 {
 	self notify( "bots_kill_menu" );
-	self.menuInit = undefined;
+	self.menuinit = undefined;
 }
 
 init_menu()
 {
-	self.menuInit = true;
+	self.menuinit = true;
 
-	self.menuOpen = false;
+	self.menuopen = false;
 	self.menu_player = undefined;
-	self.SubMenu = "Main";
-	self.Curs[ "Main" ][ "X" ] = 0;
+	self.submenu = "Main";
+	self.curs[ "Main" ][ "X" ] = 0;
 	self AddOptions();
 
 	self thread watchPlayerOpenMenu();
@@ -87,46 +87,46 @@ watchDisconnect()
 {
 	self waittill_either( "disconnect", "bots_kill_menu" );
 
-	if ( self.menuOpen )
+	if ( self.menuopen )
 	{
-		if ( isDefined( self.MenuTextY ) )
+		if ( isDefined( self.menutexty ) )
 		{
-			for ( i = 0; i < self.MenuTextY.size; i++ )
+			for ( i = 0; i < self.menutexty.size; i++ )
 			{
-				if ( isDefined( self.MenuTextY[ i ] ) )
+				if ( isDefined( self.menutexty[ i ] ) )
 				{
-					self.MenuTextY[ i ] destroy();
+					self.menutexty[ i ] destroy();
 				}
 			}
 		}
 
-		if ( isDefined( self.MenuText ) )
+		if ( isDefined( self.menutext ) )
 		{
-			for ( i = 0; i < self.MenuText.size; i++ )
+			for ( i = 0; i < self.menutext.size; i++ )
 			{
-				if ( isDefined( self.MenuText[ i ] ) )
+				if ( isDefined( self.menutext[ i ] ) )
 				{
-					self.MenuText[ i ] destroy();
+					self.menutext[ i ] destroy();
 				}
 			}
 		}
 
-		if ( isDefined( self.Menu ) && isDefined( self.Menu[ "X" ] ) )
+		if ( isDefined( self.menu ) && isDefined( self.menu[ "X" ] ) )
 		{
-			if ( isDefined( self.Menu[ "X" ][ "Shader" ] ) )
+			if ( isDefined( self.menu[ "X" ][ "Shader" ] ) )
 			{
-				self.Menu[ "X" ][ "Shader" ] destroy();
+				self.menu[ "X" ][ "Shader" ] destroy();
 			}
 
-			if ( isDefined( self.Menu[ "X" ][ "Scroller" ] ) )
+			if ( isDefined( self.menu[ "X" ][ "Scroller" ] ) )
 			{
-				self.Menu[ "X" ][ "Scroller" ] destroy();
+				self.menu[ "X" ][ "Scroller" ] destroy();
 			}
 		}
 
-		if ( isDefined( self.menuVersionHud ) )
+		if ( isDefined( self.menuversionhud ) )
 		{
-			self.menuVersionHud destroy();
+			self.menuversionhud destroy();
 		}
 	}
 }
@@ -152,16 +152,16 @@ watchPlayerOpenMenu()
 	{
 		self waittill( "bots_open_menu" );
 
-		if ( !self.menuOpen )
+		if ( !self.menuopen )
 		{
 			self playLocalSound( "mouse_click" );
-			self thread OpenSub( self.SubMenu );
+			self thread OpenSub( self.submenu );
 		}
 		else
 		{
 			self playLocalSound( "mouse_click" );
 
-			if ( self.SubMenu != "Main" )
+			if ( self.submenu != "Main" )
 			{
 				self ExitSub();
 			}
@@ -169,7 +169,7 @@ watchPlayerOpenMenu()
 			{
 				self ExitMenu();
 
-				if ( !gameFlag( "prematch_done" ) || level.gameEnded )
+				if ( !gameFlag( "prematch_done" ) || level.gameended )
 				{
 					self freezeControls( true );
 				}
@@ -193,17 +193,17 @@ MenuSelect()
 	{
 		self waittill( "bots_select" );
 
-		if ( self.MenuOpen )
+		if ( self.menuopen )
 		{
 			self playLocalSound( "mouse_click" );
 
-			if ( self.SubMenu == "Main" )
+			if ( self.submenu == "Main" )
 			{
-				self thread [[ self.Option[ "Function" ][ self.SubMenu ][ self.Curs[ "Main" ][ "X" ] ] ]]( self.Option[ "Arg1" ][ self.SubMenu ][ self.Curs[ "Main" ][ "X" ] ], self.Option[ "Arg2" ][ self.SubMenu ][ self.Curs[ "Main" ][ "X" ] ] );
+				self thread [[ self.option[ "Function" ][ self.submenu ][ self.curs[ "Main" ][ "X" ] ] ]]( self.option[ "Arg1" ][ self.submenu ][ self.curs[ "Main" ][ "X" ] ], self.option[ "Arg2" ][ self.submenu ][ self.curs[ "Main" ][ "X" ] ] );
 			}
 			else
 			{
-				self thread [[ self.Option[ "Function" ][ self.SubMenu ][ self.Curs[ self.SubMenu ][ "Y" ] ] ]]( self.Option[ "Arg1" ][ self.SubMenu ][ self.Curs[ self.SubMenu ][ "Y" ] ], self.Option[ "Arg2" ][ self.SubMenu ][ self.Curs[ self.SubMenu ][ "Y" ] ] );
+				self thread [[ self.option[ "Function" ][ self.submenu ][ self.curs[ self.submenu ][ "Y" ] ] ]]( self.option[ "Arg1" ][ self.submenu ][ self.curs[ self.submenu ][ "Y" ] ], self.option[ "Arg2" ][ self.submenu ][ self.curs[ self.submenu ][ "Y" ] ] );
 			}
 		}
 	}
@@ -220,14 +220,14 @@ LeftMenu()
 	{
 		self waittill( "bots_left" );
 
-		if ( self.MenuOpen && self.SubMenu == "Main" )
+		if ( self.menuopen && self.submenu == "Main" )
 		{
 			self playLocalSound( "mouse_over" );
-			self.Curs[ "Main" ][ "X" ]--;
+			self.curs[ "Main" ][ "X" ]--;
 
-			if ( self.Curs[ "Main" ][ "X" ] < 0 )
+			if ( self.curs[ "Main" ][ "X" ] < 0 )
 			{
-				self.Curs[ "Main" ][ "X" ] = self.Option[ "Name" ][ self.SubMenu ].size - 1;
+				self.curs[ "Main" ][ "X" ] = self.option[ "Name" ][ self.submenu ].size - 1;
 			}
 
 			self CursMove( "X" );
@@ -246,14 +246,14 @@ RightMenu()
 	{
 		self waittill( "bots_right" );
 
-		if ( self.MenuOpen && self.SubMenu == "Main" )
+		if ( self.menuopen && self.submenu == "Main" )
 		{
 			self playLocalSound( "mouse_over" );
-			self.Curs[ "Main" ][ "X" ]++;
+			self.curs[ "Main" ][ "X" ]++;
 
-			if ( self.Curs[ "Main" ][ "X" ] > self.Option[ "Name" ][ self.SubMenu ].size - 1 )
+			if ( self.curs[ "Main" ][ "X" ] > self.option[ "Name" ][ self.submenu ].size - 1 )
 			{
-				self.Curs[ "Main" ][ "X" ] = 0;
+				self.curs[ "Main" ][ "X" ] = 0;
 			}
 
 			self CursMove( "X" );
@@ -272,14 +272,14 @@ UpMenu()
 	{
 		self waittill( "bots_up" );
 
-		if ( self.MenuOpen && self.SubMenu != "Main" )
+		if ( self.menuopen && self.submenu != "Main" )
 		{
 			self playLocalSound( "mouse_over" );
-			self.Curs[ self.SubMenu ][ "Y" ]--;
+			self.curs[ self.submenu ][ "Y" ]--;
 
-			if ( self.Curs[ self.SubMenu ][ "Y" ] < 0 )
+			if ( self.curs[ self.submenu ][ "Y" ] < 0 )
 			{
-				self.Curs[ self.SubMenu ][ "Y" ] = self.Option[ "Name" ][ self.SubMenu ].size - 1;
+				self.curs[ self.submenu ][ "Y" ] = self.option[ "Name" ][ self.submenu ].size - 1;
 			}
 
 			self CursMove( "Y" );
@@ -298,14 +298,14 @@ DownMenu()
 	{
 		self waittill( "bots_down" );
 
-		if ( self.MenuOpen && self.SubMenu != "Main" )
+		if ( self.menuopen && self.submenu != "Main" )
 		{
 			self playLocalSound( "mouse_over" );
-			self.Curs[ self.SubMenu ][ "Y" ]++;
+			self.curs[ self.submenu ][ "Y" ]++;
 
-			if ( self.Curs[ self.SubMenu ][ "Y" ] > self.Option[ "Name" ][ self.SubMenu ].size - 1 )
+			if ( self.curs[ self.submenu ][ "Y" ] > self.option[ "Name" ][ self.submenu ].size - 1 )
 			{
-				self.Curs[ self.SubMenu ][ "Y" ] = 0;
+				self.curs[ self.submenu ][ "Y" ] = 0;
 			}
 
 			self CursMove( "Y" );
@@ -315,105 +315,105 @@ DownMenu()
 
 OpenSub( menu, menu2 )
 {
-	if ( menu != "Main" && ( !isDefined( self.Menu[ menu ] ) || !!isDefined( self.Menu[ menu ][ "FirstOpen" ] ) ) )
+	if ( menu != "Main" && ( !isDefined( self.menu[ menu ] ) || !!isDefined( self.menu[ menu ][ "FirstOpen" ] ) ) )
 	{
-		self.Curs[ menu ][ "Y" ] = 0;
-		self.Menu[ menu ][ "FirstOpen" ] = true;
+		self.curs[ menu ][ "Y" ] = 0;
+		self.menu[ menu ][ "FirstOpen" ] = true;
 	}
 
 	logoldi = true;
-	self.SubMenu = menu;
+	self.submenu = menu;
 
-	if ( self.SubMenu == "Main" )
+	if ( self.submenu == "Main" )
 	{
-		if ( isDefined( self.MenuText ) )
+		if ( isDefined( self.menutext ) )
 		{
-			for ( i = 0; i < self.MenuText.size; i++ )
+			for ( i = 0; i < self.menutext.size; i++ )
 			{
-				if ( isDefined( self.MenuText[ i ] ) )
+				if ( isDefined( self.menutext[ i ] ) )
 				{
-					self.MenuText[ i ] destroy();
+					self.menutext[ i ] destroy();
 				}
 			}
 		}
 
-		if ( isDefined( self.Menu ) && isDefined( self.Menu[ "X" ] ) )
+		if ( isDefined( self.menu ) && isDefined( self.menu[ "X" ] ) )
 		{
-			if ( isDefined( self.Menu[ "X" ][ "Shader" ] ) )
+			if ( isDefined( self.menu[ "X" ][ "Shader" ] ) )
 			{
-				self.Menu[ "X" ][ "Shader" ] destroy();
+				self.menu[ "X" ][ "Shader" ] destroy();
 			}
 
-			if ( isDefined( self.Menu[ "X" ][ "Scroller" ] ) )
+			if ( isDefined( self.menu[ "X" ][ "Scroller" ] ) )
 			{
-				self.Menu[ "X" ][ "Scroller" ] destroy();
+				self.menu[ "X" ][ "Scroller" ] destroy();
 			}
 		}
 
-		if ( isDefined( self.menuVersionHud ) )
+		if ( isDefined( self.menuversionhud ) )
 		{
-			self.menuVersionHud destroy();
+			self.menuversionhud destroy();
 		}
 
-		for ( i = 0 ; i < self.Option[ "Name" ][ self.SubMenu ].size ; i++ )
+		for ( i = 0 ; i < self.option[ "Name" ][ self.submenu ].size ; i++ )
 		{
-			self.MenuText[ i ] = self createfontstring( "default", 1.6 );
-			self.MenuText[ i ] setpoint( "CENTER", "CENTER", -300 + ( i * 100 ), -226 );
-			self.MenuText[ i ] settext( self.Option[ "Name" ][ self.SubMenu ][ i ] );
+			self.menutext[ i ] = self createfontstring( "default", 1.6 );
+			self.menutext[ i ] setpoint( "CENTER", "CENTER", -300 + ( i * 100 ), -226 );
+			self.menutext[ i ] settext( self.option[ "Name" ][ self.submenu ][ i ] );
 
 			if ( logOldi )
 			{
 				self.oldi = i;
 			}
 
-			if ( self.MenuText[ i ].x > 300 )
+			if ( self.menutext[ i ].x > 300 )
 			{
 				logOldi = false;
 				x = i - self.oldi;
-				self.MenuText[ i ] setpoint( "CENTER", "CENTER", ( ( ( -300 ) - ( i * 100 ) ) + ( i * 100 ) ) + ( x * 100 ), -196 );
+				self.menutext[ i ] setpoint( "CENTER", "CENTER", ( ( ( -300 ) - ( i * 100 ) ) + ( i * 100 ) ) + ( x * 100 ), -196 );
 			}
 
-			self.MenuText[ i ].alpha = 1;
-			self.MenuText[ i ].sort = 999;
+			self.menutext[ i ].alpha = 1;
+			self.menutext[ i ].sort = 999;
 		}
 
 		if ( !logOldi )
 		{
-			self.Menu[ "X" ][ "Shader" ] = self createRectangle( "CENTER", "CENTER", 0, -225, 1000, 90, ( 0, 0, 0 ), -2, 1, "white" );
+			self.menu[ "X" ][ "Shader" ] = self createRectangle( "CENTER", "CENTER", 0, -225, 1000, 90, ( 0, 0, 0 ), -2, 1, "white" );
 		}
 		else
 		{
-			self.Menu[ "X" ][ "Shader" ] = self createRectangle( "CENTER", "CENTER", 0, -225, 1000, 30, ( 0, 0, 0 ), -2, 1, "white" );
+			self.menu[ "X" ][ "Shader" ] = self createRectangle( "CENTER", "CENTER", 0, -225, 1000, 30, ( 0, 0, 0 ), -2, 1, "white" );
 		}
 
-		self.Menu[ "X" ][ "Scroller" ] = self createRectangle( "CENTER", "CENTER", self.MenuText[ self.Curs[ "Main" ][ "X" ] ].x, -225, 105, 22, ( 1, 0, 0 ), -1, 1, "white" );
+		self.menu[ "X" ][ "Scroller" ] = self createRectangle( "CENTER", "CENTER", self.menutext[ self.curs[ "Main" ][ "X" ] ].x, -225, 105, 22, ( 1, 0, 0 ), -1, 1, "white" );
 
 		self CursMove( "X" );
 
-		self.menuVersionHud = initHudElem( "Bot Warfare " + level.bw_VERSION, 0, 0 );
+		self.menuversionhud = initHudElem( "Bot Warfare " + level.bw_version, 0, 0 );
 
-		self.MenuOpen = true;
+		self.menuopen = true;
 	}
 	else
 	{
-		if ( isDefined( self.MenuTextY ) )
+		if ( isDefined( self.menutexty ) )
 		{
-			for ( i = 0 ; i < self.MenuTextY.size ; i++ )
+			for ( i = 0 ; i < self.menutexty.size ; i++ )
 			{
-				if ( isDefined( self.MenuTextY[ i ] ) )
+				if ( isDefined( self.menutexty[ i ] ) )
 				{
-					self.MenuTextY[ i ] destroy();
+					self.menutexty[ i ] destroy();
 				}
 			}
 		}
 
-		for ( i = 0 ; i < self.Option[ "Name" ][ self.SubMenu ].size ; i++ )
+		for ( i = 0 ; i < self.option[ "Name" ][ self.submenu ].size ; i++ )
 		{
-			self.MenuTextY[ i ] = self createfontstring( "default", 1.6 );
-			self.MenuTextY[ i ] setpoint( "CENTER", "CENTER", self.MenuText[ self.Curs[ "Main" ][ "X" ] ].x, -160 + ( i * 20 ) );
-			self.MenuTextY[ i ] settext( self.Option[ "Name" ][ self.SubMenu ][ i ] );
-			self.MenuTextY[ i ].alpha = 1;
-			self.MenuTextY[ i ].sort = 999;
+			self.menutexty[ i ] = self createfontstring( "default", 1.6 );
+			self.menutexty[ i ] setpoint( "CENTER", "CENTER", self.menutext[ self.curs[ "Main" ][ "X" ] ].x, -160 + ( i * 20 ) );
+			self.menutexty[ i ] settext( self.option[ "Name" ][ self.submenu ][ i ] );
+			self.menutexty[ i ].alpha = 1;
+			self.menutexty[ i ].sort = 999;
 		}
 
 		self CursMove( "Y" );
@@ -424,20 +424,20 @@ CursMove( direction )
 {
 	self notify( "scrolled" );
 
-	if ( self.SubMenu == "Main" )
+	if ( self.submenu == "Main" )
 	{
-		self.Menu[ "X" ][ "Scroller" ].x = self.MenuText[ self.Curs[ "Main" ][ "X" ] ].x;
-		self.Menu[ "X" ][ "Scroller" ].y = self.MenuText[ self.Curs[ "Main" ][ "X" ] ].y;
+		self.menu[ "X" ][ "Scroller" ].x = self.menutext[ self.curs[ "Main" ][ "X" ] ].x;
+		self.menu[ "X" ][ "Scroller" ].y = self.menutext[ self.curs[ "Main" ][ "X" ] ].y;
 
-		if ( isDefined( self.MenuText ) )
+		if ( isDefined( self.menutext ) )
 		{
-			for ( i = 0; i < self.MenuText.size; i++ )
+			for ( i = 0; i < self.menutext.size; i++ )
 			{
-				if ( isDefined( self.MenuText[ i ] ) )
+				if ( isDefined( self.menutext[ i ] ) )
 				{
-					self.MenuText[ i ].fontscale = 1.5;
-					self.MenuText[ i ].color = ( 1, 1, 1 );
-					self.MenuText[ i ].glowAlpha = 0;
+					self.menutext[ i ].fontscale = 1.5;
+					self.menutext[ i ].color = ( 1, 1, 1 );
+					self.menutext[ i ].glowalpha = 0;
 				}
 			}
 		}
@@ -446,28 +446,28 @@ CursMove( direction )
 	}
 	else
 	{
-		if ( isDefined( self.MenuTextY ) )
+		if ( isDefined( self.menutexty ) )
 		{
-			for ( i = 0; i < self.MenuTextY.size; i++ )
+			for ( i = 0; i < self.menutexty.size; i++ )
 			{
-				if ( isDefined( self.MenuTextY[ i ] ) )
+				if ( isDefined( self.menutexty[ i ] ) )
 				{
-					self.MenuTextY[ i ].fontscale = 1.5;
-					self.MenuTextY[ i ].color = ( 1, 1, 1 );
-					self.MenuTextY[ i ].glowAlpha = 0;
+					self.menutexty[ i ].fontscale = 1.5;
+					self.menutexty[ i ].color = ( 1, 1, 1 );
+					self.menutexty[ i ].glowalpha = 0;
 				}
 			}
 		}
 
-		if ( isDefined( self.MenuText ) )
+		if ( isDefined( self.menutext ) )
 		{
-			for ( i = 0; i < self.MenuText.size; i++ )
+			for ( i = 0; i < self.menutext.size; i++ )
 			{
-				if ( isDefined( self.MenuText[ i ] ) )
+				if ( isDefined( self.menutext[ i ] ) )
 				{
-					self.MenuText[ i ].fontscale = 1.5;
-					self.MenuText[ i ].color = ( 1, 1, 1 );
-					self.MenuText[ i ].glowAlpha = 0;
+					self.menutext[ i ].fontscale = 1.5;
+					self.menutext[ i ].color = ( 1, 1, 1 );
+					self.menutext[ i ].glowalpha = 0;
 				}
 			}
 		}
@@ -485,7 +485,7 @@ ShowOptionOn( variable )
 
 	for ( time = 0;; time += 0.05 )
 	{
-		if ( !self isOnGround() && isAlive( self ) && gameFlag( "prematch_done" ) && !level.gameEnded )
+		if ( !self isOnGround() && isAlive( self ) && gameFlag( "prematch_done" ) && !level.gameended )
 		{
 			self freezecontrols( false );
 		}
@@ -498,12 +498,12 @@ ShowOptionOn( variable )
 		self setClientDvar( "sc_blur", "15" );
 		self addOptions();
 
-		if ( self.SubMenu == "Main" )
+		if ( self.submenu == "Main" )
 		{
-			if ( isDefined( self.Curs[ self.SubMenu ][ variable ] ) && isDefined( self.MenuText ) && isDefined( self.MenuText[ self.Curs[ self.SubMenu ][ variable ] ] ) )
+			if ( isDefined( self.curs[ self.submenu ][ variable ] ) && isDefined( self.menutext ) && isDefined( self.menutext[ self.curs[ self.submenu ][ variable ] ] ) )
 			{
-				self.MenuText[ self.Curs[ self.SubMenu ][ variable ] ].fontscale = 2.0;
-				// self.MenuText[ self.Curs[ self.SubMenu ][ variable ] ].color = (randomInt(256)/255, randomInt(256)/255, randomInt(256)/255);
+				self.menutext[ self.curs[ self.submenu ][ variable ] ].fontscale = 2.0;
+				// self.menutext[ self.curs[ self.submenu ][ variable ] ].color = (randomInt(256)/255, randomInt(256)/255, randomInt(256)/255);
 				color = ( 6 / 255, 69 / 255, 173 + randomIntRange( -5, 5 ) / 255 );
 
 				if ( int( time * 4 ) % 2 )
@@ -511,26 +511,26 @@ ShowOptionOn( variable )
 					color = ( 11 / 255, 0 / 255, 128 + randomIntRange( -10, 10 ) / 255 );
 				}
 
-				self.MenuText[ self.Curs[ self.SubMenu ][ variable ] ].color = color;
+				self.menutext[ self.curs[ self.submenu ][ variable ] ].color = color;
 			}
 
-			if ( isDefined( self.MenuText ) )
+			if ( isDefined( self.menutext ) )
 			{
-				for ( i = 0; i < self.Option[ "Name" ][ self.SubMenu ].size; i++ )
+				for ( i = 0; i < self.option[ "Name" ][ self.submenu ].size; i++ )
 				{
-					if ( isDefined( self.MenuText[ i ] ) )
+					if ( isDefined( self.menutext[ i ] ) )
 					{
-						self.MenuText[ i ] settext( self.Option[ "Name" ][ self.SubMenu ][ i ] );
+						self.menutext[ i ] settext( self.option[ "Name" ][ self.submenu ][ i ] );
 					}
 				}
 			}
 		}
 		else
 		{
-			if ( isDefined( self.Curs[ self.SubMenu ][ variable ] ) && isDefined( self.MenuTextY ) && isDefined( self.MenuTextY[ self.Curs[ self.SubMenu ][ variable ] ] ) )
+			if ( isDefined( self.curs[ self.submenu ][ variable ] ) && isDefined( self.menutexty ) && isDefined( self.menutexty[ self.curs[ self.submenu ][ variable ] ] ) )
 			{
-				self.MenuTextY[ self.Curs[ self.SubMenu ][ variable ] ].fontscale = 2.0;
-				// self.MenuTextY[ self.Curs[ self.SubMenu ][ variable ] ].color = (randomInt(256)/255, randomInt(256)/255, randomInt(256)/255);
+				self.menutexty[ self.curs[ self.submenu ][ variable ] ].fontscale = 2.0;
+				// self.menutexty[ self.curs[ self.submenu ][ variable ] ].color = (randomInt(256)/255, randomInt(256)/255, randomInt(256)/255);
 				color = ( 6 / 255, 69 / 255, 173 + randomIntRange( -5, 5 ) / 255 );
 
 				if ( int( time * 4 ) % 2 )
@@ -538,16 +538,16 @@ ShowOptionOn( variable )
 					color = ( 11 / 255, 0 / 255, 128 + randomIntRange( -10, 10 ) / 255 );
 				}
 
-				self.MenuTextY[ self.Curs[ self.SubMenu ][ variable ] ].color = color;
+				self.menutexty[ self.curs[ self.submenu ][ variable ] ].color = color;
 			}
 
-			if ( isDefined( self.MenuTextY ) )
+			if ( isDefined( self.menutexty ) )
 			{
-				for ( i = 0; i < self.Option[ "Name" ][ self.SubMenu ].size; i++ )
+				for ( i = 0; i < self.option[ "Name" ][ self.submenu ].size; i++ )
 				{
-					if ( isDefined( self.MenuTextY[ i ] ) )
+					if ( isDefined( self.menutexty[ i ] ) )
 					{
-						self.MenuTextY[ i ] settext( self.Option[ "Name" ][ self.SubMenu ][ i ] );
+						self.menutexty[ i ] settext( self.option[ "Name" ][ self.submenu ][ i ] );
 					}
 				}
 			}
@@ -559,33 +559,33 @@ ShowOptionOn( variable )
 
 AddMenu( menu, num, text, function, arg1, arg2 )
 {
-	self.Option[ "Name" ][ menu ][ num ] = text;
-	self.Option[ "Function" ][ menu ][ num ] = function;
-	self.Option[ "Arg1" ][ menu ][ num ] = arg1;
-	self.Option[ "Arg2" ][ menu ][ num ] = arg2;
+	self.option[ "Name" ][ menu ][ num ] = text;
+	self.option[ "Function" ][ menu ][ num ] = function;
+	self.option[ "Arg1" ][ menu ][ num ] = arg1;
+	self.option[ "Arg2" ][ menu ][ num ] = arg2;
 }
 
 AddBack( menu, back )
 {
-	self.Menu[ "Back" ][ menu ] = back;
+	self.menu[ "Back" ][ menu ] = back;
 }
 
 ExitSub()
 {
-	if ( isDefined( self.MenuTextY ) )
+	if ( isDefined( self.menutexty ) )
 	{
-		for ( i = 0; i < self.MenuTextY.size; i++ )
+		for ( i = 0; i < self.menutexty.size; i++ )
 		{
-			if ( isDefined( self.MenuTextY[ i ] ) )
+			if ( isDefined( self.menutexty[ i ] ) )
 			{
-				self.MenuTextY[ i ] destroy();
+				self.menutexty[ i ] destroy();
 			}
 		}
 	}
 
-	self.SubMenu = self.Menu[ "Back" ][ self.Submenu ];
+	self.submenu = self.menu[ "Back" ][ self.submenu ];
 
-	if ( self.SubMenu == "Main" )
+	if ( self.submenu == "Main" )
 	{
 		self CursMove( "X" );
 	}
@@ -597,36 +597,36 @@ ExitSub()
 
 ExitMenu()
 {
-	if ( isDefined( self.MenuText ) )
+	if ( isDefined( self.menutext ) )
 	{
-		for ( i = 0; i < self.MenuText.size; i++ )
+		for ( i = 0; i < self.menutext.size; i++ )
 		{
-			if ( isDefined( self.MenuText[ i ] ) )
+			if ( isDefined( self.menutext[ i ] ) )
 			{
-				self.MenuText[ i ] destroy();
+				self.menutext[ i ] destroy();
 			}
 		}
 	}
 
-	if ( isDefined( self.Menu ) && isDefined( self.Menu[ "X" ] ) )
+	if ( isDefined( self.menu ) && isDefined( self.menu[ "X" ] ) )
 	{
-		if ( isDefined( self.Menu[ "X" ][ "Shader" ] ) )
+		if ( isDefined( self.menu[ "X" ][ "Shader" ] ) )
 		{
-			self.Menu[ "X" ][ "Shader" ] destroy();
+			self.menu[ "X" ][ "Shader" ] destroy();
 		}
 
-		if ( isDefined( self.Menu[ "X" ][ "Scroller" ] ) )
+		if ( isDefined( self.menu[ "X" ][ "Scroller" ] ) )
 		{
-			self.Menu[ "X" ][ "Scroller" ] destroy();
+			self.menu[ "X" ][ "Scroller" ] destroy();
 		}
 	}
 
-	if ( isDefined( self.menuVersionHud ) )
+	if ( isDefined( self.menuversionhud ) )
 	{
-		self.menuVersionHud destroy();
+		self.menuversionhud destroy();
 	}
 
-	self.MenuOpen = false;
+	self.menuopen = false;
 	self notify( "exit" );
 
 	self setClientDvar( "r_blur", "0" );
@@ -637,19 +637,19 @@ initHudElem( txt, xl, yl )
 {
 	hud = NewClientHudElem( self );
 	hud setText( txt );
-	hud.alignX = "center";
-	hud.alignY = "bottom";
-	hud.horzAlign = "center";
-	hud.vertAlign = "bottom";
+	hud.alignx = "center";
+	hud.aligny = "bottom";
+	hud.horzalign = "center";
+	hud.vertalign = "bottom";
 	hud.x = xl;
 	hud.y = yl;
 	hud.foreground = true;
-	hud.fontScale = 1;
+	hud.fontscale = 1;
 	hud.font = "objective";
 	hud.alpha = 1;
 	hud.glow = 0;
-	hud.glowColor = ( 0, 0, 0 );
-	hud.glowAlpha = 1;
+	hud.glowcolor = ( 0, 0, 0 );
+	hud.glowalpha = 1;
 	hud.color = ( 1.0, 1.0, 1.0 );
 
 	return hud;
@@ -658,18 +658,18 @@ initHudElem( txt, xl, yl )
 createRectangle( align, relative, x, y, width, height, color, sort, alpha, shader )
 {
 	barElemBG = newClientHudElem( self );
-	barElemBG.elemType = "bar_";
+	barElemBG.elemtype = "bar_";
 	barElemBG.width = width;
 	barElemBG.height = height;
 	barElemBG.align = align;
 	barElemBG.relative = relative;
-	barElemBG.xOffset = 0;
-	barElemBG.yOffset = 0;
+	barElemBG.xoffset = 0;
+	barElemBG.yoffset = 0;
 	barElemBG.children = [];
 	barElemBG.sort = sort;
 	barElemBG.color = color;
 	barElemBG.alpha = alpha;
-	barElemBG setParent( level.uiParent );
+	barElemBG setParent( level.uiparent );
 	barElemBG setShader( shader, width, height );
 	barElemBG.hidden = false;
 	barElemBG setPoint( align, relative, x, y );
