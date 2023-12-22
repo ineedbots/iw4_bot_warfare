@@ -2675,23 +2675,7 @@ bot_lookat( pos, time, vel, doAimPredict )
 
 	for ( i = 0; i < steps; i++ )
 	{
-		newX = myAngle[0] + X;
-
-		while ( newX < 0 )
-			newX += 360.0;
-
-		while ( newX >= 360.0 )
-			newX -= 360.0;
-
-		newY = myAngle[1] + Y;
-
-		while ( newY < 0 )
-			newY += 360.0;
-
-		while ( newY >= 360.0 )
-			newY -= 360.0;
-
-		myAngle = ( newX, newY, 0 );
+		myAngle = ( AngleClamp180( myAngle[ 0 ] + X ), AngleClamp180( myAngle[ 1 ] + Y ), 0 );
 		self setPlayerAngles( myAngle );
 		wait 0.05;
 	}
