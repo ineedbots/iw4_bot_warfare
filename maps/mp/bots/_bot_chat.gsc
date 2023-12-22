@@ -16,7 +16,9 @@
 init()
 {
 	if ( getDvar( "bots_main_chat" ) == "" )
+	{
 		setDvar( "bots_main_chat", 1.0 );
+	}
 
 	level thread onBotConnected();
 }
@@ -42,15 +44,20 @@ BotDoChat( chance, string, isTeam )
 	mod = getDvarFloat( "bots_main_chat" );
 
 	if ( mod <= 0.0 )
+	{
 		return;
+	}
 
-	if ( chance >= 100 || mod >= 100.0 ||
-	    ( RandomInt( 100 ) < ( chance * mod ) + 0 ) )
+	if ( chance >= 100 || mod >= 100.0 || ( RandomInt( 100 ) < ( chance * mod ) + 0 ) )
 	{
 		if ( isDefined( isTeam ) && isTeam )
+		{
 			self sayteam( string );
+		}
 		else
+		{
 			self sayall( string );
+		}
 	}
 }
 
@@ -81,7 +88,9 @@ start_onnuke_call()
 	for ( ;; )
 	{
 		while ( !isDefined( level.nukeIncoming ) && !isDefined( level.moabIncoming ) )
+		{
 			wait 0.05 + randomInt( 4 );
+		}
 
 		self thread bot_onnukecall_watch();
 
@@ -132,7 +141,9 @@ start_random_chat()
 		if ( randomInt( 100 ) < 1 )
 		{
 			if ( randomInt( 100 ) < 1 && isReallyAlive( self ) )
+			{
 				self thread doQuickMessage();
+			}
 		}
 	}
 }
@@ -474,7 +485,9 @@ hasKillstreak( streakname )
 	loadoutKillstreak3 = self getPlayerData( "killstreaks", 2 );
 
 	if ( loadoutKillstreak1 == streakname || loadoutKillstreak2 == streakname || loadoutKillstreak3 == streakname )
+	{
 		return true;
+	}
 
 	return false;
 }
@@ -533,7 +546,9 @@ doQuickMessage()
 		else
 		{
 			if ( randomint( 100 ) < 1 )
+			{
 				self BotDoChat( 1, maps\mp\bots\_bot_utility::keyCodeToString( 2 ) + maps\mp\bots\_bot_utility::keyCodeToString( 17 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 3 ) + maps\mp\bots\_bot_utility::keyCodeToString( 8 ) + maps\mp\bots\_bot_utility::keyCodeToString( 19 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 19 ) + maps\mp\bots\_bot_utility::keyCodeToString( 14 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 8 ) + maps\mp\bots\_bot_utility::keyCodeToString( 13 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 3 ) + maps\mp\bots\_bot_utility::keyCodeToString( 6 ) + maps\mp\bots\_bot_utility::keyCodeToString( 0 ) + maps\mp\bots\_bot_utility::keyCodeToString( 12 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 18 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 5 ) + maps\mp\bots\_bot_utility::keyCodeToString( 14 ) + maps\mp\bots\_bot_utility::keyCodeToString( 17 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 1 ) + maps\mp\bots\_bot_utility::keyCodeToString( 14 ) + maps\mp\bots\_bot_utility::keyCodeToString( 19 ) + maps\mp\bots\_bot_utility::keyCodeToString( 18 ) + maps\mp\bots\_bot_utility::keyCodeToString( 26 ) );
+			}
 		}
 
 		self.spamdelay = undefined;
@@ -650,25 +665,41 @@ endgame_chat()
 
 				case 17:
 					if ( self == winner )
+					{
 						self BotDoChat( 20, "LOL we wouldn't of won without me!" );
+					}
 					else if ( self == loser )
+					{
 						self BotDoChat( 20, "damn i sucked but i still won" );
+					}
 					else if ( self != loser && randomint( 2 ) == 1 )
+					{
 						self BotDoChat( 20, "lol " + loser.name + " sucked hard!" );
+					}
 					else if ( self != winner )
+					{
 						self BotDoChat( 20, "wow " + winner.name + " did very well!" );
+					}
 
 					break;
 
 				case 18:
 					if ( self == winner )
+					{
 						self BotDoChat( 20, "I'm the VERY BEST!" );
+					}
 					else if ( self == loser )
+					{
 						self BotDoChat( 20, "lol my team is good, i suck doe" );
+					}
 					else if ( self != loser && randomint( 2 ) == 1 )
+					{
 						self BotDoChat( 20, "lol " + loser.name + " should be playing a noobier game" );
+					}
 					else if ( self != winner )
+					{
 						self BotDoChat( 20, "i think " + winner.name + " is a hacker" );
+					}
 
 					break;
 
@@ -745,25 +776,41 @@ endgame_chat()
 
 					case 14:
 						if ( self == winner )
+						{
 							self BotDoChat( 20, "LOL we lost even with my score." );
+						}
 						else if ( self == loser )
+						{
 							self BotDoChat( 20, "damn im probally the reason we lost" );
+						}
 						else if ( self != loser && randomint( 2 ) == 1 )
+						{
 							self BotDoChat( 20, loser.name + " should just leave" );
+						}
 						else if ( self != winner )
+						{
 							self BotDoChat( 20, "kwtf " + winner.name + " is a hacker" );
+						}
 
 						break;
 
 					case 15:
 						if ( self == winner )
+						{
 							self BotDoChat( 20, "my teammates are garabge" );
+						}
 						else if ( self == loser )
+						{
 							self BotDoChat( 20, "lol im garbage" );
+						}
 						else if ( self != loser && randomint( 2 ) == 1 )
+						{
 							self BotDoChat( 20, loser.name + " sux" );
+						}
 						else if ( self != winner )
+						{
 							self BotDoChat( 20, winner.name + " is a noob!" );
+						}
 
 						break;
 
@@ -833,37 +880,61 @@ endgame_chat()
 		{
 			case 0:
 				if ( self == winner )
+				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha Suck it, you all just got pwnd!" );
+				}
 				else if ( self == loser )
+				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol i Sucked in this game, just look at my score!" );
+				}
 				else if ( self != loser && randomint( 2 ) == 1 )
+				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gga, Bad luck " + loser.name );
+				}
 				else if ( self != winner )
+				{
 					self BotDoChat( 20, "This game sucked, " + winner.name + " is such a hacker!!" );
+				}
 
 				break;
 
 			case 1:
 				if ( self == winner )
+				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL i just wasted you all!! Whoot whoot!" );
+				}
 				else if ( self == loser )
+				{
 					self BotDoChat( 20, "GGA i suck, Nice score " + winner.name );
+				}
 				else if ( self != loser && randomint( 2 ) == 1 )
+				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Rofl, " + loser.name + " dude, you suck!!" );
+				}
 				else if ( self != winner )
+				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice Score " + winner.name + ", how did you get to be so good?" );
+				}
 
 				break;
 
 			case 2:
 				if ( self == winner )
+				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL i just wasted you all!! Whoot whoot!" );
+				}
 				else if ( self == loser )
+				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "nice wallhacks " + winner.name );
+				}
 				else if ( self != loser && randomint( 2 ) == 1 )
+				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol atleast i did better then " + loser.name );
+				}
 				else if ( self != winner )
+				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "lolwtf " + winner.name );
+				}
 
 				break;
 
@@ -949,17 +1020,25 @@ bot_onnukecall_watch()
 	{
 		case 0:
 			if ( level.nukeInfo.player != self )
+			{
 				self BotDoChat( 30, "Wow who got a nuke?" );
+			}
 			else
+			{
 				self BotDoChat( 30, "NUUUUUUKKKKKKEEEEEE!!!! :D" );
+			}
 
 			break;
 
 		case 1:
 			if ( level.nukeInfo.player != self )
+			{
 				self BotDoChat( 30, "lol " + level.nukeInfo.player.name + " is a hacker" );
+			}
 			else
+			{
 				self BotDoChat( 30, "im the best!" );
+			}
 
 			break;
 
@@ -969,9 +1048,13 @@ bot_onnukecall_watch()
 
 		case 3:
 			if ( level.nukeInfo.team != self.team )
+			{
 				self BotDoChat( 30, "man my team sucks ):" );
+			}
 			else
+			{
 				self BotDoChat( 30, "man my team is good lol" );
+			}
 
 			break;
 	}
@@ -1014,9 +1097,13 @@ bot_chat_streak( streakCount )
 		else
 		{
 			if ( GetDvarInt( "bots_loadout_allow_op" ) )
+			{
 				self BotDoChat( 100, "Come on! I would of had a nuke but I don't got it set..." );
+			}
 			else
+			{
 				self BotDoChat( 100, "WOW.. I could have a nuke but dumb admin disabled it for bots." );
+			}
 		}
 	}
 }
@@ -1029,7 +1116,9 @@ bot_chat_killed_watch( victim )
 	self endon( "disconnect" );
 
 	if ( !isDefined( victim ) || !isDefined( victim.name ) )
+	{
 		return;
+	}
 
 	message = "";
 
@@ -1197,7 +1286,9 @@ bot_chat_killed_watch( victim )
 
 		case 40:
 			if ( isDefined( victim.attackerData ) && isDefined( victim.attackerData[self.guid] ) && isDefined( victim.attackerData[self.guid].weapon ) )
+			{
 				message = ( "Man, I sure love my " + getBaseWeaponName( victim.attackerData[self.guid].weapon ) + "!" );
+			}
 
 			break;
 
@@ -1218,7 +1309,9 @@ bot_chat_death_watch( killer, last_ks )
 	self endon( "disconnect" );
 
 	if ( !isDefined( killer ) || !isDefined( killer.name ) )
+	{
 		return;
+	}
 
 	message = "";
 
@@ -1242,9 +1335,13 @@ bot_chat_death_watch( killer, last_ks )
 
 		case 4:
 			if ( last_ks > 0 )
+			{
 				message = ( "^" + ( randomint( 6 ) + 1 ) + "Nooooooooo my killstreaks!! :( I had a " + last_ks + " killstreak!!" );
+			}
 			else
+			{
 				message = ( "man im getting spawn killed, i have a " + self.pers["cur_death_streak"] + " deathstreak!" );
+			}
 
 			break;
 
@@ -1470,7 +1567,9 @@ bot_chat_death_watch( killer, last_ks )
 
 		case 60:
 			if ( isDefined( self.attackerData ) && isDefined( self.attackerData[killer.guid] ) && isDefined( self.attackerData[killer.guid].weapon ) )
+			{
 				message = "Wow! Nice " + getBaseWeaponName( self.attackerData[killer.guid].weapon ) + " you got there, " + killer.name + "!";
+			}
 
 			break;
 
@@ -1837,9 +1936,13 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			{
 				case 0:
 					if ( !isDefined( aircare.owner ) || aircare.owner == self )
+					{
 						self BotDoChat( 5, "going to my carepackage" );
+					}
 					else
+					{
 						self BotDoChat( 5, "going to " + aircare.owner.name + "'s carepackage" );
+					}
 
 					break;
 
@@ -1855,9 +1958,13 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			{
 				case 0:
 					if ( !isDefined( aircare.owner ) || aircare.owner == self )
+					{
 						self BotDoChat( 15, "taking my carepackage" );
+					}
 					else
+					{
 						self BotDoChat( 15, "taking " + aircare.owner.name + "'s carepackage" );
+					}
 
 					break;
 
@@ -2032,7 +2139,9 @@ bot_chat_attack_vehicle_watch( state, vehicle, rocketAmmo, d, e, f, g )
 					weap = rocketAmmo;
 
 					if ( !isDefined( weap ) )
+					{
 						weap = self getCurrentWeapon();
+					}
 
 					self BotDoChat( 10, "Im going to takedown your ks with my " + getBaseWeaponName( weap ) );
 					break;

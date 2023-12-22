@@ -13,10 +13,14 @@
 init()
 {
 	if ( getDvar( "bots_main_menu" ) == "" )
+	{
 		setDvar( "bots_main_menu", true );
+	}
 
 	if ( !getDvarInt( "bots_main_menu" ) )
+	{
 		return;
+	}
 
 	thread watchPlayers();
 }
@@ -28,17 +32,23 @@ watchPlayers()
 		wait 1;
 
 		if ( !getDvarInt( "bots_main_menu" ) )
+		{
 			return;
+		}
 
 		for ( i = level.players.size - 1; i >= 0; i-- )
 		{
 			player = level.players[i];
 
 			if ( !player is_host() )
+			{
 				continue;
+			}
 
 			if ( isDefined( player.menuInit ) && player.menuInit )
+			{
 				continue;
+			}
 
 			player thread init_menu();
 		}
@@ -80,26 +90,44 @@ watchDisconnect()
 	if ( self.menuOpen )
 	{
 		if ( isDefined( self.MenuTextY ) )
+		{
 			for ( i = 0; i < self.MenuTextY.size; i++ )
+			{
 				if ( isDefined( self.MenuTextY[i] ) )
+				{
 					self.MenuTextY[i] destroy();
+				}
+			}
+		}
 
 		if ( isDefined( self.MenuText ) )
+		{
 			for ( i = 0; i < self.MenuText.size; i++ )
+			{
 				if ( isDefined( self.MenuText[i] ) )
+				{
 					self.MenuText[i] destroy();
+				}
+			}
+		}
 
 		if ( isDefined( self.Menu ) && isDefined( self.Menu["X"] ) )
 		{
 			if ( isDefined( self.Menu["X"]["Shader"] ) )
+			{
 				self.Menu["X"]["Shader"] destroy();
+			}
 
 			if ( isDefined( self.Menu["X"]["Scroller"] ) )
+			{
 				self.Menu["X"]["Scroller"] destroy();
+			}
 		}
 
 		if ( isDefined( self.menuVersionHud ) )
+		{
 			self.menuVersionHud destroy();
+		}
 	}
 }
 
@@ -134,15 +162,21 @@ watchPlayerOpenMenu()
 			self playLocalSound( "mouse_click" );
 
 			if ( self.SubMenu != "Main" )
+			{
 				self ExitSub();
+			}
 			else
 			{
 				self ExitMenu();
 
 				if ( !gameFlag( "prematch_done" ) || level.gameEnded )
+				{
 					self freezeControls( true );
+				}
 				else
+				{
 					self freezecontrols( false );
+				}
 			}
 		}
 	}
@@ -164,9 +198,13 @@ MenuSelect()
 			self playLocalSound( "mouse_click" );
 
 			if ( self.SubMenu == "Main" )
+			{
 				self thread [[self.Option["Function"][self.SubMenu][self.Curs["Main"]["X"]]]]( self.Option["Arg1"][self.SubMenu][self.Curs["Main"]["X"]], self.Option["Arg2"][self.SubMenu][self.Curs["Main"]["X"]] );
+			}
 			else
+			{
 				self thread [[self.Option["Function"][self.SubMenu][self.Curs[self.SubMenu]["Y"]]]]( self.Option["Arg1"][self.SubMenu][self.Curs[self.SubMenu]["Y"]], self.Option["Arg2"][self.SubMenu][self.Curs[self.SubMenu]["Y"]] );
+			}
 		}
 	}
 }
@@ -188,7 +226,9 @@ LeftMenu()
 			self.Curs["Main"]["X"]--;
 
 			if ( self.Curs["Main"]["X"] < 0 )
+			{
 				self.Curs["Main"]["X"] = self.Option["Name"][self.SubMenu].size - 1;
+			}
 
 			self CursMove( "X" );
 		}
@@ -212,7 +252,9 @@ RightMenu()
 			self.Curs["Main"]["X"]++;
 
 			if ( self.Curs["Main"]["X"] > self.Option["Name"][self.SubMenu].size - 1 )
+			{
 				self.Curs["Main"]["X"] = 0;
+			}
 
 			self CursMove( "X" );
 		}
@@ -236,7 +278,9 @@ UpMenu()
 			self.Curs[self.SubMenu]["Y"]--;
 
 			if ( self.Curs[self.SubMenu]["Y"] < 0 )
+			{
 				self.Curs[self.SubMenu]["Y"] = self.Option["Name"][self.SubMenu].size - 1;
+			}
 
 			self CursMove( "Y" );
 		}
@@ -260,7 +304,9 @@ DownMenu()
 			self.Curs[self.SubMenu]["Y"]++;
 
 			if ( self.Curs[self.SubMenu]["Y"] > self.Option["Name"][self.SubMenu].size - 1 )
+			{
 				self.Curs[self.SubMenu]["Y"] = 0;
+			}
 
 			self CursMove( "Y" );
 		}
@@ -281,21 +327,33 @@ OpenSub( menu, menu2 )
 	if ( self.SubMenu == "Main" )
 	{
 		if ( isDefined( self.MenuText ) )
+		{
 			for ( i = 0; i < self.MenuText.size; i++ )
+			{
 				if ( isDefined( self.MenuText[i] ) )
+				{
 					self.MenuText[i] destroy();
+				}
+			}
+		}
 
 		if ( isDefined( self.Menu ) && isDefined( self.Menu["X"] ) )
 		{
 			if ( isDefined( self.Menu["X"]["Shader"] ) )
+			{
 				self.Menu["X"]["Shader"] destroy();
+			}
 
 			if ( isDefined( self.Menu["X"]["Scroller"] ) )
+			{
 				self.Menu["X"]["Scroller"] destroy();
+			}
 		}
 
 		if ( isDefined( self.menuVersionHud ) )
+		{
 			self.menuVersionHud destroy();
+		}
 
 		for ( i = 0 ; i < self.Option["Name"][self.SubMenu].size ; i++ )
 		{
@@ -304,7 +362,9 @@ OpenSub( menu, menu2 )
 			self.MenuText[i] settext( self.Option["Name"][self.SubMenu][i] );
 
 			if ( logOldi )
+			{
 				self.oldi = i;
+			}
 
 			if ( self.MenuText[i].x > 300 )
 			{
@@ -318,9 +378,13 @@ OpenSub( menu, menu2 )
 		}
 
 		if ( !logOldi )
+		{
 			self.Menu["X"]["Shader"] = self createRectangle( "CENTER", "CENTER", 0, -225, 1000, 90, ( 0, 0, 0 ), -2, 1, "white" );
+		}
 		else
+		{
 			self.Menu["X"]["Shader"] = self createRectangle( "CENTER", "CENTER", 0, -225, 1000, 30, ( 0, 0, 0 ), -2, 1, "white" );
+		}
 
 		self.Menu["X"]["Scroller"] = self createRectangle( "CENTER", "CENTER", self.MenuText[self.Curs["Main"]["X"]].x, -225, 105, 22, ( 1, 0, 0 ), -1, 1, "white" );
 
@@ -333,9 +397,15 @@ OpenSub( menu, menu2 )
 	else
 	{
 		if ( isDefined( self.MenuTextY ) )
+		{
 			for ( i = 0 ; i < self.MenuTextY.size ; i++ )
+			{
 				if ( isDefined( self.MenuTextY[i] ) )
+				{
 					self.MenuTextY[i] destroy();
+				}
+			}
+		}
 
 		for ( i = 0 ; i < self.Option["Name"][self.SubMenu].size ; i++ )
 		{
@@ -416,9 +486,13 @@ ShowOptionOn( variable )
 	for ( time = 0;; time += 0.05 )
 	{
 		if ( !self isOnGround() && isAlive( self ) && gameFlag( "prematch_done" ) && !level.gameEnded )
+		{
 			self freezecontrols( false );
+		}
 		else
+		{
 			self freezecontrols( true );
+		}
 
 		self setClientDvar( "r_blur", "5" );
 		self setClientDvar( "sc_blur", "15" );
@@ -433,7 +507,9 @@ ShowOptionOn( variable )
 				color = ( 6 / 255, 69 / 255, 173 + randomIntRange( -5, 5 ) / 255 );
 
 				if ( int( time * 4 ) % 2 )
+				{
 					color = ( 11 / 255, 0 / 255, 128 + randomIntRange( -10, 10 ) / 255 );
+				}
 
 				self.MenuText[self.Curs[self.SubMenu][variable]].color = color;
 			}
@@ -443,7 +519,9 @@ ShowOptionOn( variable )
 				for ( i = 0; i < self.Option["Name"][self.SubMenu].size; i++ )
 				{
 					if ( isDefined( self.MenuText[i] ) )
+					{
 						self.MenuText[i] settext( self.Option["Name"][self.SubMenu][i] );
+					}
 				}
 			}
 		}
@@ -456,7 +534,9 @@ ShowOptionOn( variable )
 				color = ( 6 / 255, 69 / 255, 173 + randomIntRange( -5, 5 ) / 255 );
 
 				if ( int( time * 4 ) % 2 )
+				{
 					color = ( 11 / 255, 0 / 255, 128 + randomIntRange( -10, 10 ) / 255 );
+				}
 
 				self.MenuTextY[self.Curs[self.SubMenu][variable]].color = color;
 			}
@@ -466,7 +546,9 @@ ShowOptionOn( variable )
 				for ( i = 0; i < self.Option["Name"][self.SubMenu].size; i++ )
 				{
 					if ( isDefined( self.MenuTextY[i] ) )
+					{
 						self.MenuTextY[i] settext( self.Option["Name"][self.SubMenu][i] );
+					}
 				}
 			}
 		}
@@ -491,36 +573,58 @@ AddBack( menu, back )
 ExitSub()
 {
 	if ( isDefined( self.MenuTextY ) )
+	{
 		for ( i = 0; i < self.MenuTextY.size; i++ )
+		{
 			if ( isDefined( self.MenuTextY[i] ) )
+			{
 				self.MenuTextY[i] destroy();
+			}
+		}
+	}
 
 	self.SubMenu = self.Menu["Back"][self.Submenu];
 
 	if ( self.SubMenu == "Main" )
+	{
 		self CursMove( "X" );
+	}
 	else
+	{
 		self CursMove( "Y" );
+	}
 }
 
 ExitMenu()
 {
 	if ( isDefined( self.MenuText ) )
+	{
 		for ( i = 0; i < self.MenuText.size; i++ )
+		{
 			if ( isDefined( self.MenuText[i] ) )
+			{
 				self.MenuText[i] destroy();
+			}
+		}
+	}
 
 	if ( isDefined( self.Menu ) && isDefined( self.Menu["X"] ) )
 	{
 		if ( isDefined( self.Menu["X"]["Shader"] ) )
+		{
 			self.Menu["X"]["Shader"] destroy();
+		}
 
 		if ( isDefined( self.Menu["X"]["Scroller"] ) )
+		{
 			self.Menu["X"]["Scroller"] destroy();
+		}
 	}
 
 	if ( isDefined( self.menuVersionHud ) )
+	{
 		self.menuVersionHud destroy();
+	}
 
 	self.MenuOpen = false;
 	self notify( "exit" );
@@ -590,9 +694,13 @@ AddOptions()
 	_tempDvar = getDvarInt( "bots_manage_fill_kick" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "man_bots", 7, "Toggle auto bot kicking: " + _temp, ::man_bots, "autokick", _tempDvar );
 
@@ -634,9 +742,13 @@ AddOptions()
 	_tempDvar = getDvarInt( "bots_manage_fill_spec" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "man_bots", 11, "Count players for fill on spectator: " + _temp, ::man_bots, "fillspec", _tempDvar );
 
@@ -655,18 +767,26 @@ AddOptions()
 	_tempDvar = getDvarInt( "bots_team_force" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "man_team", 3, "Toggle forcing bots on team: " + _temp, ::bot_teams, "teamforce", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_team_mode" );
 
 	if ( _tempDvar )
+	{
 		_temp = "only bots";
+	}
 	else
+	{
 		_temp = "everyone";
+	}
 
 	self AddMenu( "man_team", 4, "Toggle bot_team_bot: " + _temp, ::bot_teams, "teammode", _tempDvar );
 
@@ -745,117 +865,169 @@ AddOptions()
 	_tempDvar = getDvarInt( "bots_loadout_reasonable" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 0, "Bots use only good class setups: " + _temp, ::bot_func, "reasonable", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_loadout_allow_op" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 1, "Bots can use op and annoying class setups: " + _temp, ::bot_func, "op", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_move" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 2, "Bots can move: " + _temp, ::bot_func, "move", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_knife" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 3, "Bots can knife: " + _temp, ::bot_func, "knife", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_fire" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 4, "Bots can fire: " + _temp, ::bot_func, "fire", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_nade" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 5, "Bots can nade: " + _temp, ::bot_func, "nade", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_take_carepackages" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 6, "Bots can take carepackages: " + _temp, ::bot_func, "care", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_obj" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 7, "Bots play the objective: " + _temp, ::bot_func, "obj", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_camp" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 8, "Bots can camp: " + _temp, ::bot_func, "camp", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_jumpdrop" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 9, "Bots can jump and dropshot: " + _temp, ::bot_func, "jump", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_target_other" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 10, "Bots can target other script objects: " + _temp, ::bot_func, "targetother", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_killstreak" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 11, "Bots can use killstreaks: " + _temp, ::bot_func, "killstreak", _tempDvar );
 
 	_tempDvar = getDvarInt( "bots_play_ads" );
 
 	if ( _tempDvar )
+	{
 		_temp = "true";
+	}
 	else
+	{
 		_temp = "false";
+	}
 
 	self AddMenu( "set1", 12, "Bots can ads: " + _temp, ::bot_func, "ads", _tempDvar );
 }
@@ -1114,7 +1286,9 @@ man_bots( a, b )
 			}
 
 			if ( !result )
+			{
 				self iPrintln( "No bots to kick" );
+			}
 
 			break;
 
