@@ -15,9 +15,9 @@
 */
 init()
 {
-	if ( getDvar( "bots_main_chat" ) == "" )
+	if ( getdvar( "bots_main_chat" ) == "" )
 	{
-		setDvar( "bots_main_chat", 1.0 );
+		setdvar( "bots_main_chat", 1.0 );
 	}
 
 	level thread onBotConnected();
@@ -41,16 +41,16 @@ onBotConnected()
 */
 BotDoChat( chance, string, isTeam )
 {
-	mod = getDvarFloat( "bots_main_chat" );
+	mod = getdvarfloat( "bots_main_chat" );
 
 	if ( mod <= 0.0 )
 	{
 		return;
 	}
 
-	if ( chance >= 100 || mod >= 100.0 || ( RandomInt( 100 ) < ( chance * mod ) + 0 ) )
+	if ( chance >= 100 || mod >= 100.0 || ( randomint( 100 ) < ( chance * mod ) + 0 ) )
 	{
-		if ( isDefined( isTeam ) && isTeam )
+		if ( isdefined( isTeam ) && isTeam )
 		{
 			self sayteam( string );
 		}
@@ -87,9 +87,9 @@ start_onnuke_call()
 
 	for ( ;; )
 	{
-		while ( !isDefined( level.nukeincoming ) && !isDefined( level.moabincoming ) )
+		while ( !isdefined( level.nukeincoming ) && !isdefined( level.moabincoming ) )
 		{
-			wait 0.05 + randomInt( 4 );
+			wait 0.05 + randomint( 4 );
 		}
 
 		self thread bot_onnukecall_watch();
@@ -138,9 +138,9 @@ start_random_chat()
 	{
 		wait 1;
 
-		if ( randomInt( 100 ) < 1 )
+		if ( randomint( 100 ) < 1 )
 		{
-			if ( randomInt( 100 ) < 1 && isReallyAlive( self ) )
+			if ( randomint( 100 ) < 1 && isreallyalive( self ) )
 			{
 				self thread doQuickMessage();
 			}
@@ -480,9 +480,9 @@ start_startgame_watch()
 */
 hasKillstreak( streakname )
 {
-	loadoutKillstreak1 = self getPlayerData( "killstreaks", 0 );
-	loadoutKillstreak2 = self getPlayerData( "killstreaks", 1 );
-	loadoutKillstreak3 = self getPlayerData( "killstreaks", 2 );
+	loadoutKillstreak1 = self getplayerdata( "killstreaks", 0 );
+	loadoutKillstreak2 = self getplayerdata( "killstreaks", 1 );
+	loadoutKillstreak3 = self getplayerdata( "killstreaks", 2 );
 
 	if ( loadoutKillstreak1 == streakname || loadoutKillstreak2 == streakname || loadoutKillstreak3 == streakname )
 	{
@@ -500,7 +500,7 @@ doQuickMessage()
 	self endon( "disconnect" );
 	self endon( "death" );
 
-	if ( !isDefined( self.talking ) || !self.talking )
+	if ( !isdefined( self.talking ) || !self.talking )
 	{
 		self.talking = true;
 		soundalias = "";
@@ -538,10 +538,10 @@ doQuickMessage()
 
 		if ( soundalias != "" && saytext != "" )
 		{
-			self maps\mp\gametypes\_quickmessages::saveHeadIcon();
-			self maps\mp\gametypes\_quickmessages::doQuickMessage( soundalias, saytext );
+			self maps\mp\gametypes\_quickmessages::saveheadicon();
+			self maps\mp\gametypes\_quickmessages::doquickmessage( soundalias, saytext );
 			wait 2;
-			self maps\mp\gametypes\_quickmessages::restoreHeadIcon();
+			self maps\mp\gametypes\_quickmessages::restoreheadicon();
 		}
 		else
 		{
@@ -589,7 +589,7 @@ endgame_chat()
 
 	if ( level.teambased )
 	{
-		winningteam = maps\mp\gametypes\_gamescore::getWinningTeam();
+		winningteam = maps\mp\gametypes\_gamescore::getwinningteam();
 
 		if ( self.pers[ "team" ] == winningteam )
 		{
@@ -1096,7 +1096,7 @@ bot_chat_streak( streakCount )
 		}
 		else
 		{
-			if ( GetDvarInt( "bots_loadout_allow_op" ) )
+			if ( getdvarint( "bots_loadout_allow_op" ) )
 			{
 				self BotDoChat( 100, "Come on! I would of had a nuke but I don't got it set..." );
 			}
@@ -1115,7 +1115,7 @@ bot_chat_killed_watch( victim )
 {
 	self endon( "disconnect" );
 
-	if ( !isDefined( victim ) || !isDefined( victim.name ) )
+	if ( !isdefined( victim ) || !isdefined( victim.name ) )
 	{
 		return;
 	}
@@ -1285,9 +1285,9 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 40:
-			if ( isDefined( victim.attackerdata ) && isDefined( victim.attackerdata[ self.guid ] ) && isDefined( victim.attackerdata[ self.guid ].weapon ) )
+			if ( isdefined( victim.attackerdata ) && isdefined( victim.attackerdata[ self.guid ] ) && isdefined( victim.attackerdata[ self.guid ].weapon ) )
 			{
-				message = ( "Man, I sure love my " + getBaseWeaponName( victim.attackerdata[ self.guid ].weapon ) + "!" );
+				message = ( "Man, I sure love my " + getbaseweaponname( victim.attackerdata[ self.guid ].weapon ) + "!" );
 			}
 
 			break;
@@ -1308,7 +1308,7 @@ bot_chat_death_watch( killer, last_ks )
 {
 	self endon( "disconnect" );
 
-	if ( !isDefined( killer ) || !isDefined( killer.name ) )
+	if ( !isdefined( killer ) || !isdefined( killer.name ) )
 	{
 		return;
 	}
@@ -1346,7 +1346,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 5:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Stop Spawn KILLING!!!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + "Stop spawn KILLING!!!" );
 			break;
 
 		case 6:
@@ -1566,9 +1566,9 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 60:
-			if ( isDefined( self.attackerdata ) && isDefined( self.attackerdata[ killer.guid ] ) && isDefined( self.attackerdata[ killer.guid ].weapon ) )
+			if ( isdefined( self.attackerdata ) && isdefined( self.attackerdata[ killer.guid ] ) && isdefined( self.attackerdata[ killer.guid ].weapon ) )
 			{
-				message = "Wow! Nice " + getBaseWeaponName( self.attackerdata[ killer.guid ].weapon ) + " you got there, " + killer.name + "!";
+				message = "Wow! Nice " + getbaseweaponname( self.attackerdata[ killer.guid ].weapon ) + " you got there, " + killer.name + "!";
 			}
 
 			break;
@@ -1616,7 +1616,7 @@ bot_chat_revive_watch( state, revive, c, d, e, f, g )
 	switch ( state )
 	{
 		case "go":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
 					self BotDoChat( 10, "i am going to revive " + revive.name );
@@ -1626,7 +1626,7 @@ bot_chat_revive_watch( state, revive, c, d, e, f, g )
 			break;
 
 		case "start":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
 					self BotDoChat( 10, "i am reviving " + revive.name );
@@ -1636,7 +1636,7 @@ bot_chat_revive_watch( state, revive, c, d, e, f, g )
 			break;
 
 		case "stop":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
 					self BotDoChat( 10, "i revived " + revive.name );
@@ -1657,7 +1657,7 @@ bot_chat_killcam_watch( state, b, c, d, e, f, g )
 	switch ( state )
 	{
 		case "start":
-			switch ( randomInt( 2 ) )
+			switch ( randomint( 2 ) )
 			{
 				case 0:
 					self BotDoChat( 1, "WTF?!?!?!! Dude youre a hacker and a half!!" );
@@ -1671,7 +1671,7 @@ bot_chat_killcam_watch( state, b, c, d, e, f, g )
 			break;
 
 		case "stop":
-			switch ( randomInt( 2 ) )
+			switch ( randomint( 2 ) )
 			{
 				case 0:
 					self BotDoChat( 1, "Wow... Im reporting you!!!" );
@@ -1693,7 +1693,7 @@ bot_chat_stuck_watch( a, b, c, d, e, f, g )
 {
 	self endon( "disconnect" );
 
-	sayLength = randomintRange( 5, 30 );
+	sayLength = randomintrange( 5, 30 );
 	msg = "";
 
 	for ( i = 0; i < sayLength; i++ )
@@ -1751,7 +1751,7 @@ bot_chat_tube_watch( state, tubeWp, tubeWeap, d, e, f, g )
 	switch ( state )
 	{
 		case "go":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
 					self BotDoChat( 10, "i am going to go tube" );
@@ -1761,7 +1761,7 @@ bot_chat_tube_watch( state, tubeWp, tubeWeap, d, e, f, g )
 			break;
 
 		case "start":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
 					self BotDoChat( 10, "i tubed" );
@@ -1924,7 +1924,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 {
 	self endon( "disconnect" );
 
-	if ( !isDefined( aircare ) )
+	if ( !isdefined( aircare ) )
 	{
 		return;
 	}
@@ -1935,7 +1935,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			switch ( randomint( 2 ) )
 			{
 				case 0:
-					if ( !isDefined( aircare.owner ) || aircare.owner == self )
+					if ( !isdefined( aircare.owner ) || aircare.owner == self )
 					{
 						self BotDoChat( 5, "going to my carepackage" );
 					}
@@ -1957,7 +1957,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			switch ( randomint( 2 ) )
 			{
 				case 0:
-					if ( !isDefined( aircare.owner ) || aircare.owner == self )
+					if ( !isdefined( aircare.owner ) || aircare.owner == self )
 					{
 						self BotDoChat( 15, "taking my carepackage" );
 					}
@@ -1976,7 +1976,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			break;
 
 		case "stop":
-			if ( !isDefined( aircare.owner ) || aircare.owner == self )
+			if ( !isdefined( aircare.owner ) || aircare.owner == self )
 			{
 				switch ( randomint( 6 ) )
 				{
@@ -2138,12 +2138,12 @@ bot_chat_attack_vehicle_watch( state, vehicle, rocketAmmo, d, e, f, g )
 				case 13:
 					weap = rocketAmmo;
 
-					if ( !isDefined( weap ) )
+					if ( !isdefined( weap ) )
 					{
-						weap = self getCurrentWeapon();
+						weap = self getcurrentweapon();
 					}
 
-					self BotDoChat( 10, "Im going to takedown your ks with my " + getBaseWeaponName( weap ) );
+					self BotDoChat( 10, "Im going to takedown your ks with my " + getbaseweaponname( weap ) );
 					break;
 			}
 
@@ -2243,7 +2243,7 @@ bot_chat_follow_watch( state, player, time, d, e, f, g )
 {
 	self endon( "disconnect" );
 
-	if ( !isDefined( player ) )
+	if ( !isdefined( player ) )
 	{
 		return;
 	}
@@ -2294,20 +2294,20 @@ bot_chat_equ_watch( state, wp, weap, d, e, f, g )
 	switch ( state )
 	{
 		case "go":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "going to place a " + getBaseWeaponName( weap ) );
+					self BotDoChat( 10, "going to place a " + getbaseweaponname( weap ) );
 					break;
 			}
 
 			break;
 
 		case "start":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "placed a " + getBaseWeaponName( weap ) );
+					self BotDoChat( 10, "placed a " + getbaseweaponname( weap ) );
 					break;
 			}
 
@@ -2325,20 +2325,20 @@ bot_chat_nade_watch( state, wp, weap, d, e, f, g )
 	switch ( state )
 	{
 		case "go":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "going to throw a " + getBaseWeaponName( weap ) );
+					self BotDoChat( 10, "going to throw a " + getbaseweaponname( weap ) );
 					break;
 			}
 
 			break;
 
 		case "start":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "threw a " + getBaseWeaponName( weap ) );
+					self BotDoChat( 10, "threw a " + getbaseweaponname( weap ) );
 					break;
 			}
 
@@ -2561,7 +2561,7 @@ bot_chat_turret_attack_watch( state, turret, c, d, e, f, g )
 	switch ( state )
 	{
 		case "go":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
 					self BotDoChat( 5, "going to this sentry..." );
@@ -2571,7 +2571,7 @@ bot_chat_turret_attack_watch( state, turret, c, d, e, f, g )
 			break;
 
 		case "start":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
 					self BotDoChat( 5, "attacking this sentry..." );
@@ -2595,7 +2595,7 @@ bot_chat_attack_equ_watch( state, equ, c, d, e, f, g )
 	switch ( state )
 	{
 		case "go_ti":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
 					self BotDoChat( 10, "going to this ti..." );
@@ -2605,7 +2605,7 @@ bot_chat_attack_equ_watch( state, equ, c, d, e, f, g )
 			break;
 
 		case "camp_ti":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
 					self BotDoChat( 10, "lol im camping this ti!" );
@@ -2615,7 +2615,7 @@ bot_chat_attack_equ_watch( state, equ, c, d, e, f, g )
 			break;
 
 		case "trigger_ti":
-			switch ( randomInt( 1 ) )
+			switch ( randomint( 1 ) )
 			{
 				case 0:
 					self BotDoChat( 10, "lol i destoryed this ti!" );

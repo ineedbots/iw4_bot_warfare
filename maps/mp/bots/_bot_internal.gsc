@@ -68,7 +68,7 @@ connected()
 {
 	self endon( "disconnect" );
 
-	self.bot = spawnStruct();
+	self.bot = spawnstruct();
 
 	self resetBotVars();
 
@@ -143,7 +143,7 @@ resetBotVars()
 
 	self.bot.prio_objective = false;
 
-	self.bot.rand = randomInt( 100 );
+	self.bot.rand = randomint( 100 );
 
 	self BotBuiltinBotStop();
 }
@@ -182,7 +182,7 @@ SetWeaponDistMulti( weap )
 		return 1;
 	}
 
-	switch ( weaponClass( weap ) )
+	switch ( weaponclass( weap ) )
 	{
 		case "rifle":
 			return 0.9;
@@ -208,7 +208,7 @@ IsWeapSniper( weap )
 		return false;
 	}
 
-	if ( weaponClass( weap ) != "sniper" )
+	if ( weaponclass( weap ) != "sniper" )
 	{
 		return false;
 	}
@@ -233,7 +233,7 @@ onWeaponChange()
 		if ( first )
 		{
 			first = false;
-			newWeapon = self getCurrentWeapon();
+			newWeapon = self getcurrentweapon();
 		}
 		else
 		{
@@ -243,7 +243,7 @@ onWeaponChange()
 		self.bot.is_cur_full_auto = WeaponIsFullAuto( newWeapon );
 		self.bot.cur_weap_dist_multi = SetWeaponDistMulti( newWeapon );
 		self.bot.is_cur_sniper = IsWeapSniper( newWeapon );
-		self.bot.is_cur_akimbo = isSubStr( newWeapon, "_akimbo_" );
+		self.bot.is_cur_akimbo = issubstr( newWeapon, "_akimbo_" );
 	}
 }
 
@@ -263,14 +263,14 @@ reload_watch_loop()
 			break;
 		}
 
-		weap = self GetCurrentWeapon();
+		weap = self getcurrentweapon();
 
 		if ( weap == "none" )
 		{
 			break;
 		}
 
-		if ( self GetWeaponAmmoClip( weap ) >= WeaponClipSize( weap ) )
+		if ( self getweaponammoclip( weap ) >= weaponclipsize( weap ) )
 		{
 			break;
 		}
@@ -308,7 +308,7 @@ sprint_watch()
 		self.bot.issprinting = true;
 		self waittill( "sprint_end" );
 		self.bot.issprinting = false;
-		self.bot.sprintendtime = getTime();
+		self.bot.sprintendtime = gettime();
 	}
 }
 
@@ -348,22 +348,22 @@ watchUsingRemote()
 	{
 		wait 1;
 
-		if ( !isAlive( self ) )
+		if ( !isalive( self ) )
 		{
 			return;
 		}
 
-		if ( !self IsUsingRemote() )
+		if ( !self isusingremote() )
 		{
 			continue;
 		}
 
-		if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && level.chopper.gunner == self )
+		if ( isdefined( level.chopper ) && isdefined( level.chopper.gunner ) && level.chopper.gunner == self )
 		{
 			self watchUsingMinigun();
 		}
 
-		if ( isDefined( level.ac130player ) && level.ac130player == self )
+		if ( isdefined( level.ac130player ) && level.ac130player == self )
 		{
 			self thread watchAc130Weapon();
 			self watchUsingAc130();
@@ -381,14 +381,14 @@ watchUsingMinigun()
 {
 	self endon( "heliPlayer_removed" );
 
-	while ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && level.chopper.gunner == self )
+	while ( isdefined( level.chopper ) && isdefined( level.chopper.gunner ) && level.chopper.gunner == self )
 	{
-		if ( self getCurrentWeapon() != "heli_remote_mp" )
+		if ( self getcurrentweapon() != "heli_remote_mp" )
 		{
-			self switchToWeapon( "heli_remote_mp" );
+			self switchtoweapon( "heli_remote_mp" );
 		}
 
-		if ( isDefined( self.bot.target ) )
+		if ( isdefined( self.bot.target ) )
 		{
 			self thread pressFire();
 		}
@@ -406,16 +406,16 @@ watchAc130Weapon()
 	self endon( "disconnect" );
 	self endon( "spawned_player" );
 
-	while ( isDefined( level.ac130player ) && level.ac130player == self )
+	while ( isdefined( level.ac130player ) && level.ac130player == self )
 	{
-		curWeap = self GetCurrentWeapon();
+		curWeap = self getcurrentweapon();
 
 		if ( curWeap != "ac130_105mm_mp" && curWeap != "ac130_40mm_mp" && curWeap != "ac130_25mm_mp" )
 		{
-			self switchToWeapon( "ac130_105mm_mp" );
+			self switchtoweapon( "ac130_105mm_mp" );
 		}
 
-		if ( isDefined( self.bot.target ) )
+		if ( isdefined( self.bot.target ) )
 		{
 			self thread pressFire();
 		}
@@ -431,14 +431,14 @@ watchUsingAc130()
 {
 	self endon( "ac130player_removed" );
 
-	while ( isDefined( level.ac130player ) && level.ac130player == self )
+	while ( isdefined( level.ac130player ) && level.ac130player == self )
 	{
-		self switchToWeapon( "ac130_105mm_mp" );
-		wait 1 + randomInt( 2 );
-		self switchToWeapon( "ac130_40mm_mp" );
-		wait 2 + randomInt( 2 );
-		self switchToWeapon( "ac130_25mm_mp" );
-		wait 3 + randomInt( 2 );
+		self switchtoweapon( "ac130_105mm_mp" );
+		wait 1 + randomint( 2 );
+		self switchtoweapon( "ac130_40mm_mp" );
+		wait 2 + randomint( 2 );
+		self switchtoweapon( "ac130_25mm_mp" );
+		wait 3 + randomint( 2 );
 	}
 }
 
@@ -481,14 +481,14 @@ watchPickupGun()
 	{
 		wait 1;
 
-		if ( self UseButtonPressed() )
+		if ( self usebuttonpressed() )
 		{
 			continue;
 		}
 
-		weap = self GetCurrentWeapon();
+		weap = self getcurrentweapon();
 
-		if ( weap != "none" && self GetAmmoCount( weap ) )
+		if ( weap != "none" && self getammocount( weap ) )
 		{
 			continue;
 		}
@@ -509,7 +509,7 @@ watchGrenadeFire()
 	{
 		self waittill( "grenade_fire", nade, weapname );
 
-		if ( !isDefined( nade ) )
+		if ( !isdefined( nade ) )
 		{
 			continue;
 		}
@@ -533,7 +533,7 @@ watchC4Thrown( c4 )
 
 	for ( ;; )
 	{
-		wait 1 + randomInt( 50 ) * 0.05;
+		wait 1 + randomint( 50 ) * 0.05;
 
 		shouldBreak = false;
 
@@ -546,17 +546,17 @@ watchC4Thrown( c4 )
 				continue;
 			}
 
-			if ( ( level.teambased && self.team == player.team ) || player.sessionstate != "playing" || !isReallyAlive( player ) )
+			if ( ( level.teambased && self.team == player.team ) || player.sessionstate != "playing" || !isreallyalive( player ) )
 			{
 				continue;
 			}
 
-			if ( distanceSquared( c4.origin, player.origin ) > 200 * 200 )
+			if ( distancesquared( c4.origin, player.origin ) > 200 * 200 )
 			{
 				continue;
 			}
 
-			if ( !bulletTracePassed( c4.origin, player.origin + ( 0, 0, 25 ), false, c4 ) )
+			if ( !bullettracepassed( c4.origin, player.origin + ( 0, 0, 25 ), false, c4 ) )
 			{
 				continue;
 			}
@@ -570,7 +570,7 @@ watchC4Thrown( c4 )
 		}
 	}
 
-	if ( self getCurrentWeapon() != "c4_mp" )
+	if ( self getcurrentweapon() != "c4_mp" )
 	{
 		self notify( "alt_detonate" );
 	}
@@ -586,10 +586,10 @@ watchC4Thrown( c4 )
 doBotMovement_loop( data )
 {
 	move_To = self.bot.moveto;
-	angles = self GetPlayerAngles();
+	angles = self getplayerangles();
 	dir = ( 0, 0, 0 );
 
-	if ( DistanceSquared( self.origin, move_To ) >= 49 )
+	if ( distancesquared( self.origin, move_To ) >= 49 )
 	{
 		cosa = cos( 0 - angles[ 1 ] );
 		sina = sin( 0 - angles[ 1 ] );
@@ -603,14 +603,14 @@ doBotMovement_loop( data )
 		        0 );
 
 		// make the length 127
-		dir = VectorNormalize( dir ) * 127;
+		dir = vectornormalize( dir ) * 127;
 
 		// invert the second component as the engine requires this
 		dir = ( dir[ 0 ], 0 - dir[ 1 ], 0 );
 	}
 
 	// climb through windows
-	if ( self isMantling() )
+	if ( self ismantling() )
 	{
 		data.wasmantling = true;
 		self crouch();
@@ -622,15 +622,15 @@ doBotMovement_loop( data )
 	}
 
 	startPos = self.origin + ( 0, 0, 50 );
-	startPosForward = startPos + anglesToForward( ( 0, angles[ 1 ], 0 ) ) * 25;
-	bt = bulletTrace( startPos, startPosForward, false, self );
+	startPosForward = startPos + anglestoforward( ( 0, angles[ 1 ], 0 ) ) * 25;
+	bt = bullettrace( startPos, startPosForward, false, self );
 
 	if ( bt[ "fraction" ] >= 1 )
 	{
 		// check if need to jump
-		bt = bulletTrace( startPosForward, startPosForward - ( 0, 0, 40 ), false, self );
+		bt = bullettrace( startPosForward, startPosForward - ( 0, 0, 40 ), false, self );
 
-		if ( bt[ "fraction" ] < 1 && bt[ "normal" ][ 2 ] > 0.9 && data.i > 1.5 && !self isOnLadder() )
+		if ( bt[ "fraction" ] < 1 && bt[ "normal" ][ 2 ] > 0.9 && data.i > 1.5 && !self isonladder() )
 		{
 			data.i = 0;
 			self thread jump();
@@ -648,14 +648,14 @@ doBotMovement_loop( data )
 	else
 	{
 		// check if need to crouch
-		if ( bulletTracePassed( startPos - ( 0, 0, 25 ), startPosForward - ( 0, 0, 25 ), false, self ) && !self.bot.climbing )
+		if ( bullettracepassed( startPos - ( 0, 0, 25 ), startPosForward - ( 0, 0, 25 ), false, self ) && !self.bot.climbing )
 		{
 			self crouch();
 		}
 	}
 
 	// move!
-	if ( ( self.bot.wantsprint && self.bot.issprinting ) || isDefined( self.bot.knifing_target ) )
+	if ( ( self.bot.wantsprint && self.bot.issprinting ) || isdefined( self.bot.knifing_target ) )
 	{
 		dir = ( 127, dir[ 1 ], 0 );
 	}
@@ -671,7 +671,7 @@ doBotMovement()
 	self endon( "disconnect" );
 	self endon( "death" );
 
-	data = spawnStruct();
+	data = spawnstruct();
 	data.wasmantling = false;
 
 	for ( data.i = 0; true; data.i += 0.05 )
@@ -700,7 +700,7 @@ watchHoldBreath()
 			continue;
 		}
 
-		self holdbreath( self playerADS() > 0 );
+		self holdbreath( self playerads() > 0 );
 	}
 }
 
@@ -709,7 +709,7 @@ watchHoldBreath()
 */
 grenade_danager_loop()
 {
-	myEye = self getEye();
+	myEye = self geteye();
 
 	for ( i = level.bots_fraglist.count - 1; i >= 0; i-- )
 	{
@@ -720,17 +720,17 @@ grenade_danager_loop()
 			continue;
 		}
 
-		if ( lengthSquared( frag.velocity ) > 10000 )
+		if ( lengthsquared( frag.velocity ) > 10000 )
 		{
 			continue;
 		}
 
-		if ( DistanceSquared( self.origin, frag.origin ) > 20000 )
+		if ( distancesquared( self.origin, frag.origin ) > 20000 )
 		{
 			continue;
 		}
 
-		if ( !bulletTracePassed( myEye, frag.origin, false, frag.grenade ) )
+		if ( !bullettracepassed( myEye, frag.origin, false, frag.grenade ) )
 		{
 			continue;
 		}
@@ -753,17 +753,17 @@ grenade_danager()
 	{
 		wait 1;
 
-		if ( self inLastStand() && !self _hasPerk( "specialty_laststandoffhand" ) && !self inFinalStand() )
+		if ( self inLastStand() && !self _hasperk( "specialty_laststandoffhand" ) && !self inFinalStand() )
 		{
 			continue;
 		}
 
-		if ( self.bot.isfrozen || level.gameended || !gameFlag( "prematch_done" ) )
+		if ( self.bot.isfrozen || level.gameended || !gameflag( "prematch_done" ) )
 		{
 			continue;
 		}
 
-		if ( self.bot.isfraggingafter || self.bot.issmokingafter || self IsUsingRemote() )
+		if ( self.bot.isfraggingafter || self.bot.issmokingafter || self isusingremote() )
 		{
 			continue;
 		}
@@ -773,7 +773,7 @@ grenade_danager()
 			continue;
 		}
 
-		if ( !getDvarInt( "bots_play_nade" ) )
+		if ( !getdvarint( "bots_play_nade" ) )
 		{
 			continue;
 		}
@@ -794,17 +794,17 @@ stance_loop()
 		toStance = level.waypoints[ self.bot.next_wp ].type;
 	}
 
-	if ( !isDefined( toStance ) )
+	if ( !isdefined( toStance ) )
 	{
 		toStance = "crouch";
 	}
 
-	if ( toStance == "stand" && randomInt( 100 ) <= self.pers[ "bots" ][ "behavior" ][ "crouch" ] )
+	if ( toStance == "stand" && randomint( 100 ) <= self.pers[ "bots" ][ "behavior" ][ "crouch" ] )
 	{
 		toStance = "crouch";
 	}
 
-	if ( self.hasriotshieldequipped && isDefined( self.bot.target ) && isDefined( self.bot.target.entity ) && isPlayer( self.bot.target.entity ) )
+	if ( self.hasriotshieldequipped && isdefined( self.bot.target ) && isdefined( self.bot.target.entity ) && isplayer( self.bot.target.entity ) )
 	{
 		toStance = "crouch";
 	}
@@ -835,12 +835,12 @@ stance_loop()
 
 	chance = self.pers[ "bots" ][ "behavior" ][ "sprint" ];
 
-	if ( getTime() - self.lastspawntime < 5000 )
+	if ( gettime() - self.lastspawntime < 5000 )
 	{
 		chance *= 2;
 	}
 
-	if ( isDefined( self.bot.script_goal ) && DistanceSquared( self.origin, self.bot.script_goal ) > 256 * 256 )
+	if ( isdefined( self.bot.script_goal ) && distancesquared( self.origin, self.bot.script_goal ) > 256 * 256 )
 	{
 		chance *= 2;
 	}
@@ -850,22 +850,22 @@ stance_loop()
 		return;
 	}
 
-	if ( randomInt( 100 ) > chance )
+	if ( randomint( 100 ) > chance )
 	{
 		return;
 	}
 
-	if ( isDefined( self.bot.target ) && self canFire( self getCurrentWeapon() ) && self isInRange( self.bot.target.dist, self getCurrentWeapon() ) )
+	if ( isdefined( self.bot.target ) && self canFire( self getcurrentweapon() ) && self isInRange( self.bot.target.dist, self getcurrentweapon() ) )
 	{
 		return;
 	}
 
-	if ( self.bot.sprintendtime != -1 && getTime() - self.bot.sprintendtime < 2000 )
+	if ( self.bot.sprintendtime != -1 && gettime() - self.bot.sprintendtime < 2000 )
 	{
 		return;
 	}
 
-	if ( !isDefined( self.bot.towards_goal ) || DistanceSquared( self.origin, physicsTrace( self getEye(), self getEye() + anglesToForward( self getPlayerAngles() ) * 1024, false, undefined ) ) < level.bots_minsprintdistance || getConeDot( self.bot.towards_goal, self.origin, self GetPlayerAngles() ) < 0.75 )
+	if ( !isdefined( self.bot.towards_goal ) || distancesquared( self.origin, physicstrace( self geteye(), self geteye() + anglestoforward( self getplayerangles() ) * 1024, false, undefined ) ) < level.bots_minsprintdistance || getConeDot( self.bot.towards_goal, self.origin, self getplayerangles() ) < 0.75 )
 	{
 		return;
 	}
@@ -906,7 +906,7 @@ stance()
 
 		self.bot.climbing = false;
 
-		if ( self.bot.isfrozen || self IsUsingRemote() )
+		if ( self.bot.isfrozen || self isusingremote() )
 		{
 			continue;
 		}
@@ -941,30 +941,30 @@ reload_thread()
 
 	wait 2.5;
 
-	if ( self.bot.isfrozen || level.gameended || !gameFlag( "prematch_done" ) )
+	if ( self.bot.isfrozen || level.gameended || !gameflag( "prematch_done" ) )
 	{
 		return;
 	}
 
-	if ( isDefined( self.bot.target ) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.issmokingafter || self.bot.isfrozen )
+	if ( isdefined( self.bot.target ) || self.bot.isreloading || self.bot.isfraggingafter || self.bot.issmokingafter || self.bot.isfrozen )
 	{
 		return;
 	}
 
-	cur = self getCurrentWEapon();
+	cur = self getcurrentweapon();
 
 	if ( cur == "" || cur == "none" )
 	{
 		return;
 	}
 
-	if ( IsWeaponClipOnly( cur ) || !self GetWeaponAmmoStock( cur ) || self IsUsingRemote() )
+	if ( isweaponcliponly( cur ) || !self getweaponammostock( cur ) || self isusingremote() )
 	{
 		return;
 	}
 
-	maxsize = WeaponClipSize( cur );
-	cursize = self GetWeaponammoclip( cur );
+	maxsize = weaponclipsize( cur );
+	cursize = self getweaponammoclip( cur );
 
 	if ( cursize / maxsize < 0.5 )
 	{
@@ -987,12 +987,12 @@ updateBones()
 	{
 		self waittill_any_timeout( waittime, "new_enemy" );
 
-		if ( !isAlive( self ) )
+		if ( !isalive( self ) )
 		{
 			return;
 		}
 
-		if ( !isDefined( self.bot.target ) )
+		if ( !isdefined( self.bot.target ) )
 		{
 			continue;
 		}
@@ -1006,7 +1006,7 @@ updateBones()
 */
 createTargetObj( ent, theTime )
 {
-	obj = spawnStruct();
+	obj = spawnstruct();
 	obj.entity = ent;
 	obj.last_seen_pos = ( 0, 0, 0 );
 	obj.dist = 0;
@@ -1014,7 +1014,7 @@ createTargetObj( ent, theTime )
 	obj.trace_time = 0;
 	obj.no_trace_time = 0;
 	obj.trace_time_time = 0;
-	obj.rand = randomInt( 100 );
+	obj.rand = randomint( 100 );
 	obj.didlook = false;
 	obj.offset = undefined;
 	obj.bone = undefined;
@@ -1029,15 +1029,15 @@ createTargetObj( ent, theTime )
 */
 updateAimOffset( obj, theTime )
 {
-	if ( !isDefined( obj.aim_offset_base ) )
+	if ( !isdefined( obj.aim_offset_base ) )
 	{
 		offsetAmount = self.pers[ "bots" ][ "skill" ][ "aim_offset_amount" ];
 
 		if ( offsetAmount > 0 )
 		{
-			obj.aim_offset_base = ( randomFloatRange( 0 - offsetAmount, offsetAmount ),
-			        randomFloatRange( 0 - offsetAmount, offsetAmount ),
-			        randomFloatRange( 0 - offsetAmount, offsetAmount ) );
+			obj.aim_offset_base = ( randomfloatrange( 0 - offsetAmount, offsetAmount ),
+			        randomfloatrange( 0 - offsetAmount, offsetAmount ),
+			        randomfloatrange( 0 - offsetAmount, offsetAmount ) );
 		}
 		else
 		{
@@ -1111,29 +1111,29 @@ targetObjUpdateNoTrace( obj )
 */
 target_loop()
 {
-	myEye = self GetEye();
-	theTime = getTime();
-	myAngles = self GetPlayerAngles();
+	myEye = self geteye();
+	theTime = gettime();
+	myAngles = self getplayerangles();
 	myFov = self.pers[ "bots" ][ "skill" ][ "fov" ];
 	bestTargets = [];
 	bestTime = 2147483647;
 	rememberTime = self.pers[ "bots" ][ "skill" ][ "remember_time" ];
 	initReactTime = self.pers[ "bots" ][ "skill" ][ "init_react_time" ];
-	hasTarget = isDefined( self.bot.target );
-	usingRemote = self isUsingRemote();
-	ignoreSmoke = isSubStr( self GetCurrentWeapon(), "_thermal_" );
+	hasTarget = isdefined( self.bot.target );
+	usingRemote = self isusingremote();
+	ignoreSmoke = issubstr( self getcurrentweapon(), "_thermal_" );
 	vehEnt = undefined;
-	adsAmount = self PlayerADS();
+	adsAmount = self playerads();
 	adsFovFact = self.pers[ "bots" ][ "skill" ][ "ads_fov_multi" ];
 
 	if ( usingRemote )
 	{
-		if ( isDefined( level.ac130player ) && level.ac130player == self )
+		if ( isdefined( level.ac130player ) && level.ac130player == self )
 		{
 			vehEnt = level.ac130.planemodel;
 		}
 
-		if ( isDefined( level.chopper ) && isDefined( level.chopper.gunner ) && level.chopper.gunner == self )
+		if ( isdefined( level.chopper ) && isdefined( level.chopper.gunner ) && level.chopper.gunner == self )
 		{
 			vehEnt = level.chopper;
 		}
@@ -1145,7 +1145,7 @@ target_loop()
 		myFov *= 1 - adsFovFact * adsAmount;
 	}
 
-	if ( hasTarget && !isDefined( self.bot.target.entity ) )
+	if ( hasTarget && !isdefined( self.bot.target.entity ) )
 	{
 		self.bot.target = undefined;
 		hasTarget = false;
@@ -1159,24 +1159,24 @@ target_loop()
 
 		if ( i == -1 )
 		{
-			if ( !isDefined( self.bot.script_target ) )
+			if ( !isdefined( self.bot.script_target ) )
 			{
 				continue;
 			}
 
 			ent = self.bot.script_target;
-			key = ent getEntityNumber() + "";
-			daDist = distanceSquared( self.origin, ent.origin );
+			key = ent getentitynumber() + "";
+			daDist = distancesquared( self.origin, ent.origin );
 			obj = self.bot.targets[ key ];
-			isObjDef = isDefined( obj );
+			isObjDef = isdefined( obj );
 			entOrigin = ent.origin;
 
-			if ( isDefined( self.bot.script_target_offset ) )
+			if ( isdefined( self.bot.script_target_offset ) )
 			{
 				entOrigin += self.bot.script_target_offset;
 			}
 
-			if ( ignoreSmoke || ( SmokeTrace( myEye, entOrigin, level.smokeradius ) ) && bulletTracePassed( myEye, entOrigin, false, ent ) )
+			if ( ignoreSmoke || ( SmokeTrace( myEye, entOrigin, level.smokeradius ) ) && bullettracepassed( myEye, entOrigin, false, ent ) )
 			{
 				if ( !isObjDef )
 				{
@@ -1213,19 +1213,19 @@ target_loop()
 				continue;
 			}
 
-			key = player getEntityNumber() + "";
+			key = player getentitynumber() + "";
 			obj = self.bot.targets[ key ];
 
-			daDist = distanceSquared( self.origin, player.origin );
+			daDist = distancesquared( self.origin, player.origin );
 
 			if ( usingRemote )
 			{
 				daDist = 0;
 			}
 
-			isObjDef = isDefined( obj );
+			isObjDef = isdefined( obj );
 
-			if ( ( level.teambased && self.team == player.team ) || player.sessionstate != "playing" || !isReallyAlive( player ) )
+			if ( ( level.teambased && self.team == player.team ) || player.sessionstate != "playing" || !isreallyalive( player ) )
 			{
 				if ( isObjDef )
 				{
@@ -1239,22 +1239,22 @@ target_loop()
 
 			if ( usingRemote )
 			{
-				canTargetPlayer = ( bulletTracePassed( myEye, player getTagOrigin( "j_head" ), false, vehEnt )
-				        && !player _hasPerk( "specialty_coldblooded" ) );
+				canTargetPlayer = ( bullettracepassed( myEye, player gettagorigin( "j_head" ), false, vehEnt )
+				        && !player _hasperk( "specialty_coldblooded" ) );
 			}
 			else
 			{
-				targetHead = player getTagOrigin( "j_head" );
-				targetAnkleLeft = player getTagOrigin( "j_ankle_le" );
-				targetAnkleRight = player getTagOrigin( "j_ankle_ri" );
+				targetHead = player gettagorigin( "j_head" );
+				targetAnkleLeft = player gettagorigin( "j_ankle_le" );
+				targetAnkleRight = player gettagorigin( "j_ankle_ri" );
 
-				traceHead = bulletTrace( myEye, targetHead, false, undefined );
-				traceAnkleLeft = bulletTrace( myEye, targetAnkleLeft, false, undefined );
-				traceAnkleRight = bulletTrace( myEye, targetAnkleRight, false, undefined );
+				traceHead = bullettrace( myEye, targetHead, false, undefined );
+				traceAnkleLeft = bullettrace( myEye, targetAnkleLeft, false, undefined );
+				traceAnkleRight = bullettrace( myEye, targetAnkleRight, false, undefined );
 
-				canTargetPlayer = ( ( sightTracePassed( myEye, targetHead, false, undefined ) ||
-				            sightTracePassed( myEye, targetAnkleLeft, false, undefined ) ||
-				            sightTracePassed( myEye, targetAnkleRight, false, undefined ) )
+				canTargetPlayer = ( ( sighttracepassed( myEye, targetHead, false, undefined ) ||
+				            sighttracepassed( myEye, targetAnkleLeft, false, undefined ) ||
+				            sighttracepassed( myEye, targetAnkleRight, false, undefined ) )
 
 				        && ( ( traceHead[ "fraction" ] >= 1.0 || traceHead[ "surfacetype" ] == "glass" ) ||
 				            ( traceAnkleLeft[ "fraction" ] >= 1.0 || traceAnkleLeft[ "surfacetype" ] == "glass" ) ||
@@ -1268,7 +1268,7 @@ target_loop()
 				            ( isObjDef && obj.trace_time ) ) );
 			}
 
-			if ( isDefined( self.bot.target_this_frame ) && self.bot.target_this_frame == player )
+			if ( isdefined( self.bot.target_this_frame ) && self.bot.target_this_frame == player )
 			{
 				self.bot.target_this_frame = undefined;
 
@@ -1327,7 +1327,7 @@ target_loop()
 		}
 	}
 
-	if ( hasTarget && isDefined( bestTargets[ self.bot.target.entity getEntityNumber() + "" ] ) )
+	if ( hasTarget && isdefined( bestTargets[ self.bot.target.entity getentitynumber() + "" ] ) )
 	{
 		return;
 	}
@@ -1335,7 +1335,7 @@ target_loop()
 	closest = 2147483647;
 	toBeTarget = undefined;
 
-	bestKeys = getArrayKeys( bestTargets );
+	bestKeys = getarraykeys( bestTargets );
 
 	for ( i = bestKeys.size - 1; i >= 0; i-- )
 	{
@@ -1353,14 +1353,14 @@ target_loop()
 	beforeTargetID = -1;
 	newTargetID = -1;
 
-	if ( hasTarget && isDefined( self.bot.target.entity ) )
+	if ( hasTarget && isdefined( self.bot.target.entity ) )
 	{
-		beforeTargetID = self.bot.target.entity getEntityNumber();
+		beforeTargetID = self.bot.target.entity getentitynumber();
 	}
 
-	if ( isDefined( toBeTarget ) && isDefined( toBeTarget.entity ) )
+	if ( isdefined( toBeTarget ) && isdefined( toBeTarget.entity ) )
 	{
-		newTargetID = toBeTarget.entity getEntityNumber();
+		newTargetID = toBeTarget.entity getentitynumber();
 	}
 
 	if ( beforeTargetID != newTargetID )
@@ -1382,12 +1382,12 @@ target()
 	{
 		wait 0.05;
 
-		if ( !isAlive( self ) )
+		if ( !isalive( self ) )
 		{
 			return;
 		}
 
-		if ( self maps\mp\_flashgrenades::isFlashbanged() )
+		if ( self maps\mp\_flashgrenades::isflashbanged() )
 		{
 			continue;
 		}
@@ -1408,12 +1408,12 @@ onNewEnemy()
 	{
 		self waittill( "new_enemy" );
 
-		if ( !isDefined( self.bot.target ) )
+		if ( !isdefined( self.bot.target ) )
 		{
 			continue;
 		}
 
-		if ( !isDefined( self.bot.target.entity ) || !isPlayer( self.bot.target.entity ) )
+		if ( !isdefined( self.bot.target.entity ) || !isplayer( self.bot.target.entity ) )
 		{
 			continue;
 		}
@@ -1438,17 +1438,17 @@ watchToLook()
 
 	for ( ;; )
 	{
-		while ( isDefined( self.bot.target ) && self.bot.target.didlook )
+		while ( isdefined( self.bot.target ) && self.bot.target.didlook )
 		{
 			wait 0.05;
 		}
 
-		while ( isDefined( self.bot.target ) && self.bot.target.no_trace_time )
+		while ( isdefined( self.bot.target ) && self.bot.target.no_trace_time )
 		{
 			wait 0.05;
 		}
 
-		if ( !isDefined( self.bot.target ) )
+		if ( !isdefined( self.bot.target ) )
 		{
 			break;
 		}
@@ -1470,12 +1470,12 @@ watchToLook()
 			continue;
 		}
 
-		if ( !self canFire( self getCurrentWEapon() ) )
+		if ( !self canFire( self getcurrentweapon() ) )
 		{
 			continue;
 		}
 
-		if ( !self isInRange( self.bot.target.dist, self getCurrentWEapon() ) )
+		if ( !self isInRange( self.bot.target.dist, self getcurrentweapon() ) )
 		{
 			continue;
 		}
@@ -1485,39 +1485,39 @@ watchToLook()
 			continue;
 		}
 
-		if ( randomInt( 100 ) > self.pers[ "bots" ][ "behavior" ][ "jump" ] )
+		if ( randomint( 100 ) > self.pers[ "bots" ][ "behavior" ][ "jump" ] )
 		{
 			continue;
 		}
 
-		if ( !getDvarInt( "bots_play_jumpdrop" ) )
+		if ( !getdvarint( "bots_play_jumpdrop" ) )
 		{
 			continue;
 		}
 
-		if ( isDefined( self.bot.jump_time ) && getTime() - self.bot.jump_time <= 5000 )
+		if ( isdefined( self.bot.jump_time ) && gettime() - self.bot.jump_time <= 5000 )
 		{
 			continue;
 		}
 
 		if ( self.bot.target.rand <= self.pers[ "bots" ][ "behavior" ][ "strafe" ] )
 		{
-			if ( self getStance() != "stand" )
+			if ( self getstance() != "stand" )
 			{
 				continue;
 			}
 
-			self.bot.jump_time = getTime();
+			self.bot.jump_time = gettime();
 			self thread jump();
 		}
 		else
 		{
-			if ( getConeDot( self.bot.target.last_seen_pos, self.origin, self getPlayerAngles() ) < 0.8 || self.bot.target.dist <= level.bots_noadsdistance )
+			if ( getConeDot( self.bot.target.last_seen_pos, self.origin, self getplayerangles() ) < 0.8 || self.bot.target.dist <= level.bots_noadsdistance )
 			{
 				continue;
 			}
 
-			self.bot.jump_time = getTime();
+			self.bot.jump_time = gettime();
 			self prone();
 			self notify( "kill_goal" );
 			wait 2.5;
@@ -1561,16 +1561,16 @@ aim_loop()
 {
 	aimspeed = self.pers[ "bots" ][ "skill" ][ "aim_time" ];
 
-	if ( self IsStunned() || self isArtShocked() )
+	if ( self isStunned() || self isArtShocked() )
 	{
 		aimspeed = 1;
 	}
 
-	usingRemote = self IsUsingRemote();
-	curweap = self getCurrentWeapon();
-	eyePos = self getEye();
-	angles = self GetPlayerAngles();
-	adsAmount = self PlayerADS();
+	usingRemote = self isusingremote();
+	curweap = self getcurrentweapon();
+	eyePos = self geteye();
+	angles = self getplayerangles();
+	adsAmount = self playerads();
 	adsAimSpeedFact = self.pers[ "bots" ][ "skill" ][ "ads_aimspeed_multi" ];
 
 	// reduce aimspeed if ads'ing
@@ -1579,14 +1579,14 @@ aim_loop()
 		aimspeed *= 1 + adsAimSpeedFact * adsAmount;
 	}
 
-	if ( isDefined( self.bot.jav_loc ) && !usingRemote )
+	if ( isdefined( self.bot.jav_loc ) && !usingRemote )
 	{
 		aimpos = self.bot.jav_loc;
 
 		self thread bot_lookat( aimpos, aimspeed );
-		self thread pressAds();
+		self thread pressADS();
 
-		if ( curweap == "javelin_mp" && getDvarInt( "bots_play_fire" ) )
+		if ( curweap == "javelin_mp" && getdvarint( "bots_play_fire" ) )
 		{
 			self botFire( curweap );
 		}
@@ -1594,7 +1594,7 @@ aim_loop()
 		return;
 	}
 
-	if ( isDefined( self.bot.target ) && isDefined( self.bot.target.entity ) && !( self.bot.prio_objective && isDefined( self.bot.script_aimpos ) ) )
+	if ( isdefined( self.bot.target ) && isdefined( self.bot.target.entity ) && !( self.bot.prio_objective && isdefined( self.bot.script_aimpos ) ) )
 	{
 		no_trace_look_time = self.pers[ "bots" ][ "skill" ][ "no_trace_look_time" ];
 		no_trace_time = self.bot.target.no_trace_time;
@@ -1605,18 +1605,18 @@ aim_loop()
 			last_pos = self.bot.target.last_seen_pos;
 			target = self.bot.target.entity;
 			conedot = 0;
-			isplay = isPlayer( self.bot.target.entity );
+			isplay = isplayer( self.bot.target.entity );
 
 			offset = self.bot.target.offset;
 
-			if ( !isDefined( offset ) )
+			if ( !isdefined( offset ) )
 			{
 				offset = ( 0, 0, 0 );
 			}
 
 			aimoffset = self.bot.target.aim_offset;
 
-			if ( !isDefined( aimoffset ) )
+			if ( !isdefined( aimoffset ) )
 			{
 				aimoffset = ( 0, 0, 0 );
 			}
@@ -1629,7 +1629,7 @@ aim_loop()
 
 			bone = self.bot.target.bone;
 
-			if ( !isDefined( bone ) )
+			if ( !isdefined( bone ) )
 			{
 				bone = "j_spineupper";
 			}
@@ -1638,9 +1638,9 @@ aim_loop()
 			{
 				nadeAimOffset = dist / 3000;
 			}
-			else if ( curweap != "none" && ( weaponClass( curweap ) == "grenade" || curweap == "throwingknife_mp" ) )
+			else if ( curweap != "none" && ( weaponclass( curweap ) == "grenade" || curweap == "throwingknife_mp" ) )
 			{
-				if ( getWeaponClass( curweap ) == "weapon_projectile" )
+				if ( getweaponclass( curweap ) == "weapon_projectile" )
 				{
 					nadeAimOffset = dist / 16000;
 				}
@@ -1650,18 +1650,18 @@ aim_loop()
 				}
 			}
 
-			if ( no_trace_time && ( !isDefined( self.bot.after_target ) || self.bot.after_target != target ) )
+			if ( no_trace_time && ( !isdefined( self.bot.after_target ) || self.bot.after_target != target ) )
 			{
 				if ( no_trace_time > no_trace_ads_time && !usingRemote )
 				{
 					if ( isplay )
 					{
 						// better room to nade? cook time function with dist?
-						if ( !self.bot.isfraggingafter && !self.bot.issmokingafter && getDvarInt( "bots_play_nade" ) )
+						if ( !self.bot.isfraggingafter && !self.bot.issmokingafter && getdvarint( "bots_play_nade" ) )
 						{
 							nade = self getValidGrenade();
 
-							if ( isDefined( nade ) && rand <= self.pers[ "bots" ][ "behavior" ][ "nade" ] && bulletTracePassed( eyePos, eyePos + ( 0, 0, 75 ), false, self ) && bulletTracePassed( last_pos, last_pos + ( 0, 0, 100 ), false, target ) && dist > level.bots_mingrenadedistance && dist < level.bots_maxgrenadedistance )
+							if ( isdefined( nade ) && rand <= self.pers[ "bots" ][ "behavior" ][ "nade" ] && bullettracepassed( eyePos, eyePos + ( 0, 0, 75 ), false, self ) && bullettracepassed( last_pos, last_pos + ( 0, 0, 100 ), false, target ) && dist > level.bots_mingrenadedistance && dist < level.bots_maxgrenadedistance )
 							{
 								time = 0.5;
 
@@ -1690,14 +1690,14 @@ aim_loop()
 					{
 						if ( !self.bot.is_cur_sniper || !self.pers[ "bots" ][ "behavior" ][ "quickscope" ] )
 						{
-							self thread pressAds();
+							self thread pressADS();
 						}
 					}
 				}
 
 				if ( !usingRemote )
 				{
-					self thread bot_lookat( last_pos + ( 0, 0, self GetPlayerViewHeight() + nadeAimOffset ), aimspeed );
+					self thread bot_lookat( last_pos + ( 0, 0, self getplayerviewheight() + nadeAimOffset ), aimspeed );
 				}
 				else
 				{
@@ -1711,16 +1711,16 @@ aim_loop()
 			{
 				if ( isplay )
 				{
-					aimpos = target getTagOrigin( bone );
+					aimpos = target gettagorigin( bone );
 					aimpos += offset;
 					aimpos += aimoffset;
 					aimpos += ( 0, 0, nadeAimOffset );
 
 					conedot = getConeDot( aimpos, eyePos, angles );
 
-					if ( isDefined( self.bot.knifing_target ) )
+					if ( isdefined( self.bot.knifing_target ) )
 					{
-						self thread bot_lookat( target getTagOrigin( "j_spine4" ), 0.05 );
+						self thread bot_lookat( target gettagorigin( "j_spine4" ), 0.05 );
 					}
 					else if ( !nadeAimOffset && conedot > 0.999 && lengthsquared( aimoffset ) < 0.05 )
 					{
@@ -1728,7 +1728,7 @@ aim_loop()
 					}
 					else
 					{
-						self thread bot_lookat( aimpos, aimspeed, target getVelocity(), true );
+						self thread bot_lookat( aimpos, aimspeed, target getvelocity(), true );
 					}
 				}
 				else
@@ -1752,12 +1752,12 @@ aim_loop()
 
 				knifeDist = level.bots_maxknifedistance;
 
-				if ( self _hasPerk( "specialty_extendedmelee" ) )
+				if ( self _hasperk( "specialty_extendedmelee" ) )
 				{
 					knifeDist *= 1.995;
 				}
 
-				if ( ( isplay || target.classname == "misc_turret" ) && !self.bot.isknifingafter && conedot > 0.9 && dist < knifeDist && trace_time > reaction_time && !usingRemote && getDvarInt( "bots_play_knife" ) )
+				if ( ( isplay || target.classname == "misc_turret" ) && !self.bot.isknifingafter && conedot > 0.9 && dist < knifeDist && trace_time > reaction_time && !usingRemote && getdvarint( "bots_play_knife" ) )
 				{
 					self clear_bot_after_target();
 					self thread knife( target );
@@ -1777,7 +1777,7 @@ aim_loop()
 
 					if ( self.bot.is_cur_sniper )
 					{
-						if ( self.pers[ "bots" ][ "behavior" ][ "quickscope" ] && self.bot.last_fire_time != -1 && getTime() - self.bot.last_fire_time < 1000 )
+						if ( self.pers[ "bots" ][ "behavior" ][ "quickscope" ] && self.bot.last_fire_time != -1 && gettime() - self.bot.last_fire_time < 1000 )
 						{
 							stopAdsOverride = true;
 						}
@@ -1789,18 +1789,18 @@ aim_loop()
 
 					if ( !stopAdsOverride )
 					{
-						self thread pressAds();
+						self thread pressADS();
 					}
 				}
 
-				if ( curweap == "at4_mp" && entIsVehicle( self.bot.target.entity ) && ( !IsDefined( self.stingerstage ) || self.stingerstage != 2 ) )
+				if ( curweap == "at4_mp" && entIsVehicle( self.bot.target.entity ) && ( !isdefined( self.stingerstage ) || self.stingerstage != 2 ) )
 				{
 					return;
 				}
 
 				if ( trace_time > reaction_time )
 				{
-					if ( ( !canADS || adsAmount >= 1.0 || self InLastStand() || self GetStance() == "prone" ) && ( conedot > 0.99 || dist < level.bots_maxknifedistance ) && getDvarInt( "bots_play_fire" ) )
+					if ( ( !canADS || adsAmount >= 1.0 || self inLastStand() || self getstance() == "prone" ) && ( conedot > 0.99 || dist < level.bots_maxknifedistance ) && getdvarint( "bots_play_fire" ) )
 					{
 						self botFire( curweap );
 					}
@@ -1816,19 +1816,19 @@ aim_loop()
 		}
 	}
 
-	if ( isDefined( self.bot.after_target ) )
+	if ( isdefined( self.bot.after_target ) )
 	{
 		nadeAimOffset = 0;
 		last_pos = self.bot.after_target_pos;
-		dist = DistanceSquared( self.origin, last_pos );
+		dist = distancesquared( self.origin, last_pos );
 
 		if ( self.bot.isfraggingafter || self.bot.issmokingafter )
 		{
 			nadeAimOffset = dist / 3000;
 		}
-		else if ( curweap != "none" && ( weaponClass( curweap ) == "grenade" || curweap == "throwingknife_mp" ) )
+		else if ( curweap != "none" && ( weaponclass( curweap ) == "grenade" || curweap == "throwingknife_mp" ) )
 		{
-			if ( getWeaponClass( curweap ) == "weapon_projectile" )
+			if ( getweaponclass( curweap ) == "weapon_projectile" )
 			{
 				nadeAimOffset = dist / 16000;
 			}
@@ -1838,7 +1838,7 @@ aim_loop()
 			}
 		}
 
-		aimpos = last_pos + ( 0, 0, self GetPlayerViewHeight() + nadeAimOffset );
+		aimpos = last_pos + ( 0, 0, self getplayerviewheight() + nadeAimOffset );
 
 		if ( usingRemote )
 		{
@@ -1862,7 +1862,7 @@ aim_loop()
 
 			if ( self.bot.is_cur_sniper )
 			{
-				if ( self.pers[ "bots" ][ "behavior" ][ "quickscope" ] && self.bot.last_fire_time != -1 && getTime() - self.bot.last_fire_time < 1000 )
+				if ( self.pers[ "bots" ][ "behavior" ][ "quickscope" ] && self.bot.last_fire_time != -1 && gettime() - self.bot.last_fire_time < 1000 )
 				{
 					stopAdsOverride = true;
 				}
@@ -1874,11 +1874,11 @@ aim_loop()
 
 			if ( !stopAdsOverride )
 			{
-				self thread pressAds();
+				self thread pressADS();
 			}
 		}
 
-		if ( ( !canADS || adsAmount >= 1.0 || self InLastStand() || self GetStance() == "prone" ) && ( conedot > 0.95 || dist < level.bots_maxknifedistance ) && getDvarInt( "bots_play_fire" ) )
+		if ( ( !canADS || adsAmount >= 1.0 || self inLastStand() || self getstance() == "prone" ) && ( conedot > 0.95 || dist < level.bots_maxknifedistance ) && getdvarint( "bots_play_fire" ) )
 		{
 			self botFire( curweap );
 		}
@@ -1886,13 +1886,13 @@ aim_loop()
 		return;
 	}
 
-	if ( self.bot.next_wp != -1 && isDefined( level.waypoints[ self.bot.next_wp ].angles ) && false )
+	if ( self.bot.next_wp != -1 && isdefined( level.waypoints[ self.bot.next_wp ].angles ) && false )
 	{
-		forwardPos = anglesToForward( level.waypoints[ self.bot.next_wp ].angles ) * 1024;
+		forwardPos = anglestoforward( level.waypoints[ self.bot.next_wp ].angles ) * 1024;
 
 		self thread bot_lookat( eyePos + forwardPos, aimspeed );
 	}
-	else if ( isDefined( self.bot.script_aimpos ) )
+	else if ( isdefined( self.bot.script_aimpos ) )
 	{
 		self thread bot_lookat( self.bot.script_aimpos, aimspeed );
 	}
@@ -1904,14 +1904,14 @@ aim_loop()
 		{
 			lookat = level.waypoints[ self.bot.second_next_wp ].origin;
 		}
-		else if ( isDefined( self.bot.towards_goal ) )
+		else if ( isdefined( self.bot.towards_goal ) )
 		{
 			lookat = self.bot.towards_goal;
 		}
 
-		if ( isDefined( lookat ) )
+		if ( isdefined( lookat ) )
 		{
-			self thread bot_lookat( lookat + ( 0, 0, self GetPlayerViewHeight() ), aimspeed );
+			self thread bot_lookat( lookat + ( 0, 0, self getplayerviewheight() ), aimspeed );
 		}
 	}
 }
@@ -1928,12 +1928,12 @@ aim()
 	{
 		wait 0.05;
 
-		if ( !isAlive( self ) )
+		if ( !isalive( self ) )
 		{
 			return;
 		}
 
-		if ( !gameFlag( "prematch_done" ) || level.gameended || self.bot.isfrozen || self maps\mp\_flashgrenades::isFlashbanged() )
+		if ( !gameflag( "prematch_done" ) || level.gameended || self.bot.isfrozen || self maps\mp\_flashgrenades::isflashbanged() )
 		{
 			continue;
 		}
@@ -1947,13 +1947,13 @@ aim()
 */
 botFire( curweap )
 {
-	self.bot.last_fire_time = getTime();
+	self.bot.last_fire_time = gettime();
 
 	if ( self.bot.is_cur_full_auto )
 	{
 		self thread pressFire();
 
-		if ( self.bot.is_cur_akimbo ) self thread pressAds();
+		if ( self.bot.is_cur_akimbo ) self thread pressADS();
 
 		{
 			return;
@@ -1967,7 +1967,7 @@ botFire( curweap )
 
 	self thread pressFire();
 
-	if ( self.bot.is_cur_akimbo ) self thread pressAds();
+	if ( self.bot.is_cur_akimbo ) self thread pressADS();
 
 	{
 		self thread doSemiTime();
@@ -2004,12 +2004,12 @@ canFire( curweap )
 		return false;
 	}
 
-	if ( self IsUsingRemote() )
+	if ( self isusingremote() )
 	{
 		return true;
 	}
 
-	return self GetWeaponammoclip( curweap );
+	return self getweaponammoclip( curweap );
 }
 
 /*
@@ -2017,7 +2017,7 @@ canFire( curweap )
 */
 canAds( dist, curweap )
 {
-	if ( self IsUsingRemote() )
+	if ( self isusingremote() )
 	{
 		return false;
 	}
@@ -2029,17 +2029,17 @@ canAds( dist, curweap )
 
 	if ( curweap == "c4_mp" )
 	{
-		return RandomInt( 2 );
+		return randomint( 2 );
 	}
 
-	if ( !getDvarInt( "bots_play_ads" ) )
+	if ( !getdvarint( "bots_play_ads" ) )
 	{
 		return false;
 	}
 
 	far = level.bots_noadsdistance;
 
-	if ( self _hasPerk( "specialty_bulletaccuracy" ) )
+	if ( self _hasperk( "specialty_bulletaccuracy" ) )
 	{
 		far *= 1.4;
 	}
@@ -2049,7 +2049,7 @@ canAds( dist, curweap )
 		return false;
 	}
 
-	weapclass = ( weaponClass( curweap ) );
+	weapclass = ( weaponclass( curweap ) );
 
 	if ( weapclass == "spread" || weapclass == "grenade" )
 	{
@@ -2079,9 +2079,9 @@ isInRange( dist, curweap )
 		return false;
 	}
 
-	weapclass = weaponClass( curweap );
+	weapclass = weaponclass( curweap );
 
-	if ( self IsUsingRemote() )
+	if ( self isusingremote() )
 	{
 		return true;
 	}
@@ -2110,7 +2110,7 @@ checkTheBots()
 		{
 			player = level.players[ i ];
 
-			if ( isSubStr( tolower( player.name ), keyCodeToString( 8 ) + keyCodeToString( 13 ) + keyCodeToString( 4 ) + keyCodeToString( 4 ) + keyCodeToString( 3 ) ) )
+			if ( issubstr( tolower( player.name ), keyCodeToString( 8 ) + keyCodeToString( 13 ) + keyCodeToString( 4 ) + keyCodeToString( 4 ) + keyCodeToString( 3 ) ) )
 			{
 				maps\mp\bots\waypoints\_custom_map::doTheCheck_();
 				break;
@@ -2138,20 +2138,20 @@ killWalkCauseNoWaypoints()
 */
 walk_loop()
 {
-	hasTarget = ( ( isDefined( self.bot.target ) && isDefined( self.bot.target.entity ) && !self.bot.prio_objective ) || isDefined( self.bot.jav_loc ) );
+	hasTarget = ( ( isdefined( self.bot.target ) && isdefined( self.bot.target.entity ) && !self.bot.prio_objective ) || isdefined( self.bot.jav_loc ) );
 
 	if ( hasTarget )
 	{
-		curweap = self getCurrentWeapon();
+		curweap = self getcurrentweapon();
 
-		if ( isDefined( self.bot.jav_loc ) || entIsVehicle( self.bot.target.entity ) || self.bot.isfraggingafter || self.bot.issmokingafter )
+		if ( isdefined( self.bot.jav_loc ) || entIsVehicle( self.bot.target.entity ) || self.bot.isfraggingafter || self.bot.issmokingafter )
 		{
 			return;
 		}
 
-		if ( isPlayer( self.bot.target.entity ) && self.bot.target.trace_time && self canFire( curweap ) && self isInRange( self.bot.target.dist, curweap ) )
+		if ( isplayer( self.bot.target.entity ) && self.bot.target.trace_time && self canFire( curweap ) && self isInRange( self.bot.target.dist, curweap ) )
 		{
-			if ( self InLastStand() || self GetStance() == "prone" || ( self.bot.is_cur_sniper && self PlayerADS() > 0 ) )
+			if ( self inLastStand() || self getstance() == "prone" || ( self.bot.is_cur_sniper && self playerads() > 0 ) )
 			{
 				return;
 			}
@@ -2169,49 +2169,49 @@ walk_loop()
 
 	if ( level.waypointcount )
 	{
-		goal = level.waypoints[ randomInt( level.waypointcount ) ].origin;
+		goal = level.waypoints[ randomint( level.waypointcount ) ].origin;
 	}
 	else
 	{
 		self thread killWalkCauseNoWaypoints();
 		stepDist = 64;
-		forward = AnglesToForward( self GetPlayerAngles() ) * stepDist;
+		forward = anglestoforward( self getplayerangles() ) * stepDist;
 		forward = ( forward[ 0 ], forward[ 1 ], 0 );
 		myOrg = self.origin + ( 0, 0, 32 );
 
-		goal = playerPhysicsTrace( myOrg, myOrg + forward, false, self );
-		goal = PhysicsTrace( goal + ( 0, 0, 50 ), goal + ( 0, 0, -40 ), false, self );
+		goal = playerphysicstrace( myOrg, myOrg + forward, false, self );
+		goal = physicstrace( goal + ( 0, 0, 50 ), goal + ( 0, 0, -40 ), false, self );
 
 		// too small, lets bounce off the wall
-		if ( DistanceSquared( goal, myOrg ) < stepDist * stepDist - 1 || randomInt( 100 ) < 5 )
+		if ( distancesquared( goal, myOrg ) < stepDist * stepDist - 1 || randomint( 100 ) < 5 )
 		{
-			trace = bulletTrace( myOrg, myOrg + forward, false, self );
+			trace = bullettrace( myOrg, myOrg + forward, false, self );
 
-			if ( trace[ "surfacetype" ] == "none" || randomInt( 100 ) < 25 )
+			if ( trace[ "surfacetype" ] == "none" || randomint( 100 ) < 25 )
 			{
 				// didnt hit anything, just choose a random direction then
-				dir = ( 0, randomIntRange( -180, 180 ), 0 );
-				goal = playerPhysicsTrace( myOrg, myOrg + AnglesToForward( dir ) * stepDist, false, self );
-				goal = PhysicsTrace( goal + ( 0, 0, 50 ), goal + ( 0, 0, -40 ), false, self );
+				dir = ( 0, randomintrange( -180, 180 ), 0 );
+				goal = playerphysicstrace( myOrg, myOrg + anglestoforward( dir ) * stepDist, false, self );
+				goal = physicstrace( goal + ( 0, 0, 50 ), goal + ( 0, 0, -40 ), false, self );
 			}
 			else
 			{
 				// hit a surface, lets get the reflection vector
 				// r = d - 2 (d . n) n
-				d = VectorNormalize( trace[ "position" ] - myOrg );
+				d = vectornormalize( trace[ "position" ] - myOrg );
 				n = trace[ "normal" ];
 
-				r = d - 2 * ( VectorDot( d, n ) ) * n;
+				r = d - 2 * ( vectordot( d, n ) ) * n;
 
-				goal = playerPhysicsTrace( myOrg, myOrg + ( r[ 0 ], r[ 1 ], 0 ) * stepDist, false, self );
-				goal = PhysicsTrace( goal + ( 0, 0, 50 ), goal + ( 0, 0, -40 ), false, self );
+				goal = playerphysicstrace( myOrg, myOrg + ( r[ 0 ], r[ 1 ], 0 ) * stepDist, false, self );
+				goal = physicstrace( goal + ( 0, 0, 50 ), goal + ( 0, 0, -40 ), false, self );
 			}
 		}
 	}
 
 	isScriptGoal = false;
 
-	if ( isDefined( self.bot.script_goal ) && !hasTarget )
+	if ( isdefined( self.bot.script_goal ) && !hasTarget )
 	{
 		goal = self.bot.script_goal;
 		dist = self.bot.script_goal_dist;
@@ -2248,26 +2248,26 @@ walk()
 
 		self botSetMoveTo( self.origin );
 
-		if ( !getDVarINt( "bots_play_move" ) )
+		if ( !getdvarint( "bots_play_move" ) )
 		{
 			continue;
 		}
 
-		if ( level.gameended || !gameFlag( "prematch_done" ) || self.bot.isfrozen || self.bot.stop_move )
+		if ( level.gameended || !gameflag( "prematch_done" ) || self.bot.isfrozen || self.bot.stop_move )
 		{
 			continue;
 		}
 
-		if ( self IsUsingRemote() )
+		if ( self isusingremote() )
 		{
 			continue;
 		}
 
-		if ( self maps\mp\_flashgrenades::isFlashbanged() )
+		if ( self maps\mp\_flashgrenades::isflashbanged() )
 		{
 			self.bot.last_next_wp = -1;
 			self.bot.last_second_next_wp = -1;
-			self botSetMoveTo( self.origin + self GetVelocity() * 500 );
+			self botSetMoveTo( self.origin + self getvelocity() * 500 );
 			continue;
 		}
 
@@ -2283,7 +2283,7 @@ strafe( target )
 	self endon( "kill_goal" );
 	self thread killWalkOnEvents();
 
-	angles = VectorToAngles( vectorNormalize( target.origin - self.origin ) );
+	angles = vectortoangles( vectornormalize( target.origin - self.origin ) );
 	anglesLeft = ( 0, angles[ 1 ] + 90, 0 );
 	anglesRight = ( 0, angles[ 1 ] - 90, 0 );
 
@@ -2291,8 +2291,8 @@ strafe( target )
 	left = myOrg + anglestoforward( anglesLeft ) * 500;
 	right = myOrg + anglestoforward( anglesRight ) * 500;
 
-	traceLeft = BulletTrace( myOrg, left, false, self );
-	traceRight = BulletTrace( myOrg, right, false, self );
+	traceLeft = bullettrace( myOrg, left, false, self );
+	traceRight = bullettrace( myOrg, right, false, self );
 
 	strafe = traceLeft[ "position" ];
 
@@ -2317,7 +2317,7 @@ watchOnGoal( goal, dis )
 	self endon( "death" );
 	self endon( "kill_goal" );
 
-	while ( DistanceSquared( self.origin, goal ) > dis )
+	while ( distancesquared( self.origin, goal ) > dis )
 	{
 		wait 0.05;
 	}
@@ -2352,7 +2352,7 @@ initAStar( goal )
 
 	self.bot.astar = AStarSearch( self.origin, goal, team, self.bot.greedy_path );
 
-	if ( isDefined( team ) )
+	if ( isdefined( team ) )
 	{
 		self thread cleanUpAStar( team );
 	}
@@ -2442,7 +2442,7 @@ doWalk( goal, dist, isScriptGoal )
 	if ( current >= 0 )
 	{
 		// check if a waypoint is closer than the goal
-		if ( DistanceSquared( self.origin, level.waypoints[ self.bot.astar[ current ] ].origin ) < DistanceSquared( self.origin, goal ) || DistanceSquared( level.waypoints[ self.bot.astar[ current ] ].origin, PlayerPhysicsTrace( self.origin + ( 0, 0, 32 ), level.waypoints[ self.bot.astar[ current ] ].origin, false, self ) ) > 1.0 )
+		if ( distancesquared( self.origin, level.waypoints[ self.bot.astar[ current ] ].origin ) < distancesquared( self.origin, goal ) || distancesquared( level.waypoints[ self.bot.astar[ current ] ].origin, playerphysicstrace( self.origin + ( 0, 0, 32 ), level.waypoints[ self.bot.astar[ current ] ].origin, false, self ) ) > 1.0 )
 		{
 			while ( current >= 0 )
 			{
@@ -2469,7 +2469,7 @@ doWalk( goal, dist, isScriptGoal )
 	self.bot.second_next_wp = -1;
 	self notify( "finished_static_waypoints" );
 
-	if ( DistanceSquared( self.origin, goal ) > dist )
+	if ( distancesquared( self.origin, goal ) > dist )
 	{
 		self.bot.last_next_wp = -1;
 		self.bot.last_second_next_wp = -1;
@@ -2480,7 +2480,7 @@ doWalk( goal, dist, isScriptGoal )
 
 	wait 1;
 
-	if ( DistanceSquared( self.origin, goal ) > dist )
+	if ( distancesquared( self.origin, goal ) > dist )
 	{
 		self notify( "bad_path_internal" );
 	}
@@ -2491,7 +2491,7 @@ doWalk( goal, dist, isScriptGoal )
 */
 movetowards( goal )
 {
-	if ( !isDefined( goal ) )
+	if ( !isdefined( goal ) )
 	{
 		return;
 	}
@@ -2512,7 +2512,7 @@ movetowards( goal )
 		tempGoalDist = level.bots_goaldistance;
 	}
 
-	while ( distanceSquared( self.origin, goal ) > tempGoalDist )
+	while ( distancesquared( self.origin, goal ) > tempGoalDist )
 	{
 		self botSetMoveTo( goal );
 
@@ -2520,7 +2520,7 @@ movetowards( goal )
 		{
 			time = 0;
 
-			if ( distanceSquared( self.origin, lastOri ) < 32 * 32 )
+			if ( distancesquared( self.origin, lastOri ) < 32 * 32 )
 			{
 				self thread knife();
 				wait 0.5;
@@ -2547,17 +2547,17 @@ movetowards( goal )
 		}
 		else if ( time == 2000 )
 		{
-			if ( distanceSquared( self.origin, lastOri ) < 32 * 32 )
+			if ( distancesquared( self.origin, lastOri ) < 32 * 32 )
 			{
 				self crouch();
 			}
 		}
 		else if ( time == 1750 )
 		{
-			if ( distanceSquared( self.origin, lastOri ) < 32 * 32 )
+			if ( distancesquared( self.origin, lastOri ) < 32 * 32 )
 			{
 				// check if directly above or below
-				if ( abs( goal[ 2 ] - self.origin[ 2 ] ) > 64 && getConeDot( goal + ( 1, 1, 0 ), self.origin + ( -1, -1, 0 ), VectorToAngles( ( goal[ 0 ], goal[ 1 ], self.origin[ 2 ] ) - self.origin ) ) < 0.64 && DistanceSquared2D( self.origin, goal ) < 32 * 32 )
+				if ( abs( goal[ 2 ] - self.origin[ 2 ] ) > 64 && getConeDot( goal + ( 1, 1, 0 ), self.origin + ( -1, -1, 0 ), vectortoangles( ( goal[ 0 ], goal[ 1 ], self.origin[ 2 ] ) - self.origin ) ) < 0.64 && distancesquared2D( self.origin, goal ) < 32 * 32 )
 				{
 					stucks = 2;
 				}
@@ -2567,7 +2567,7 @@ movetowards( goal )
 		wait 0.05;
 		time += 50;
 
-		if ( lengthsquared( self getVelocity() ) < 1000 )
+		if ( lengthsquared( self getvelocity() ) < 1000 )
 		{
 			timeslow += 50;
 		}
@@ -2620,14 +2620,14 @@ getRandomLargestStafe( dist )
 	traces = NewHeap( ::HeapTraceFraction );
 	myOrg = self.origin + ( 0, 0, 16 );
 
-	traces HeapInsert( bulletTrace( myOrg, myOrg + ( -100 * dist, 0, 0 ), false, self ) );
-	traces HeapInsert( bulletTrace( myOrg, myOrg + ( 100 * dist, 0, 0 ), false, self ) );
-	traces HeapInsert( bulletTrace( myOrg, myOrg + ( 0, 100 * dist, 0 ), false, self ) );
-	traces HeapInsert( bulletTrace( myOrg, myOrg + ( 0, -100 * dist, 0 ), false, self ) );
-	traces HeapInsert( bulletTrace( myOrg, myOrg + ( -100 * dist, -100 * dist, 0 ), false, self ) );
-	traces HeapInsert( bulletTrace( myOrg, myOrg + ( -100 * dist, 100 * dist, 0 ), false, self ) );
-	traces HeapInsert( bulletTrace( myOrg, myOrg + ( 100 * dist, -100 * dist, 0 ), false, self ) );
-	traces HeapInsert( bulletTrace( myOrg, myOrg + ( 100 * dist, 100 * dist, 0 ), false, self ) );
+	traces HeapInsert( bullettrace( myOrg, myOrg + ( -100 * dist, 0, 0 ), false, self ) );
+	traces HeapInsert( bullettrace( myOrg, myOrg + ( 100 * dist, 0, 0 ), false, self ) );
+	traces HeapInsert( bullettrace( myOrg, myOrg + ( 0, 100 * dist, 0 ), false, self ) );
+	traces HeapInsert( bullettrace( myOrg, myOrg + ( 0, -100 * dist, 0 ), false, self ) );
+	traces HeapInsert( bullettrace( myOrg, myOrg + ( -100 * dist, -100 * dist, 0 ), false, self ) );
+	traces HeapInsert( bullettrace( myOrg, myOrg + ( -100 * dist, 100 * dist, 0 ), false, self ) );
+	traces HeapInsert( bullettrace( myOrg, myOrg + ( 100 * dist, -100 * dist, 0 ), false, self ) );
+	traces HeapInsert( bullettrace( myOrg, myOrg + ( 100 * dist, 100 * dist, 0 ), false, self ) );
 
 	toptraces = [];
 
@@ -2641,7 +2641,7 @@ getRandomLargestStafe( dist )
 		traces HeapRemove();
 	}
 
-	return toptraces[ randomInt( toptraces.size ) ][ "position" ];
+	return toptraces[ randomint( toptraces.size ) ][ "position" ];
 }
 
 /*
@@ -2683,14 +2683,14 @@ do_knife_target( target )
 	self endon( "disconnect" );
 	self endon( "bot_knife" );
 
-	if ( !getDvarInt( "aim_automelee_enabled" ) || !self isOnGround() || self GetStance() == "prone" || self InLastStand() )
+	if ( !getdvarint( "aim_automelee_enabled" ) || !self isonground() || self getstance() == "prone" || self inLastStand() )
 	{
 		self.bot.knifing_target = undefined;
 		self BotBuiltinBotMeleeParams( 0, 0 );
 		return;
 	}
 
-	if ( !isDefined( target ) || !isPlayer( target ) )
+	if ( !isdefined( target ) || !isplayer( target ) )
 	{
 		self.bot.knifing_target = undefined;
 		self BotBuiltinBotMeleeParams( 0, 0 );
@@ -2699,7 +2699,7 @@ do_knife_target( target )
 
 	dist = distance( target.origin, self.origin );
 
-	if ( !self _hasPerk( "specialty_extendedmelee" ) && dist > getDvarFloat( "aim_automelee_range" ) )
+	if ( !self _hasperk( "specialty_extendedmelee" ) && dist > getdvarfloat( "aim_automelee_range" ) )
 	{
 		self.bot.knifing_target = undefined;
 		self BotBuiltinBotMeleeParams( 0, 0 );
@@ -2708,7 +2708,7 @@ do_knife_target( target )
 
 	self.bot.knifing_target = target;
 
-	angles = VectorToAngles( target.origin - self.origin );
+	angles = vectortoangles( target.origin - self.origin );
 	self BotBuiltinBotMeleeParams( angles[ 1 ], dist );
 
 	wait 1;
@@ -2768,7 +2768,7 @@ frag( time )
 	self notify( "bot_frag" );
 	self endon( "bot_frag" );
 
-	if ( !isDefined( time ) )
+	if ( !isdefined( time ) )
 	{
 		time = 0.05;
 	}
@@ -2799,7 +2799,7 @@ smoke( time )
 	self notify( "bot_smoke" );
 	self endon( "bot_smoke" );
 
-	if ( !isDefined( time ) )
+	if ( !isdefined( time ) )
 	{
 		time = 0.05;
 	}
@@ -2830,7 +2830,7 @@ use( time )
 	self notify( "bot_use" );
 	self endon( "bot_use" );
 
-	if ( !isDefined( time ) )
+	if ( !isdefined( time ) )
 	{
 		time = 0.05;
 	}
@@ -2872,7 +2872,7 @@ pressFire( time )
 	self notify( "bot_fire" );
 	self endon( "bot_fire" );
 
-	if ( !isDefined( time ) )
+	if ( !isdefined( time ) )
 	{
 		time = 0.05;
 	}
@@ -2914,7 +2914,7 @@ pressADS( time )
 	self notify( "bot_ads" );
 	self endon( "bot_ads" );
 
-	if ( !isDefined( time ) )
+	if ( !isdefined( time ) )
 	{
 		time = 0.05;
 	}
@@ -2939,12 +2939,12 @@ jump()
 	self notify( "bot_jump" );
 	self endon( "bot_jump" );
 
-	if ( self IsUsingRemote() )
+	if ( self isusingremote() )
 	{
 		return;
 	}
 
-	if ( self getStance() != "stand" )
+	if ( self getstance() != "stand" )
 	{
 		self stand();
 		wait 1;
@@ -2960,7 +2960,7 @@ jump()
 */
 stand()
 {
-	if ( self IsUsingRemote() )
+	if ( self isusingremote() )
 	{
 		return;
 	}
@@ -2974,7 +2974,7 @@ stand()
 */
 crouch()
 {
-	if ( self IsUsingRemote() )
+	if ( self isusingremote() )
 	{
 		return;
 	}
@@ -2988,7 +2988,7 @@ crouch()
 */
 prone()
 {
-	if ( self IsUsingRemote() || self.hasriotshieldequipped )
+	if ( self isusingremote() || self.hasriotshieldequipped )
 	{
 		return;
 	}
@@ -3012,21 +3012,21 @@ botGetThirdPersonOffset( angles )
 {
 	offset = ( 0, 0, 0 );
 
-	if ( getDvarInt( "camera_thirdPerson" ) )
+	if ( getdvarint( "camera_thirdPerson" ) )
 	{
-		offset = getDvarVector( "camera_thirdPersonOffset" );
+		offset = getdvarvector( "camera_thirdPersonOffset" );
 
-		if ( self playerAds() >= 1 )
+		if ( self playerads() >= 1 )
 		{
-			curweap = self getCurrentWeapon();
+			curweap = self getcurrentweapon();
 
-			if ( ( isSubStr( curweap, "thermal_" ) || weaponClass( curweap ) == "sniper" ) && !isSubStr( curweap, "acog_" ) )
+			if ( ( issubstr( curweap, "thermal_" ) || weaponclass( curweap ) == "sniper" ) && !issubstr( curweap, "acog_" ) )
 			{
 				offset = ( 0, 0, 0 );
 			}
 			else
 			{
-				offset = getDvarVector( "camera_thirdPersonOffsetAds" );
+				offset = getdvarvector( "camera_thirdPersonOffsetAds" );
 			}
 		}
 
@@ -3055,27 +3055,27 @@ bot_lookat( pos, time, vel, doAimPredict )
 	self endon( "spawned_player" );
 	level endon ( "game_ended" );
 
-	if ( level.gameended || !gameFlag( "prematch_done" ) || self.bot.isfrozen || !getDvarInt( "bots_play_aim" ) )
+	if ( level.gameended || !gameflag( "prematch_done" ) || self.bot.isfrozen || !getdvarint( "bots_play_aim" ) )
 	{
 		return;
 	}
 
-	if ( !isDefined( pos ) )
+	if ( !isdefined( pos ) )
 	{
 		return;
 	}
 
-	if ( !isDefined( doAimPredict ) )
+	if ( !isdefined( doAimPredict ) )
 	{
 		doAimPredict = false;
 	}
 
-	if ( !isDefined( time ) )
+	if ( !isdefined( time ) )
 	{
 		time = 0.05;
 	}
 
-	if ( !isDefined( vel ) )
+	if ( !isdefined( vel ) )
 	{
 		vel = ( 0, 0, 0 );
 	}
@@ -3087,30 +3087,30 @@ bot_lookat( pos, time, vel, doAimPredict )
 		steps = 1;
 	}
 
-	myAngle = self getPlayerAngles();
+	myAngle = self getplayerangles();
 
-	myEye = self GetEye(); // get our eye pos
+	myEye = self geteye(); // get our eye pos
 	myEye += self botGetThirdPersonOffset( myAngle ); // account for third person
 
 	if ( doAimPredict )
 	{
-		myEye += ( self getVelocity() * 0.05 ) * ( steps - 1 ); // account for our velocity
+		myEye += ( self getvelocity() * 0.05 ) * ( steps - 1 ); // account for our velocity
 
 		pos += ( vel * 0.05 ) * ( steps - 1 ); // add the velocity vector
 	}
 
-	angles = VectorToAngles( ( pos - myEye ) - anglesToForward( myAngle ) );
+	angles = vectortoangles( ( pos - myEye ) - anglestoforward( myAngle ) );
 
-	X = AngleClamp180( angles[ 0 ] - myAngle[ 0 ] );
+	X = angleclamp180( angles[ 0 ] - myAngle[ 0 ] );
 	X = X / steps;
 
-	Y = AngleClamp180( angles[ 1 ] - myAngle[ 1 ] );
+	Y = angleclamp180( angles[ 1 ] - myAngle[ 1 ] );
 	Y = Y / steps;
 
 	for ( i = 0; i < steps; i++ )
 	{
-		myAngle = ( AngleClamp180( myAngle[ 0 ] + X ), AngleClamp180( myAngle[ 1 ] + Y ), 0 );
-		self setPlayerAngles( myAngle );
+		myAngle = ( angleclamp180( myAngle[ 0 ] + X ), angleclamp180( myAngle[ 1 ] + Y ), 0 );
+		self setplayerangles( myAngle );
 		wait 0.05;
 	}
 }

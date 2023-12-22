@@ -12,12 +12,12 @@
 
 init()
 {
-	if ( getDvar( "bots_main_menu" ) == "" )
+	if ( getdvar( "bots_main_menu" ) == "" )
 	{
-		setDvar( "bots_main_menu", true );
+		setdvar( "bots_main_menu", true );
 	}
 
-	if ( !getDvarInt( "bots_main_menu" ) )
+	if ( !getdvarint( "bots_main_menu" ) )
 	{
 		return;
 	}
@@ -31,7 +31,7 @@ watchPlayers()
 	{
 		wait 1;
 
-		if ( !getDvarInt( "bots_main_menu" ) )
+		if ( !getdvarint( "bots_main_menu" ) )
 		{
 			return;
 		}
@@ -45,7 +45,7 @@ watchPlayers()
 				continue;
 			}
 
-			if ( isDefined( player.menuinit ) && player.menuinit )
+			if ( isdefined( player.menuinit ) && player.menuinit )
 			{
 				continue;
 			}
@@ -69,7 +69,7 @@ init_menu()
 	self.menu_player = undefined;
 	self.submenu = "Main";
 	self.curs[ "Main" ][ "X" ] = 0;
-	self AddOptions();
+	self addOptions();
 
 	self thread watchPlayerOpenMenu();
 	self thread MenuSelect();
@@ -89,42 +89,42 @@ watchDisconnect()
 
 	if ( self.menuopen )
 	{
-		if ( isDefined( self.menutexty ) )
+		if ( isdefined( self.menutexty ) )
 		{
 			for ( i = 0; i < self.menutexty.size; i++ )
 			{
-				if ( isDefined( self.menutexty[ i ] ) )
+				if ( isdefined( self.menutexty[ i ] ) )
 				{
 					self.menutexty[ i ] destroy();
 				}
 			}
 		}
 
-		if ( isDefined( self.menutext ) )
+		if ( isdefined( self.menutext ) )
 		{
 			for ( i = 0; i < self.menutext.size; i++ )
 			{
-				if ( isDefined( self.menutext[ i ] ) )
+				if ( isdefined( self.menutext[ i ] ) )
 				{
 					self.menutext[ i ] destroy();
 				}
 			}
 		}
 
-		if ( isDefined( self.menu ) && isDefined( self.menu[ "X" ] ) )
+		if ( isdefined( self.menu ) && isdefined( self.menu[ "X" ] ) )
 		{
-			if ( isDefined( self.menu[ "X" ][ "Shader" ] ) )
+			if ( isdefined( self.menu[ "X" ][ "Shader" ] ) )
 			{
 				self.menu[ "X" ][ "Shader" ] destroy();
 			}
 
-			if ( isDefined( self.menu[ "X" ][ "Scroller" ] ) )
+			if ( isdefined( self.menu[ "X" ][ "Scroller" ] ) )
 			{
 				self.menu[ "X" ][ "Scroller" ] destroy();
 			}
 		}
 
-		if ( isDefined( self.menuversionhud ) )
+		if ( isdefined( self.menuversionhud ) )
 		{
 			self.menuversionhud destroy();
 		}
@@ -136,9 +136,9 @@ doGreetings()
 	self endon ( "disconnect" );
 	self endon ( "bots_kill_menu" );
 	wait 1;
-	self iPrintln( "Welcome to Bot Warfare " + self.name + "!" );
+	self iprintln( "Welcome to Bot Warfare " + self.name + "!" );
 	wait 5;
-	self iPrintln( "Press [{+actionslot 2}] to open menu!" );
+	self iprintln( "Press [{+actionslot 2}] to open menu!" );
 }
 
 watchPlayerOpenMenu()
@@ -146,7 +146,7 @@ watchPlayerOpenMenu()
 	self endon ( "disconnect" );
 	self endon ( "bots_kill_menu" );
 
-	self notifyOnPlayerCommand( "bots_open_menu", "+actionslot 2" );
+	self notifyonplayercommand( "bots_open_menu", "+actionslot 2" );
 
 	for ( ;; )
 	{
@@ -154,12 +154,12 @@ watchPlayerOpenMenu()
 
 		if ( !self.menuopen )
 		{
-			self playLocalSound( "mouse_click" );
+			self playlocalsound( "mouse_click" );
 			self thread OpenSub( self.submenu );
 		}
 		else
 		{
-			self playLocalSound( "mouse_click" );
+			self playlocalsound( "mouse_click" );
 
 			if ( self.submenu != "Main" )
 			{
@@ -169,9 +169,9 @@ watchPlayerOpenMenu()
 			{
 				self ExitMenu();
 
-				if ( !gameFlag( "prematch_done" ) || level.gameended )
+				if ( !gameflag( "prematch_done" ) || level.gameended )
 				{
-					self freezeControls( true );
+					self freezecontrols( true );
 				}
 				else
 				{
@@ -187,7 +187,7 @@ MenuSelect()
 	self endon ( "disconnect" );
 	self endon ( "bots_kill_menu" );
 
-	self notifyOnPlayerCommand( "bots_select", "+gostand" );
+	self notifyonplayercommand( "bots_select", "+gostand" );
 
 	for ( ;; )
 	{
@@ -195,7 +195,7 @@ MenuSelect()
 
 		if ( self.menuopen )
 		{
-			self playLocalSound( "mouse_click" );
+			self playlocalsound( "mouse_click" );
 
 			if ( self.submenu == "Main" )
 			{
@@ -214,7 +214,7 @@ LeftMenu()
 	self endon ( "disconnect" );
 	self endon ( "bots_kill_menu" );
 
-	self notifyOnPlayerCommand( "bots_left", "+moveleft" );
+	self notifyonplayercommand( "bots_left", "+moveleft" );
 
 	for ( ;; )
 	{
@@ -222,7 +222,7 @@ LeftMenu()
 
 		if ( self.menuopen && self.submenu == "Main" )
 		{
-			self playLocalSound( "mouse_over" );
+			self playlocalsound( "mouse_over" );
 			self.curs[ "Main" ][ "X" ]--;
 
 			if ( self.curs[ "Main" ][ "X" ] < 0 )
@@ -240,7 +240,7 @@ RightMenu()
 	self endon ( "disconnect" );
 	self endon ( "bots_kill_menu" );
 
-	self notifyOnPlayerCommand( "bots_right", "+moveright" );
+	self notifyonplayercommand( "bots_right", "+moveright" );
 
 	for ( ;; )
 	{
@@ -248,7 +248,7 @@ RightMenu()
 
 		if ( self.menuopen && self.submenu == "Main" )
 		{
-			self playLocalSound( "mouse_over" );
+			self playlocalsound( "mouse_over" );
 			self.curs[ "Main" ][ "X" ]++;
 
 			if ( self.curs[ "Main" ][ "X" ] > self.option[ "Name" ][ self.submenu ].size - 1 )
@@ -266,7 +266,7 @@ UpMenu()
 	self endon ( "disconnect" );
 	self endon ( "bots_kill_menu" );
 
-	self notifyOnPlayerCommand( "bots_up", "+forward" );
+	self notifyonplayercommand( "bots_up", "+forward" );
 
 	for ( ;; )
 	{
@@ -274,7 +274,7 @@ UpMenu()
 
 		if ( self.menuopen && self.submenu != "Main" )
 		{
-			self playLocalSound( "mouse_over" );
+			self playlocalsound( "mouse_over" );
 			self.curs[ self.submenu ][ "Y" ]--;
 
 			if ( self.curs[ self.submenu ][ "Y" ] < 0 )
@@ -292,7 +292,7 @@ DownMenu()
 	self endon ( "disconnect" );
 	self endon ( "bots_kill_menu" );
 
-	self notifyOnPlayerCommand( "bots_down", "+back" );
+	self notifyonplayercommand( "bots_down", "+back" );
 
 	for ( ;; )
 	{
@@ -300,7 +300,7 @@ DownMenu()
 
 		if ( self.menuopen && self.submenu != "Main" )
 		{
-			self playLocalSound( "mouse_over" );
+			self playlocalsound( "mouse_over" );
 			self.curs[ self.submenu ][ "Y" ]++;
 
 			if ( self.curs[ self.submenu ][ "Y" ] > self.option[ "Name" ][ self.submenu ].size - 1 )
@@ -315,42 +315,42 @@ DownMenu()
 
 OpenSub( menu, menu2 )
 {
-	if ( menu != "Main" && ( !isDefined( self.menu[ menu ] ) || !!isDefined( self.menu[ menu ][ "FirstOpen" ] ) ) )
+	if ( menu != "Main" && ( !isdefined( self.menu[ menu ] ) || !!isdefined( self.menu[ menu ][ "FirstOpen" ] ) ) )
 	{
 		self.curs[ menu ][ "Y" ] = 0;
 		self.menu[ menu ][ "FirstOpen" ] = true;
 	}
 
-	logoldi = true;
+	logOldi = true;
 	self.submenu = menu;
 
 	if ( self.submenu == "Main" )
 	{
-		if ( isDefined( self.menutext ) )
+		if ( isdefined( self.menutext ) )
 		{
 			for ( i = 0; i < self.menutext.size; i++ )
 			{
-				if ( isDefined( self.menutext[ i ] ) )
+				if ( isdefined( self.menutext[ i ] ) )
 				{
 					self.menutext[ i ] destroy();
 				}
 			}
 		}
 
-		if ( isDefined( self.menu ) && isDefined( self.menu[ "X" ] ) )
+		if ( isdefined( self.menu ) && isdefined( self.menu[ "X" ] ) )
 		{
-			if ( isDefined( self.menu[ "X" ][ "Shader" ] ) )
+			if ( isdefined( self.menu[ "X" ][ "Shader" ] ) )
 			{
 				self.menu[ "X" ][ "Shader" ] destroy();
 			}
 
-			if ( isDefined( self.menu[ "X" ][ "Scroller" ] ) )
+			if ( isdefined( self.menu[ "X" ][ "Scroller" ] ) )
 			{
 				self.menu[ "X" ][ "Scroller" ] destroy();
 			}
 		}
 
-		if ( isDefined( self.menuversionhud ) )
+		if ( isdefined( self.menuversionhud ) )
 		{
 			self.menuversionhud destroy();
 		}
@@ -396,11 +396,11 @@ OpenSub( menu, menu2 )
 	}
 	else
 	{
-		if ( isDefined( self.menutexty ) )
+		if ( isdefined( self.menutexty ) )
 		{
 			for ( i = 0 ; i < self.menutexty.size ; i++ )
 			{
-				if ( isDefined( self.menutexty[ i ] ) )
+				if ( isdefined( self.menutexty[ i ] ) )
 				{
 					self.menutexty[ i ] destroy();
 				}
@@ -429,11 +429,11 @@ CursMove( direction )
 		self.menu[ "X" ][ "Scroller" ].x = self.menutext[ self.curs[ "Main" ][ "X" ] ].x;
 		self.menu[ "X" ][ "Scroller" ].y = self.menutext[ self.curs[ "Main" ][ "X" ] ].y;
 
-		if ( isDefined( self.menutext ) )
+		if ( isdefined( self.menutext ) )
 		{
 			for ( i = 0; i < self.menutext.size; i++ )
 			{
-				if ( isDefined( self.menutext[ i ] ) )
+				if ( isdefined( self.menutext[ i ] ) )
 				{
 					self.menutext[ i ].fontscale = 1.5;
 					self.menutext[ i ].color = ( 1, 1, 1 );
@@ -446,11 +446,11 @@ CursMove( direction )
 	}
 	else
 	{
-		if ( isDefined( self.menutexty ) )
+		if ( isdefined( self.menutexty ) )
 		{
 			for ( i = 0; i < self.menutexty.size; i++ )
 			{
-				if ( isDefined( self.menutexty[ i ] ) )
+				if ( isdefined( self.menutexty[ i ] ) )
 				{
 					self.menutexty[ i ].fontscale = 1.5;
 					self.menutexty[ i ].color = ( 1, 1, 1 );
@@ -459,11 +459,11 @@ CursMove( direction )
 			}
 		}
 
-		if ( isDefined( self.menutext ) )
+		if ( isdefined( self.menutext ) )
 		{
 			for ( i = 0; i < self.menutext.size; i++ )
 			{
-				if ( isDefined( self.menutext[ i ] ) )
+				if ( isdefined( self.menutext[ i ] ) )
 				{
 					self.menutext[ i ].fontscale = 1.5;
 					self.menutext[ i ].color = ( 1, 1, 1 );
@@ -485,7 +485,7 @@ ShowOptionOn( variable )
 
 	for ( time = 0;; time += 0.05 )
 	{
-		if ( !self isOnGround() && isAlive( self ) && gameFlag( "prematch_done" ) && !level.gameended )
+		if ( !self isonground() && isalive( self ) && gameflag( "prematch_done" ) && !level.gameended )
 		{
 			self freezecontrols( false );
 		}
@@ -494,31 +494,31 @@ ShowOptionOn( variable )
 			self freezecontrols( true );
 		}
 
-		self setClientDvar( "r_blur", "5" );
-		self setClientDvar( "sc_blur", "15" );
+		self setclientdvar( "r_blur", "5" );
+		self setclientdvar( "sc_blur", "15" );
 		self addOptions();
 
 		if ( self.submenu == "Main" )
 		{
-			if ( isDefined( self.curs[ self.submenu ][ variable ] ) && isDefined( self.menutext ) && isDefined( self.menutext[ self.curs[ self.submenu ][ variable ] ] ) )
+			if ( isdefined( self.curs[ self.submenu ][ variable ] ) && isdefined( self.menutext ) && isdefined( self.menutext[ self.curs[ self.submenu ][ variable ] ] ) )
 			{
 				self.menutext[ self.curs[ self.submenu ][ variable ] ].fontscale = 2.0;
-				// self.menutext[ self.curs[ self.submenu ][ variable ] ].color = (randomInt(256)/255, randomInt(256)/255, randomInt(256)/255);
-				color = ( 6 / 255, 69 / 255, 173 + randomIntRange( -5, 5 ) / 255 );
+				// self.menutext[ self.curs[ self.submenu ][ variable ] ].color = (randomint(256)/255, randomint(256)/255, randomint(256)/255);
+				color = ( 6 / 255, 69 / 255, 173 + randomintrange( -5, 5 ) / 255 );
 
 				if ( int( time * 4 ) % 2 )
 				{
-					color = ( 11 / 255, 0 / 255, 128 + randomIntRange( -10, 10 ) / 255 );
+					color = ( 11 / 255, 0 / 255, 128 + randomintrange( -10, 10 ) / 255 );
 				}
 
 				self.menutext[ self.curs[ self.submenu ][ variable ] ].color = color;
 			}
 
-			if ( isDefined( self.menutext ) )
+			if ( isdefined( self.menutext ) )
 			{
 				for ( i = 0; i < self.option[ "Name" ][ self.submenu ].size; i++ )
 				{
-					if ( isDefined( self.menutext[ i ] ) )
+					if ( isdefined( self.menutext[ i ] ) )
 					{
 						self.menutext[ i ] settext( self.option[ "Name" ][ self.submenu ][ i ] );
 					}
@@ -527,25 +527,25 @@ ShowOptionOn( variable )
 		}
 		else
 		{
-			if ( isDefined( self.curs[ self.submenu ][ variable ] ) && isDefined( self.menutexty ) && isDefined( self.menutexty[ self.curs[ self.submenu ][ variable ] ] ) )
+			if ( isdefined( self.curs[ self.submenu ][ variable ] ) && isdefined( self.menutexty ) && isdefined( self.menutexty[ self.curs[ self.submenu ][ variable ] ] ) )
 			{
 				self.menutexty[ self.curs[ self.submenu ][ variable ] ].fontscale = 2.0;
-				// self.menutexty[ self.curs[ self.submenu ][ variable ] ].color = (randomInt(256)/255, randomInt(256)/255, randomInt(256)/255);
-				color = ( 6 / 255, 69 / 255, 173 + randomIntRange( -5, 5 ) / 255 );
+				// self.menutexty[ self.curs[ self.submenu ][ variable ] ].color = (randomint(256)/255, randomint(256)/255, randomint(256)/255);
+				color = ( 6 / 255, 69 / 255, 173 + randomintrange( -5, 5 ) / 255 );
 
 				if ( int( time * 4 ) % 2 )
 				{
-					color = ( 11 / 255, 0 / 255, 128 + randomIntRange( -10, 10 ) / 255 );
+					color = ( 11 / 255, 0 / 255, 128 + randomintrange( -10, 10 ) / 255 );
 				}
 
 				self.menutexty[ self.curs[ self.submenu ][ variable ] ].color = color;
 			}
 
-			if ( isDefined( self.menutexty ) )
+			if ( isdefined( self.menutexty ) )
 			{
 				for ( i = 0; i < self.option[ "Name" ][ self.submenu ].size; i++ )
 				{
-					if ( isDefined( self.menutexty[ i ] ) )
+					if ( isdefined( self.menutexty[ i ] ) )
 					{
 						self.menutexty[ i ] settext( self.option[ "Name" ][ self.submenu ][ i ] );
 					}
@@ -572,11 +572,11 @@ AddBack( menu, back )
 
 ExitSub()
 {
-	if ( isDefined( self.menutexty ) )
+	if ( isdefined( self.menutexty ) )
 	{
 		for ( i = 0; i < self.menutexty.size; i++ )
 		{
-			if ( isDefined( self.menutexty[ i ] ) )
+			if ( isdefined( self.menutexty[ i ] ) )
 			{
 				self.menutexty[ i ] destroy();
 			}
@@ -597,31 +597,31 @@ ExitSub()
 
 ExitMenu()
 {
-	if ( isDefined( self.menutext ) )
+	if ( isdefined( self.menutext ) )
 	{
 		for ( i = 0; i < self.menutext.size; i++ )
 		{
-			if ( isDefined( self.menutext[ i ] ) )
+			if ( isdefined( self.menutext[ i ] ) )
 			{
 				self.menutext[ i ] destroy();
 			}
 		}
 	}
 
-	if ( isDefined( self.menu ) && isDefined( self.menu[ "X" ] ) )
+	if ( isdefined( self.menu ) && isdefined( self.menu[ "X" ] ) )
 	{
-		if ( isDefined( self.menu[ "X" ][ "Shader" ] ) )
+		if ( isdefined( self.menu[ "X" ][ "Shader" ] ) )
 		{
 			self.menu[ "X" ][ "Shader" ] destroy();
 		}
 
-		if ( isDefined( self.menu[ "X" ][ "Scroller" ] ) )
+		if ( isdefined( self.menu[ "X" ][ "Scroller" ] ) )
 		{
 			self.menu[ "X" ][ "Scroller" ] destroy();
 		}
 	}
 
-	if ( isDefined( self.menuversionhud ) )
+	if ( isdefined( self.menuversionhud ) )
 	{
 		self.menuversionhud destroy();
 	}
@@ -629,14 +629,14 @@ ExitMenu()
 	self.menuopen = false;
 	self notify( "exit" );
 
-	self setClientDvar( "r_blur", "0" );
-	self setClientDvar( "sc_blur", "2" );
+	self setclientdvar( "r_blur", "0" );
+	self setclientdvar( "sc_blur", "2" );
 }
 
 initHudElem( txt, xl, yl )
 {
-	hud = NewClientHudElem( self );
-	hud setText( txt );
+	hud = newclienthudelem( self );
+	hud settext( txt );
 	hud.alignx = "center";
 	hud.aligny = "bottom";
 	hud.horzalign = "center";
@@ -657,7 +657,7 @@ initHudElem( txt, xl, yl )
 
 createRectangle( align, relative, x, y, width, height, color, sort, alpha, shader )
 {
-	barElemBG = newClientHudElem( self );
+	barElemBG = newclienthudelem( self );
 	barElemBG.elemtype = "bar_";
 	barElemBG.width = width;
 	barElemBG.height = height;
@@ -669,20 +669,20 @@ createRectangle( align, relative, x, y, width, height, color, sort, alpha, shade
 	barElemBG.sort = sort;
 	barElemBG.color = color;
 	barElemBG.alpha = alpha;
-	barElemBG setParent( level.uiparent );
-	barElemBG setShader( shader, width, height );
+	barElemBG setparent( level.uiparent );
+	barElemBG setshader( shader, width, height );
 	barElemBG.hidden = false;
-	barElemBG setPoint( align, relative, x, y );
+	barElemBG setpoint( align, relative, x, y );
 	return barElemBG;
 }
 
-AddOptions()
+addOptions()
 {
 	self AddMenu( "Main", 0, "Manage bots", ::OpenSub, "man_bots", "" );
 	self AddBack( "man_bots", "Main" );
 
 	_temp = "";
-	_tempDvar = getDvarInt( "bots_manage_add" );
+	_tempDvar = getdvarint( "bots_manage_add" );
 	self AddMenu( "man_bots", 0, "Add 1 bot", ::man_bots, "add", 1 + _tempDvar );
 	self AddMenu( "man_bots", 1, "Add 3 bot", ::man_bots, "add", 3 + _tempDvar );
 	self AddMenu( "man_bots", 2, "Add 7 bot", ::man_bots, "add", 7 + _tempDvar );
@@ -691,7 +691,7 @@ AddOptions()
 	self AddMenu( "man_bots", 5, "Kick a bot", ::man_bots, "kick", 1 );
 	self AddMenu( "man_bots", 6, "Kick all bots", ::man_bots, "kick", getBotArray().size );
 
-	_tempDvar = getDvarInt( "bots_manage_fill_kick" );
+	_tempDvar = getdvarint( "bots_manage_fill_kick" );
 
 	if ( _tempDvar )
 	{
@@ -704,7 +704,7 @@ AddOptions()
 
 	self AddMenu( "man_bots", 7, "Toggle auto bot kicking: " + _temp, ::man_bots, "autokick", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_manage_fill_mode" );
+	_tempDvar = getdvarint( "bots_manage_fill_mode" );
 
 	switch ( _tempDvar )
 	{
@@ -735,11 +735,11 @@ AddOptions()
 
 	self AddMenu( "man_bots", 8, "Change bot_fill_mode: " + _temp, ::man_bots, "fillmode", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_manage_fill" );
+	_tempDvar = getdvarint( "bots_manage_fill" );
 	self AddMenu( "man_bots", 9, "Increase bots to keep in-game: " + _tempDvar, ::man_bots, "fillup", _tempDvar );
 	self AddMenu( "man_bots", 10, "Decrease bots to keep in-game: " + _tempDvar, ::man_bots, "filldown", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_manage_fill_spec" );
+	_tempDvar = getdvarint( "bots_manage_fill_spec" );
 
 	if ( _tempDvar )
 	{
@@ -760,11 +760,11 @@ AddOptions()
 	_tempDvar = getdvar( "bots_team" );
 	self AddMenu( "man_team", 0, "Change bot team: " + _tempDvar, ::bot_teams, "team", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_team_amount" );
+	_tempDvar = getdvarint( "bots_team_amount" );
 	self AddMenu( "man_team", 1, "Increase bots to be on axis team: " + _tempDvar, ::bot_teams, "teamup", _tempDvar );
 	self AddMenu( "man_team", 2, "Decrease bots to be on axis team: " + _tempDvar, ::bot_teams, "teamdown", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_team_force" );
+	_tempDvar = getdvarint( "bots_team_force" );
 
 	if ( _tempDvar )
 	{
@@ -777,7 +777,7 @@ AddOptions()
 
 	self AddMenu( "man_team", 3, "Toggle forcing bots on team: " + _temp, ::bot_teams, "teamforce", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_team_mode" );
+	_tempDvar = getdvarint( "bots_team_mode" );
 
 	if ( _tempDvar )
 	{
@@ -841,19 +841,19 @@ AddOptions()
 
 	self AddMenu( "man_team", 5, "Change bot difficulty: " + _temp, ::bot_teams, "skill", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_skill_axis_hard" );
+	_tempDvar = getdvarint( "bots_skill_axis_hard" );
 	self AddMenu( "man_team", 6, "Increase amount of hard bots on axis team: " + _tempDvar, ::bot_teams, "axishardup", _tempDvar );
 	self AddMenu( "man_team", 7, "Decrease amount of hard bots on axis team: " + _tempDvar, ::bot_teams, "axisharddown", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_skill_axis_med" );
+	_tempDvar = getdvarint( "bots_skill_axis_med" );
 	self AddMenu( "man_team", 8, "Increase amount of med bots on axis team: " + _tempDvar, ::bot_teams, "axismedup", _tempDvar );
 	self AddMenu( "man_team", 9, "Decrease amount of med bots on axis team: " + _tempDvar, ::bot_teams, "axismeddown", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_skill_allies_hard" );
+	_tempDvar = getdvarint( "bots_skill_allies_hard" );
 	self AddMenu( "man_team", 10, "Increase amount of hard bots on allies team: " + _tempDvar, ::bot_teams, "allieshardup", _tempDvar );
 	self AddMenu( "man_team", 11, "Decrease amount of hard bots on allies team: " + _tempDvar, ::bot_teams, "alliesharddown", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_skill_allies_med" );
+	_tempDvar = getdvarint( "bots_skill_allies_med" );
 	self AddMenu( "man_team", 12, "Increase amount of med bots on allies team: " + _tempDvar, ::bot_teams, "alliesmedup", _tempDvar );
 	self AddMenu( "man_team", 13, "Decrease amount of med bots on allies team: " + _tempDvar, ::bot_teams, "alliesmeddown", _tempDvar );
 
@@ -862,7 +862,7 @@ AddOptions()
 	self AddMenu( "Main", 2, "Bot settings", ::OpenSub, "set1", "" );
 	self AddBack( "set1", "Main" );
 
-	_tempDvar = getDvarInt( "bots_loadout_reasonable" );
+	_tempDvar = getdvarint( "bots_loadout_reasonable" );
 
 	if ( _tempDvar )
 	{
@@ -875,7 +875,7 @@ AddOptions()
 
 	self AddMenu( "set1", 0, "Bots use only good class setups: " + _temp, ::bot_func, "reasonable", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_loadout_allow_op" );
+	_tempDvar = getdvarint( "bots_loadout_allow_op" );
 
 	if ( _tempDvar )
 	{
@@ -888,7 +888,7 @@ AddOptions()
 
 	self AddMenu( "set1", 1, "Bots can use op and annoying class setups: " + _temp, ::bot_func, "op", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_move" );
+	_tempDvar = getdvarint( "bots_play_move" );
 
 	if ( _tempDvar )
 	{
@@ -901,7 +901,7 @@ AddOptions()
 
 	self AddMenu( "set1", 2, "Bots can move: " + _temp, ::bot_func, "move", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_knife" );
+	_tempDvar = getdvarint( "bots_play_knife" );
 
 	if ( _tempDvar )
 	{
@@ -914,7 +914,7 @@ AddOptions()
 
 	self AddMenu( "set1", 3, "Bots can knife: " + _temp, ::bot_func, "knife", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_fire" );
+	_tempDvar = getdvarint( "bots_play_fire" );
 
 	if ( _tempDvar )
 	{
@@ -927,7 +927,7 @@ AddOptions()
 
 	self AddMenu( "set1", 4, "Bots can fire: " + _temp, ::bot_func, "fire", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_nade" );
+	_tempDvar = getdvarint( "bots_play_nade" );
 
 	if ( _tempDvar )
 	{
@@ -940,7 +940,7 @@ AddOptions()
 
 	self AddMenu( "set1", 5, "Bots can nade: " + _temp, ::bot_func, "nade", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_take_carepackages" );
+	_tempDvar = getdvarint( "bots_play_take_carepackages" );
 
 	if ( _tempDvar )
 	{
@@ -953,7 +953,7 @@ AddOptions()
 
 	self AddMenu( "set1", 6, "Bots can take carepackages: " + _temp, ::bot_func, "care", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_obj" );
+	_tempDvar = getdvarint( "bots_play_obj" );
 
 	if ( _tempDvar )
 	{
@@ -966,7 +966,7 @@ AddOptions()
 
 	self AddMenu( "set1", 7, "Bots play the objective: " + _temp, ::bot_func, "obj", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_camp" );
+	_tempDvar = getdvarint( "bots_play_camp" );
 
 	if ( _tempDvar )
 	{
@@ -979,7 +979,7 @@ AddOptions()
 
 	self AddMenu( "set1", 8, "Bots can camp: " + _temp, ::bot_func, "camp", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_jumpdrop" );
+	_tempDvar = getdvarint( "bots_play_jumpdrop" );
 
 	if ( _tempDvar )
 	{
@@ -992,7 +992,7 @@ AddOptions()
 
 	self AddMenu( "set1", 9, "Bots can jump and dropshot: " + _temp, ::bot_func, "jump", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_target_other" );
+	_tempDvar = getdvarint( "bots_play_target_other" );
 
 	if ( _tempDvar )
 	{
@@ -1005,7 +1005,7 @@ AddOptions()
 
 	self AddMenu( "set1", 10, "Bots can target other script objects: " + _temp, ::bot_func, "targetother", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_killstreak" );
+	_tempDvar = getdvarint( "bots_play_killstreak" );
 
 	if ( _tempDvar )
 	{
@@ -1018,7 +1018,7 @@ AddOptions()
 
 	self AddMenu( "set1", 11, "Bots can use killstreaks: " + _temp, ::bot_func, "killstreak", _tempDvar );
 
-	_tempDvar = getDvarInt( "bots_play_ads" );
+	_tempDvar = getdvarint( "bots_play_ads" );
 
 	if ( _tempDvar )
 	{
@@ -1037,68 +1037,68 @@ bot_func( a, b )
 	switch ( a )
 	{
 		case "reasonable":
-			setDvar( "bots_loadout_reasonable", !b );
-			self iPrintln( "Bots using reasonable setups: " + !b );
+			setdvar( "bots_loadout_reasonable", !b );
+			self iprintln( "Bots using reasonable setups: " + !b );
 			break;
 
 		case "op":
-			setDvar( "bots_loadout_allow_op", !b );
-			self iPrintln( "Bots using op setups: " + !b );
+			setdvar( "bots_loadout_allow_op", !b );
+			self iprintln( "Bots using op setups: " + !b );
 			break;
 
 		case "move":
-			setDvar( "bots_play_move", !b );
-			self iPrintln( "Bots move: " + !b );
+			setdvar( "bots_play_move", !b );
+			self iprintln( "Bots move: " + !b );
 			break;
 
 		case "knife":
-			setDvar( "bots_play_knife", !b );
-			self iPrintln( "Bots knife: " + !b );
+			setdvar( "bots_play_knife", !b );
+			self iprintln( "Bots knife: " + !b );
 			break;
 
 		case "fire":
-			setDvar( "bots_play_fire", !b );
-			self iPrintln( "Bots fire: " + !b );
+			setdvar( "bots_play_fire", !b );
+			self iprintln( "Bots fire: " + !b );
 			break;
 
 		case "nade":
-			setDvar( "bots_play_nade", !b );
-			self iPrintln( "Bots nade: " + !b );
+			setdvar( "bots_play_nade", !b );
+			self iprintln( "Bots nade: " + !b );
 			break;
 
 		case "care":
-			setDvar( "bots_play_take_carepackages", !b );
-			self iPrintln( "Bots take carepackages: " + !b );
+			setdvar( "bots_play_take_carepackages", !b );
+			self iprintln( "Bots take carepackages: " + !b );
 			break;
 
 		case "obj":
-			setDvar( "bots_play_obj", !b );
-			self iPrintln( "Bots play the obj: " + !b );
+			setdvar( "bots_play_obj", !b );
+			self iprintln( "Bots play the obj: " + !b );
 			break;
 
 		case "camp":
-			setDvar( "bots_play_camp", !b );
-			self iPrintln( "Bots camp: " + !b );
+			setdvar( "bots_play_camp", !b );
+			self iprintln( "Bots camp: " + !b );
 			break;
 
 		case "jump":
-			setDvar( "bots_play_jumpdrop", !b );
-			self iPrintln( "Bots jump: " + !b );
+			setdvar( "bots_play_jumpdrop", !b );
+			self iprintln( "Bots jump: " + !b );
 			break;
 
 		case "targetother":
-			setDvar( "bots_play_target_other", !b );
-			self iPrintln( "Bots target other: " + !b );
+			setdvar( "bots_play_target_other", !b );
+			self iprintln( "Bots target other: " + !b );
 			break;
 
 		case "killstreak":
-			setDvar( "bots_play_killstreak", !b );
-			self iPrintln( "Bots use killstreaks: " + !b );
+			setdvar( "bots_play_killstreak", !b );
+			self iprintln( "Bots use killstreaks: " + !b );
 			break;
 
 		case "ads":
-			setDvar( "bots_play_ads", !b );
-			self iPrintln( "Bots ads: " + !b );
+			setdvar( "bots_play_ads", !b );
+			self iprintln( "Bots ads: " + !b );
 			break;
 	}
 }
@@ -1112,22 +1112,22 @@ bot_teams( a, b )
 			{
 				case "autoassign":
 					setdvar( "bots_team", "allies" );
-					self iPrintlnBold( "Changed bot team to allies." );
+					self iprintlnbold( "Changed bot team to allies." );
 					break;
 
 				case "allies":
 					setdvar( "bots_team", "axis" );
-					self iPrintlnBold( "Changed bot team to axis." );
+					self iprintlnbold( "Changed bot team to axis." );
 					break;
 
 				case "axis":
 					setdvar( "bots_team", "custom" );
-					self iPrintlnBold( "Changed bot team to custom." );
+					self iprintlnbold( "Changed bot team to custom." );
 					break;
 
 				default:
 					setdvar( "bots_team", "autoassign" );
-					self iPrintlnBold( "Changed bot team to autoassign." );
+					self iprintlnbold( "Changed bot team to autoassign." );
 					break;
 			}
 
@@ -1135,75 +1135,75 @@ bot_teams( a, b )
 
 		case "teamup":
 			setdvar( "bots_team_amount", b + 1 );
-			self iPrintln( ( b + 1 ) + " bot(s) will try to be on axis team." );
+			self iprintln( ( b + 1 ) + " bot(s) will try to be on axis team." );
 			break;
 
 		case "teamdown":
 			setdvar( "bots_team_amount", b - 1 );
-			self iPrintln( ( b - 1 ) + " bot(s) will try to be on axis team." );
+			self iprintln( ( b - 1 ) + " bot(s) will try to be on axis team." );
 			break;
 
 		case "teamforce":
-			setDvar( "bots_team_force", !b );
-			self iPrintln( "Forcing bots to team: " + !b );
+			setdvar( "bots_team_force", !b );
+			self iprintln( "Forcing bots to team: " + !b );
 			break;
 
 		case "teammode":
-			setDvar( "bots_team_mode", !b );
-			self iPrintln( "Only count bots on team: " + !b );
+			setdvar( "bots_team_mode", !b );
+			self iprintln( "Only count bots on team: " + !b );
 			break;
 
 		case "skill":
 			switch ( b )
 			{
 				case 0:
-					self iPrintlnBold( "Changed bot skill to easy." );
-					setDvar( "bots_skill", 1 );
+					self iprintlnbold( "Changed bot skill to easy." );
+					setdvar( "bots_skill", 1 );
 					break;
 
 				case 1:
-					self iPrintlnBold( "Changed bot skill to easy-med." );
-					setDvar( "bots_skill", 2 );
+					self iprintlnbold( "Changed bot skill to easy-med." );
+					setdvar( "bots_skill", 2 );
 					break;
 
 				case 2:
-					self iPrintlnBold( "Changed bot skill to medium." );
-					setDvar( "bots_skill", 3 );
+					self iprintlnbold( "Changed bot skill to medium." );
+					setdvar( "bots_skill", 3 );
 					break;
 
 				case 3:
-					self iPrintlnBold( "Changed bot skill to med-hard." );
-					setDvar( "bots_skill", 4 );
+					self iprintlnbold( "Changed bot skill to med-hard." );
+					setdvar( "bots_skill", 4 );
 					break;
 
 				case 4:
-					self iPrintlnBold( "Changed bot skill to hard." );
-					setDvar( "bots_skill", 5 );
+					self iprintlnbold( "Changed bot skill to hard." );
+					setdvar( "bots_skill", 5 );
 					break;
 
 				case 5:
-					self iPrintlnBold( "Changed bot skill to very hard." );
-					setDvar( "bots_skill", 6 );
+					self iprintlnbold( "Changed bot skill to very hard." );
+					setdvar( "bots_skill", 6 );
 					break;
 
 				case 6:
-					self iPrintlnBold( "Changed bot skill to hardest." );
-					setDvar( "bots_skill", 7 );
+					self iprintlnbold( "Changed bot skill to hardest." );
+					setdvar( "bots_skill", 7 );
 					break;
 
 				case 7:
-					self iPrintlnBold( "Changed bot skill to custom. Base is easy." );
-					setDvar( "bots_skill", 8 );
+					self iprintlnbold( "Changed bot skill to custom. Base is easy." );
+					setdvar( "bots_skill", 8 );
 					break;
 
 				case 8:
-					self iPrintlnBold( "Changed bot skill to complete random. Takes effect at restart." );
-					setDvar( "bots_skill", 9 );
+					self iprintlnbold( "Changed bot skill to complete random. Takes effect at restart." );
+					setdvar( "bots_skill", 9 );
 					break;
 
 				default:
-					self iPrintlnBold( "Changed bot skill to random. Takes effect at restart." );
-					setDvar( "bots_skill", 0 );
+					self iprintlnbold( "Changed bot skill to random. Takes effect at restart." );
+					setdvar( "bots_skill", 0 );
 					break;
 			}
 
@@ -1211,42 +1211,42 @@ bot_teams( a, b )
 
 		case "axishardup":
 			setdvar( "bots_skill_axis_hard", ( b + 1 ) );
-			self iPrintln( ( ( b + 1 ) ) + " hard bots will be on axis team." );
+			self iprintln( ( ( b + 1 ) ) + " hard bots will be on axis team." );
 			break;
 
 		case "axisharddown":
 			setdvar( "bots_skill_axis_hard", ( b - 1 ) );
-			self iPrintln( ( ( b - 1 ) ) + " hard bots will be on axis team." );
+			self iprintln( ( ( b - 1 ) ) + " hard bots will be on axis team." );
 			break;
 
 		case "axismedup":
 			setdvar( "bots_skill_axis_med", ( b + 1 ) );
-			self iPrintln( ( ( b + 1 ) ) + " med bots will be on axis team." );
+			self iprintln( ( ( b + 1 ) ) + " med bots will be on axis team." );
 			break;
 
 		case "axismeddown":
 			setdvar( "bots_skill_axis_med", ( b - 1 ) );
-			self iPrintln( ( ( b - 1 ) ) + " med bots will be on axis team." );
+			self iprintln( ( ( b - 1 ) ) + " med bots will be on axis team." );
 			break;
 
 		case "allieshardup":
 			setdvar( "bots_skill_allies_hard", ( b + 1 ) );
-			self iPrintln( ( ( b + 1 ) ) + " hard bots will be on allies team." );
+			self iprintln( ( ( b + 1 ) ) + " hard bots will be on allies team." );
 			break;
 
 		case "alliesharddown":
 			setdvar( "bots_skill_allies_hard", ( b - 1 ) );
-			self iPrintln( ( ( b - 1 ) ) + " hard bots will be on allies team." );
+			self iprintln( ( ( b - 1 ) ) + " hard bots will be on allies team." );
 			break;
 
 		case "alliesmedup":
 			setdvar( "bots_skill_allies_med", ( b + 1 ) );
-			self iPrintln( ( ( b + 1 ) ) + " med bots will be on allies team." );
+			self iprintln( ( ( b + 1 ) ) + " med bots will be on allies team." );
 			break;
 
 		case "alliesmeddown":
 			setdvar( "bots_skill_allies_med", ( b - 1 ) );
-			self iPrintln( ( ( b - 1 ) ) + " med bots will be on allies team." );
+			self iprintln( ( ( b - 1 ) ) + " med bots will be on allies team." );
 			break;
 	}
 }
@@ -1260,11 +1260,11 @@ man_bots( a, b )
 
 			if ( b == 1 )
 			{
-				self iPrintln( "Adding " + b + " bot." );
+				self iprintln( "Adding " + b + " bot." );
 			}
 			else
 			{
-				self iPrintln( "Adding " + b + " bots." );
+				self iprintln( "Adding " + b + " bots." );
 			}
 
 			break;
@@ -1276,9 +1276,9 @@ man_bots( a, b )
 			{
 				tempBot = random( getBotArray() );
 
-				if ( isDefined( tempBot ) )
+				if ( isdefined( tempBot ) )
 				{
-					kick( tempBot getEntityNumber(), "EXE_PLAYERKICKED" );
+					kick( tempBot getentitynumber(), "EXE_PLAYERKICKED" );
 					result = true;
 				}
 
@@ -1287,14 +1287,14 @@ man_bots( a, b )
 
 			if ( !result )
 			{
-				self iPrintln( "No bots to kick" );
+				self iprintln( "No bots to kick" );
 			}
 
 			break;
 
 		case "autokick":
-			setDvar( "bots_manage_fill_kick", !b );
-			self iPrintln( "Kicking bots when bots_fill is exceeded: " + !b );
+			setdvar( "bots_manage_fill_kick", !b );
+			self iprintln( "Kicking bots when bots_fill is exceeded: " + !b );
 			break;
 
 		case "fillmode":
@@ -1302,27 +1302,27 @@ man_bots( a, b )
 			{
 				case 0:
 					setdvar( "bots_manage_fill_mode", 1 );
-					self iPrintln( "bot_fill will now count only bots." );
+					self iprintln( "bot_fill will now count only bots." );
 					break;
 
 				case 1:
 					setdvar( "bots_manage_fill_mode", 2 );
-					self iPrintln( "bot_fill will now count everyone, adjusting to map." );
+					self iprintln( "bot_fill will now count everyone, adjusting to map." );
 					break;
 
 				case 2:
 					setdvar( "bots_manage_fill_mode", 3 );
-					self iPrintln( "bot_fill will now count only bots, adjusting to map." );
+					self iprintln( "bot_fill will now count only bots, adjusting to map." );
 					break;
 
 				case 3:
 					setdvar( "bots_manage_fill_mode", 4 );
-					self iPrintln( "bot_fill will now use bots as team balance." );
+					self iprintln( "bot_fill will now use bots as team balance." );
 					break;
 
 				default:
 					setdvar( "bots_manage_fill_mode", 0 );
-					self iPrintln( "bot_fill will now count everyone." );
+					self iprintln( "bot_fill will now count everyone." );
 					break;
 			}
 
@@ -1330,17 +1330,17 @@ man_bots( a, b )
 
 		case "fillup":
 			setdvar( "bots_manage_fill", b + 1 );
-			self iPrintln( "Increased to maintain " + ( b + 1 ) + " bot(s)." );
+			self iprintln( "Increased to maintain " + ( b + 1 ) + " bot(s)." );
 			break;
 
 		case "filldown":
 			setdvar( "bots_manage_fill", b - 1 );
-			self iPrintln( "Decreased to maintain " + ( b - 1 ) + " bot(s)." );
+			self iprintln( "Decreased to maintain " + ( b - 1 ) + " bot(s)." );
 			break;
 
 		case "fillspec":
-			setDvar( "bots_manage_fill_spec", !b );
-			self iPrintln( "Count players on spectator for bots_fill: " + !b );
+			setdvar( "bots_manage_fill_spec", !b );
+			self iprintln( "Count players on spectator for bots_fill: " + !b );
 			break;
 	}
 }
