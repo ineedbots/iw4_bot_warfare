@@ -161,15 +161,15 @@ start_killed_watch()
 	{
 		self waittill( "killed_enemy" );
 
-		if ( self.bots_lastKS < self.pers["cur_kill_streak"] )
+		if ( self.bots_lastKS < self.pers[ "cur_kill_streak" ] )
 		{
-			for ( i = self.bots_lastKS + 1; i <= self.pers["cur_kill_streak"]; i++ )
+			for ( i = self.bots_lastKS + 1; i <= self.pers[ "cur_kill_streak" ]; i++ )
 			{
 				self thread bot_chat_streak( i );
 			}
 		}
 
-		self.bots_lastKS = self.pers["cur_kill_streak"];
+		self.bots_lastKS = self.pers[ "cur_kill_streak" ];
 
 		self thread bot_chat_killed_watch( self.lastKilledPlayer );
 	}
@@ -572,18 +572,18 @@ endgame_chat()
 
 	for ( i = 0; i < level.players.size; i++ )
 	{
-		player = level.players[i];
+		player = level.players[ i ];
 
-		if ( player.pers["score"] > b )
+		if ( player.pers[ "score" ] > b )
 		{
 			winner = player;
-			b = player.pers["score"];
+			b = player.pers[ "score" ];
 		}
 
-		if ( player.pers["score"] < w )
+		if ( player.pers[ "score" ] < w )
 		{
 			loser = player;
-			w = player.pers["score"];
+			w = player.pers[ "score" ];
 		}
 	}
 
@@ -591,7 +591,7 @@ endgame_chat()
 	{
 		winningteam = maps\mp\gametypes\_gamescore::getWinningTeam();
 
-		if ( self.pers["team"] == winningteam )
+		if ( self.pers[ "team" ] == winningteam )
 		{
 			switch ( randomint( 21 ) )
 			{
@@ -624,7 +624,7 @@ endgame_chat()
 					break;
 
 				case 7:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers["team"] + " always wins!!" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers[ "team" ] + " always wins!!" );
 					break;
 
 				case 8:
@@ -735,7 +735,7 @@ endgame_chat()
 						break;
 
 					case 5:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers["team"] + " always loses!!" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers[ "team" ] + " always loses!!" );
 						break;
 
 					case 2:
@@ -1069,7 +1069,7 @@ bot_chat_streak( streakCount )
 
 	if ( streakCount == 25 )
 	{
-		if ( self.pers["lastEarnedStreak"] == "nuke" )
+		if ( self.pers[ "lastEarnedStreak" ] == "nuke" )
 		{
 			switch ( randomint( 5 ) )
 			{
@@ -1245,11 +1245,11 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 30:
-			message = ( "haha thanks " + victim.name + ", im at a " + self.pers["cur_kill_streak"] + " streak." );
+			message = ( "haha thanks " + victim.name + ", im at a " + self.pers[ "cur_kill_streak" ] + " streak." );
 			break;
 
 		case 31:
-			message = ( "lol " + victim.name + " is at a " + victim.pers["cur_death_streak"] + " deathstreak" );
+			message = ( "lol " + victim.name + " is at a " + victim.pers[ "cur_death_streak" ] + " deathstreak" );
 			break;
 
 		case 32:
@@ -1285,9 +1285,9 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 40:
-			if ( isDefined( victim.attackerData ) && isDefined( victim.attackerData[self.guid] ) && isDefined( victim.attackerData[self.guid].weapon ) )
+			if ( isDefined( victim.attackerData ) && isDefined( victim.attackerData[ self.guid ] ) && isDefined( victim.attackerData[ self.guid ].weapon ) )
 			{
-				message = ( "Man, I sure love my " + getBaseWeaponName( victim.attackerData[self.guid].weapon ) + "!" );
+				message = ( "Man, I sure love my " + getBaseWeaponName( victim.attackerData[ self.guid ].weapon ) + "!" );
 			}
 
 			break;
@@ -1340,7 +1340,7 @@ bot_chat_death_watch( killer, last_ks )
 			}
 			else
 			{
-				message = ( "man im getting spawn killed, i have a " + self.pers["cur_death_streak"] + " deathstreak!" );
+				message = ( "man im getting spawn killed, i have a " + self.pers[ "cur_death_streak" ] + " deathstreak!" );
 			}
 
 			break;
@@ -1438,19 +1438,19 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 28:
-			message = ( "AHH! IM DEAD BECAUSE " + level.players[randomint( level.players.size )].name + " is a noob!" );
+			message = ( "AHH! IM DEAD BECAUSE " + level.players[ randomint( level.players.size ) ].name + " is a noob!" );
 			break;
 
 		case 29:
-			message = ( level.players[randomint( level.players.size )].name + ", please don't talk." );
+			message = ( level.players[ randomint( level.players.size ) ].name + ", please don't talk." );
 			break;
 
 		case 30:
-			message = ( "Wow " + level.players[randomint( level.players.size )].name + " is a blocker noob!" );
+			message = ( "Wow " + level.players[ randomint( level.players.size ) ].name + " is a blocker noob!" );
 			break;
 
 		case 31:
-			message = ( "Next time GET OUT OF MY WAY " + level.players[randomint( level.players.size )].name + "!!" );
+			message = ( "Next time GET OUT OF MY WAY " + level.players[ randomint( level.players.size ) ].name + "!!" );
 			break;
 
 		case 32:
@@ -1506,7 +1506,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 45:
-			message = ( "someone kill " + killer.name + ", they are on a streak of " + killer.pers["cur_kill_streak"] + "!" );
+			message = ( "someone kill " + killer.name + ", they are on a streak of " + killer.pers[ "cur_kill_streak" ] + "!" );
 			break;
 
 		case 46:
@@ -1566,9 +1566,9 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 60:
-			if ( isDefined( self.attackerData ) && isDefined( self.attackerData[killer.guid] ) && isDefined( self.attackerData[killer.guid].weapon ) )
+			if ( isDefined( self.attackerData ) && isDefined( self.attackerData[ killer.guid ] ) && isDefined( self.attackerData[ killer.guid ].weapon ) )
 			{
-				message = "Wow! Nice " + getBaseWeaponName( self.attackerData[killer.guid].weapon ) + " you got there, " + killer.name + "!";
+				message = "Wow! Nice " + getBaseWeaponName( self.attackerData[ killer.guid ].weapon ) + " you got there, " + killer.name + "!";
 			}
 
 			break;
