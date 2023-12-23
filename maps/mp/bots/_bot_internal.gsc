@@ -1953,11 +1953,12 @@ botFire( curweap )
 	{
 		self thread pressFire();
 
-		if ( self.bot.is_cur_akimbo ) self thread pressADS();
-
+		if ( self.bot.is_cur_akimbo )
 		{
-			return;
+			self thread pressADS();
 		}
+
+		return;
 	}
 
 	if ( self.bot.semi_time )
@@ -1967,11 +1968,12 @@ botFire( curweap )
 
 	self thread pressFire();
 
-	if ( self.bot.is_cur_akimbo ) self thread pressADS();
-
+	if ( self.bot.is_cur_akimbo )
 	{
-		self thread doSemiTime();
+		self thread pressADS();
 	}
+
+	self thread doSemiTime();
 }
 
 /*
