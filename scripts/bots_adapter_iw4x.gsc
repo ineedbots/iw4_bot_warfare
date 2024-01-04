@@ -12,43 +12,43 @@ init()
 
 do_printconsole( s )
 {
-	PrintConsole( s + "\n" );
+	printconsole( s + "\n" );
 }
 
 do_filewrite( file, contents, mode )
 {
 	file = "scriptdata/" + file;
-	FileWrite( file, contents, mode );
+	filewrite( file, contents, mode );
 }
 
 do_fileread( file )
 {
 	file = "scriptdata/" + file;
-	return FileRead( file );
+	return fileread( file );
 }
 
 do_fileexists( file )
 {
 	file = "scriptdata/" + file;
-	return FileExists( file );
+	return fileexists( file );
 }
 
 do_botaction( action )
 {
-	self BotAction( action );
+	self botaction( action );
 }
 
 do_botstop()
 {
-	self BotStop();
+	self botstop();
 }
 
 do_botmovement( forward, right )
 {
-	self BotMovement( forward, right );
+	self botmovement( forward, right );
 }
 
 do_botmeleeparams( yaw, dist )
 {
-	self BotMeleeParams( yaw, dist );
+	self botmeleeparams( yaw, dist );
 }
