@@ -1,21 +1,27 @@
 # try to mimic the original gsc provided
+# mode=ghc
 mode=c
 style=allman
 
-indent=tab
+indent=force-tab=2
 lineend=windows
 
 pad-oper
 pad-paren-in
 pad-header
-
-# delete-empty-lines
+# pad-brackets-in
+fill-empty-lines
+squeeze-lines=2
+squeeze-ws
+break-one-line-headers
+add-braces
+remove-comment-prefix
 
 break-blocks
-# remove-braces
 
 indent-switches
 indent-cases
 indent-after-parens
+indent-col1-comments
 
 remove-comment-prefix

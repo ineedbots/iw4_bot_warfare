@@ -4,7 +4,7 @@ root = true
 indent_style = tab
 indent_size = 2
 charset = latin1
-trim_trailing_whitespace = true
+trim_trailing_whitespace = false
 insert_final_newline = true
 
 [*.md]
