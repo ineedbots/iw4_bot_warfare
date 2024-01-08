@@ -1,0 +1,19 @@
+name: main
+
+on: [push]
+
+jobs:
+  main-win:
+    name: Test on Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out files
+        uses: actions/checkout@main
+
+      - name: Setup gsc-tool
+        uses: xensik/setup-gsc-tool@v1
+
+      - name: Compile test script
+        run: |
+          gsc-tool.exe parse iw5 pc .
