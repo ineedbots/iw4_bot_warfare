@@ -26,41 +26,41 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 - Loading waypoints from CSV files.
 
 - Adds AI clients to multiplayer games to simulate playing real players. (essentially Combat Training for MW2)
-  - Bots move around the maps with native engine input. (all normal maps, most to all custom maps)
-  - Bots press all the buttons with native engine input (ads, sprint, jump, etc)
-  - Bots play all gamemodes/objectives, they capture flags, plant, defuse bombs, etc. ( all normal modes, most custom modes)
-  - Bots use all killstreaks. Including AC130 and chopper gunner.
-  - Bots target killstreaks, use stingers and other weapons to take out all killstreaks. ( even sentry guns)
-  - Bots can capture and steal care packages.
-  - Bots target equipment, and can even camp TIs.
-  - Bots can camp randomly or when about to use the laptop.
-  - Bots can follow others on own will.
-  - Bots have smooth and realistic aim.
-  - Bots respond smartly to their surroundings, they will go to you if you shoot, uav, etc.
-  - Bots use all deathstreaks, perks and weapons. (including javelin)
-  - Bots difficulty level can be customized and are accurate. (hard is hard, easy is easy, etc.)
-  - Bots each all have different classes, traits, and difficulty and remember it all.
-  - Bots switch from between primaries and secondaries.
-  - Bots can grenade, place claymores and TIs, they even use grenades and tubes in preset map locations.
-  - Bots use grenade launchers and shotgun attachments.
-  - Bots can melee people and sentry guns.
-  - Bots can run!
-  - Bots can climb ladders!
-  - Bots jump shot and drop shot.
-  - Bots detect smoke grenades, stun grenades, flashed and airstrike slows.
-  - Bots will remember their class, killstreak, skill and traits, even on multiround based gametypes.
-  - Bots can throwback grenades.
-  - ... And pretty much everything you expect a Combat Training bot to have
+	- Bots move around the maps with native engine input. (all normal maps, most to all custom maps)
+	- Bots press all the buttons with native engine input (ads, sprint, jump, etc)
+	- Bots play all gamemodes/objectives, they capture flags, plant, defuse bombs, etc. ( all normal modes, most custom modes)
+	- Bots use all killstreaks. Including AC130 and chopper gunner.
+	- Bots target killstreaks, use stingers and other weapons to take out all killstreaks. ( even sentry guns)
+	- Bots can capture and steal care packages.
+	- Bots target equipment, and can even camp TIs.
+	- Bots can camp randomly or when about to use the laptop.
+	- Bots can follow others on own will.
+	- Bots have smooth and realistic aim.
+	- Bots respond smartly to their surroundings, they will go to you if you shoot, uav, etc.
+	- Bots use all deathstreaks, perks and weapons. (including javelin)
+	- Bots difficulty level can be customized and are accurate. (hard is hard, easy is easy, etc.)
+	- Bots each all have different classes, traits, and difficulty and remember it all.
+	- Bots switch from between primaries and secondaries.
+	- Bots can grenade, place claymores and TIs, they even use grenades and tubes in preset map locations.
+	- Bots use grenade launchers and shotgun attachments.
+	- Bots can melee people and sentry guns.
+	- Bots can run!
+	- Bots can climb ladders!
+	- Bots jump shot and drop shot.
+	- Bots detect smoke grenades, stun grenades, flashed and airstrike slows.
+	- Bots will remember their class, killstreak, skill and traits, even on multiround based gametypes.
+	- Bots can throwback grenades.
+	- ... And pretty much everything you expect a Combat Training bot to have
 
 ## Installation
 0. Make sure that [IW4x](https://alterware.dev/) is installed, updated and working properly.
-    - Download the [latest release](https://github.com/ineedbots/iw4_bot_warfare/releases) of Bot Warfare.
+		- Download the [latest release](https://github.com/ineedbots/iw4_bot_warfare/releases) of Bot Warfare.
 1. Locate your IW4 install folder.
 2. Move the files/folders found in 'Move files to root of IW4 folder' from the Bot Warfare release archive you downloaded into the root of your IW4 install folder.
-    - The folder/file structure should follow as '.IW4 game folder\mods\bots\z_svr_bots.iwd'.
+		- The folder/file structure should follow as '.IW4 game folder\mods\bots\z_svr_bots.iwd'.
 3. The mod is now installed, now run your game.
-    - If you are a dedicated server, you will need to set the DVAR 'fs_game' to 'mods/bots'
-    - If you are not a dedicated server, open the 'Mods' option from the main menu of the game and select 'bots' and then 'Launch'.
+		- If you are a dedicated server, you will need to set the DVAR 'fs_game' to 'mods/bots'
+		- If you are not a dedicated server, open the 'Mods' option from the main menu of the game and select 'bots' and then 'Launch'.
 4. The mod should be loaded! Now go start a map and play!
 
 ## Documentation
@@ -92,7 +92,7 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 | bots_team_amount                 | When `bots_team` is set to `custom`. The amount of bots to be placed on the axis team. The remainder will be placed on the allies team. | 0 |
 | bots_team_force                  | If the server should force bots' teams according to the `bots_team` value. When `bots_team` is `autoassign`, unbalanced teams will be balanced. This dvar is ignored when `bots_team` is `custom`. | 0     |
 | bots_team_mode                   | When `bots_team_force` is `true` and `bots_team` is `autoassign`, players/bots counting method. <ul><li>`0` - counts both players and bots.</li><li>`1` - only counts bots</li></ul> | 0 |
-| bots_skill                       | Bots' difficulty.<ul><li>`0` - Random difficulty for each bot.</li><li>`1` - Easiest difficulty for all bots.</li><li>`2` to `6` - Between easy and hard difficulty for all bots.</li><li>`7` - The hardest difficulty for all bots.</li><li>`8` - custom (look at the `bots_skill_<team>_<difficulty>` dvars</li></ul> | 0 |
+| bots_skill                       | Bots' difficulty.<ul><li>`0` - Random difficulty for each bot.</li><li>`1` - Easiest difficulty for all bots.</li><li>`2` to `6` - Between easy and hard difficulty for all bots.</li><li>`7` - The hardest difficulty for all bots.</li><li>`8` - custom (look at the `bots_skill_<team>_<difficulty>` dvars)</li></ul> | 0 |
 | bots_skill_axis_hard             | When `bots_skill` is set to `8`, the amount of hard difficulty bots to set on the axis team. | 0            |
 | bots_skill_axis_med              | When `bots_skill` is set to `8`, the amount of medium difficulty bots to set on the axis team. The remaining bots on the team will be set to easy difficulty. | 0 |
 | bots_skill_allies_hard           | When `bots_skill` is set to `8`, the amount of hard difficulty bots to set on the allies team. | 0          |
@@ -117,50 +117,57 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 | bots_play_aim                    | If the bots can aim.                                                                           | 1          |
 
 ## Changelog
+- v2.2.0
+	- Bots can now melee lunge
+	- Fixed some chat related script runtime errors
+	- Works with latest IW4x
+	- Fix bots possibly being stuck in sab
+	- Major cleanup
+
 - v2.1.0
-  - Bot chatter system, bots_main_chat
-  - Greatly reduce script variable usage
-  - Fix bots slowly reacting in remote streaks
-  - Improved bots mantling and stuck
-  - Improved bots aim
-  - Fix some runtime errors
-  - Fixed bots aim in third person
-  - Bots sprint more
-  - Improved bots sight on enemies
-  - Bots play hidden gamemodes like one-flag and arena
-  - Bots do random actions while waiting at an objective
-  - Improved bots from getting stuck
-  - Better bot difficulty management, bots_skill_min and bots_skill_max
+	- Bot chatter system, bots_main_chat
+	- Greatly reduce script variable usage
+	- Fix bots slowly reacting in remote streaks
+	- Improved bots mantling and stuck
+	- Improved bots aim
+	- Fix some runtime errors
+	- Fixed bots aim in third person
+	- Bots sprint more
+	- Improved bots sight on enemies
+	- Bots play hidden gamemodes like one-flag and arena
+	- Bots do random actions while waiting at an objective
+	- Improved bots from getting stuck
+	- Better bot difficulty management, bots_skill_min and bots_skill_max
 
 - v2.0.1
-  - Reduced bots crouching
-  - Increased bots sprinting
-  - Improved bots mantling, crouching and knifing glass when needed
-  - Fixed possible script runtime errors
-  - Fixed demolition spawn killing
-  - Improved domination
-  - Bots use explosives more if they have it
-  - Fixed bots moving their player when using remote
-  - Bots aim slower when ads'ing
-  - Fixed bots holding breath
-  - Bots are more smart when waiting for carepackages
-  - Improved and fixed various waypoints for maps
-  - Fixed bots rubberbanding movement when their goal changes
-  - Added bots quickscoping with snipers
-  - Added bots reload canceling and fast swaps
-  - Bots use C4
-  - Improved revenge
-  - Bots can swap weapons on spawn more likely
+	- Reduced bots crouching
+	- Increased bots sprinting
+	- Improved bots mantling, crouching and knifing glass when needed
+	- Fixed possible script runtime errors
+	- Fixed demolition spawn killing
+	- Improved domination
+	- Bots use explosives more if they have it
+	- Fixed bots moving their player when using remote
+	- Bots aim slower when ads'ing
+	- Fixed bots holding breath
+	- Bots are more smart when waiting for carepackages
+	- Improved and fixed various waypoints for maps
+	- Fixed bots rubberbanding movement when their goal changes
+	- Added bots quickscoping with snipers
+	- Added bots reload canceling and fast swaps
+	- Bots use C4
+	- Improved revenge
+	- Bots can swap weapons on spawn more likely
 
 - v2.0.0
-  - Initial reboot release
+	- Initial reboot release
 
 
 - TODOs
-  - A variable leak in _menu
-  - Recoil for bots (engine, maybe script)
-  - Use static turrets in maps
-  - Proper use of pred missile
+	- A variable leak in _menu
+	- Recoil for bots (engine, maybe script)
+	- Use static turrets in maps
+	- Proper use of pred missile
 
 ## Credits
 - IW4x Team - https://github.com/iw4x/iw4x-client
