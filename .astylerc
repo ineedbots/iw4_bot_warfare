@@ -10,7 +10,6 @@ pad-oper
 pad-paren-in
 pad-header
 # pad-brackets-in
-fill-empty-lines
 squeeze-lines=2
 squeeze-ws
 break-one-line-headers
