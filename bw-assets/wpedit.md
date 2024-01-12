@@ -1,9 +1,9 @@
-# IW4x Bot Warfare Waypoint Editor
+# IW4 Bot Warfare Waypoint Editor
 First things first, Bot Warfare uses the [AStar search algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm) for creating paths for the bots to find their way through a map. 
 
 The AStar search algorithm requires a [set of waypoints](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)) defining where all the paths are in the map.
 
-Now if you want to modify existing or create new waypoints for IW4x maps, this is the read for you.
+Now if you want to modify existing or create new waypoints for IW4 maps, this is the read for you.
 
 ## Contents
 - [Setting up the Waypoint Editor](#Setting-up-the-Waypoint-Editor)
@@ -15,16 +15,14 @@ The Bot Warfare mod comes with the Waypoint Editor out of the box, so its just a
 Start your game, and load up the Bot Warfare mod. Now open your console with tilde(~).
 ![How tilde](/bw-assets/how-tilde.png)
 
-In the console, type in ```set bots_main_debug 1```
+In the console, type in `set bots_main_debug 1`
 ![Setting the dvar](/bw-assets/wp-editor-debug-dvar.png)
 
 Now start a match with the map you want to edit.
 
-It should be noted that waypoints load in this following order;
-1. check the 'waypoints' folder (FS_Game\waypoints) for a csv file
-2. load the waypoints from GSC (maps\mp\bots\waypoints)
+It should be noted that waypoints load from the 'waypoints' folder (<fs_game>\scriptdata\waypoints) for a csv file.
 
-If all fail to load waypoints, then the bots will not know how to navigate the map.
+If csv fails to load waypoints, then the bots will not know how to navigate the map.
 
 ## The Editor
 ![The editor](/bw-assets/wp-editor-0.png)
@@ -94,5 +92,5 @@ Once you feel like you are done, press the Save button. This will generate a [CS
 
 That is it! The waypoints should load next time you start your game!
 
-Your waypoints CSV file will be located at ```FS_Game/waypoints/<mapname>_wp.csv```. (userraw folder if fs_game is blank)
+Your waypoints CSV file will be located at `<fs_game>\scriptdata\waypoints\<mapname>_wp.csv`. (userraw folder if fs_game is blank)
 ![Location](/bw-assets/wp_edit_fil_loc.png)
