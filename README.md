@@ -57,10 +57,10 @@ You can find the ModDB release post [here](https://www.moddb.com/mods/bot-warfar
 	- Download the [latest release](https://github.com/ineedbots/iw4_bot_warfare/releases) of Bot Warfare.
 1. Locate your MW2 install folder.
 2. Move the files/folders found in 'Move files to root of MW2 folder' from the Bot Warfare release archive you downloaded into the root of your MW2 install folder.
-	- The folder/file structure should follow as '.MW2 game folder\mods\bots\z_svr_bots.iwd'.
+	- The folder/file structure should follow as '.MW2 game folder\mods\mp_bots\z_svr_bots.iwd'.
 3. The mod is now installed, now run your game.
-	- If you are a dedicated server, you will need to set the DVAR 'fs_game' to 'mods/bots'
-	- If you are not a dedicated server, open the 'Mods' option from the main menu of the game and select 'bots' and then 'Launch'.
+	- If you are a dedicated server, you will need to set the DVAR 'fs_game' to 'mods/mp_bots'
+	- If you are not a dedicated server, open the 'Mods' option from the main menu of the game and select 'mp_bots' and then 'Launch'.
 4. The mod should be loaded! Now go start a map and play!
 
 ## Documentation
