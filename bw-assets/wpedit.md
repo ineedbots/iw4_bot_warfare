@@ -3,7 +3,7 @@ First things first, Bot Warfare uses the [AStar search algorithm](https://en.wik
 
 The AStar search algorithm requires a [set of waypoints](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)) defining where all the paths are in the map.
 
-Now if you want to modify existing or create new waypoints for IW4 maps, this is the read for you.
+Now if you want to modify existing or create new waypoints for MW2 maps, this is the read for you.
 
 ## Contents
 - [Setting up the Waypoint Editor](#Setting-up-the-Waypoint-Editor)
