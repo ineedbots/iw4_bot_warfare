@@ -13,7 +13,9 @@ jobs:
 
       - name: Setup gsc-tool
         uses: xensik/setup-gsc-tool@v1
+        with:
+          version: '1.4.0'
 
       - name: Compile test script
         run: |
-          gsc-tool.exe parse iw5 pc .
+          gsc-tool.exe -m parse -g iw5 -s pc .
