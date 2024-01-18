@@ -1718,7 +1718,7 @@ aim_loop()
 
 					conedot = getConeDot( aimpos, eyePos, angles );
 
-					if ( isdefined( self.bot.knifing_target ) )
+					if ( isdefined( self.bot.knifing_target ) && self.bot.knifing_target == target )
 					{
 						self thread bot_lookat( target gettagorigin( "j_spine4" ), 0.05 );
 					}
