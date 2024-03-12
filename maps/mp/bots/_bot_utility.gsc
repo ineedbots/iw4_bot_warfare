@@ -362,11 +362,21 @@ BotStopMoving( what )
 }
 
 /*
+	Waits till frame end so that if two notifies happen in the same frame, the other will not be missed.
+*/
+BotNotifyBotEvent_( msg, a, b, c, d, e, f, g )
+{
+	self endon( "disconnect" );
+	waittillframeend; // wait for the waittills to setup again
+	self notify( "bot_event", msg, a, b, c, d, e, f, g );
+}
+
+/*
 	Notify the bot chat message
 */
 BotNotifyBotEvent( msg, a, b, c, d, e, f, g )
 {
-	self notify( "bot_event", msg, a, b, c, d, e, f, g );
+	self thread BotNotifyBotEvent_( msg, a, b, c, d, e, f, g );
 }
 
 /*
