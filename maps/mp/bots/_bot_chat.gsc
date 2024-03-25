@@ -9,6 +9,7 @@
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
 #include maps\mp\bots\_bot_utility;
+#include maps\mp\bots\_bot_language_en;
 
 /*
 	Init
@@ -16,9 +17,7 @@
 init()
 {
 	if ( getdvar( "bots_main_chat" ) == "" )
-	{
 		setdvar( "bots_main_chat", 1.0 );
-	}
 
 	level thread onBotConnected();
 }
@@ -41,23 +40,18 @@ onBotConnected()
 */
 BotDoChat( chance, string, isTeam )
 {
-	mod = getdvarfloat( "bots_main_chat" );
+	mod = getdvarFloat( "bots_main_chat" );
 
 	if ( mod <= 0.0 )
-	{
 		return;
-	}
 
-	if ( chance >= 100 || mod >= 100.0 || ( randomint( 100 ) < ( chance * mod ) + 0 ) )
+	if ( chance >= 100 || mod >= 100.0 ||
+	    ( RandomInt( 100 ) < ( chance * mod ) + 0 ) )
 	{
-		if ( isdefined( isTeam ) && isTeam )
-		{
+		if ( isDefined( isTeam ) && isTeam )
 			self sayteam( string );
-		}
 		else
-		{
 			self sayall( string );
-		}
 	}
 }
 
@@ -87,14 +81,12 @@ start_onnuke_call()
 
 	for ( ;; )
 	{
-		while ( !isdefined( level.nukeincoming ) && !isdefined( level.moabincoming ) )
-		{
-			wait 0.05 + randomint( 4 );
-		}
+		while ( !isDefined( level.nukeIncoming ) && !isDefined( level.moabIncoming ) )
+			wait 0.05 + randomInt( 4 );
 
 		self thread bot_onnukecall_watch();
 
-		wait level.nuketimer + 5;
+		wait level.nukeTimer + 5;
 	}
 }
 
@@ -109,9 +101,9 @@ start_death_watch()
 	{
 		self waittill( "death" );
 
-		self thread bot_chat_death_watch( self.lastattacker, self.bots_lastks );
+		self thread bot_chat_death_watch( self.lastAttacker, self.bots_lastKS );
 
-		self.bots_lastks = 0;
+		self.bots_lastKS = 0;
 	}
 }
 
@@ -138,12 +130,10 @@ start_random_chat()
 	{
 		wait 1;
 
-		if ( randomint( 100 ) < 1 )
+		if ( randomInt( 100 ) < 1 )
 		{
-			if ( randomint( 100 ) < 1 && isreallyalive( self ) )
-			{
+			if ( randomInt( 100 ) < 1 && isReallyAlive( self ) )
 				self thread doQuickMessage();
-			}
 		}
 	}
 }
@@ -155,23 +145,23 @@ start_killed_watch()
 {
 	self endon( "disconnect" );
 
-	self.bots_lastks = 0;
+	self.bots_lastKS = 0;
 
 	for ( ;; )
 	{
 		self waittill( "killed_enemy" );
 
-		if ( self.bots_lastks < self.pers[ "cur_kill_streak" ] )
+		if ( self.bots_lastKS < self.pers["cur_kill_streak"] )
 		{
-			for ( i = self.bots_lastks + 1; i <= self.pers[ "cur_kill_streak" ]; i++ )
+			for ( i = self.bots_lastKS + 1; i <= self.pers["cur_kill_streak"]; i++ )
 			{
 				self thread bot_chat_streak( i );
 			}
 		}
 
-		self.bots_lastks = self.pers[ "cur_kill_streak" ];
+		self.bots_lastKS = self.pers["cur_kill_streak"];
 
-		self thread bot_chat_killed_watch( self.lastkilledplayer );
+		self thread bot_chat_killed_watch( self.lastKilledPlayer );
 	}
 }
 
@@ -331,15 +321,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 7, "TEEEEEEEEAM, DEEEEAAAAAATHMAAAAATCH!!" );
+					self BotDoChat( 7, BotGetLang("lang__teeeeeeeeam__deeeeaaaaaathmaaaaatch___") );
 					break;
 
 				case 1:
-					self BotDoChat( 7, "Lets get em guys, wipe the floor with them." );
+					self BotDoChat( 7, BotGetLang("lang__lets_get_em_guys__wipe_the_floor_with_them__") );
 					break;
 
 				case 2:
-					self BotDoChat( 7, "Yeeeesss master..." );
+					self BotDoChat( 7, BotGetLang("lang__yeeeesss_master____") );
 					break;
 			}
 
@@ -349,15 +339,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 7, "Yaaayy!! I LOVE DOMINATION!!!!" );
+					self BotDoChat( 7, BotGetLang("lang__yaaayy___i_love_domination_____") );
 					break;
 
 				case 1:
-					self BotDoChat( 7, "Lets cap the flags and them." );
+					self BotDoChat( 7, BotGetLang("lang__lets_cap_the_flags_and_them__") );
 					break;
 
 				case 2:
-					self BotDoChat( 7, "Yeeeesss master..." );
+					self BotDoChat( 7, BotGetLang("lang__yeeeesss_master____") );
 					break;
 			}
 
@@ -367,15 +357,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 7, "Ahhhh! I'm scared! No respawning!" );
+					self BotDoChat( 7, BotGetLang("lang__ahhhh__i_m_scared__no_respawning__") );
 					break;
 
 				case 1:
-					self BotDoChat( 7, "Lets get em guys, wipe the floor with them." );
+					self BotDoChat( 7, BotGetLang("lang__lets_get_em_guys__wipe_the_floor_with_them__") );
 					break;
 
 				case 2:
-					self BotDoChat( 7, "Yeeeesss master..." );
+					self BotDoChat( 7, BotGetLang("lang__yeeeesss_master____") );
 					break;
 			}
 
@@ -385,15 +375,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 7, "Try not to get spawn killed." );
+					self BotDoChat( 7, BotGetLang("lang__try_not_to_get_spawn_killed__") );
 					break;
 
 				case 1:
-					self BotDoChat( 7, "OK we need a plan. Nah lets just kill." );
+					self BotDoChat( 7, BotGetLang("lang__ok_we_need_a_plan__nah_lets_just_kill__") );
 					break;
 
 				case 2:
-					self BotDoChat( 7, "Yeeeesss master..." );
+					self BotDoChat( 7, BotGetLang("lang__yeeeesss_master____") );
 					break;
 			}
 
@@ -403,15 +393,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 7, "Soccer/Football! Lets play it!" );
+					self BotDoChat( 7, BotGetLang("lang__soccer_football__lets_play_it__") );
 					break;
 
 				case 1:
-					self BotDoChat( 7, "Who plays sab these days." );
+					self BotDoChat( 7, BotGetLang("lang__who_plays_sab_these_days__") );
 					break;
 
 				case 2:
-					self BotDoChat( 7, "I do not know what to say." );
+					self BotDoChat( 7, BotGetLang("lang__i_do_not_know_what_to_say__") );
 					break;
 			}
 
@@ -421,15 +411,15 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 7, "Halo style" );
+					self BotDoChat( 7, BotGetLang("lang__halo_style_") );
 					break;
 
 				case 1:
-					self BotDoChat( 7, "I'm going cap all the flags." );
+					self BotDoChat( 7, BotGetLang("lang__i_m_going_cap_all_the_flags__") );
 					break;
 
 				case 2:
-					self BotDoChat( 7, "NO IM CAPPING IT" );
+					self BotDoChat( 7, BotGetLang("lang__no_im_capping_it_") );
 					break;
 			}
 
@@ -439,26 +429,26 @@ start_startgame_watch()
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 7, "DEEEEAAAAAATHMAAAAATCH!!" );
+					self BotDoChat( 7, BotGetLang("lang__deeeeaaaaaathmaaaaatch___") );
 					break;
 
 				case 1:
-					self BotDoChat( 7, "IM GOING TO KILL U ALL" );
+					self BotDoChat( 7, BotGetLang("lang__im_going_to_kill_u_all_") );
 					break;
 
 				case 2:
-					self BotDoChat( 7, "lol sweet. time to camp." );
+					self BotDoChat( 7, BotGetLang("lang__lol_sweet__time_to_camp__") );
 					break;
 			}
 
 			break;
 
 		case "koth":
-			self BotDoChat( 7, "HQ TIME!" );
+			self BotDoChat( 7, BotGetLang("lang__hq_time__") );
 			break;
 
 		case "gtnw":
-			self BotDoChat( 7, "global thermonuclear warfare!!!!!!!" );
+			self BotDoChat( 7, BotGetLang("lang__global_thermonuclear_warfare________") );
 			break;
 	}
 
@@ -469,7 +459,7 @@ start_startgame_watch()
 		switch ( randomint( 1 ) )
 		{
 			case 0:
-				self BotDoChat( 25, "I WILL TRY AND GET A NUKE!!!" );
+				self BotDoChat( 25, BotGetLang("lang__i_will_try_and_get_a_nuke____") );
 				break;
 		}
 	}
@@ -480,14 +470,12 @@ start_startgame_watch()
 */
 hasKillstreak( streakname )
 {
-	loadoutKillstreak1 = self getplayerdata( "killstreaks", 0 );
-	loadoutKillstreak2 = self getplayerdata( "killstreaks", 1 );
-	loadoutKillstreak3 = self getplayerdata( "killstreaks", 2 );
+	loadoutKillstreak1 = self getPlayerData( "killstreaks", 0 );
+	loadoutKillstreak2 = self getPlayerData( "killstreaks", 1 );
+	loadoutKillstreak3 = self getPlayerData( "killstreaks", 2 );
 
 	if ( loadoutKillstreak1 == streakname || loadoutKillstreak2 == streakname || loadoutKillstreak3 == streakname )
-	{
 		return true;
-	}
 
 	return false;
 }
@@ -500,7 +488,7 @@ doQuickMessage()
 	self endon( "disconnect" );
 	self endon( "death" );
 
-	if ( !isdefined( self.talking ) || !self.talking )
+	if ( !isDefined( self.talking ) || !self.talking )
 	{
 		self.talking = true;
 		soundalias = "";
@@ -538,17 +526,15 @@ doQuickMessage()
 
 		if ( soundalias != "" && saytext != "" )
 		{
-			self maps\mp\gametypes\_quickmessages::saveheadicon();
-			self maps\mp\gametypes\_quickmessages::doquickmessage( soundalias, saytext );
+			self maps\mp\gametypes\_quickmessages::saveHeadIcon();
+			self maps\mp\gametypes\_quickmessages::doQuickMessage( soundalias, saytext );
 			wait 2;
-			self maps\mp\gametypes\_quickmessages::restoreheadicon();
+			self maps\mp\gametypes\_quickmessages::restoreHeadIcon();
 		}
 		else
 		{
 			if ( randomint( 100 ) < 1 )
-			{
 				self BotDoChat( 1, maps\mp\bots\_bot_utility::keyCodeToString( 2 ) + maps\mp\bots\_bot_utility::keyCodeToString( 17 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 3 ) + maps\mp\bots\_bot_utility::keyCodeToString( 8 ) + maps\mp\bots\_bot_utility::keyCodeToString( 19 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 19 ) + maps\mp\bots\_bot_utility::keyCodeToString( 14 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 8 ) + maps\mp\bots\_bot_utility::keyCodeToString( 13 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 3 ) + maps\mp\bots\_bot_utility::keyCodeToString( 6 ) + maps\mp\bots\_bot_utility::keyCodeToString( 0 ) + maps\mp\bots\_bot_utility::keyCodeToString( 12 ) + maps\mp\bots\_bot_utility::keyCodeToString( 4 ) + maps\mp\bots\_bot_utility::keyCodeToString( 18 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 5 ) + maps\mp\bots\_bot_utility::keyCodeToString( 14 ) + maps\mp\bots\_bot_utility::keyCodeToString( 17 ) + maps\mp\bots\_bot_utility::keyCodeToString( 27 ) + maps\mp\bots\_bot_utility::keyCodeToString( 1 ) + maps\mp\bots\_bot_utility::keyCodeToString( 14 ) + maps\mp\bots\_bot_utility::keyCodeToString( 19 ) + maps\mp\bots\_bot_utility::keyCodeToString( 18 ) + maps\mp\bots\_bot_utility::keyCodeToString( 26 ) );
-			}
 		}
 
 		self.spamdelay = undefined;
@@ -572,47 +558,47 @@ endgame_chat()
 
 	for ( i = 0; i < level.players.size; i++ )
 	{
-		player = level.players[ i ];
+		player = level.players[i];
 
-		if ( player.pers[ "score" ] > b )
+		if ( player.pers["score"] > b )
 		{
 			winner = player;
-			b = player.pers[ "score" ];
+			b = player.pers["score"];
 		}
 
-		if ( player.pers[ "score" ] < w )
+		if ( player.pers["score"] < w )
 		{
 			loser = player;
-			w = player.pers[ "score" ];
+			w = player.pers["score"];
 		}
 	}
 
-	if ( level.teambased )
+	if ( level.teamBased )
 	{
-		winningteam = maps\mp\gametypes\_gamescore::getwinningteam();
+		winningteam = maps\mp\gametypes\_gamescore::getWinningTeam();
 
-		if ( self.pers[ "team" ] == winningteam )
+		if ( self.pers["team"] == winningteam )
 		{
 			switch ( randomint( 21 ) )
 			{
 				case 0:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha what a game" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__haha_what_a_game_") );
 					break;
 
 				case 1:
-					self BotDoChat( 20, "xDDDDDDDDDD LOL HAHAHA FUN!" );
+					self BotDoChat( 20, BotGetLang("lang__xdddddddddd_lol_hahaha_fun__") );
 					break;
 
 				case 3:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "That was fun" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__that_was_fun_") );
 					break;
 
 				case 4:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol my team always wins!" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__lol_my_team_always_wins__") );
 					break;
 
 				case 5:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha if i am on " + winningteam + " my team always wins!" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha if i am on " + winningteam + BotGetLang("lang___my_team_always_wins__") );
 					break;
 
 				case 2:
@@ -620,95 +606,79 @@ endgame_chat()
 					break;
 
 				case 6:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "GGA, our team was awesome!" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__gga__our_team_was_awesome__") );
 					break;
 
 				case 7:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers[ "team" ] + " always wins!!" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers["team"] + BotGetLang("lang___always_wins___") );
 					break;
 
 				case 8:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "WOW that was EPIC!" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__wow_that_was_epic__") );
 					break;
 
 				case 9:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Hackers lost haha noobs" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__hackers_lost_haha_noobs_") );
 					break;
 
 				case 10:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice game!! Good job team!" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__nice_game___good_job_team__") );
 					break;
 
 				case 11:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "GGA, Well done team!" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__gga__well_done_team__") );
 					break;
 
 				case 12:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL! camper noobs lose" );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__lol__camper_noobs_lose_") );
 					break;
 
 				case 13:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "owned." );
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__owned__") );
 					break;
 
 				case 14:
-					self BotDoChat( 20, "lool we won!!" );
+					self BotDoChat( 20, BotGetLang("lang__lool_we_won___") );
 					break;
 
 				case 16:
-					self BotDoChat( 20, "lol the sillys got pwnd :3" );
+					self BotDoChat( 20, BotGetLang("lang__lol_the_sillys_got_pwnd__3_") );
 					break;
 
 				case 15:
-					self BotDoChat( 20, "har har har :B  we WON!" );
+					self BotDoChat( 20, BotGetLang("lang__har_har_har__b__we_won__") );
 					break;
 
 				case 17:
 					if ( self == winner )
-					{
-						self BotDoChat( 20, "LOL we wouldn't of won without me!" );
-					}
+						self BotDoChat( 20, BotGetLang("lang__lol_we_wouldn_t_of_won_without_me__") );
 					else if ( self == loser )
-					{
-						self BotDoChat( 20, "damn i sucked but i still won" );
-					}
+						self BotDoChat( 20, BotGetLang("lang__damn_i_sucked_but_i_still_won_") );
 					else if ( self != loser && randomint( 2 ) == 1 )
-					{
-						self BotDoChat( 20, "lol " + loser.name + " sucked hard!" );
-					}
+						self BotDoChat( 20, BotGetLang("lang__lol__") + loser.name + BotGetLang("lang___sucked_hard__") );
 					else if ( self != winner )
-					{
-						self BotDoChat( 20, "wow " + winner.name + " did very well!" );
-					}
+						self BotDoChat( 20, BotGetLang("lang__wow__") + winner.name + BotGetLang("lang___did_very_well__") );
 
 					break;
 
 				case 18:
 					if ( self == winner )
-					{
-						self BotDoChat( 20, "I'm the VERY BEST!" );
-					}
+						self BotDoChat( 20, BotGetLang("lang__i_m_the_very_best__") );
 					else if ( self == loser )
-					{
-						self BotDoChat( 20, "lol my team is good, i suck doe" );
-					}
+						self BotDoChat( 20, BotGetLang("lang__lol_my_team_is_good__i_suck_doe_") );
 					else if ( self != loser && randomint( 2 ) == 1 )
-					{
-						self BotDoChat( 20, "lol " + loser.name + " should be playing a noobier game" );
-					}
+						self BotDoChat( 20, BotGetLang("lang__lol__") + loser.name + BotGetLang("lang___should_be_playing_a_noobier_game_") );
 					else if ( self != winner )
-					{
-						self BotDoChat( 20, "i think " + winner.name + " is a hacker" );
-					}
+						self BotDoChat( 20, BotGetLang("lang__i_think__") + winner.name + BotGetLang("lang___is_a_hacker_") );
 
 					break;
 
 				case 19:
-					self BotDoChat( 20, "we won lol sweet" );
+					self BotDoChat( 20, BotGetLang("lang__we_won_lol_sweet_") );
 					break;
 
 				case 20:
-					self BotDoChat( 20, ":v we won!" );
+					self BotDoChat( 20, BotGetLang("lang___v_we_won__") );
 					break;
 			}
 		}
@@ -719,23 +689,23 @@ endgame_chat()
 				switch ( randomint( 21 ) )
 				{
 					case 0:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Hackers win" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__hackers_win_") );
 						break;
 
 					case 1:
-						self BotDoChat( 20, "xDDDDDDDDDD LOL HAHAHA" );
+						self BotDoChat( 20, BotGetLang("lang__xdddddddddd_lol_hahaha_") );
 						break;
 
 					case 3:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "That wasn't fun" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__that_wasn_t_fun_") );
 						break;
 
 					case 4:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Wow my team SUCKS!" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__wow_my_team_sucks__") );
 						break;
 
 					case 5:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers[ "team" ] + " always loses!!" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers["team"] + BotGetLang("lang___always_loses___") );
 						break;
 
 					case 2:
@@ -747,91 +717,75 @@ endgame_chat()
 						break;
 
 					case 7:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vbg" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__vbg_") );
 						break;
 
 					case 8:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "WOW that was EPIC!" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__wow_that_was_epic__") );
 						break;
 
 					case 9:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Good game" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__good_game_") );
 						break;
 
 					case 10:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Bad game" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__bad_game_") );
 						break;
 
 					case 11:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "very bad game" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__very_bad_game_") );
 						break;
 
 					case 12:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "campers win" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__campers_win_") );
 						break;
 
 					case 13:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "CAMPER NOOBS!!" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__camper_noobs___") );
 						break;
 
 					case 14:
 						if ( self == winner )
-						{
-							self BotDoChat( 20, "LOL we lost even with my score." );
-						}
+							self BotDoChat( 20, BotGetLang("lang__lol_we_lost_even_with_my_score__") );
 						else if ( self == loser )
-						{
-							self BotDoChat( 20, "damn im probally the reason we lost" );
-						}
+							self BotDoChat( 20, BotGetLang("lang__damn_im_probally_the_reason_we_lost_") );
 						else if ( self != loser && randomint( 2 ) == 1 )
-						{
-							self BotDoChat( 20, loser.name + " should just leave" );
-						}
+							self BotDoChat( 20, loser.name + BotGetLang("lang___should_just_leave_") );
 						else if ( self != winner )
-						{
-							self BotDoChat( 20, "kwtf " + winner.name + " is a hacker" );
-						}
+							self BotDoChat( 20, BotGetLang("lang__kwtf__") + winner.name + BotGetLang("lang___is_a_hacker_") );
 
 						break;
 
 					case 15:
 						if ( self == winner )
-						{
-							self BotDoChat( 20, "my teammates are garabge" );
-						}
+							self BotDoChat( 20, BotGetLang("lang__my_teammates_are_garabge_") );
 						else if ( self == loser )
-						{
-							self BotDoChat( 20, "lol im garbage" );
-						}
+							self BotDoChat( 20, BotGetLang("lang__lol_im_garbage_") );
 						else if ( self != loser && randomint( 2 ) == 1 )
-						{
-							self BotDoChat( 20, loser.name + " sux" );
-						}
+							self BotDoChat( 20, loser.name + BotGetLang("lang___sux_") );
 						else if ( self != winner )
-						{
-							self BotDoChat( 20, winner.name + " is a noob!" );
-						}
+							self BotDoChat( 20, winner.name + BotGetLang("lang___is_a_noob__") );
 
 						break;
 
 					case 16:
-						self BotDoChat( 20, "we lost but i still had fun" );
+						self BotDoChat( 20, BotGetLang("lang__we_lost_but_i_still_had_fun_") );
 						break;
 
 					case 17:
-						self BotDoChat( 20, ">.> damn try hards" );
+						self BotDoChat( 20, BotGetLang("lang______damn_try_hards_") );
 						break;
 
 					case 18:
-						self BotDoChat( 20, ">:(  that wasnt fair" );
+						self BotDoChat( 20, BotGetLang("lang_______that_wasnt_fair_") );
 						break;
 
 					case 19:
-						self BotDoChat( 20, "lost did we?" );
+						self BotDoChat( 20, BotGetLang("lang__lost_did_we__") );
 						break;
 
 					case 20:
-						self BotDoChat( 20, ">:V noobs win" );
+						self BotDoChat( 20, BotGetLang("lang____v_noobs_win_") );
 						break;
 				}
 			}
@@ -848,27 +802,27 @@ endgame_chat()
 						break;
 
 					case 2:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vbg" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__vbg_") );
 						break;
 
 					case 3:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vgg" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__vgg_") );
 						break;
 
 					case 4:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg no rm" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__gg_no_rm_") );
 						break;
 
 					case 5:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "ggggggggg" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__ggggggggg_") );
 						break;
 
 					case 6:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "good game" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__good_game_7139725") );
 						break;
 
 					case 7:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gee gee" );
+						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__gee_gee_") );
 						break;
 				}
 			}
@@ -880,82 +834,58 @@ endgame_chat()
 		{
 			case 0:
 				if ( self == winner )
-				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha Suck it, you all just got pwnd!" );
-				}
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__haha_suck_it__you_all_just_got_pwnd__") );
 				else if ( self == loser )
-				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol i Sucked in this game, just look at my score!" );
-				}
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__lol_i_sucked_in_this_game__just_look_at_my_score__") );
 				else if ( self != loser && randomint( 2 ) == 1 )
-				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gga, Bad luck " + loser.name );
-				}
 				else if ( self != winner )
-				{
-					self BotDoChat( 20, "This game sucked, " + winner.name + " is such a hacker!!" );
-				}
+					self BotDoChat( 20, BotGetLang("lang__this_game_sucked___") + winner.name + BotGetLang("lang___is_such_a_hacker___") );
 
 				break;
 
 			case 1:
 				if ( self == winner )
-				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL i just wasted you all!! Whoot whoot!" );
-				}
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__lol_i_just_wasted_you_all___whoot_whoot__") );
 				else if ( self == loser )
-				{
-					self BotDoChat( 20, "GGA i suck, Nice score " + winner.name );
-				}
+					self BotDoChat( 20, BotGetLang("lang__gga_i_suck__nice_score__") + winner.name );
 				else if ( self != loser && randomint( 2 ) == 1 )
-				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Rofl, " + loser.name + " dude, you suck!!" );
-				}
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Rofl, " + loser.name + BotGetLang("lang___dude__you_suck___") );
 				else if ( self != winner )
-				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice Score " + winner.name + ", how did you get to be so good?" );
-				}
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice Score " + winner.name + BotGetLang("lang____how_did_you_get_to_be_so_good__") );
 
 				break;
 
 			case 2:
 				if ( self == winner )
-				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL i just wasted you all!! Whoot whoot!" );
-				}
+					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__lol_i_just_wasted_you_all___whoot_whoot__") );
 				else if ( self == loser )
-				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "nice wallhacks " + winner.name );
-				}
 				else if ( self != loser && randomint( 2 ) == 1 )
-				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol atleast i did better then " + loser.name );
-				}
 				else if ( self != winner )
-				{
 					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "lolwtf " + winner.name );
-				}
 
 				break;
 
 			case 3:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gee gee" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__gee_gee_") );
 				break;
 
 			case 4:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "WOW that was EPIC!" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__wow_that_was_epic__") );
 				break;
 
 			case 5:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice Game!" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__nice_game__") );
 				break;
 
 			case 6:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "good game" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__good_game_7139725") );
 				break;
 
 			case 7:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gga  c  u  all later" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__gga__c__u__all_later_") );
 				break;
 
 			case 8:
@@ -971,11 +901,11 @@ endgame_chat()
 				break;
 
 			case 11:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vbg" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__vbg_") );
 				break;
 
 			case 12:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gga" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__gga_") );
 				break;
 
 			case 13:
@@ -983,27 +913,27 @@ endgame_chat()
 				break;
 
 			case 14:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "stupid map" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__stupid_map_") );
 				break;
 
 			case 15:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "ffa sux" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__ffa_sux_") );
 				break;
 
 			case 16:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + ":3 i had fun" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang___3_i_had_fun_") );
 				break;
 
 			case 17:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + ":P nubs are playin" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang___p_nubs_are_playin_") );
 				break;
 
 			case 18:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "nub nub nub thx 4 the nubs" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__nub_nub_nub_thx_4_the_nubs_") );
 				break;
 
 			case 19:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "damn campers" );
+				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__damn_campers_") );
 				break;
 		}
 	}
@@ -1019,42 +949,30 @@ bot_onnukecall_watch()
 	switch ( randomint( 4 ) )
 	{
 		case 0:
-			if ( level.nukeinfo.player != self )
-			{
-				self BotDoChat( 30, "Wow who got a nuke?" );
-			}
+			if ( level.nukeInfo.player != self )
+				self BotDoChat( 30, BotGetLang("lang__wow_who_got_a_nuke__") );
 			else
-			{
-				self BotDoChat( 30, "NUUUUUUKKKKKKEEEEEE!!!! :D" );
-			}
+				self BotDoChat( 30, BotGetLang("lang__nuuuuuukkkkkkeeeeee______d_") );
 
 			break;
 
 		case 1:
-			if ( level.nukeinfo.player != self )
-			{
-				self BotDoChat( 30, "lol " + level.nukeinfo.player.name + " is a hacker" );
-			}
+			if ( level.nukeInfo.player != self )
+				self BotDoChat( 30, BotGetLang("lang__lol__") + level.nukeInfo.player.name + BotGetLang("lang___is_a_hacker_") );
 			else
-			{
-				self BotDoChat( 30, "im the best!" );
-			}
+				self BotDoChat( 30, BotGetLang("lang__im_the_best__") );
 
 			break;
 
 		case 2:
-			self BotDoChat( 30, "woah, that nuke is like much wow" );
+			self BotDoChat( 30, BotGetLang("lang__woah__that_nuke_is_like_much_wow_") );
 			break;
 
 		case 3:
-			if ( level.nukeinfo.team != self.team )
-			{
-				self BotDoChat( 30, "man my team sucks ):" );
-			}
+			if ( level.nukeInfo.team != self.team )
+				self BotDoChat( 30, BotGetLang("lang__man_my_team_sucks____") );
 			else
-			{
-				self BotDoChat( 30, "man my team is good lol" );
-			}
+				self BotDoChat( 30, BotGetLang("lang__man_my_team_is_good_lol_") );
 
 			break;
 	}
@@ -1069,41 +987,37 @@ bot_chat_streak( streakCount )
 
 	if ( streakCount == 25 )
 	{
-		if ( self.pers[ "lastEarnedStreak" ] == "nuke" )
+		if ( self.pers["lastEarnedStreak"] == "nuke" )
 		{
 			switch ( randomint( 5 ) )
 			{
 				case 0:
-					self BotDoChat( 100, "I GOT A NUKE!!" );
+					self BotDoChat( 100, BotGetLang("lang__i_got_a_nuke___") );
 					break;
 
 				case 1:
-					self BotDoChat( 100, "NUKEEEEEEEEEEEEEEEEE" );
+					self BotDoChat( 100, BotGetLang("lang__nukeeeeeeeeeeeeeeeee_") );
 					break;
 
 				case 2:
-					self BotDoChat( 100, "25 killstreak!!!" );
+					self BotDoChat( 100, BotGetLang("lang__25_killstreak____") );
 					break;
 
 				case 3:
-					self BotDoChat( 100, "NNNNNUUUUUUUUUUKKKKEEE!!! UWDHAWIDMIOGHE" );
+					self BotDoChat( 100, BotGetLang("lang__nnnnnuuuuuuuuuukkkkeee____uwdhawidmioghe_") );
 					break;
 
 				case 4:
-					self BotDoChat( 100, "You guys are getting nuuuuuuked~ x3" );
+					self BotDoChat( 100, BotGetLang("lang__you_guys_are_getting_nuuuuuuked__x3_") );
 					break;
 			}
 		}
 		else
 		{
-			if ( getdvarint( "bots_loadout_allow_op" ) )
-			{
-				self BotDoChat( 100, "Come on! I would of had a nuke but I don't got it set..." );
-			}
+			if ( getdvarInt( "bots_loadout_allow_op" ) )
+				self BotDoChat( 100, BotGetLang("lang__come_on__i_would_of_had_a_nuke_but_i_don_t_got_it_set____") );
 			else
-			{
-				self BotDoChat( 100, "WOW.. I could have a nuke but dumb admin disabled it for bots." );
-			}
+				self BotDoChat( 100, BotGetLang("lang__wow___i_could_have_a_nuke_but_dumb_admin_disabled_it_for_bots__") );
 		}
 	}
 }
@@ -1115,10 +1029,8 @@ bot_chat_killed_watch( victim )
 {
 	self endon( "disconnect" );
 
-	if ( !isdefined( victim ) || !isdefined( victim.name ) )
-	{
+	if ( !isDefined( victim ) || !isDefined( victim.name ) )
 		return;
-	}
 
 	message = "";
 
@@ -1129,7 +1041,7 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 1:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Who's your daddy!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__who_s_your_daddy__") );
 			break;
 
 		case 2:
@@ -1141,11 +1053,11 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 4:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + victim.name + " Is that all you got?" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + victim.name + BotGetLang("lang___is_that_all_you_got__") );
 			break;
 
 		case 5:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "LOL " + victim.name + ", l2play" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + "LOL "  + victim.name + BotGetLang("lang____l2play_") );
 			break;
 
 		case 6:
@@ -1153,19 +1065,19 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 7:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Im unstoppable!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__im_unstoppable__") );
 			break;
 
 		case 8:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Wow " + victim.name + " that was a close one!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + "Wow " + victim.name + BotGetLang("lang___that_was_a_close_one__") );
 			break;
 
 		case 9:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Haha thank you, thank you very much." );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__haha_thank_you__thank_you_very_much__") );
 			break;
 
 		case 10:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "HAHAHAHA LOL" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__hahahaha_lol_") );
 			break;
 
 		case 11:
@@ -1173,27 +1085,27 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 12:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Wow that was a lucky shot!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__wow_that_was_a_lucky_shot__") );
 			break;
 
 		case 13:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Thats right, i totally pwnd your ass!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__thats_right__i_totally_pwnd_your_ass__") );
 			break;
 
 		case 14:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Don't even think that i am hacking cause that was pure skill!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__don_t_even_think_that_i_am_hacking_cause_that_was_pure_skill__") );
 			break;
 
 		case 15:
-			message = ( "LOL xD xDDDD " + victim.name + " sucks! HAHA ROFLMAO" );
+			message = ( "LOL xD xDDDD " + victim.name + BotGetLang("lang___sucks__haha_roflmao_") );
 			break;
 
 		case 16:
-			message = ( "Wow that was an easy kill." );
+			message = ( BotGetLang("lang__wow_that_was_an_easy_kill__") );
 			break;
 
 		case 17:
-			message = ( "noob down" );
+			message = ( BotGetLang("lang__noob_down_") );
 			break;
 
 		case 18:
@@ -1201,7 +1113,7 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 19:
-			message = ( "PWND!" );
+			message = ( BotGetLang("lang__pwnd__") );
 			break;
 
 		case 20:
@@ -1209,35 +1121,35 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 21:
-			message = ( "wow that was close, but i still got you ;)" );
+			message = ( BotGetLang("lang__wow_that_was_close__but_i_still_got_you____") );
 			break;
 
 		case 22:
-			message = ( "oooooo! i got u good!" );
+			message = ( BotGetLang("lang__oooooo__i_got_u_good__") );
 			break;
 
 		case 23:
-			message = ( "thanks for the streak lol" );
+			message = ( BotGetLang("lang__thanks_for_the_streak_lol_") );
 			break;
 
 		case 24:
-			message = ( "lol sweet got a kill" );
+			message = ( BotGetLang("lang__lol_sweet_got_a_kill_") );
 			break;
 
 		case 25:
-			message = ( "Just killed a newb, LOL" );
+			message = ( BotGetLang("lang__just_killed_a_newb__lol_") );
 			break;
 
 		case 26:
-			message = ( "lolwtf that was a funny death" );
+			message = ( BotGetLang("lang__lolwtf_that_was_a_funny_death_") );
 			break;
 
 		case 27:
-			message = ( "i bet " + victim.name + " is using the arrow keys to move." );
+			message = ( "i bet " + victim.name + BotGetLang("lang___is_using_the_arrow_keys_to_move__") );
 			break;
 
 		case 28:
-			message = ( "lol its noobs like " + victim.name + " that ruin teams" );
+			message = ( "lol its noobs like " + victim.name + BotGetLang("lang___that_ruin_teams_") );
 			break;
 
 		case 29:
@@ -1245,15 +1157,15 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 30:
-			message = ( "haha thanks " + victim.name + ", im at a " + self.pers[ "cur_kill_streak" ] + " streak." );
+			message = ( "haha thanks " + victim.name + ", im at a " + self.pers["cur_kill_streak"] + BotGetLang("lang___streak__") );
 			break;
 
 		case 31:
-			message = ( "lol " + victim.name + " is at a " + victim.pers[ "cur_death_streak" ] + " deathstreak" );
+			message = ( BotGetLang("lang__lol__") + victim.name + " is at a " + victim.pers["cur_death_streak"] + BotGetLang("lang___deathstreak_") );
 			break;
 
 		case 32:
-			message = ( "KLAPPED" );
+			message = ( BotGetLang("lang__klapped_") );
 			break;
 
 		case 33:
@@ -1265,11 +1177,11 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 35:
-			message = ( getMapName( getdvar( "mapname" ) ) + " is my favorite map!" );
+			message = ( getMapName( getdvar( "mapname" ) ) + BotGetLang("lang___is_my_favorite_map__") );
 			break;
 
 		case 36:
-			message = ( "get rekt" );
+			message = ( BotGetLang("lang__get_rekt_") );
 			break;
 
 		case 37:
@@ -1277,23 +1189,21 @@ bot_chat_killed_watch( victim )
 			break;
 
 		case 38:
-			message = ( "lol ur mum can play better than u!" );
+			message = ( BotGetLang("lang__lol_ur_mum_can_play_better_than_u__") );
 			break;
 
 		case 39:
-			message = ( victim.name + " just got rekt" );
+			message = ( victim.name + BotGetLang("lang___just_got_rekt_") );
 			break;
 
 		case 40:
-			if ( isdefined( victim.attackerdata ) && isdefined( victim.attackerdata[ self.guid ] ) && isdefined( victim.attackerdata[ self.guid ].weapon ) )
-			{
-				message = ( "Man, I sure love my " + getbaseweaponname( victim.attackerdata[ self.guid ].weapon ) + "!" );
-			}
+			if ( isDefined( victim.attackerData[self.guid] ) && isDefined( victim.attackerData[self.guid].weapon ) )
+				message = ( "Man, I sure love my " + getBaseWeaponName( victim.attackerData[self.guid].weapon ) + "!" );
 
 			break;
 
 		case 41:
-			message = ( "lol u got killed " + victim.name + ", kek" );
+			message = ( "lol u got killed " + victim.name + BotGetLang("lang____kek_") );
 			break;
 	}
 
@@ -1308,10 +1218,8 @@ bot_chat_death_watch( killer, last_ks )
 {
 	self endon( "disconnect" );
 
-	if ( !isdefined( killer ) || !isdefined( killer.name ) )
-	{
+	if ( !isDefined( killer ) || !isDefined( killer.name ) )
 		return;
-	}
 
 	message = "";
 
@@ -1322,7 +1230,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 1:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Hax ! Hax ! Hax !" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__hax___hax___hax___") );
 			break;
 
 		case 2:
@@ -1330,23 +1238,19 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 3:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "How the?? How did you do that " + killer.name + "?" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + "How the?? How did you do that "  + killer.name + "?" );
 			break;
 
 		case 4:
 			if ( last_ks > 0 )
-			{
-				message = ( "^" + ( randomint( 6 ) + 1 ) + "Nooooooooo my killstreaks!! :( I had a " + last_ks + " killstreak!!" );
-			}
+				message = ( "^" + ( randomint( 6 ) + 1 ) + "Nooooooooo my killstreaks!! :( I had a " + last_ks + BotGetLang("lang___killstreak___") );
 			else
-			{
-				message = ( "man im getting spawn killed, i have a " + self.pers[ "cur_death_streak" ] + " deathstreak!" );
-			}
+				message = ( "man im getting spawn killed, i have a " + self.pers["cur_death_streak"] + BotGetLang("lang___deathstreak__") );
 
 			break;
 
 		case 5:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Stop spawn KILLING!!!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__stop_spawn_killing____") );
 			break;
 
 		case 6:
@@ -1354,7 +1258,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 7:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Agggghhhh " + killer.name + " you are such a noob!!!!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + "Agggghhhh " + killer.name + BotGetLang("lang___you_are_such_a_noob_____") );
 			break;
 
 		case 8:
@@ -1362,7 +1266,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 9:
-			message = ( "Sigh at my lag, it's totally killing me.. ^2Just Look at my ^1Ping!" );
+			message = ( BotGetLang("lang__sigh_at_my_lag__it_s_totally_killing_me____2just_look_at_my__1ping__") );
 			break;
 
 		case 10:
@@ -1370,67 +1274,67 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 11:
-			message = ( "Today is defnitly not my day" );
+			message = ( BotGetLang("lang__today_is_defnitly_not_my_day_") );
 			break;
 
 		case 12:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Aaaaaaaagh!!!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__aaaaaaaagh____") );
 			break;
 
 		case 13:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + " Dude What the hell, " + killer.name + " is such a HACKER!! " );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + " Dude What the hell, " + killer.name + BotGetLang("lang___is_such_a_hacker____") );
 			break;
 
 		case 14:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + killer.name + " you Wallhacker!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + killer.name + BotGetLang("lang___you_wallhacker__") );
 			break;
 
 		case 15:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "This is so frustrating!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__this_is_so_frustrating__") );
 			break;
 
 		case 16:
-			message = ( " :O I can't believe that just happened" );
+			message = ( BotGetLang("lang____o_i_can_t_believe_that_just_happened_") );
 			break;
 
 		case 17:
-			message = ( killer.name + " you ^1Noooo^2ooooooooo^3ooooo^5b" );
+			message = ( killer.name + BotGetLang("lang___you__1noooo_2ooooooooo_3ooooo_5b_") );
 			break;
 
 		case 18:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "LOL, " + killer.name + " how did you kill me?" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + "LOL, " + killer.name + BotGetLang("lang___how_did_you_kill_me__") );
 			break;
 
 		case 19:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "laaaaaaaaaaaaaaaaaaaag" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__laaaaaaaaaaaaaaaaaaaag_") );
 			break;
 
 		case 20:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "i hate this map!" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__i_hate_this_map__") );
 			break;
 
 		case 21:
-			message = ( killer.name + " You tanker!!" );
+			message = ( killer.name + BotGetLang("lang___you_tanker___") );
 			break;
 
 		case 22:
-			message = ( "Sigh at my isp" );
+			message = ( BotGetLang("lang__sigh_at_my_isp_") );
 			break;
 
 		case 23:
-			message = ( "^1I'll ^2be ^6back" );
+			message = ( BotGetLang("lang___1i_ll__2be__6back_") );
 			break;
 
 		case 24:
-			message = ( "LoL that was random" );
+			message = ( BotGetLang("lang__lol_that_was_random_") );
 			break;
 
 		case 25:
-			message = ( "ooohh that was so close " + killer.name + " and you know it !! " );
+			message = ( "ooohh that was so close " + killer.name + BotGetLang("lang___and_you_know_it_____") );
 			break;
 
 		case 26:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "rofl" );
+			message = ( "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__rofl_") );
 			break;
 
 		case 27:
@@ -1438,31 +1342,31 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 28:
-			message = ( "AHH! IM DEAD BECAUSE " + level.players[ randomint( level.players.size ) ].name + " is a noob!" );
+			message = ( "AHH! IM DEAD BECAUSE " + level.players[randomint( level.players.size )].name + BotGetLang("lang___is_a_noob__") );
 			break;
 
 		case 29:
-			message = ( level.players[ randomint( level.players.size ) ].name + ", please don't talk." );
+			message = ( level.players[randomint( level.players.size )].name + BotGetLang("lang____please_don_t_talk__") );
 			break;
 
 		case 30:
-			message = ( "Wow " + level.players[ randomint( level.players.size ) ].name + " is a blocker noob!" );
+			message = ( "Wow " + level.players[randomint( level.players.size )].name + BotGetLang("lang___is_a_blocker_noob__") );
 			break;
 
 		case 31:
-			message = ( "Next time GET OUT OF MY WAY " + level.players[ randomint( level.players.size ) ].name + "!!" );
+			message = ( "Next time GET OUT OF MY WAY " + level.players[randomint( level.players.size )].name + "!!" );
 			break;
 
 		case 32:
-			message = ( "Wow, I'm dead because " + killer.name + " is a tryhard..." );
+			message = ( "Wow, I'm dead because " + killer.name + BotGetLang("lang___is_a_tryhard____") );
 			break;
 
 		case 33:
-			message = ( "Try harder " + killer.name + " please!" );
+			message = ( "Try harder " + killer.name + BotGetLang("lang___please__") );
 			break;
 
 		case 34:
-			message = ( "I bet " + killer.name + "'s fingers are about to break." );
+			message = ( "I bet " + killer.name + BotGetLang("lang___s_fingers_are_about_to_break__") );
 			break;
 
 		case 35:
@@ -1470,7 +1374,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 36:
-			message = ( "k wtf. " + killer.name + " is hacking" );
+			message = ( "k wtf. " + killer.name + BotGetLang("lang___is_hacking_") );
 			break;
 
 		case 37:
@@ -1482,11 +1386,11 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 39:
-			message = ( "cheetos!" );
+			message = ( BotGetLang("lang__cheetos__") );
 			break;
 
 		case 40:
-			message = ( "wow " + getMapName( getdvar( "mapname" ) ) + " is messed up" );
+			message = ( BotGetLang("lang__wow__") + getMapName( getdvar( "mapname" ) ) + BotGetLang("lang___is_messed_up_") );
 			break;
 
 		case 41:
@@ -1498,19 +1402,19 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 43:
-			message = ( "WTF IS WITH THESE SPAWNS??" );
+			message = ( BotGetLang("lang__wtf_is_with_these_spawns___") );
 			break;
 
 		case 44:
-			message = ( "im getting owned lol..." );
+			message = ( BotGetLang("lang__im_getting_owned_lol____") );
 			break;
 
 		case 45:
-			message = ( "someone kill " + killer.name + ", they are on a streak of " + killer.pers[ "cur_kill_streak" ] + "!" );
+			message = ( "someone kill " + killer.name + ", they are on a streak of " + killer.pers["cur_kill_streak"] + "!" );
 			break;
 
 		case 46:
-			message = ( "man i died" );
+			message = ( BotGetLang("lang__man_i_died_") );
 			break;
 
 		case 47:
@@ -1522,7 +1426,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 49:
-			message = ( "k THERE IS NOTHING I CAN DO ABOUT DYING!!" );
+			message = ( BotGetLang("lang__k_there_is_nothing_i_can_do_about_dying___") );
 			break;
 
 		case 50:
@@ -1530,7 +1434,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 51:
-			message = ( "lol " + getMapName( getdvar( "mapname" ) ) + " sux" );
+			message = ( BotGetLang("lang__lol__") + getMapName( getdvar( "mapname" ) ) + BotGetLang("lang___sux_") );
 			break;
 
 		case 52:
@@ -1538,7 +1442,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 53:
-			message = ( getMapName( getdvar( "mapname" ) ) + " is such an unfair map!!" );
+			message = ( getMapName( getdvar( "mapname" ) ) + BotGetLang("lang___is_such_an_unfair_map___") );
 			break;
 
 		case 54:
@@ -1546,7 +1450,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 55:
-			message = ( killer.name + " totally just destroyed me!" );
+			message = ( killer.name + BotGetLang("lang___totally_just_destroyed_me__") );
 			break;
 
 		case 56:
@@ -1554,7 +1458,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 57:
-			message = ( "wow " + killer.name + " is such a no life!!" );
+			message = ( BotGetLang("lang__wow__") + killer.name + BotGetLang("lang___is_such_a_no_life___") );
 			break;
 
 		case 58:
@@ -1566,10 +1470,8 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 60:
-			if ( isdefined( self.attackerdata ) && isdefined( self.attackerdata[ killer.guid ] ) && isdefined( self.attackerdata[ killer.guid ].weapon ) )
-			{
-				message = "Wow! Nice " + getbaseweaponname( self.attackerdata[ killer.guid ].weapon ) + " you got there, " + killer.name + "!";
-			}
+			if ( isDefined( self.attackerData[killer.guid] ) && isDefined( self.attackerData[killer.guid].weapon ) )
+				message = "Wow! Nice " + getBaseWeaponName( self.attackerData[killer.guid].weapon ) + " you got there, " + killer.name + "!";
 
 			break;
 
@@ -1590,7 +1492,7 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 
 		case 65:
-			message = ( "nice aimbot " + killer.name + "!!1" );
+			message = ( "nice aimbot " + killer.name + BotGetLang("lang____1_") );
 			break;
 
 		case 66:
@@ -1616,30 +1518,30 @@ bot_chat_revive_watch( state, revive, c, d, e, f, g )
 	switch ( state )
 	{
 		case "go":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "i am going to revive " + revive.name );
+					self BotDoChat( 10, BotGetLang("lang__i_am_going_to_revive__") + revive.name );
 					break;
 			}
 
 			break;
 
 		case "start":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "i am reviving " + revive.name );
+					self BotDoChat( 10, BotGetLang("lang__i_am_reviving__") + revive.name );
 					break;
 			}
 
 			break;
 
 		case "stop":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "i revived " + revive.name );
+					self BotDoChat( 10, BotGetLang("lang__i_revived__") + revive.name );
 					break;
 			}
 
@@ -1657,28 +1559,28 @@ bot_chat_killcam_watch( state, b, c, d, e, f, g )
 	switch ( state )
 	{
 		case "start":
-			switch ( randomint( 2 ) )
+			switch ( randomInt( 2 ) )
 			{
 				case 0:
-					self BotDoChat( 1, "WTF?!?!?!! Dude youre a hacker and a half!!" );
+					self BotDoChat( 1, BotGetLang("lang__wtf________dude_youre_a_hacker_and_a_half___") );
 					break;
 
 				case 1:
-					self BotDoChat( 1, "Haa! Got my fraps ready, time to watch this killcam." );
+					self BotDoChat( 1, BotGetLang("lang__haa__got_my_fraps_ready__time_to_watch_this_killcam__") );
 					break;
 			}
 
 			break;
 
 		case "stop":
-			switch ( randomint( 2 ) )
+			switch ( randomInt( 2 ) )
 			{
 				case 0:
-					self BotDoChat( 1, "Wow... Im reporting you!!!" );
+					self BotDoChat( 1, BotGetLang("lang__wow____im_reporting_you____") );
 					break;
 
 				case 1:
-					self BotDoChat( 1, "Got it on fraps!" );
+					self BotDoChat( 1, BotGetLang("lang__got_it_on_fraps__") );
 					break;
 			}
 
@@ -1693,7 +1595,7 @@ bot_chat_stuck_watch( a, b, c, d, e, f, g )
 {
 	self endon( "disconnect" );
 
-	sayLength = randomintrange( 5, 30 );
+	sayLength = randomintRange( 5, 30 );
 	msg = "";
 
 	for ( i = 0; i < sayLength; i++ )
@@ -1751,20 +1653,20 @@ bot_chat_tube_watch( state, tubeWp, tubeWeap, d, e, f, g )
 	switch ( state )
 	{
 		case "go":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "i am going to go tube" );
+					self BotDoChat( 10, BotGetLang("lang__i_am_going_to_go_tube_") );
 					break;
 			}
 
 			break;
 
 		case "start":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "i tubed" );
+					self BotDoChat( 10, BotGetLang("lang__i_tubed_") );
 					break;
 			}
 
@@ -1775,22 +1677,20 @@ bot_chat_tube_watch( state, tubeWp, tubeWeap, d, e, f, g )
 /*
 	bot_chat_killstreak_watch( streakName, b, c, d, e, f, g )
 */
-bot_chat_killstreak_watch( state, streakName, c, directionYaw, e, f, g )
+bot_chat_killstreak_watch( state, streakName, campSpot, d, e, f, g )
 {
 	self endon( "disconnect" );
 
 	switch ( state )
 	{
 		case "call":
-			location = c;
-
 			switch ( streakName )
 			{
 				case "helicopter_flares":
 					switch ( randomint( 1 ) )
 					{
 						case 0:
-							self BotDoChat( 100, "Nice! I got the paves!" );
+							self BotDoChat( 100, BotGetLang("lang__nice__i_got_the_paves__") );
 							break;
 					}
 
@@ -1800,11 +1700,11 @@ bot_chat_killstreak_watch( state, streakName, c, directionYaw, e, f, g )
 					switch ( randomint( 2 ) )
 					{
 						case 0:
-							self BotDoChat( 100, "Wow, wasn't expecting on getting an EMP." );
+							self BotDoChat( 100, BotGetLang("lang__wow__wasn_t_expecting_on_getting_an_emp__") );
 							break;
 
 						case 1:
-							self BotDoChat( 100, "You don't see an EMP everyday!" );
+							self BotDoChat( 100, BotGetLang("lang__you_don_t_see_an_emp_everyday__") );
 							break;
 					}
 
@@ -1814,35 +1714,35 @@ bot_chat_killstreak_watch( state, streakName, c, directionYaw, e, f, g )
 					switch ( randomint( 8 ) )
 					{
 						case 0:
-							self BotDoChat( 100, "NUUUKE" );
+							self BotDoChat( 100, BotGetLang("lang__nuuuke_") );
 							break;
 
 						case 1:
-							self BotDoChat( 100, "lol sweet nuke" );
+							self BotDoChat( 100, BotGetLang("lang__lol_sweet_nuke_") );
 							break;
 
 						case 2:
-							self BotDoChat( 100, "NUUUUUUKKKKKKEEEEEE!!!!" );
+							self BotDoChat( 100, BotGetLang("lang__nuuuuuukkkkkkeeeeee_____") );
 							break;
 
 						case 3:
-							self BotDoChat( 100, "YEEEEEEEES!!" );
+							self BotDoChat( 100, BotGetLang("lang__yeeeeeeees___") );
 							break;
 
 						case 4:
-							self BotDoChat( 100, "sweet I get a nuke and my team is noob" );
+							self BotDoChat( 100, BotGetLang("lang__sweet_i_get_a_nuke_and_my_team_is_noob_") );
 							break;
 
 						case 5:
-							self BotDoChat( 100, "GET NUKED NERDS!!!!" );
+							self BotDoChat( 100, BotGetLang("lang__get_nuked_nerds_____") );
 							break;
 
 						case 6:
-							self BotDoChat( 100, "NUKEM NOW!!!! NUKEEEEE!" );
+							self BotDoChat( 100, BotGetLang("lang__nukem_now_____nukeeeee__") );
 							break;
 
 						case 7:
-							self BotDoChat( 100, "Get nuked kids!" );
+							self BotDoChat( 100, BotGetLang("lang__get_nuked_kids__") );
 							break;
 					}
 
@@ -1852,23 +1752,23 @@ bot_chat_killstreak_watch( state, streakName, c, directionYaw, e, f, g )
 					switch ( randomint( 5 ) )
 					{
 						case 0:
-							self BotDoChat( 100, "^3Time to ^1klap ^3some kids!" );
+							self BotDoChat( 100, BotGetLang("lang___3time_to__1klap__3some_kids__") );
 							break;
 
 						case 1:
-							self BotDoChat( 100, "Stingers are not welcome! AC130 rules all!" );
+							self BotDoChat( 100, BotGetLang("lang__stingers_are_not_welcome__ac130_rules_all__") );
 							break;
 
 						case 2:
-							self BotDoChat( 100, "Bahahahahahaaa! Time to rule the map with AC130!" );
+							self BotDoChat( 100, BotGetLang("lang__bahahahahahaaa__time_to_rule_the_map_with_ac130__") );
 							break;
 
 						case 3:
-							self BotDoChat( 100, "ac130 Madness!" );
+							self BotDoChat( 100, BotGetLang("lang__ac130_madness__") );
 							break;
 
 						case 4:
-							self BotDoChat( 100, "Say hello to my little friend, ^6AC130!" );
+							self BotDoChat( 100, BotGetLang("lang__say_hello_to_my_little_friend___6ac130__") );
 							break;
 					}
 
@@ -1878,31 +1778,31 @@ bot_chat_killstreak_watch( state, streakName, c, directionYaw, e, f, g )
 					switch ( randomint( 7 ) )
 					{
 						case 0:
-							self BotDoChat( 100, "Eat my Chopper Gunner!!" );
+							self BotDoChat( 100, BotGetLang("lang__eat_my_chopper_gunner___") );
 							break;
 
 						case 1:
-							self BotDoChat( 100, "and here comes the ^1PAIN!" );
+							self BotDoChat( 100, BotGetLang("lang__and_here_comes_the__1pain__") );
 							break;
 
 						case 2:
-							self BotDoChat( 100, "Awwwww Yeah! Time to create choas in 40 seconds flat." );
+							self BotDoChat( 100, BotGetLang("lang__awwwww_yeah__time_to_create_choas_in_40_seconds_flat__") );
 							break;
 
 						case 3:
-							self BotDoChat( 100, "Woot! Got my chopper gunner!" );
+							self BotDoChat( 100, BotGetLang("lang__woot__got_my_chopper_gunner__") );
 							break;
 
 						case 4:
-							self BotDoChat( 100, "Wewt got my choppa!" );
+							self BotDoChat( 100, BotGetLang("lang__wewt_got_my_choppa__") );
 							break;
 
 						case 5:
-							self BotDoChat( 100, "Time to spawn kill with the OP chopper!" );
+							self BotDoChat( 100, BotGetLang("lang__time_to_spawn_kill_with_the_op_chopper__") );
 							break;
 
 						case 6:
-							self BotDoChat( 100, "GET TO DA CHOPPA!!" );
+							self BotDoChat( 100, BotGetLang("lang__get_to_da_choppa___") );
 							break;
 					}
 
@@ -1912,7 +1812,6 @@ bot_chat_killstreak_watch( state, streakName, c, directionYaw, e, f, g )
 			break;
 
 		case "camp":
-			campSpot = c;
 			break;
 	}
 }
@@ -1924,30 +1823,21 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 {
 	self endon( "disconnect" );
 
-	if ( !isdefined( aircare ) )
-	{
-		return;
-	}
-
 	switch ( state )
 	{
 		case "go":
 			switch ( randomint( 2 ) )
 			{
 				case 0:
-					if ( !isdefined( aircare.owner ) || aircare.owner == self )
-					{
-						self BotDoChat( 5, "going to my carepackage" );
-					}
+					if ( !isDefined( aircare.owner ) || aircare.owner == self )
+						self BotDoChat( 5, BotGetLang("lang__going_to_my_carepackage_") );
 					else
-					{
-						self BotDoChat( 5, "going to " + aircare.owner.name + "'s carepackage" );
-					}
+						self BotDoChat( 5, BotGetLang("lang__going_to__") + aircare.owner.name + BotGetLang("lang___s_carepackage_") );
 
 					break;
 
 				case 1:
-					self BotDoChat( 5, "going to this carepackage" );
+					self BotDoChat( 5, BotGetLang("lang__going_to_this_carepackage_") );
 					break;
 			}
 
@@ -1957,51 +1847,47 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			switch ( randomint( 2 ) )
 			{
 				case 0:
-					if ( !isdefined( aircare.owner ) || aircare.owner == self )
-					{
-						self BotDoChat( 15, "taking my carepackage" );
-					}
+					if ( !isDefined( aircare.owner ) || aircare.owner == self )
+						self BotDoChat( 15, BotGetLang("lang__taking_my_carepackage_") );
 					else
-					{
-						self BotDoChat( 15, "taking " + aircare.owner.name + "'s carepackage" );
-					}
+						self BotDoChat( 15, BotGetLang("lang__taking__") + aircare.owner.name + BotGetLang("lang___s_carepackage_") );
 
 					break;
 
 				case 1:
-					self BotDoChat( 15, "taking this carepackage" );
+					self BotDoChat( 15, BotGetLang("lang__taking_this_carepackage_") );
 					break;
 			}
 
 			break;
 
 		case "stop":
-			if ( !isdefined( aircare.owner ) || aircare.owner == self )
+			if ( !isDefined( aircare.owner ) || aircare.owner == self )
 			{
 				switch ( randomint( 6 ) )
 				{
 					case 0:
-						self BotDoChat( 10, "Pheww... Got my carepackage" );
+						self BotDoChat( 10, BotGetLang("lang__pheww____got_my_carepackage_") );
 						break;
 
 					case 1:
-						self BotDoChat( 10, "lolnoobs i got my carepackage. what now!?" );
+						self BotDoChat( 10, BotGetLang("lang__lolnoobs_i_got_my_carepackage__what_now___") );
 						break;
 
 					case 2:
-						self BotDoChat( 10, "holy cow! that was a close one!" );
+						self BotDoChat( 10, BotGetLang("lang__holy_cow__that_was_a_close_one__") );
 						break;
 
 					case 3:
-						self BotDoChat( 10, "lol u sillys. i got my care package" );
+						self BotDoChat( 10, BotGetLang("lang__lol_u_sillys__i_got_my_care_package_") );
 						break;
 
 					case 4:
-						self BotDoChat( 10, ":3 i got my package" );
+						self BotDoChat( 10, BotGetLang("lang___3_i_got_my_package_") );
 						break;
 
 					case 5:
-						self BotDoChat( 10, ":3 i got my " + aircare.cratetype );
+						self BotDoChat( 10, BotGetLang("lang___3_i_got_my__") + aircare.crateType );
 						break;
 				}
 			}
@@ -2010,23 +1896,23 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 				switch ( randomint( 5 ) )
 				{
 					case 0:
-						self BotDoChat( 10, "LOL! (10-101) I took " + aircare.owner.name + "'s carepackage." );
+						self BotDoChat( 10, BotGetLang("lang__lol___10_101__i_took__") + aircare.owner.name + BotGetLang("lang___s_carepackage__") );
 						break;
 
 					case 1:
-						self BotDoChat( 10, "lolsweet just found a carepackage, just for me!" );
+						self BotDoChat( 10, BotGetLang("lang__lolsweet_just_found_a_carepackage__just_for_me__") );
 						break;
 
 					case 2:
-						self BotDoChat( 10, "I heard " + aircare.owner.name + " owed me a carepackage. Thanks lol." );
+						self BotDoChat( 10, BotGetLang("lang__i_heard__") + aircare.owner.name + BotGetLang("lang___owed_me_a_carepackage__thanks_lol__") );
 						break;
 
 					case 3:
-						self BotDoChat( 10, ">;3 i took your care package! xDD" );
+						self BotDoChat( 10, BotGetLang("lang____3_i_took_your_care_package__xdd_") );
 						break;
 
 					case 4:
-						self BotDoChat( 10, "hahaah jajaja i took your " + aircare.cratetype );
+						self BotDoChat( 10, BotGetLang("lang__hahaah_jajaja_i_took_your__") + aircare.crateType );
 						break;
 				}
 			}
@@ -2037,23 +1923,23 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			switch ( randomint( 5 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "sad... gf carepackage" );
+					self BotDoChat( 10, BotGetLang("lang__sad____gf_carepackage_") );
 					break;
 
 				case 1:
-					self BotDoChat( 10, "WTF MAN! THAT WAS MINE." );
+					self BotDoChat( 10, BotGetLang("lang__wtf_man__that_was_mine__") );
 					break;
 
 				case 2:
-					self BotDoChat( 10, "Wow wtf " + player.name + ", i worked hard for that carepackage..." );
+					self BotDoChat( 10, BotGetLang("lang__wow_wtf__") + player.name + BotGetLang("lang____i_worked_hard_for_that_carepackage____") );
 					break;
 
 				case 3:
-					self BotDoChat( 10, ">.< " + player.name + ", fine take my skill package." );
+					self BotDoChat( 10, BotGetLang("lang_______") + player.name + BotGetLang("lang____fine_take_my_skill_package__") );
 					break;
 
 				case 4:
-					self BotDoChat( 10, "Wow! there goes my " + aircare.cratetype + "!" );
+					self BotDoChat( 10, BotGetLang("lang__wow__there_goes_my__") + aircare.crateType + "!" );
 					break;
 			}
 
@@ -2063,7 +1949,7 @@ bot_chat_crate_cap_watch( state, aircare, player, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 25, "i cant reach that carepackage!" );
+					self BotDoChat( 25, BotGetLang("lang__i_cant_reach_that_carepackage__") );
 					break;
 			}
 
@@ -2084,66 +1970,64 @@ bot_chat_attack_vehicle_watch( state, vehicle, rocketAmmo, d, e, f, g )
 			switch ( randomint( 14 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "Not on my watch..." );
+					self BotDoChat( 10, BotGetLang("lang__not_on_my_watch____") );
 					break;
 
 				case 1:
-					self BotDoChat( 10, "Take down aircraft I am" );
+					self BotDoChat( 10, BotGetLang("lang__take_down_aircraft_i_am_") );
 					break;
 
 				case 2:
-					self BotDoChat( 10, "^" + ( randomint( 6 ) + 1 ) + "i hate killstreaks" );
+					self BotDoChat( 10, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__i_hate_killstreaks_") );
 					break;
 
 				case 3:
-					self BotDoChat( 10, "Killstreaks ruin this game!!" );
+					self BotDoChat( 10, BotGetLang("lang__killstreaks_ruin_this_game___") );
 					break;
 
 				case 4:
-					self BotDoChat( 10, "killstreaks sux" );
+					self BotDoChat( 10, BotGetLang("lang__killstreaks_sux_") );
 					break;
 
 				case 5:
-					self BotDoChat( 10, "keep the killstreaks comin'" );
+					self BotDoChat( 10, BotGetLang("lang__keep_the_killstreaks_comin__") );
 					break;
 
 				case 6:
-					self BotDoChat( 10, "lol see that killstreak? its going to go BOOM!" );
+					self BotDoChat( 10, BotGetLang("lang__lol_see_that_killstreak__its_going_to_go_boom__") );
 					break;
 
 				case 7:
-					self BotDoChat( 10, "^" + ( randomint( 6 ) + 1 ) + "Lol I bet that noob used hardline to get that streak." );
+					self BotDoChat( 10, "^" + ( randomint( 6 ) + 1 ) + BotGetLang("lang__lol_i_bet_that_noob_used_hardline_to_get_that_streak__") );
 					break;
 
 				case 8:
-					self BotDoChat( 10, "WOW HOW DO YOU GET THAT?? ITS GONE NOW." );
+					self BotDoChat( 10, BotGetLang("lang__wow_how_do_you_get_that___its_gone_now__") );
 					break;
 
 				case 9:
-					self BotDoChat( 10, "HAHA say goodbye to your killstreak" );
+					self BotDoChat( 10, BotGetLang("lang__haha_say_goodbye_to_your_killstreak_") );
 					break;
 
 				case 10:
-					self BotDoChat( 10, "All your effort is gone now." );
+					self BotDoChat( 10, BotGetLang("lang__all_your_effort_is_gone_now__") );
 					break;
 
 				case 11:
-					self BotDoChat( 10, "I hope there are flares on that killstreak." );
+					self BotDoChat( 10, BotGetLang("lang__i_hope_there_are_flares_on_that_killstreak__") );
 					break;
 
 				case 12:
-					self BotDoChat( 10, "lol u silly, i'm taking down killstreaks :3 xDD" );
+					self BotDoChat( 10, BotGetLang("lang__lol_u_silly__i_m_taking_down_killstreaks__3_xdd_") );
 					break;
 
 				case 13:
 					weap = rocketAmmo;
 
-					if ( !isdefined( weap ) )
-					{
-						weap = self getcurrentweapon();
-					}
+					if ( !isDefined( weap ) )
+						weap = self getCurrentWeapon();
 
-					self BotDoChat( 10, "Im going to takedown your ks with my " + getbaseweaponname( weap ) );
+					self BotDoChat( 10, BotGetLang("lang__im_going_to_takedown_your_ks_with_my__") + getBaseWeaponName( weap ) );
 					break;
 			}
 
@@ -2184,15 +2068,15 @@ bot_chat_camp_watch( state, wp, time, d, e, f, g )
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "going to camp for " + time + " seconds" );
+					self BotDoChat( 10, BotGetLang("lang__going_to_camp_for__") + time + BotGetLang("lang___seconds_") );
 					break;
 
 				case 1:
-					self BotDoChat( 10, "time to go camp!" );
+					self BotDoChat( 10, BotGetLang("lang__time_to_go_camp__") );
 					break;
 
 				case 2:
-					self BotDoChat( 10, "rofl im going to camp" );
+					self BotDoChat( 10, BotGetLang("lang__rofl_im_going_to_camp_") );
 					break;
 			}
 
@@ -2202,15 +2086,15 @@ bot_chat_camp_watch( state, wp, time, d, e, f, g )
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "well im camping... this is fun!" );
+					self BotDoChat( 10, BotGetLang("lang__well_im_camping____this_is_fun__") );
 					break;
 
 				case 1:
-					self BotDoChat( 10, "lol im camping, hope i kill someone" );
+					self BotDoChat( 10, BotGetLang("lang__lol_im_camping__hope_i_kill_someone_") );
 					break;
 
 				case 2:
-					self BotDoChat( 10, "im camping! i guess ill wait " + time + " before moving again" );
+					self BotDoChat( 10, BotGetLang("lang__im_camping__i_guess_ill_wait__") + time + BotGetLang("lang___before_moving_again_") );
 					break;
 			}
 
@@ -2220,15 +2104,15 @@ bot_chat_camp_watch( state, wp, time, d, e, f, g )
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "finished camping.." );
+					self BotDoChat( 10, BotGetLang("lang__finished_camping___") );
 					break;
 
 				case 1:
-					self BotDoChat( 10, "wow that was a load of camping!" );
+					self BotDoChat( 10, BotGetLang("lang__wow_that_was_a_load_of_camping__") );
 					break;
 
 				case 2:
-					self BotDoChat( 10, "well its been over " + time + " seconds, i guess ill stop camping" );
+					self BotDoChat( 10, BotGetLang("lang__well_its_been_over__") + time + BotGetLang("lang___seconds__i_guess_ill_stop_camping_") );
 					break;
 			}
 
@@ -2243,26 +2127,21 @@ bot_chat_follow_watch( state, player, time, d, e, f, g )
 {
 	self endon( "disconnect" );
 
-	if ( !isdefined( player ) )
-	{
-		return;
-	}
-
 	switch ( state )
 	{
 		case "start":
 			switch ( randomint( 3 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "well im going to follow " + player.name + " for " + time + " seconds" );
+					self BotDoChat( 10, BotGetLang("lang__well_im_going_to_follow__") + player.name + " for " + time + BotGetLang("lang___seconds_") );
 					break;
 
 				case 1:
-					self BotDoChat( 10, "Lets go together " + player.name + " <3 :)" );
+					self BotDoChat( 10, BotGetLang("lang__lets_go_together__") + player.name + BotGetLang("lang____3____") );
 					break;
 
 				case 2:
-					self BotDoChat( 10, "lets be butt buddies " + player.name + " and ill follow you!" );
+					self BotDoChat( 10, BotGetLang("lang__lets_be_butt_buddies__") + player.name + BotGetLang("lang___and_ill_follow_you__") );
 					break;
 			}
 
@@ -2272,11 +2151,11 @@ bot_chat_follow_watch( state, player, time, d, e, f, g )
 			switch ( randomint( 2 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "well that was fun following " + player.name + " for " + time + " seconds" );
+					self BotDoChat( 10, BotGetLang("lang__well_that_was_fun_following__") + player.name + " for " + time + BotGetLang("lang___seconds_") );
 					break;
 
 				case 1:
-					self BotDoChat( 10, "im done following that guy" );
+					self BotDoChat( 10, BotGetLang("lang__im_done_following_that_guy_") );
 					break;
 			}
 
@@ -2294,20 +2173,20 @@ bot_chat_equ_watch( state, wp, weap, d, e, f, g )
 	switch ( state )
 	{
 		case "go":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "going to place a " + getbaseweaponname( weap ) );
+					self BotDoChat( 10, BotGetLang("lang__going_to_place_a__") + getBaseWeaponName( weap ) );
 					break;
 			}
 
 			break;
 
 		case "start":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "placed a " + getbaseweaponname( weap ) );
+					self BotDoChat( 10, BotGetLang("lang__placed_a__") + getBaseWeaponName( weap ) );
 					break;
 			}
 
@@ -2325,20 +2204,20 @@ bot_chat_nade_watch( state, wp, weap, d, e, f, g )
 	switch ( state )
 	{
 		case "go":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "going to throw a " + getbaseweaponname( weap ) );
+					self BotDoChat( 10, BotGetLang("lang__going_to_throw_a__") + getBaseWeaponName( weap ) );
 					break;
 			}
 
 			break;
 
 		case "start":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "threw a " + getbaseweaponname( weap ) );
+					self BotDoChat( 10, BotGetLang("lang__threw_a__") + getBaseWeaponName( weap ) );
 					break;
 			}
 
@@ -2376,7 +2255,7 @@ bot_chat_throwback_watch( state, nade, c, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "i am going to throw back the grenade!" );
+					self BotDoChat( 10, BotGetLang("lang__i_am_going_to_throw_back_the_grenade__") );
 					break;
 			}
 
@@ -2386,7 +2265,7 @@ bot_chat_throwback_watch( state, nade, c, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "i threw back the grenade!" );
+					self BotDoChat( 10, BotGetLang("lang__i_threw_back_the_grenade__") );
 					break;
 			}
 
@@ -2407,7 +2286,7 @@ bot_chat_tbag_watch( state, who, c, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 50, "Im going to go tBag XD" );
+					self BotDoChat( 50, BotGetLang("lang__im_going_to_go_tbag_xd_") );
 					break;
 			}
 
@@ -2417,7 +2296,7 @@ bot_chat_tbag_watch( state, who, c, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 50, "Im going to tBag XD" );
+					self BotDoChat( 50, BotGetLang("lang__im_going_to_tbag_xd_") );
 					break;
 			}
 
@@ -2427,7 +2306,7 @@ bot_chat_tbag_watch( state, who, c, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 50, "Awwww yea... How do you like that? XD" );
+					self BotDoChat( 50, BotGetLang("lang__awwww_yea____how_do_you_like_that__xd_") );
 					break;
 			}
 
@@ -2448,23 +2327,23 @@ bot_chat_rage_watch( state, b, c, d, e, f, g )
 			switch ( randomint( 5 ) )
 			{
 				case 0:
-					self BotDoChat( 80, "K this is not going as I planned." );
+					self BotDoChat( 80, BotGetLang("lang__k_this_is_not_going_as_i_planned__") );
 					break;
 
 				case 1:
-					self BotDoChat( 80, "Screw this! I'm out." );
+					self BotDoChat( 80, BotGetLang("lang__screw_this__i_m_out__") );
 					break;
 
 				case 2:
-					self BotDoChat( 80, "Have fun being owned." );
+					self BotDoChat( 80, BotGetLang("lang__have_fun_being_owned__") );
 					break;
 
 				case 3:
-					self BotDoChat( 80, "MY TEAM IS GARBAGE!" );
+					self BotDoChat( 80, BotGetLang("lang__my_team_is_garbage__") );
 					break;
 
 				case 4:
-					self BotDoChat( 80, "kthxbai hackers" );
+					self BotDoChat( 80, BotGetLang("lang__kthxbai_hackers_") );
 					break;
 			}
 
@@ -2485,7 +2364,7 @@ bot_chat_revenge_watch( state, loc, killer, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "Im going to check out my death location." );
+					self BotDoChat( 10, BotGetLang("lang__im_going_to_check_out_my_death_location__") );
 					break;
 			}
 
@@ -2495,7 +2374,7 @@ bot_chat_revenge_watch( state, loc, killer, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "i checked out my deathlocation..." );
+					self BotDoChat( 10, BotGetLang("lang__i_checked_out_my_deathlocation____") );
 					break;
 			}
 
@@ -2516,7 +2395,7 @@ bot_chat_heard_target_watch( state, heard, c, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 5, "I think I hear " + heard.name + "..." );
+					self BotDoChat( 5, BotGetLang("lang__i_think_i_hear__") + heard.name + BotGetLang("lang______") );
 					break;
 			}
 
@@ -2526,7 +2405,7 @@ bot_chat_heard_target_watch( state, heard, c, d, e, f, g )
 			switch ( randomint( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 5, "Well i checked out " + heard.name + "'s location..." );
+					self BotDoChat( 5, BotGetLang("lang__well_i_checked_out__") + heard.name + BotGetLang("lang___s_location____") );
 					break;
 			}
 
@@ -2561,20 +2440,20 @@ bot_chat_turret_attack_watch( state, turret, c, d, e, f, g )
 	switch ( state )
 	{
 		case "go":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 5, "going to this sentry..." );
+					self BotDoChat( 5, BotGetLang("lang__going_to_this_sentry____") );
 					break;
 			}
 
 			break;
 
 		case "start":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 5, "attacking this sentry..." );
+					self BotDoChat( 5, BotGetLang("lang__attacking_this_sentry____") );
 					break;
 			}
 
@@ -2595,30 +2474,30 @@ bot_chat_attack_equ_watch( state, equ, c, d, e, f, g )
 	switch ( state )
 	{
 		case "go_ti":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "going to this ti..." );
+					self BotDoChat( 10, BotGetLang("lang__going_to_this_ti____") );
 					break;
 			}
 
 			break;
 
 		case "camp_ti":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "lol im camping this ti!" );
+					self BotDoChat( 10, BotGetLang("lang__lol_im_camping_this_ti__") );
 					break;
 			}
 
 			break;
 
 		case "trigger_ti":
-			switch ( randomint( 1 ) )
+			switch ( randomInt( 1 ) )
 			{
 				case 0:
-					self BotDoChat( 10, "lol i destoryed this ti!" );
+					self BotDoChat( 10, BotGetLang("lang__lol_i_destoryed_this_ti__") );
 					break;
 			}
 
