@@ -28,6 +28,11 @@ init()
 */
 onBotConnected()
 {
+	if ( !getdvarfloat( "bots_main_chat" ) )
+	{
+		return;
+	}
+	
 	for ( ;; )
 	{
 		level waittill( "bot_connected", bot );
@@ -629,7 +634,7 @@ endgame_chat()
 			switch ( randomint( 21 ) )
 			{
 				case 0:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha what a game" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Haha what a game" );
 					break;
 					
 				case 1:
@@ -637,51 +642,51 @@ endgame_chat()
 					break;
 					
 				case 3:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "That was fun" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "That was fun" );
 					break;
 					
 				case 4:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol my team always wins!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Lol my team always wins!" );
 					break;
 					
 				case 5:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha if i am on " + winningteam + " my team always wins!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Haha if i am on " + winningteam + " my team always wins!" );
 					break;
 					
 				case 2:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "gg" );
 					break;
 					
 				case 6:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "GGA, our team was awesome!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "GGA, our team was awesome!" );
 					break;
 					
 				case 7:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers[ "team" ] + " always wins!!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "My team " + self.pers[ "team" ] + " always wins!!" );
 					break;
 					
 				case 8:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "WOW that was EPIC!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "WOW that was EPIC!" );
 					break;
 					
 				case 9:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Hackers lost haha noobs" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Hackers lost haha noobs" );
 					break;
 					
 				case 10:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice game!! Good job team!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Nice game!! Good job team!" );
 					break;
 					
 				case 11:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "GGA, Well done team!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "GGA, Well done team!" );
 					break;
 					
 				case 12:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL! camper noobs lose" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "LOL! camper noobs lose" );
 					break;
 					
 				case 13:
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "owned." );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "owned." );
 					break;
 					
 				case 14:
@@ -752,7 +757,7 @@ endgame_chat()
 				switch ( randomint( 21 ) )
 				{
 					case 0:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Hackers win" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Hackers win" );
 						break;
 						
 					case 1:
@@ -760,51 +765,51 @@ endgame_chat()
 						break;
 						
 					case 3:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "That wasn't fun" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "That wasn't fun" );
 						break;
 						
 					case 4:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Wow my team SUCKS!" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Wow my team SUCKS!" );
 						break;
 						
 					case 5:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "My team " + self.pers[ "team" ] + " always loses!!" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "My team " + self.pers[ "team" ] + " always loses!!" );
 						break;
 						
 					case 2:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "gg" );
 						break;
 						
 					case 6:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "bg" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "bg" );
 						break;
 						
 					case 7:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vbg" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "vbg" );
 						break;
 						
 					case 8:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "WOW that was EPIC!" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "WOW that was EPIC!" );
 						break;
 						
 					case 9:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Good game" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Good game" );
 						break;
 						
 					case 10:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Bad game" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Bad game" );
 						break;
 						
 					case 11:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "very bad game" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "very bad game" );
 						break;
 						
 					case 12:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "campers win" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "campers win" );
 						break;
 						
 					case 13:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "CAMPER NOOBS!!" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "CAMPER NOOBS!!" );
 						break;
 						
 					case 14:
@@ -873,35 +878,35 @@ endgame_chat()
 				switch ( randomint( 8 ) )
 				{
 					case 0:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "gg" );
 						break;
 						
 					case 1:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "bg" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "bg" );
 						break;
 						
 					case 2:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vbg" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "vbg" );
 						break;
 						
 					case 3:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vgg" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "vgg" );
 						break;
 						
 					case 4:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg no rm" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "gg no rm" );
 						break;
 						
 					case 5:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "ggggggggg" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "ggggggggg" );
 						break;
 						
 					case 6:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "good game" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "good game" );
 						break;
 						
 					case 7:
-						self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gee gee" );
+						self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "gee gee" );
 						break;
 				}
 			}
@@ -914,15 +919,15 @@ endgame_chat()
 			case 0:
 				if ( self == winner )
 				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Haha Suck it, you all just got pwnd!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Haha Suck it, you all just got pwnd!" );
 				}
 				else if ( self == loser )
 				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol i Sucked in this game, just look at my score!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Lol i Sucked in this game, just look at my score!" );
 				}
 				else if ( self != loser && randomint( 2 ) == 1 )
 				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gga, Bad luck " + loser.name );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "gga, Bad luck " + loser.name );
 				}
 				else if ( self != winner )
 				{
@@ -934,7 +939,7 @@ endgame_chat()
 			case 1:
 				if ( self == winner )
 				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL i just wasted you all!! Whoot whoot!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "LOL i just wasted you all!! Whoot whoot!" );
 				}
 				else if ( self == loser )
 				{
@@ -942,11 +947,11 @@ endgame_chat()
 				}
 				else if ( self != loser && randomint( 2 ) == 1 )
 				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Rofl, " + loser.name + " dude, you suck!!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Rofl, " + loser.name + " dude, you suck!!" );
 				}
 				else if ( self != winner )
 				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice Score " + winner.name + ", how did you get to be so good?" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Nice Score " + winner.name + ", how did you get to be so good?" );
 				}
 				
 				break;
@@ -954,89 +959,89 @@ endgame_chat()
 			case 2:
 				if ( self == winner )
 				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "LOL i just wasted you all!! Whoot whoot!" );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "LOL i just wasted you all!! Whoot whoot!" );
 				}
 				else if ( self == loser )
 				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "nice wallhacks " + winner.name );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "nice wallhacks " + winner.name );
 				}
 				else if ( self != loser && randomint( 2 ) == 1 )
 				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Lol atleast i did better then " + loser.name );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Lol atleast i did better then " + loser.name );
 				}
 				else if ( self != winner )
 				{
-					self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "lolwtf " + winner.name );
+					self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "lolwtf " + winner.name );
 				}
 				
 				break;
 				
 			case 3:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gee gee" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "gee gee" );
 				break;
 				
 			case 4:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "WOW that was EPIC!" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "WOW that was EPIC!" );
 				break;
 				
 			case 5:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "Nice Game!" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "Nice Game!" );
 				break;
 				
 			case 6:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "good game" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "good game" );
 				break;
 				
 			case 7:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gga  c  u  all later" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "gga  c  u  all later" );
 				break;
 				
 			case 8:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "bg" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "bg" );
 				break;
 				
 			case 9:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "GG" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "GG" );
 				break;
 				
 			case 10:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gg" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "gg" );
 				break;
 				
 			case 11:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "vbg" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "vbg" );
 				break;
 				
 			case 12:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "gga" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "gga" );
 				break;
 				
 			case 13:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "BG" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "BG" );
 				break;
 				
 			case 14:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "stupid map" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "stupid map" );
 				break;
 				
 			case 15:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "ffa sux" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "ffa sux" );
 				break;
 				
 			case 16:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + ":3 i had fun" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + ":3 i had fun" );
 				break;
 				
 			case 17:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + ":P nubs are playin" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + ":P nubs are playin" );
 				break;
 				
 			case 18:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "nub nub nub thx 4 the nubs" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "nub nub nub thx 4 the nubs" );
 				break;
 				
 			case 19:
-				self BotDoChat( 20, "^" + ( randomint( 6 ) + 1 ) + "damn campers" );
+				self BotDoChat( 20, "^" + ( randomint( 7 ) + 1 ) + "damn campers" );
 				break;
 		}
 	}
@@ -1158,67 +1163,67 @@ bot_chat_killed_watch( victim )
 	switch ( randomint( 42 ) )
 	{
 		case 0:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Haha take that " + victim.name );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Haha take that " + victim.name );
 			break;
 			
 		case 1:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Who's your daddy!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Who's your daddy!" );
 			break;
 			
 		case 2:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "O i just kicked your ass " + victim.name + "!!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "O i just kicked your ass " + victim.name + "!!" );
 			break;
 			
 		case 3:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Better luck next time " + victim.name );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Better luck next time " + victim.name );
 			break;
 			
 		case 4:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + victim.name + " Is that all you got?" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + victim.name + " Is that all you got?" );
 			break;
 			
 		case 5:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "LOL " + victim.name + ", l2play" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "LOL " + victim.name + ", l2play" );
 			break;
 			
 		case 6:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + ":)" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + ":)" );
 			break;
 			
 		case 7:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Im unstoppable!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Im unstoppable!" );
 			break;
 			
 		case 8:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Wow " + victim.name + " that was a close one!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Wow " + victim.name + " that was a close one!" );
 			break;
 			
 		case 9:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Haha thank you, thank you very much." );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Haha thank you, thank you very much." );
 			break;
 			
 		case 10:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "HAHAHAHA LOL" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "HAHAHAHA LOL" );
 			break;
 			
 		case 11:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "ROFL you suck " + victim.name + "!!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "ROFL you suck " + victim.name + "!!" );
 			break;
 			
 		case 12:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Wow that was a lucky shot!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Wow that was a lucky shot!" );
 			break;
 			
 		case 13:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Thats right, i totally pwnd your ass!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Thats right, i totally pwnd your ass!" );
 			break;
 			
 		case 14:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Don't even think that i am hacking cause that was pure skill!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Don't even think that i am hacking cause that was pure skill!" );
 			break;
 			
 		case 15:
-			message = ( "LOL xD xDDDD " + victim.name + " sucks! HAHA ROFLMAO" );
+			message = ( "LOL xD xDDDD " + toupper( victim.name ) + " SUCKS! HAHA ROFLMAO" );
 			break;
 			
 		case 16:
@@ -1230,7 +1235,7 @@ bot_chat_killed_watch( victim )
 			break;
 			
 		case 18:
-			message = ( "Lol u suck " + victim.name );
+			message = ( "Lol u suck " + tolower( victim.name ) );
 			break;
 			
 		case 19:
@@ -1238,7 +1243,7 @@ bot_chat_killed_watch( victim )
 			break;
 			
 		case 20:
-			message = ( "sit down " + victim.name );
+			message = ( "sit down " + tolower( victim.name ) );
 			break;
 			
 		case 21:
@@ -1266,35 +1271,41 @@ bot_chat_killed_watch( victim )
 			break;
 			
 		case 27:
-			message = ( "i bet " + victim.name + " is using the arrow keys to move." );
+			message = ( "i bet " + tolower( victim.name ) + " is using the arrow keys to move." );
 			break;
 			
 		case 28:
-			message = ( "lol its noobs like " + victim.name + " that ruin teams" );
+			message = ( "lol its noobs like " + tolower( victim.name ) + " that ruin teams" );
 			break;
 			
 		case 29:
-			message = ( "lolwat was that " + victim.name + "?" );
+			message = ( "lolwat was that " + tolower( victim.name ) + "?" );
 			break;
 			
 		case 30:
-			message = ( "haha thanks " + victim.name + ", im at a " + self.pers[ "cur_kill_streak" ] + " streak." );
-			break;
+			if ( self.pers["cur_kill_streak"] > 1 )
+			{
+				message = ( "haha thanks " + tolower( victim.name ) + ", im at a " + self.pers[ "cur_kill_streak" ] + " streak." );
+				break;
+			}
 			
 		case 31:
-			message = ( "lol " + victim.name + " is at a " + victim.pers[ "cur_death_streak" ] + " deathstreak" );
-			break;
+			if ( victim.pers[ "cur_death_streak" ] > 1 )
+			{
+				message = ( "lol " + tolower( victim.name ) + " is at a " + victim.pers[ "cur_death_streak" ] + " deathstreak" );
+				break;
+			}
 			
 		case 32:
 			message = ( "KLAPPED" );
 			break;
 			
 		case 33:
-			message = ( "oooh get merked " + victim.name );
+			message = ( "oooh get merked " + tolower( victim.name ) );
 			break;
 			
 		case 34:
-			message = ( "i love " + getMapName( getdvar( "mapname" ) ) + "!" );
+			message = ( "i love " + tolower( getMapName( getdvar( "mapname" ) ) ) + "!" );
 			break;
 			
 		case 35:
@@ -1306,7 +1317,7 @@ bot_chat_killed_watch( victim )
 			break;
 			
 		case 37:
-			message = ( "lol i rekt " + victim.name );
+			message = ( "lol i rekt " + tolower( victim.name ) );
 			break;
 			
 		case 38:
@@ -1314,7 +1325,7 @@ bot_chat_killed_watch( victim )
 			break;
 			
 		case 39:
-			message = ( victim.name + " just got rekt" );
+			message = ( tolower( victim.name ) + " just got rekt" );
 			break;
 			
 		case 40:
@@ -1326,7 +1337,7 @@ bot_chat_killed_watch( victim )
 			break;
 			
 		case 41:
-			message = ( "lol u got killed " + victim.name + ", kek" );
+			message = ( "lol u got killed " + tolower( victim.name ) + ", kek" );
 			break;
 	}
 	
@@ -1347,51 +1358,55 @@ bot_chat_death_watch( killer, last_ks )
 	}
 	
 	message = "";
+	skip_teammate_lines = false;
 	
 	switch ( randomint( 68 ) )
 	{
 		case 0:
-			message = "^" + ( randomint( 6 ) + 1 ) + "Damm, i just got pwnd by " + killer.name;
+			message = "^" + ( randomint( 7 ) + 1 ) + "Damm, i just got pwnd by " + killer.name;
 			break;
 			
 		case 1:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Hax ! Hax ! Hax !" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Hax ! Hax ! Hax !" );
 			break;
 			
 		case 2:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "WOW n1 " + killer.name );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "WOW n1 " + killer.name );
 			break;
 			
 		case 3:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "How the?? How did you do that " + killer.name + "?" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "How the?? How did you do that " + killer.name + "?" );
 			break;
 			
 		case 4:
-			if ( last_ks > 0 )
+			if ( last_ks > 1 )
 			{
-				message = ( "^" + ( randomint( 6 ) + 1 ) + "Nooooooooo my killstreaks!! :( I had a " + last_ks + " killstreak!!" );
+				message = ( "^" + ( randomint( 7 ) + 1 ) + "Nooooooooo my killstreaks!! :( I had a " + last_ks + " killstreak!!" );
 			}
-			else
+			else if ( self.pers[ "cur_death_streak" ] > 1 )
 			{
 				message = ( "man im getting spawn killed, i have a " + self.pers[ "cur_death_streak" ] + " deathstreak!" );
 			}
 			
-			break;
+			if ( message != "" )
+			{
+				break;
+			}
 			
 		case 5:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Stop spawn KILLING!!!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Stop spawn KILLING!!!" );
 			break;
 			
 		case 6:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Haha Well done " + killer.name );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Haha Well done " + killer.name );
 			break;
 			
 		case 7:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Agggghhhh " + killer.name + " you are such a noob!!!!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Agggghhhh " + killer.name + " you are such a noob!!!!" );
 			break;
 			
 		case 8:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "n1 " + killer.name );
+			message = ( "Nice kill " + killer.name + "! " + ( randomint( 6 ) + 5 ) + "/10!" );
 			break;
 			
 		case 9:
@@ -1407,19 +1422,19 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 			
 		case 12:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "Aaaaaaaagh!!!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "Aaaaaaaagh!!!" );
 			break;
 			
 		case 13:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + " Dude What the hell, " + killer.name + " is such a HACKER!! " );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + " Dude What the hell, " + killer.name + " is such a HACKER!! " );
 			break;
 			
 		case 14:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + killer.name + " you Wallhacker!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + killer.name + " you Wallhacker!" );
 			break;
 			
 		case 15:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "This is so frustrating!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "This is so frustrating!" );
 			break;
 			
 		case 16:
@@ -1431,15 +1446,15 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 			
 		case 18:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "LOL, " + killer.name + " how did you kill me?" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "LOL, " + killer.name + " how did you kill me?" );
 			break;
 			
 		case 19:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "laaaaaaaaaaaaaaaaaaaag" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "laaaaaaaaaaaaaaaaaaaag" );
 			break;
 			
 		case 20:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "i hate this map!" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "i hate this map!" );
 			break;
 			
 		case 21:
@@ -1459,32 +1474,70 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 			
 		case 25:
-			message = ( "ooohh that was so close " + killer.name + " and you know it !! " );
-			break;
+			if ( ( killer.health / killer.maxHealth ) <= ( 1 / 2 ) )
+			{
+				message = ( "ooohh that was so close " + killer.name + " and you know it !! " );
+				break;
+			}
 			
 		case 26:
-			message = ( "^" + ( randomint( 6 ) + 1 ) + "rofl" );
+			message = ( "^" + ( randomint( 7 ) + 1 ) + "rofl" );
 			break;
 			
 		case 27:
-			message = ( "AAAAHHHHH! WTF! IM GOING TO KILL YOU " + killer.name );
+			message = ( "AAAAHHHHH! WTF! IM GOING TO KILL YOU " + toupper( killer.name ) );
 			break;
 			
 		case 28:
-			message = ( "AHH! IM DEAD BECAUSE " + level.players[ randomint( level.players.size ) ].name + " is a noob!" );
-			break;
+			
+			random_teammate = self get_random_teammate();
+			if ( IsDefined( random_teammate ) )
+			{
+				message = ( "AHH! IM DEAD BECAUSE " + toupper( random_teammate.name ) + " IS A NOOB!" );
+				break;
+			}
+			else
+			{
+				skip_teammate_lines = true;
+			}
 			
 		case 29:
-			message = ( level.players[ randomint( level.players.size ) ].name + ", please don't talk." );
-			break;
+			if ( !skip_teammate_lines ) {
+				random_teammate = self get_random_teammate();
+				if ( IsDefined( random_teammate ) )
+				{
+					message = ( random_teammate.name + ", please don't talk." );
+					break;
+				}
+				else
+				{
+					skip_teammate_lines = true;
+				}
+			}
 			
 		case 30:
-			message = ( "Wow " + level.players[ randomint( level.players.size ) ].name + " is a blocker noob!" );
-			break;
+			if ( !skip_teammate_lines ) {
+				random_teammate = self get_random_teammate();
+				if ( IsDefined( random_teammate ) ) {
+					message = ( "Wow " + random_teammate.name + " is a blocker noob!" );
+					break;
+				}
+				else
+				{
+					skip_teammate_lines = true;
+				}
+			}
 			
 		case 31:
-			message = ( "Next time GET OUT OF MY WAY " + level.players[ randomint( level.players.size ) ].name + "!!" );
-			break;
+			if ( !skip_teammate_lines )
+			{
+				random_teammate = self get_random_teammate();
+				if ( IsDefined( random_teammate ) )
+				{
+					message = ( "Next time GET OUT OF MY WAY " + toupper( random_teammate.name ) + "!!" );
+					break;
+				}
+			}
 			
 		case 32:
 			message = ( "Wow, I'm dead because " + killer.name + " is a tryhard..." );
@@ -1499,19 +1552,19 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 			
 		case 35:
-			message = ( "WOW, USE A REAL GUN " + killer.name + "!" );
+			message = ( "WOW, USE A REAL GUN " + toupper( killer.name ) + "!" );
 			break;
 			
 		case 36:
-			message = ( "k wtf. " + killer.name + " is hacking" );
+			message = ( "k wtf. " + tolower( killer.name ) + " is hacking" );
 			break;
 			
 		case 37:
-			message = ( "nice wallhacks " + killer.name );
+			message = ( "nice wallhacks " + tolower( killer.name ) );
 			break;
 			
 		case 38:
-			message = ( "wh " + killer.name );
+			message = ( "wh " + tolower( killer.name ) );
 			break;
 			
 		case 39:
@@ -1519,15 +1572,15 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 			
 		case 40:
-			message = ( "wow " + getMapName( getdvar( "mapname" ) ) + " is messed up" );
+			message = ( "wow " + tolower( getMapName( getdvar( "mapname" ) ) ) + " is messed up" );
 			break;
 			
 		case 41:
-			message = ( "lolwtf was that " + killer.name + "?" );
+			message = ( "lolwtf was that " + tolower( killer.name ) + "?" );
 			break;
 			
 		case 42:
-			message = ( "admin pls ban " + killer.name );
+			message = ( "admin pls ban " + tolower( killer.name ) );
 			break;
 			
 		case 43:
@@ -1539,19 +1592,22 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 			
 		case 45:
-			message = ( "someone kill " + killer.name + ", they are on a streak of " + killer.pers[ "cur_kill_streak" ] + "!" );
-			break;
+			if ( killer.pers[ "cur_kill_streak" ] > 1 )
+			{
+				message = ( "someone kill " + tolower( killer.name ) + ", they are on a streak of " + killer.pers[ "cur_kill_streak" ] + "!" );
+				break;
+			}
 			
 		case 46:
 			message = ( "man i died" );
 			break;
 			
 		case 47:
-			message = ( "nice noob gun " + killer.name );
+			message = ( "nice noob gun " + tolower( killer.name ) );
 			break;
 			
 		case 48:
-			message = ( "stop camping " + killer.name + "!" );
+			message = ( "stop camping " + tolower( killer.name ) + "!" );
 			break;
 			
 		case 49:
@@ -1563,39 +1619,39 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 			
 		case 51:
-			message = ( "lol " + getMapName( getdvar( "mapname" ) ) + " sux" );
+			message = ( "lol " + tolower( getMapName( getdvar( "mapname" ) ) ) + " sux" );
 			break;
 			
 		case 52:
-			message = ( "why are we even playing on " + getMapName( getdvar( "mapname" ) ) + "?" );
+			message = ( "why are we even playing on " + tolower( getMapName( getdvar( "mapname" ) ) ) + "?" );
 			break;
 			
 		case 53:
-			message = ( getMapName( getdvar( "mapname" ) ) + " is such an unfair map!!" );
+			message = ( tolower( getMapName( getdvar( "mapname" ) ) ) + " is such an unfair map!!" );
 			break;
 			
 		case 54:
-			message = ( "what were they thinking when making " + getMapName( getdvar( "mapname" ) ) + "?!" );
+			message = ( "what were they thinking when making " + tolower( getMapName( getdvar( "mapname" ) ) ) + "?!" );
 			break;
 			
 		case 55:
-			message = ( killer.name + " totally just destroyed me!" );
+			message = ( tolower( killer.name ) + " totally just destroyed me!" );
 			break;
 			
 		case 56:
-			message = ( "can i be admen plz? so i can ban " + killer.name );
+			message = ( "can i be admen plz? so i can ban " + tolower( killer.name ) );
 			break;
 			
 		case 57:
-			message = ( "wow " + killer.name + " is such a no life!!" );
+			message = ( "wow " + tolower( killer.name ) + " is such a no life!!" );
 			break;
 			
 		case 58:
-			message = ( "man i got rekt by " + killer.name );
+			message = ( "man i got rekt by " + tolower( killer.name ) );
 			break;
 			
 		case 59:
-			message = ( "admen pls ben " + killer.name );
+			message = ( "admen pls ben " + tolower( killer.name ) );
 			break;
 			
 		case 60:
@@ -1607,36 +1663,61 @@ bot_chat_death_watch( killer, last_ks )
 			break;
 			
 		case 61:
-			message = ( "you are so banned " + killer.name );
+			message = ( "you are so banned " + tolower( killer.name ) );
 			break;
 			
 		case 62:
-			message = ( "recorded reported and deported! " + killer.name );
+			message = ( "recorded reported and deported " + tolower( killer.name ) + "!" );
 			break;
 			
 		case 63:
-			message = ( "hack name " + killer.name + "?" );
+			message = ( "hack name " + tolower( killer.name ) + "?" );
 			break;
 			
 		case 64:
-			message = ( "dude can you send me that hack " + killer.name + "?" );
+			message = ( "dude can you send me that hack " + tolower( killer.name ) + "?" );
 			break;
 			
 		case 65:
-			message = ( "nice aimbot " + killer.name + "!!1" );
+			message = ( "nice aimbot " + tolower( killer.name ) + "!!1" );
 			break;
 			
 		case 66:
-			message = ( "you are benned " + killer.name + "!!" );
+			message = ( "you are benned " + tolower( killer.name ) + "!!" );
 			break;
 			
 		case 67:
-			message = ( "that was topkek " + killer.name );
+			message = ( "that was topkek " + tolower( killer.name ) );
 			break;
 	}
 	
 	wait ( randomint( 3 ) + 1 );
 	self BotDoChat( 8, message );
+}
+
+/*
+	Get random teammate
+*/
+get_random_teammate()
+{
+	if ( !IsDefined( self ) || !level.teamBased )
+	{
+		return;
+	}
+	
+	teammates = [];
+	foreach ( player in level.players )
+	{
+		if ( player.team == self.team && player != self )
+		{
+			teammates[teammates.size] = player;
+		}
+	}
+	
+	if ( teammates.size > 0 )
+	{
+		return random( teammates );
+	}
 }
 
 /*
@@ -2125,7 +2206,7 @@ bot_chat_attack_vehicle_watch( state, vehicle, rocketAmmo, d, e, f, g )
 					break;
 					
 				case 2:
-					self BotDoChat( 10, "^" + ( randomint( 6 ) + 1 ) + "i hate killstreaks" );
+					self BotDoChat( 10, "^" + ( randomint( 7 ) + 1 ) + "i hate killstreaks" );
 					break;
 					
 				case 3:
@@ -2145,7 +2226,7 @@ bot_chat_attack_vehicle_watch( state, vehicle, rocketAmmo, d, e, f, g )
 					break;
 					
 				case 7:
-					self BotDoChat( 10, "^" + ( randomint( 6 ) + 1 ) + "Lol I bet that noob used hardline to get that streak." );
+					self BotDoChat( 10, "^" + ( randomint( 7 ) + 1 ) + "Lol I bet that noob used hardline to get that streak." );
 					break;
 					
 				case 8:
