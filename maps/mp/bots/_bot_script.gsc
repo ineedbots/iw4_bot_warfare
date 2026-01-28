@@ -177,19 +177,20 @@ bot_get_rank()
 getCardTitles()
 {
 	cards = [];
+	empty_rows = 0;
 	
-	for ( i = 0; i < 600; i++ )
+	for ( i = 0; empty_rows < 2; i++ )
 	{
 		card_name = tablelookupbyrow( "mp/cardTitleTable.csv", i, 0 );
 		
 		if ( card_name == "" )
 		{
+			empty_rows++;
 			continue;
 		}
-		
-		if ( !issubstr( card_name, "cardtitle_" ) )
+		else
 		{
-			continue;
+			empty_rows = 0;
 		}
 		
 		cards[ cards.size ] = card_name;
@@ -204,19 +205,20 @@ getCardTitles()
 getCardIcons()
 {
 	cards = [];
+	empty_rows = 0;
 	
-	for ( i = 0; i < 300; i++ )
+	for ( i = 0; empty_rows < 2; i++ )
 	{
 		card_name = tablelookupbyrow( "mp/cardIconTable.csv", i, 0 );
 		
 		if ( card_name == "" )
 		{
+			empty_rows++;
 			continue;
 		}
-		
-		if ( !issubstr( card_name, "cardicon_" ) )
+		else
 		{
-			continue;
+			empty_rows = 0;
 		}
 		
 		cards[ cards.size ] = card_name;
@@ -249,9 +251,9 @@ getAttachmentsForGun( gun )
 	
 	attachments = [];
 	
-	for ( h = 0; h < 10; h++ )
+	for ( i = 0; true; i++ )
 	{
-		attachmentName = tablelookupbyrow( "mp/statStable.csv", row, h + 11 );
+		attachmentName = tablelookupbyrow( "mp/statStable.csv", row, i + 11 );
 		
 		if ( attachmentName == "" )
 		{
@@ -271,10 +273,21 @@ getAttachmentsForGun( gun )
 getPrimaries()
 {
 	primaries = [];
+	empty_rows = 0;
 	
-	for ( i = 0; i < 160; i++ )
+	for ( i = 0; empty_rows < 2; i++ )
 	{
 		weapon_type = tablelookupbyrow( "mp/statstable.csv", i, 2 );
+		
+		if ( weapon_type == "" )
+		{
+			empty_rows++;
+			continue;
+		}
+		else
+		{
+			empty_rows = 0;
+		}
 		
 		if ( weapon_type != "weapon_assault" && weapon_type != "weapon_riot" && weapon_type != "weapon_smg" && weapon_type != "weapon_sniper" && weapon_type != "weapon_lmg" )
 		{
@@ -295,10 +308,21 @@ getPrimaries()
 getSecondaries()
 {
 	secondaries = [];
+	empty_rows = 0;
 	
-	for ( i = 0; i < 160; i++ )
+	for ( i = 0; empty_rows < 2; i++ )
 	{
 		weapon_type = tablelookupbyrow( "mp/statstable.csv", i, 2 );
+		
+		if ( weapon_type == "" )
+		{
+			empty_rows++;
+			continue;
+		}
+		else
+		{
+			empty_rows = 0;
+		}
 		
 		if ( weapon_type != "weapon_pistol" && weapon_type != "weapon_machine_pistol" && weapon_type != "weapon_projectile" && weapon_type != "weapon_shotgun" )
 		{
@@ -324,12 +348,23 @@ getSecondaries()
 getCamos()
 {
 	camos = [];
+	empty_rows = 0;
 	
-	for ( i = 0; i < 15; i++ )
+	for ( i = 0; empty_rows < 2; i++ )
 	{
 		camo_name = tablelookupbyrow( "mp/camoTable.csv", i, 1 );
 		
 		if ( camo_name == "" )
+		{
+			empty_rows++;
+			continue;
+		}
+		else
+		{
+			empty_rows = 0;
+		}
+		
+		if ( camo_name == "gold" || camo_name == "prestige" )
 		{
 			continue;
 		}
@@ -346,10 +381,21 @@ getCamos()
 getPerks( perktype )
 {
 	perks = [];
+	empty_rows = 0;
 	
-	for ( i = 0; i < 50; i++ )
+	for ( i = 0; empty_rows < 2; i++ )
 	{
 		perk_type = tablelookupbyrow( "mp/perktable.csv", i, 5 );
+		
+		if ( perk_type == "" )
+		{
+			empty_rows++;
+			continue;
+		}
+		else
+		{
+			empty_rows = 0;
+		}
 		
 		if ( perk_type != perktype )
 		{
@@ -388,27 +434,23 @@ getKillsNeededForStreak( streak )
 getKillstreaks()
 {
 	killstreaks = [];
+	empty_rows = 0;
 	
-	for ( i = 0; i < 40; i++ )
+	for ( i = 0; empty_rows < 2; i++ )
 	{
 		streak_name = tablelookupbyrow( "mp/killstreakTable.csv", i, 1 );
 		
-		if ( streak_name == "" || streak_name == "none" )
+		if ( streak_name == "" )
 		{
+			empty_rows++;
 			continue;
 		}
-		
-		if ( streak_name == "b1" )
+		else
 		{
-			continue;
+			empty_rows = 0;
 		}
 		
-		if ( streak_name == "sentry" ) // theres an airdrop version
-		{
-			continue;
-		}
-		
-		if ( issubstr( streak_name, "KILLSTREAKS_" ) )
+		if ( streak_name == "none" || streak_name == "b1" || streak_name == "sentry" || issubstr( streak_name, "KILLSTREAKS_" )
 		{
 			continue;
 		}
