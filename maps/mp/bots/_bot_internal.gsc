@@ -29,7 +29,6 @@ added()
 	self.pers[ "bots" ][ "skill" ][ "no_trace_ads_time" ] = 2500; // how long a bot ads's when they cant see the target
 	self.pers[ "bots" ][ "skill" ][ "no_trace_look_time" ] = 10000; // how long a bot will look at a target's last position
 	self.pers[ "bots" ][ "skill" ][ "remember_time" ] = 25000; // how long a bot will remember a target before forgetting about it when they cant see the target
-	self.pers[ "bots" ][ "skill" ][ "fov" ] = -1; // the fov of the bot, -1 being 360, 1 being 0
 	self.pers[ "bots" ][ "skill" ][ "dist_max" ] = 100000 * 2; // the longest distance a bot will target
 	self.pers[ "bots" ][ "skill" ][ "dist_start" ] = 100000; // the start distance before bot's target abilitys diminish
 	self.pers[ "bots" ][ "skill" ][ "spawn_time" ] = 0; // how long a bot waits after spawning before targeting, etc
@@ -1338,7 +1337,7 @@ target_loop()
 	myEye = self geteye();
 	theTime = gettime();
 	myAngles = self getplayerangles();
-	myFov = self.pers[ "bots" ][ "skill" ][ "fov" ];
+	myFov = 0.75; // the fov of the bot, -1 being 360, 1 being 0
 	bestTargets = [];
 	bestTime = 2147483647;
 	rememberTime = self.pers[ "bots" ][ "skill" ][ "remember_time" ];
@@ -1348,7 +1347,7 @@ target_loop()
 	ignoreSmoke = issubstr( self getcurrentweapon(), "_thermal_" );
 	vehEnt = undefined;
 	adsAmount = self playerads();
-	adsFovFact = self.pers[ "bots" ][ "skill" ][ "ads_fov_multi" ];
+	hasBlastshield = self _hasPerk( "_specialty_blastshield" );
 	
 	if ( usingRemote )
 	{
@@ -1366,7 +1365,43 @@ target_loop()
 	// reduce fov if ads'ing
 	if ( adsAmount > 0 )
 	{
-		myFov *= 1 - adsFovFact * adsAmount;
+		currentWeapon = self GetCurrentWeapon();
+		currentWeaponClass = WeaponClass( currentWeapon );
+		hasThermal = ignoreSmoke;
+		hasAcog = IsSubstr( currentWeapon, "_acog_" );
+		
+		if ( ( hasThermal || currentWeaponClass == "sniper" || currentWeapon == "javelin_mp" )
+			&& !hasAcog
+			&& adsAmount >= 1 )
+		{
+			if ( !hasBlastshield )
+			{
+				myFov = 0.95;
+			}
+			else
+			{
+				myFov = 0.9;
+			}
+		}
+		else if ( hasAcog || currentWeaponClass == "stinger_mp" )
+		{
+			myFov = ( 1 - adsAmount ) * myFov + adsAmount * 0.9;
+		}
+		else if ( currentWeaponClass == "rifle" || currentWeaponClass == "mg" )
+		{
+			myFov = ( 1 - adsAmount ) * myFov + adsAmount * 0.85;
+		}
+		else if ( currentWeaponClass == "smg"
+			|| currentWeaponClass == "spread"
+			|| currentWeaponClass == "rocketlauncher" )
+		{
+			myFov = ( 1 - adsAmount ) * myFov + adsAmount * 0.8;
+		}
+	}
+	
+	if ( hasBlastshield )
+	{
+		myFov += 0.05;
 	}
 	
 	if ( hasTarget && !isdefined( self.bot.target.entity ) )

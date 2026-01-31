@@ -1428,7 +1428,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "no_trace_ads_time" ] = 500;
 					self.pers[ "bots" ][ "skill" ][ "no_trace_look_time" ] = 600;
 					self.pers[ "bots" ][ "skill" ][ "remember_time" ] = 750;
-					self.pers[ "bots" ][ "skill" ][ "fov" ] = 0.7;
 					self.pers[ "bots" ][ "skill" ][ "dist_max" ] = 2500;
 					self.pers[ "bots" ][ "skill" ][ "dist_start" ] = 1000;
 					self.pers[ "bots" ][ "skill" ][ "spawn_time" ] = 0.75;
@@ -1439,7 +1438,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "aim_offset_amount" ] = 4;
 					self.pers[ "bots" ][ "skill" ][ "bone_update_interval" ] = 2;
 					self.pers[ "bots" ][ "skill" ][ "bones" ] = "j_spineupper,j_ankle_le,j_ankle_ri";
-					self.pers[ "bots" ][ "skill" ][ "ads_fov_multi" ] = 0.5;
 					self.pers[ "bots" ][ "skill" ][ "ads_aimspeed_multi" ] = 0.5;
 					
 					self.pers[ "bots" ][ "behavior" ][ "strafe" ] = 0;
@@ -1460,7 +1458,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "no_trace_ads_time" ] = 1000;
 					self.pers[ "bots" ][ "skill" ][ "no_trace_look_time" ] = 1250;
 					self.pers[ "bots" ][ "skill" ][ "remember_time" ] = 1500;
-					self.pers[ "bots" ][ "skill" ][ "fov" ] = 0.65;
 					self.pers[ "bots" ][ "skill" ][ "dist_max" ] = 3000;
 					self.pers[ "bots" ][ "skill" ][ "dist_start" ] = 1500;
 					self.pers[ "bots" ][ "skill" ][ "spawn_time" ] = 0.65;
@@ -1471,7 +1468,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "aim_offset_amount" ] = 3;
 					self.pers[ "bots" ][ "skill" ][ "bone_update_interval" ] = 1.5;
 					self.pers[ "bots" ][ "skill" ][ "bones" ] = "j_spineupper,j_ankle_le,j_ankle_ri,j_head";
-					self.pers[ "bots" ][ "skill" ][ "ads_fov_multi" ] = 0.5;
 					self.pers[ "bots" ][ "skill" ][ "ads_aimspeed_multi" ] = 0.5;
 					
 					self.pers[ "bots" ][ "behavior" ][ "strafe" ] = 10;
@@ -1492,7 +1488,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "no_trace_ads_time" ] = 1000;
 					self.pers[ "bots" ][ "skill" ][ "no_trace_look_time" ] = 1500;
 					self.pers[ "bots" ][ "skill" ][ "remember_time" ] = 2000;
-					self.pers[ "bots" ][ "skill" ][ "fov" ] = 0.6;
 					self.pers[ "bots" ][ "skill" ][ "dist_max" ] = 4000;
 					self.pers[ "bots" ][ "skill" ][ "dist_start" ] = 2250;
 					self.pers[ "bots" ][ "skill" ][ "spawn_time" ] = 0.5;
@@ -1503,7 +1498,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "aim_offset_amount" ] = 2.5;
 					self.pers[ "bots" ][ "skill" ][ "bone_update_interval" ] = 1;
 					self.pers[ "bots" ][ "skill" ][ "bones" ] = "j_spineupper,j_spineupper,j_ankle_le,j_ankle_ri,j_head";
-					self.pers[ "bots" ][ "skill" ][ "ads_fov_multi" ] = 0.5;
 					self.pers[ "bots" ][ "skill" ][ "ads_aimspeed_multi" ] = 0.5;
 					
 					self.pers[ "bots" ][ "behavior" ][ "strafe" ] = 20;
@@ -1524,7 +1518,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "no_trace_ads_time" ] = 1500;
 					self.pers[ "bots" ][ "skill" ][ "no_trace_look_time" ] = 2000;
 					self.pers[ "bots" ][ "skill" ][ "remember_time" ] = 3000;
-					self.pers[ "bots" ][ "skill" ][ "fov" ] = 0.55;
 					self.pers[ "bots" ][ "skill" ][ "dist_max" ] = 5000;
 					self.pers[ "bots" ][ "skill" ][ "dist_start" ] = 3350;
 					self.pers[ "bots" ][ "skill" ][ "spawn_time" ] = 0.35;
@@ -1535,7 +1528,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "aim_offset_amount" ] = 2;
 					self.pers[ "bots" ][ "skill" ][ "bone_update_interval" ] = 0.75;
 					self.pers[ "bots" ][ "skill" ][ "bones" ] = "j_spineupper,j_spineupper,j_ankle_le,j_ankle_ri,j_head,j_head";
-					self.pers[ "bots" ][ "skill" ][ "ads_fov_multi" ] = 0.5;
 					self.pers[ "bots" ][ "skill" ][ "ads_aimspeed_multi" ] = 0.5;
 					
 					self.pers[ "bots" ][ "behavior" ][ "strafe" ] = 30;
@@ -1556,7 +1548,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "no_trace_ads_time" ] = 2500;
 					self.pers[ "bots" ][ "skill" ][ "no_trace_look_time" ] = 3000;
 					self.pers[ "bots" ][ "skill" ][ "remember_time" ] = 4000;
-					self.pers[ "bots" ][ "skill" ][ "fov" ] = 0.5;
 					self.pers[ "bots" ][ "skill" ][ "dist_max" ] = 7500;
 					self.pers[ "bots" ][ "skill" ][ "dist_start" ] = 5000;
 					self.pers[ "bots" ][ "skill" ][ "spawn_time" ] = 0.25;
@@ -1567,7 +1558,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "aim_offset_amount" ] = 1.5;
 					self.pers[ "bots" ][ "skill" ][ "bone_update_interval" ] = 0.5;
 					self.pers[ "bots" ][ "skill" ][ "bones" ] = "j_spineupper,j_head";
-					self.pers[ "bots" ][ "skill" ][ "ads_fov_multi" ] = 0.5;
 					self.pers[ "bots" ][ "skill" ][ "ads_aimspeed_multi" ] = 0.5;
 					
 					self.pers[ "bots" ][ "behavior" ][ "strafe" ] = 40;
@@ -1588,7 +1578,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "no_trace_ads_time" ] = 2500;
 					self.pers[ "bots" ][ "skill" ][ "no_trace_look_time" ] = 4000;
 					self.pers[ "bots" ][ "skill" ][ "remember_time" ] = 5000;
-					self.pers[ "bots" ][ "skill" ][ "fov" ] = 0.45;
 					self.pers[ "bots" ][ "skill" ][ "dist_max" ] = 10000;
 					self.pers[ "bots" ][ "skill" ][ "dist_start" ] = 7500;
 					self.pers[ "bots" ][ "skill" ][ "spawn_time" ] = 0.2;
@@ -1599,7 +1588,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "aim_offset_amount" ] = 1;
 					self.pers[ "bots" ][ "skill" ][ "bone_update_interval" ] = 0.25;
 					self.pers[ "bots" ][ "skill" ][ "bones" ] = "j_spineupper,j_head,j_head";
-					self.pers[ "bots" ][ "skill" ][ "ads_fov_multi" ] = 0.5;
 					self.pers[ "bots" ][ "skill" ][ "ads_aimspeed_multi" ] = 0.5;
 					
 					self.pers[ "bots" ][ "behavior" ][ "strafe" ] = 50;
@@ -1620,7 +1608,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "no_trace_ads_time" ] = 2500;
 					self.pers[ "bots" ][ "skill" ][ "no_trace_look_time" ] = 4000;
 					self.pers[ "bots" ][ "skill" ][ "remember_time" ] = 7500;
-					self.pers[ "bots" ][ "skill" ][ "fov" ] = 0.4;
 					self.pers[ "bots" ][ "skill" ][ "dist_max" ] = 15000;
 					self.pers[ "bots" ][ "skill" ][ "dist_start" ] = 10000;
 					self.pers[ "bots" ][ "skill" ][ "spawn_time" ] = 0.05;
@@ -1631,7 +1618,6 @@ difficulty()
 					self.pers[ "bots" ][ "skill" ][ "aim_offset_amount" ] = 0;
 					self.pers[ "bots" ][ "skill" ][ "bone_update_interval" ] = 0.05;
 					self.pers[ "bots" ][ "skill" ][ "bones" ] = "j_head";
-					self.pers[ "bots" ][ "skill" ][ "ads_fov_multi" ] = 0.5;
 					self.pers[ "bots" ][ "skill" ][ "ads_aimspeed_multi" ] = 0.5;
 					
 					self.pers[ "bots" ][ "behavior" ][ "strafe" ] = 65;
@@ -1675,7 +1661,6 @@ set_diff()
 			self.pers[ "bots" ][ "skill" ][ "remember_time" ] = 50 * randomint( 100 );
 			self.pers[ "bots" ][ "skill" ][ "no_trace_ads_time" ] = 50 * randomint( 100 );
 			self.pers[ "bots" ][ "skill" ][ "no_trace_look_time" ] = 50 * randomint( 100 );
-			self.pers[ "bots" ][ "skill" ][ "fov" ] = randomfloatrange( -1, 1 );
 			
 			randomNum = randomintrange( 500, 25000 );
 			self.pers[ "bots" ][ "skill" ][ "dist_start" ] = randomNum;
