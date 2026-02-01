@@ -3309,9 +3309,47 @@ bot_lookat( pos, time, vel, doAimPredict )
 	
 	if ( doAimPredict )
 	{
-		myEye += ( self getvelocity() * 0.05 ) * ( steps - 1 ); // account for our velocity
+
+		curWeap = self getcurrentweapon();
 		
-		pos += ( vel * 0.05 ) * ( steps - 1 ); // add the velocity vector
+		if ( curWeap == "ac130_105mm_mp" || curWeap == "ac130_40mm_mp" || curWeap == "ac130_25mm_mp" ) {
+			if ( !IsDefined( level.ac130.planeModel.lastOrigin ) )
+			{
+				level.ac130.planeModel.lastOrigin = level.ac130.planeModel.origin;
+			}
+			ac130Vel = ( level.ac130.planeModel.origin - level.ac130.planeModel.lastOrigin ) * 20;
+			level.ac130.planeModel.lastOrigin = level.ac130.planeModel.origin;
+			myEye += ( ac130Vel * 0.05 ) * steps;
+			
+			fDist = DistanceSquared( myEye, pos );
+			fTime = 0.05;
+			fRandom = 1.0;
+			
+			switch ( curWeap )
+			{
+				case "ac130_105mm_mp":
+					fTime = fDist / ( 3000 * 3000 );
+					break;
+				case "ac130_40mm_mp":
+					fTime = fDist / ( 5000 * 5000 );
+					fRandom = 1.5;
+					break;
+				case "ac130_25mm_mp":
+					fTime = fDist / ( 10000 * 10000 );
+					fRandom = 2.0;
+			}
+			
+			if ( vel != ( 0, 0, 0 ) && fTime > 0 )
+			{
+				pos += ( vel * 0.05 ) * ( RandomFloat( fTime * fRandom ) * 20 );
+			}
+		}
+		else
+		{
+			myEye += ( self getvelocity() * 0.05 ) * ( steps - 1 ); // account for our velocity
+			
+			pos += ( vel * 0.05 ) * ( steps - 1 ); // add the velocity vector
+		}
 	}
 	
 	angles = vectortoangles( ( pos - myEye ) - anglestoforward( myAngle ) );
